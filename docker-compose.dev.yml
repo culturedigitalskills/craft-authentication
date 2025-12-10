@@ -1,0 +1,35 @@
+services:
+    postgres:
+        image: postgres:16-alpine
+        restart: unless-stopped
+        env_file:
+            - .env.local
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        ports:
+            - '${POSTGRES_PORT:-5432}:5432'
+        volumes:
+            - ./data-dev/postgres:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    garage:
+        image: dxflrs/garage:v2.1.0
+        restart: unless-stopped
+        env_file:
+            - .env.local
+        environment:
+            GARAGE_RPC_SECRET: ${GARAGE_RPC_SECRET}
+        command: /garage server
+        ports:
+            - '${S3_PORT:-3900}:3900'
+            - '${GARAGE_ADMIN_PORT:-3903}:3903'
+        volumes:
+            - ./garage.toml:/etc/garage.toml:ro
+            - ./data-dev/garage-data:/data
+            - ./data-dev/garage-meta:/meta
