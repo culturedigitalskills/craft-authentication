@@ -16,7 +16,7 @@ services:
             - postgres
             - garage
         ports:
-            - '${APP_PORT:-3000}:3000'
+            - '${PORT:-3000}:3000'
         restart: unless-stopped
         healthcheck:
             test:

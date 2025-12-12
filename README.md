@@ -120,7 +120,7 @@ pnpm db:migrate
 pnpm dev
 ```
 
-Open [http://localhost:20100](http://localhost:20100) (or your configured `APP_PORT`).
+Open [http://localhost:20100](http://localhost:20100) (or your configured `PORT`).
 
 ### 2. Production / Docker
 
@@ -148,7 +148,7 @@ pnpm prod:docker:down
 pnpm prod:docker:up
 ```
 
-App runs on [http://localhost:3000](http://localhost:3000) by default (configure with `APP_PORT`).
+App runs on [http://localhost:3000](http://localhost:3000) by default (configure with `PORT`).
 
 ## Available pnpm Scripts
 
