@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { errorResponse } from '@/lib/validations/types'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const fileData = await prisma.mediaFile.findUnique({ where: { id } })
 
         if (!fileData) {
-            return NextResponse.json({ error: 'File not found' }, { status: 404 })
+            return errorResponse('File not found', 404)
         }
 
         const getCommand = new GetObjectCommand({
@@ -23,12 +24,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const headers = new Headers()
         headers.set('Content-Type', fileData.mimeType)
         headers.set('Content-Disposition', `inline; filename="${fileData.originalName}"`)
+        // This assumes, that the media files are immutable and allways public meaning that access
+        // is not restricted by authentication or other permission checks.
         headers.set('Cache-Control', 'public, max-age=31536000')
 
         return new NextResponse(stream, { headers })
     } catch (error) {
         console.error('Error retrieving file:', error)
-        return NextResponse.json({ error: 'Failed to retrieve file' }, { status: 500 })
+        return errorResponse('Failed to retrieve file', 500)
     }
 }
 
@@ -41,7 +44,7 @@ export async function DELETE(
         const fileData = await prisma.mediaFile.findUnique({ where: { id } })
 
         if (!fileData) {
-            return NextResponse.json({ error: 'File not found' }, { status: 404 })
+            return errorResponse('File not found', 404)
         }
 
         // Delete from Garage
@@ -57,6 +60,6 @@ export async function DELETE(
         return NextResponse.json({ message: 'File deleted successfully' })
     } catch (error) {
         console.error('Error deleting file:', error)
-        return NextResponse.json({ error: 'Failed to delete file' }, { status: 500 })
+        return errorResponse('Failed to delete file', 500)
     }
 }

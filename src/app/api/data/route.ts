@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { dataQuerySchema, createDataRecordSchema } from '@/lib/validations/data'
+import { handleValidationError, errorResponse } from '@/lib/validations/types'
+import { ZodError } from 'zod'
 
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams
-        const page = parseInt(searchParams.get('page') || '1')
-        const limit = parseInt(searchParams.get('limit') || '10')
-        const search = searchParams.get('search') || ''
+        const queryParams = dataQuerySchema.parse(Object.fromEntries(searchParams))
+
+        const { page, limit, search } = queryParams
 
         const skip = (page - 1) * limit
 
@@ -42,19 +45,19 @@ export async function GET(request: NextRequest) {
             },
         })
     } catch (error) {
+        if (error instanceof ZodError) {
+            return handleValidationError(error)
+        }
         console.error('Error fetching data records:', error)
-        return NextResponse.json({ error: 'Failed to fetch data records' }, { status: 500 })
+        return errorResponse('Failed to fetch data records', 500)
     }
 }
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { name, description, data } = body
-
-        if (!name) {
-            return NextResponse.json({ error: 'Name is required' }, { status: 400 })
-        }
+        const validatedData = createDataRecordSchema.parse(body)
+        const { name, description, data } = validatedData
 
         const record = await prisma.dataRecord.create({
             data: {
@@ -66,7 +69,10 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(record, { status: 201 })
     } catch (error) {
+        if (error instanceof ZodError) {
+            return handleValidationError(error)
+        }
         console.error('Error creating data record:', error)
-        return NextResponse.json({ error: 'Failed to create data record' }, { status: 500 })
+        return errorResponse('Failed to create data record', 500)
     }
 }

@@ -228,6 +228,9 @@ craft-authentication/
 │       ├── prisma.ts     # Prisma client singleton
 │       ├── utils.ts      # cn() utility for Tailwind
 │       └── validations/  # Zod schemas
+│           ├── data.ts   # Data record schemas
+│           ├── media.ts  # Media query/upload schemas
+│           └── types.ts  # Shared error response helpers
 ├── components.json       # shadcn/ui config
 ├── docker-compose.yml    # Production compose (app + postgres + garage)
 ├── docker-compose.dev.yml # Dev compose (postgres + garage only)

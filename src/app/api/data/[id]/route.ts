@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { updateDataRecordSchema } from '@/lib/validations/data'
+import { handleValidationError, errorResponse } from '@/lib/validations/types'
+import { ZodError } from 'zod'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -13,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         return NextResponse.json(record)
     } catch (error) {
         console.error('Error fetching data record:', error)
-        return NextResponse.json({ error: 'Failed to fetch data record' }, { status: 500 })
+        return errorResponse('Failed to fetch data record', 500)
     }
 }
 
@@ -21,7 +24,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     try {
         const { id } = await params
         const body = await request.json()
-        const { name, description, data } = body
+        const validatedData = updateDataRecordSchema.parse(body)
+        const { name, description, data } = validatedData
 
         const record = await prisma.dataRecord.update({
             where: { id },
@@ -35,11 +39,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         return NextResponse.json(record)
     } catch (error: any) {
-        console.error('Error updating data record:', error)
-        if (error.code === 'P2025') {
-            return NextResponse.json({ error: 'Data record not found' }, { status: 404 })
+        if (error instanceof ZodError) {
+            return handleValidationError(error)
         }
-        return NextResponse.json({ error: 'Failed to update data record' }, { status: 500 })
+        console.error('Error updating data record:', error)
+        return errorResponse('Failed to update data record', 500)
     }
 }
 
@@ -57,9 +61,6 @@ export async function DELETE(
         })
     } catch (error: any) {
         console.error('Error deleting data record:', error)
-        if (error.code === 'P2025') {
-            return NextResponse.json({ error: 'Data record not found' }, { status: 404 })
-        }
-        return NextResponse.json({ error: 'Failed to delete data record' }, { status: 500 })
+        return errorResponse('Failed to delete data record', 500)
     }
 }
