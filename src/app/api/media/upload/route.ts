@@ -31,29 +31,39 @@ export async function POST(request: NextRequest) {
 
         const buffer = await file.arrayBuffer()
 
-        // Upload to Garage
-        const putCommand = new PutObjectCommand({
-            Bucket: BUCKET_NAME,
-            Key: objectKey,
-            Body: Buffer.from(buffer),
-            ContentType: file.type,
-            Metadata: {
-                'original-name': file.name,
-            },
-        })
-        await s3Client.send(putCommand)
+        // We use a transaction to reduce the liklyhood of
+        // orphaned meida files in garage storage
+        // If either fails, the transaction rolls back
+        const mediaFile = await prisma.$transaction(async (tx) => {
+            // Create database record first (not yet committed)
+            const createdFile = await tx.mediaFile.create({
+                data: {
+                    id: fileId,
+                    filename: objectKey,
+                    originalName: file.name,
+                    mimeType: file.type,
+                    size: file.size,
+                    bucket: BUCKET_NAME,
+                    objectKey,
+                },
+            })
 
-        // Save metadata to database
-        const mediaFile = await prisma.mediaFile.create({
-            data: {
-                id: fileId,
-                filename: objectKey,
-                originalName: file.name,
-                mimeType: file.type,
-                size: file.size,
-                bucket: BUCKET_NAME,
-                objectKey,
-            },
+            // Upload to Garage
+            // If this fails, the transaction will rollback
+            const putCommand = new PutObjectCommand({
+                Bucket: BUCKET_NAME,
+                Key: objectKey,
+                Body: Buffer.from(buffer),
+                ContentType: file.type,
+                Metadata: {
+                    'original-name': file.name,
+                },
+            })
+            await s3Client.send(putCommand)
+
+            // If no error was thrown up to now, the transaction
+            // will be commited
+            return createdFile
         })
 
         return NextResponse.json(

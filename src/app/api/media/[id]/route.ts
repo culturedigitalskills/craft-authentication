@@ -47,15 +47,26 @@ export async function DELETE(
             return errorResponse('File not found', 404)
         }
 
-        // Delete from Garage
-        const deleteCommand = new DeleteObjectCommand({
-            Bucket: BUCKET_NAME,
-            Key: fileData.objectKey,
-        })
-        await s3Client.send(deleteCommand)
+        // We have two data items for a media file, a database
+        // record and the file on garage storage. We use a
+        // transaction to reduce the probability that we get
+        // orpahed files in sttorage as the DB deletion only
+        // commits if storage deletion succeeds
+        await prisma.$transaction(async (tx) => {
+            // Delete from database (not yet committed)
+            await tx.mediaFile.delete({ where: { id } })
 
-        // Delete from database
-        await prisma.mediaFile.delete({ where: { id } })
+            // Delete from Garage storage
+            // If this fails, the transaction will rollback
+            const deleteCommand = new DeleteObjectCommand({
+                Bucket: BUCKET_NAME,
+                Key: fileData.objectKey,
+            })
+            await s3Client.send(deleteCommand)
+
+            // If no error was thrown up to now, the transaction
+            // will be commited
+        })
 
         return NextResponse.json({ message: 'File deleted successfully' })
     } catch (error) {
