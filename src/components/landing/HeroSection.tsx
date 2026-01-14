@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { Camera, QrCode, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 export function HeroSection() {
     const locale = useLocale()
@@ -56,16 +57,14 @@ export function HeroSection() {
 
                     {/* Right Column - Hero Image */}
                     <div className="relative">
-                        <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                            <div className="relative aspect-video md:aspect-square rounded-xl overflow-hidden bg-muted">
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="text-center text-muted-foreground">
-                                        <Camera className="h-16 w-16 mx-auto mb-4 opacity-20" />
-                                        <p className="text-sm">Artisan Working Image</p>
-                                        <p className="text-xs">(Placeholder)</p>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className="relative aspect-[4/3] md:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+                            <Image
+                                src="/media/artisan_w.jpg"
+                                alt="Artisan at work"
+                                fill
+                                className="object-cover"
+                                priority
+                            />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                         </div>
 

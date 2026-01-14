@@ -1,7 +1,8 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { CheckCircle, Palette } from 'lucide-react'
+import { CheckCircle } from 'lucide-react'
+import Image from 'next/image'
 
 export function TraditionSection() {
     const t = useTranslations('landing.tradition')
@@ -11,14 +12,13 @@ export function TraditionSection() {
             <div className="max-w-6xl mx-auto">
                 <div className="grid gap-12 md:grid-cols-2 items-center">
                     {/* Left Column - Image */}
-                    <div className="relative aspect-video rounded-xl overflow-hidden bg-muted shadow-xl order-2 md:order-1">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center text-muted-foreground">
-                                <Palette className="h-16 w-16 mx-auto mb-4 opacity-20" />
-                                <p className="text-sm">Artisan at Work</p>
-                                <p className="text-xs">(Placeholder)</p>
-                            </div>
-                        </div>
+                    <div className="relative aspect-video rounded-xl overflow-hidden shadow-xl order-2 md:order-1">
+                        <Image
+                            src="/media/scan.jpg"
+                            alt="QR code scanning"
+                            fill
+                            className="object-cover"
+                        />
                     </div>
 
                     {/* Right Column - Text */}
