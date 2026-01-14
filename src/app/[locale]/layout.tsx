@@ -1,12 +1,11 @@
-import type { Metadata } from 'next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getMessages } from 'next-intl/server'
+import { notFound } from 'next/navigation'
 import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
+import '../globals.css'
 import { cn } from '@/lib/utils'
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import {NextIntlClientProvider, hasLocale} from 'next-intl';
-import {notFound} from 'next/navigation';
-import {routing} from '@/i8n/routing'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -18,35 +17,51 @@ const geistMono = Geist_Mono({
     subsets: ['latin'],
 })
 
-type Props = {
-  children: React.ReactNode;
-  params: Promise<{locale: string}>;
-};
+const locales = ['en', 'hi']
 
-export default async function RootLayout({children, params}: Props) {
-    // Ensure that the incoming `locale` is valid
-    const {locale} = await params;
+export function generateStaticParams() {
+    return locales.map((locale) => ({ locale }))
+}
 
-    if (!hasLocale(routing.locales, locale)) {
-    notFound();
+export const metadata = {
+    title: 'Sustainable Crafting',
+    description: 'Authentic Cultural Products - Connect with artisans worldwide',
+}
+
+export default async function LocaleLayout({
+    children,
+    params,
+}: {
+    children: React.ReactNode
+    params: Promise<{ locale: string }>
+}) {
+    const { locale } = await params
+
+    if (!locales.includes(locale)) {
+        notFound()
     }
+
+    const messages = await getMessages({ locale })
+
     return (
-        <html lang={`/${locale}`} suppressHydrationWarning>
-            <head>
-                <link href="/favicon.ico" rel="icon" sizes="32x32" />
-                <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
-            </head>
-             <body
+        <html lang={locale} suppressHydrationWarning>
+            <body
                 className={cn(
                     'min-h-screen bg-background font-sans antialiased',
                     geistSans.variable,
                     geistMono.variable,
                 )}
             >
-                <Header />
-                <main>{children}</main>
-                <Footer />
-            </body> 
+                <NextIntlClientProvider messages={messages}>
+                    <div className="flex min-h-screen flex-col">
+                        <Header />
+                        <main className="flex-1">
+                            {children}
+                        </main>
+                        <Footer />
+                    </div>
+                </NextIntlClientProvider>
+            </body>
         </html>
     )
 }
