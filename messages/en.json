@@ -5,7 +5,11 @@
       "subtitle": "Authentic Cultural Products",
       "description": "Connect directly with skilled artisans from across the world. Every skillfully designed product tells an authentic story about the place, its histories, and the people who create them. Verify their authenticity through our innovative QR code system.",
       "exploreCrafts": "Explore Crafts",
-      "learnMore": "Learn More"
+      "learnMore": "Learn More",
+      "qrCard": {
+        "title": "Scan to Verify",
+        "description": "Authenticate, trace and connect"
+      }
     },
     "features": {
       "authentic": {
