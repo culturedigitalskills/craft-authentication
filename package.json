@@ -14,7 +14,7 @@
         "start": "dotenv -e .env.production -- next start",
         "lint": "eslint .",
         "lint:fix": "pnpm lint --fix",
-        "prisma:generate": "dotenv -e .env.production -- prisma generate",
+        "prisma:generate": "dotenv -e .env.local -- prisma generate",
         "docker:build": "docker compose --env-file .env.production build app",
         "prod:docker:up": "docker compose --env-file .env.production up -d",
         "prod:docker:down": "docker compose --env-file .env.production down",
