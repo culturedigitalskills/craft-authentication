@@ -1,0 +1,86 @@
+{
+  "locale": "de",
+  "initials": "SC",
+  "title": "Nachhaltiges Handwerk",
+  "subtitle": "Authentische kulturelle Produkte",
+  "copyright": "© 2025 sustainablecrafting.org. Alle Rechte vorbehalten.",
+  "madeWith": "Mit ❤️ für Kunsthandwerker weltweit gemacht",
+  "navbar": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "login": "Anmelden"
+  },
+  "about": {
+    "title": "Über SustainableCrafting",
+    "missionTitle": "Unsere Mission",
+    "missionDescription": "Bei SustainableCrafting ist es unsere Mission, Kunsthandwerker weltweit zu stärken, indem wir eine Plattform bereitstellen, die sie direkt mit Kunden verbindet. Wir glauben daran, traditionelle Handwerke zu bewahren und gleichzeitig Nachhaltigkeit und Authentizität auf dem globalen Markt zu fördern.",
+    "viewRepository": "Unser GitHub-Repository ansehen",
+    "keyFeatures": "Die Datenbank umfasst Prisma, das über umgebungsvariable URLs für Entwicklung und Docker mit Postgres verbunden ist. Die Benutzeroberfläche enthält shadcn/ui mit Tailwind v3, Radix-Primitives und wiederverwendbaren Hilfsfunktionen. Alles ist in einem Docker-Container für eine einfache Bereitstellung verpackt.",
+    "privacyPolicy": "Datenschutzerklärung",
+    "contact": "Kontakt"
+  },
+  "footer": {
+    "description": "Die Projektwebsite wurde von der University of Brighton erstellt und wird von ihr verwaltet. Dieses Projekt wird vom Arts and Humanities Research Council des Vereinigten Königreichs im Rahmen der Indien–UK-Forschung zu kreativen Industrien und kulturellem Erbe mit dem Titel „Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries“ finanziert. (Fördernummer OPP080)."
+  },
+  "socialmedia": {
+    "title": "Folge uns",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "email": "E-Mail"
+  },
+  "landing": {
+    "description": "Verbinde dich direkt mit erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes sorgfältig gestaltete Produkt erzählt eine authentische Geschichte über den Ort, seine Geschichte und die Menschen, die es herstellen. Überprüfe seine Echtheit durch unser innovatives QR-Code-System.",
+    "exploreCrafts": "Handwerke entdecken",
+    "learnMore": "Mehr erfahren"
+  },
+  "features": {
+    "authentic": {
+      "title": "Authentisch",
+      "description": "Zugang zu Informationen über kulturelle Produkte"
+    },
+    "traceable": {
+      "title": "Rückverfolgbar",
+      "description": "QR-Code-basierter Verifizierer"
+    },
+    "connected": {
+      "title": "Vernetzt",
+      "description": "Direkte Verbindung zu Kunsthandwerkern und Herstellern"
+    },
+    "qrCard": {
+      "title": "Zum Überprüfen scannen",
+      "description": "Authentifizieren, nachverfolgen und verbinden"
+    }
+  },
+  "howItWorks": {
+    "title": "So funktioniert es",
+    "subtitle": "Kunsthandwerker auf der ganzen Welt können sich über wenige einfache Schritte mit Kunden verbinden:",
+    "steps": {
+      "record": {
+        "title": "Dokumentieren",
+        "description": "Kunsthandwerker dokumentieren ihre Arbeit während des Herstellungsprozesses mit unserer mobilen App."
+      },
+      "generate": {
+        "title": "QR-Code generieren",
+        "description": "Das System erstellt eine einzigartige Signatur, die mit dem Profil des Kunsthandwerkers und dem Herstellungsprozess verknüpft ist."
+      },
+      "scan": {
+        "title": "Scannen & Überprüfen",
+        "description": "Kunden scannen den QR-Code, um die Echtheit zu überprüfen und die Geschichte des Produkts kennenzulernen."
+      },
+      "access": {
+        "title": "Globaler Zugang",
+        "description": "Interessierte erfahren mehr über die Prozesse und Geschichten von Kunsthandwerkern weltweit."
+      }
+    }
+  },
+  "tradition": {
+    "title": "Tradition mit Technologie verbinden",
+    "description": "Unser QR-Code-System schafft eine untrennbare Verbindung zwischen handgefertigten Produkten und ihren Schöpfern. Jeder Scan offenbart die Geschichte des Kunsthandwerkers, die verwendeten Materialien und die traditionellen Techniken, die jedes Stück einzigartig und wertvoll machen."
+  },
+  "benefits": {
+    "certificates": "Unveränderliche digitale Zertifikate für jedes Handwerk",
+    "connection": "Direkte Verbindung zwischen Kunsthandwerkern und Kunden",
+    "supply": "Transparente Lieferkette von der Herstellung bis zum Verkauf"
+  }
+}

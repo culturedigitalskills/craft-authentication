@@ -1,38 +1,62 @@
 {
+  "locale": "en",
+  "initials": "SC",
+  "title": "Sustainable Crafting",
+  "subtitle": "Authentic Cultural Products",
+  "copyright": "© 2025 sustainablecrafting.org. All rights reserved.",
+  "madeWith": "Made with ❤️ for artisans worldwide",
+  "navbar": {
+    "home": "Home",
+    "about": "About",
+    "login": "Login"
+  },
+  "about": {
+    "title": "About SustainableCrafting",
+    "missionTitle": "Our Mission",
+    "missionDescription": "At SustainableCrafting, our mission is to empower artisans worldwide by providing a platform that connects them directly with customers. We believe in preserving traditional crafts while promoting sustainability and authenticity in the global marketplace.",
+    "viewRepository" : "View our GitHub Repository",
+    "keyFeatures" : "The database includes a Prisma wired to Postgres via env-driven URLs for dev and Docker. UI includes the shadcn/ui with Tailwind v3, radix primitives, and reusable utilities. All packaged in a Docker container for easy deployment.",
+    "privacyPolicy": "Privacy Policy",
+    "contact": "Contact"
+
+  },
+  "footer": {
+    "description": "The project website has been produced and is managed by the University of Brighton. This project is funded by the UK's Arts and Humanities Research Council under the India-UK research into creative industries and cultural heritage with the title: Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries. (Grant No. OPP080)."
+    
+  },
+  "socialmedia": {
+      "title": "Follow Us",
+      "instagram": "Instagram",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "email": "Email"
+    },
   "landing": {
-    "hero": {
-      "title": "Sustainable Crafting",
-      "subtitle": "Authentic Cultural Products",
       "description": "Connect directly with skilled artisans from across the world. Every skillfully designed product tells an authentic story about the place, its histories, and the people who create them. Verify their authenticity through our innovative QR code system.",
       "exploreCrafts": "Explore Crafts",
-      "learnMore": "Learn More",
-      "qrCard": {
-        "title": "Scan to Verify",
-        "description": "Authenticate, trace and connect"
-      }
+      "learnMore": "Learn More"
+   },
+  "features": {
+    "authentic": {
+      "title": "Authentic",
+      "description": "Access information on cultural products"
     },
-    "features": {
-      "authentic": {
-        "title": "Authentic",
-        "description": "Access information on cultural products"
-      },
-      "traceable": {
-        "title": "Traceable",
-        "description": "QR-code signed verifier"
-      },
-      "connected": {
-        "title": "Connected",
-        "description": "Direct link to artisans and makers"
-      }
+    "traceable": {
+      "title": "Traceable",
+      "description": "QR-code signed verifier"
     },
-    "qrTechnology": {
-      "eyebrow": "QR code technology",
+    "connected": {
+      "title": "Connected",
+      "description": "Direct link to artisans and makers"
+    },
+    "qrCard": {
       "title": "Scan to Verify",
       "description": "Authenticate, trace and connect"
-    },
+    }          
+  },
     "howItWorks": {
       "title": "How It Works",
-      "subtitle": "Artisans across the world have the means to communicate with customers through a few simple steps:",
+      "subtitle": "Artisans across the world have the means to connect with customers through a few simple steps:",
       "steps": {
         "record": {
           "title": "Record",
@@ -54,41 +78,12 @@
     },
     "tradition": {
       "title": "Bridging Tradition with Technology",
-      "description": "Our QR code system creates an unbreakable link between handmade crafts and their creators. Each scan reveals the artisan's story, the materials used, and the traditional techniques that make every piece unique and valuable.",
-      "benefits": {
-        "certificates": "Immutable digital certificates for each craft",
-        "connection": "Direct connection between artisans and customers",
-        "supply": "Transparent supply chain from creation to sale"
-      }
-    }
-  },
-  "header": {
-    "login": "Login"
-  },
-  "footer": {
-    "description": "The project website has been produced and is managed by the University of Brighton. This project is funded by the UK's Arts and Humanities Research Council under the India-UK research into creative industries and cultural heritage with the title: Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries. (Grant No. OPP080).",
-    "platform": {
-      "title": "Platform",
-      "howItWorks": "How It Works",
-      "verification": "Verification",
-      "mobileApp": "Mobile App",
-      "api": "API"
+      "description": "Our QR code system creates an unbreakable link between handmade crafts and their creators. Each scan reveals the artisan's story, the materials used, and the traditional techniques that make every piece unique and valuable."
     },
-    "artisans": {
-      "title": "Artisans",
-      "joinPlatform": "Join Platform",
-      "uploadCrafts": "Upload Crafts",
-      "successStories": "Success Stories",
-      "support": "Support"
-    },
-    "project": {
-      "title": "Project",
-      "about": "About",
-      "mission": "Mission",
-      "privacyPolicy": "Privacy Policy",
-      "contact": "Contact"
-    },
-    "copyright": "© 2025 sustainablecrafting.org. All rights reserved.",
-    "madeWith": "Made with ❤️ for artisans worldwide"
-  }
+    "benefits": {
+      "certificates": "Immutable digital certificates for each craft",
+      "connection": "Direct connection between artisans and customers",
+      "supply": "Transparent supply chain from creation to sale"
+    }    
 }
+

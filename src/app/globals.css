@@ -46,11 +46,11 @@
     --input: 223.8 26.2% 19.8%;
     --ring: 216 12.2% 83.9%;
 }
-
+.button {
+  padding: 500px;
+}
 * {
     @apply border-border;
 }
 
-body {
-    @apply bg-background text-foreground min-h-screen font-sans antialiased;
-}
+

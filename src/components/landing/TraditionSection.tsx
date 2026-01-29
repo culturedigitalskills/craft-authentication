@@ -1,11 +1,9 @@
-'use client'
-
 import { useTranslations } from 'next-intl'
 import { CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 
 export function TraditionSection() {
-    const t = useTranslations('landing.tradition')
+    const t = useTranslations('');
 
     return (
         <section className="py-16 px-4 bg-muted/30">
@@ -23,11 +21,11 @@ export function TraditionSection() {
 
                     {/* Right Column - Text */}
                     <div className="space-y-6 order-1 md:order-2">
-                        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-                            {t('title')}
+                        <h2 className="sm:text-2xl font-bold tracking-tight">
+                            {t('tradition.title')}
                         </h2>
                         <p className="text-lg text-muted-foreground leading-relaxed">
-                            {t('description')}
+                            {t('tradition.description')}
                         </p>
 
                         {/* Benefits List */}
@@ -52,7 +50,7 @@ export function TraditionSection() {
                             </li>
                         </ul>
                     </div>
-                </div>
+                </div> 
             </div>
         </section>
     )
