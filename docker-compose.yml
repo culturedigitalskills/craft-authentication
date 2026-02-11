@@ -12,9 +12,13 @@ services:
             S3_ACCESS_KEY: ${S3_ACCESS_KEY}
             S3_SECRET_KEY: ${S3_SECRET_KEY}
             S3_REGION: ${S3_REGION}
+            GARAGE_ADMIN_URL: http://garage:3903
+            GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN:-}
         depends_on:
-            - postgres
-            - garage
+            postgres:
+                condition: service_healthy
+            garage:
+                condition: service_started
         ports:
             - '${PORT:-3000}:3000'
         restart: unless-stopped
@@ -43,7 +47,7 @@ services:
         volumes:
             - ./data/postgres:/var/lib/postgresql/data
         healthcheck:
-            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
             interval: 10s
             timeout: 5s
             retries: 5
@@ -63,3 +67,9 @@ services:
             - ./garage.toml:/etc/garage.toml:ro
             - ./data/garage-data:/data
             - ./data/garage-meta:/meta
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:3903/health']
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 10s

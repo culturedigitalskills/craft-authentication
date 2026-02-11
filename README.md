@@ -70,13 +70,16 @@ Directories are created automatically by Docker and are excluded from Git.
 
 ## Environment Setup
 
-Copy the appropriate .env example based on your target environment:
+Copy the appropriate configuration files based on your target environment:
 
 ### Local Development
 
 ```bash
 cp .env.local.example .env.local
 # Edit .env.local with your secrets
+
+cp garage.toml.example garage.toml
+# No admin_token needed for local dev
 ```
 
 - Uses `localhost` for Postgres and Garage endpoints
@@ -88,6 +91,9 @@ cp .env.local.example .env.local
 ```bash
 cp .env.production.example .env.production
 # Edit .env.production with your secrets
+
+cp garage.toml.example garage.toml
+# Set admin_token in garage.toml to match GARAGE_ADMIN_TOKEN from .env.production
 ```
 
 - Uses container hostnames (`postgres`, `garage`) except for the DATABASE_URL
@@ -100,6 +106,9 @@ cp .env.production.example .env.production
 ```bash
 # Copy and configure local env
 cp .env.local.example .env.local
+
+# Copy Garage config (admin_token not required for local dev)
+cp garage.toml.example garage.toml
 
 # Start Postgres + Garage containers
 pnpm docker:up
@@ -125,28 +134,53 @@ Open [http://localhost:20100](http://localhost:20100) (or your configured `PORT`
 ### 2. Production / Docker
 
 ```bash
-# Copy and configure production env
+# 1. Copy and configure production env
 cp .env.production.example .env.production
+# Edit .env.production – set passwords, secrets, and tokens
 
-# Build app container
+# 2. Copy and configure Garage
+cp garage.toml.example garage.toml
+# Edit garage.toml and set admin_token to match GARAGE_ADMIN_TOKEN from .env.production
+
+# 3. Build app container
 pnpm docker:build
 
-# Start all containers (app, postgres, garage)
+# 4. Start all containers
 pnpm prod:docker:up
+```
 
-# Run Database Migrations
-pnpm prod:db:migrate
+When the containers are set up for the first time, some **additional secrets** will be generated.Check them with:
 
-# Initialize garage store
-pnpm prod:garage:init
+```bash
+pnpm prod:docker:logs
+```
 
-# Verify your .env.local file
-Check that S3_ACCESS_KEY and S3_SECRET_KEY were updated by the above step
+or
 
-# Restart containers with new env-variables
+```bash
+pnpm prod:docker:logs | grep -A 5 "NEW GARAGE CREDENTIALS"
+```
+
+Look for the highlighted box:
+
+```
+╔══════════════════════════════════════════════════════════╗
+║  NEW GARAGE CREDENTIALS – copy these to .env.production  ║
+╠══════════════════════════════════════════════════════════╣
+S3_ACCESS_KEY=GK...
+S3_SECRET_KEY=...
+╚══════════════════════════════════════════════════════════╝
+```
+
+Copy these keys into `.env.production`, then restart containers to stabilize them:
+
+```bash
+# After updating .env.production:
 pnpm prod:docker:down
 pnpm prod:docker:up
 ```
+
+Subsequent starts will reuse the same keys.
 
 App runs on [http://localhost:3000](http://localhost:3000) by default (configure with `PORT`).
 
@@ -171,16 +205,14 @@ App runs on [http://localhost:3000](http://localhost:3000) by default (configure
 
 ### Production / Docker
 
-- `pnpm prod:docker:build` – Builds app container
-- `pnpm prod:docker:up` – Starts all production containers (app, postgres, garage)
+- `pnpm docker:build` – Builds app container
+- `pnpm prod:docker:up` – Starts all production containers (migrations + Garage init run automatically)
 - `pnpm prod:docker:down` – Stops all production containers
+- `pnpm prod:docker:logs` – Follow app startup / init logs
 
-#### Storage (Garage)
+#### Manual overrides (require local Node.js + Prisma)
 
-- `pnpm prod:garage:init` – Initializes Garage for production
-
-#### Database (Prisma)
-
+- `pnpm prod:garage:init` – Initializes Garage via `docker exec` (only if auto-init is skipped)
 - `pnpm prod:db:migrate` – Runs migrations in deploy mode
 - `pnpm prod:db:push` – Pushes schema changes without migration
 - `pnpm prod:db:studio` – Opens Prisma Studio
@@ -212,7 +244,9 @@ craft-authentication/
 │   ├── schema.prisma     # Prisma schema
 │   └── migrations/       # Database migrations
 ├── scripts/
-│   └── init-garage.js    # Garage initialization script
+│   ├── docker-entrypoint.sh  # Production container entrypoint (migrations + init)
+│   ├── init-garage.js        # Garage init via docker exec (local dev)
+│   └── init-garage-http.js   # Garage init via Admin HTTP API (Docker)
 ├── src/
 │   ├── app/
 │   │   ├── api/
@@ -235,7 +269,7 @@ craft-authentication/
 ├── docker-compose.yml    # Production compose (app + postgres + garage)
 ├── docker-compose.dev.yml # Dev compose (postgres + garage only)
 ├── Dockerfile            # Multi-stage production build
-├── garage.toml           # Garage S3 configuration
+├── garage.toml.example   # Garage S3 configuration template
 ├── .env.local.example    # Local dev env template
 ├── .env.production.example # Production env template
 ├── .prettierrc           # Prettier config (single quotes, 4 spaces, no semi)
@@ -246,8 +280,9 @@ craft-authentication/
 
 ## Docker Notes
 
-- **Dockerfile**: Uses multi-stage build with standalone output for minimal production image.
-- **docker-compose.yml**: Full stack (app + postgres + garage)
+- **Dockerfile**: Multi-stage build with standalone output. The runner stage includes the Prisma CLI for migrations and init scripts – no full dev toolchain.
+- **Auto-init**: On startup, the app container runs database migrations and Garage initialization before starting the server. New Garage credentials are logged for the user to copy into `.env.production`.
+- **docker-compose.yml**: Full stack (app + postgres + garage). The Garage Admin API token is configured in `garage.toml`.
 - **docker-compose.dev.yml**: Only postgres + garage; run Next.js locally.
 - **Data persistence**: Uses local directories (`./data` and `./data-dev`) instead of Docker volumes for easier backup and inspection.
 
