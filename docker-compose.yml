@@ -20,13 +20,13 @@ services:
             garage:
                 condition: service_started
         ports:
-            - '${PORT:-3000}:3000'
+            - '${PORT:-3000}:${PORT:-3000}'
         restart: unless-stopped
         healthcheck:
             test:
                 [
                     'CMD-SHELL',
-                    'curl -f http://localhost:3000/health | jq -e ''.status == "healthy"'' > /dev/null',
+                    'curl -f http://localhost:${PORT:-3000}/health | jq -e ''.status == "healthy"'' > /dev/null',
                 ]
             interval: 30s
             timeout: 10s

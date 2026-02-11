@@ -19,4 +19,4 @@ root_domain = ".s3.garage.localhost"
 api_bind_addr = "[::]:3903"
 
 # Uncomment and set this to enable the Admin HTTP API:
-# admin_token = "your-secret-token-here"
+admin_token = "your-secret-token-here"
