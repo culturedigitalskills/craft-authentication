@@ -43,3 +43,6 @@ next-env.d.ts
 # data directories
 /data
 /data-dev
+
+# garage config with secrets
+garage.toml

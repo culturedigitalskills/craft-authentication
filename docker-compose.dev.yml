@@ -13,7 +13,7 @@ services:
         volumes:
             - ./data-dev/postgres:/var/lib/postgresql/data
         healthcheck:
-            test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
             interval: 10s
             timeout: 5s
             retries: 5
@@ -33,3 +33,9 @@ services:
             - ./garage.toml:/etc/garage.toml:ro
             - ./data-dev/garage-data:/data
             - ./data-dev/garage-meta:/meta
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:3903/health']
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 10s

@@ -13,3 +13,10 @@ pnpm-debug.log*
 .env
 .env.local
 .env.*
+data/
+data-dev/
+README.md
+LICENSE
+garage.toml.example
+next-env.d.ts
+.vscode
