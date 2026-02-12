@@ -3,8 +3,9 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { cn } from '@/lib/utils'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { SessionProvider } from '@/components/auth/SessionProvider'
 import {routing} from '@/i8n/routing'
 //we are using the css in the main app folder
 import '../globals.css'
@@ -29,6 +30,7 @@ type Props = {
 export default async function LocaleLayout({ children, params }: Props) {
 // Ensure that the incoming `locale` is valid
     const {locale} = await params;
+    const messages = await getMessages();
 
     if (!hasLocale(routing.locales, locale)) {
     notFound();
@@ -47,13 +49,17 @@ export default async function LocaleLayout({ children, params }: Props) {
                     geistMono.variable,
                 )}
             >
-                    <div className="flex min-h-screen flex-col">
-                        <Header />
-                        <main className="flex-1">
-                            {children}
-                        </main>
-                        <Footer />
-                    </div>
+                <SessionProvider>
+                    <NextIntlClientProvider messages={messages}>
+                        <div className="flex min-h-screen flex-col">
+                            <Header />
+                            <main className="flex-1">
+                                {children}
+                            </main>
+                            <Footer />
+                        </div>
+                    </NextIntlClientProvider>
+                </SessionProvider>
             </body>
         </html>
     )
