@@ -31,8 +31,7 @@ export const languages: Language[] = routing.locales.map((locale) => ({
 
 interface LanguageSelectProps {
     isMobile: boolean;
-    lang: Language;
-    jsonlan: string  
+    jsonlan: string
 }
 
 export function LanguageSelect({ isMobile, jsonlan }: LanguageSelectProps) {
