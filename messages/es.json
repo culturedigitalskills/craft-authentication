@@ -1,0 +1,105 @@
+{
+  "locale": "es",
+  "initials": "SC",
+  "title": "Artesanía Sostenible",
+  "subtitle": "Productos Culturales Auténticos",
+  "copyright": "© 2025 sustainablecrafting.org. Todos los derechos reservados.",
+  "madeWith": "Hecho con ❤️ para artesanos de todo el mundo",
+  "navbar": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "registerTitle": "Crear cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "name": "Nombre completo",
+    "login": "Iniciar sesión",
+    "register": "Crear cuenta",
+    "signingIn": "Iniciando sesión...",
+    "registering": "Creando cuenta...",
+    "invalidCredentials": "Correo electrónico o contraseña inválidos",
+    "noAccount": "¿No tienes una cuenta?",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "registrationFailed": "Error al registrarse. Inténtalo de nuevo.",
+    "emailExists": "Ya existe una cuenta con este correo electrónico."
+  },
+  "about": {
+    "title": "Acerca de SustainableCrafting",
+    "missionTitle": "Nuestra Misión",
+    "missionDescription": "En SustainableCrafting, nuestra misión es empoderar a artesanos de todo el mundo proporcionándoles una plataforma que los conecte directamente con los clientes. Creemos en preservar las artesanías tradicionales mientras promovemos la sostenibilidad y la autenticidad en el mercado global.",
+    "viewRepository": "Ver nuestro repositorio en GitHub",
+    "keyFeatures": "La base de datos incluye Prisma conectado a Postgres mediante URLs basadas en variables de entorno para desarrollo y Docker. La interfaz de usuario incluye shadcn/ui con Tailwind v3, primitivas de Radix y utilidades reutilizables. Todo empaquetado en un contenedor Docker para un despliegue sencillo.",
+    "privacyPolicy": "Política de privacidad",
+    "contact": "Contacto"
+  },
+  "footer": {
+    "description": "El sitio web del proyecto ha sido producido y es gestionado por la Universidad de Brighton. Este proyecto está financiado por el Consejo de Investigación en Artes y Humanidades del Reino Unido dentro de la investigación India-Reino Unido sobre industrias creativas y patrimonio cultural, con el título: Forjando un Futuro Sostenible: Empoderando las Artesanías Indias en las Industrias Creativas. (Subvención No. OPP080)."
+  },
+  "socialmedia": {
+    "title": "Síguenos",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "email": "Correo electrónico"
+  },
+  "landing": {
+    "description": "Conéctate directamente con artesanos expertos de todo el mundo. Cada producto diseñado con destreza cuenta una historia auténtica sobre el lugar, su historia y las personas que lo crean. Verifica su autenticidad mediante nuestro innovador sistema de códigos QR.",
+    "exploreCrafts": "Explorar artesanías",
+    "learnMore": "Saber más"
+  },
+  "features": {
+    "authentic": {
+      "title": "Auténtico",
+      "description": "Accede a información sobre productos culturales"
+    },
+    "traceable": {
+      "title": "Rastreable",
+      "description": "Verificador firmado con código QR"
+    },
+    "connected": {
+      "title": "Conectado",
+      "description": "Enlace directo con artesanos y creadores"
+    },
+    "qrCard": {
+      "title": "Escanear para verificar",
+      "description": "Autenticar, rastrear y conectar"
+    }
+  },
+  "howItWorks": {
+    "title": "Cómo funciona",
+    "subtitle": "Artesanos de todo el mundo pueden conectarse con clientes mediante unos sencillos pasos:",
+    "steps": {
+      "record": {
+        "title": "Registrar",
+        "description": "Los artesanos documentan su trabajo con nuestra aplicación móvil durante el proceso de creación."
+      },
+      "generate": {
+        "title": "Generar QR",
+        "description": "El sistema crea una firma única que enlaza con el perfil del artesano y el proceso de creación."
+      },
+      "scan": {
+        "title": "Escanear y verificar",
+        "description": "Los clientes escanean el código QR para verificar la autenticidad y conocer la historia del producto."
+      },
+      "access": {
+        "title": "Acceso global",
+        "description": "El público puede conocer los procesos y las historias de artesanos de todo el mundo."
+      }
+    }
+  },
+  "tradition": {
+    "title": "Uniendo tradición y tecnología",
+    "description": "Nuestro sistema de códigos QR crea un vínculo inquebrantable entre las artesanías hechas a mano y sus creadores. Cada escaneo revela la historia del artesano, los materiales utilizados y las técnicas tradicionales que hacen que cada pieza sea única y valiosa."
+  },
+  "benefits": {
+    "certificates": "Certificados digitales inmutables para cada artesanía",
+    "connection": "Conexión directa entre artesanos y clientes",
+    "supply": "Cadena de suministro transparente desde la creación hasta la venta"
+  }
+}

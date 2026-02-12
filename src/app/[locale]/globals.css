@@ -1,4 +1,4 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -83,7 +83,15 @@
     --error: 10 39% 43%;
   }
 }
+.buttonText {
+    color: red;
+}
 
+
+.buttonText .buttonText:hover {
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid white;
+}
 @layer base {
   * {
     @apply border-border;
@@ -91,4 +99,4 @@
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
   }
-}
+} */

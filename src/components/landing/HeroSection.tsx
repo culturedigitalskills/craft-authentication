@@ -1,19 +1,14 @@
-'use client'
-
 import Link from 'next/link'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { Camera, QrCode, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 
 export function HeroSection() {
-    const locale = useLocale()
-    const t = useTranslations('landing.hero')
-    const tFeatures = useTranslations('landing.features')
+    const t = useTranslations()
 
     return (
-        <section className="bg-gradient-to-br from-background to-muted/20 py-16 px-4">
-            <div className="container mx-auto max-w-6xl">
+        <section className="bg-gradient-to-br from-background to-muted/20 ">
                 <div className="grid gap-12 md:grid-cols-2 items-center">
                     {/* Left Column - Text Content */}
                     <div>
@@ -24,14 +19,14 @@ export function HeroSection() {
                             <span className="block text-primary">{t('subtitle')}</span>
                         </h2>
                         <p className="mb-8 text-xl leading-relaxed text-muted-foreground">
-                            {t('description')}
+                            {t('landing.description')}
                         </p>
                         <div className="mb-8 flex flex-col gap-4 sm:flex-row">
                             <Button size="lg" className="px-8" asChild>
-                                <Link href={`/${locale}/crafts`}>{t('exploreCrafts')}</Link>
+                                <Link href={`crafts`}>{t('landing.exploreCrafts')}</Link>
                             </Button>
                             <Button variant="outline" size="lg" className="px-8" asChild>
-                                <Link href={`/${locale}/about`}>{t('learnMore')}</Link>
+                                <Link href={`/about`}>{t('landing.learnMore')}</Link>
                             </Button>
                         </div>
 
@@ -39,18 +34,18 @@ export function HeroSection() {
                         <div className="grid grid-cols-3 gap-8 border-t pt-8">
                             <div className="text-center">
                                 <Camera className="mx-auto mb-2 h-8 w-8 text-primary" />
-                                <p className="font-medium">{tFeatures('authentic.title')}</p>
-                                <p className="text-sm text-muted-foreground">{tFeatures('authentic.description')}</p>
+                                <p className="font-medium">{t('features.authentic.title')}</p>
+                                <p className="text-sm text-muted-foreground">{t('features.authentic.description')}</p>
                             </div>
                             <div className="text-center">
                                 <QrCode className="mx-auto mb-2 h-8 w-8 text-primary" />
-                                <p className="font-medium">{tFeatures('traceable.title')}</p>
-                                <p className="text-sm text-muted-foreground">{tFeatures('traceable.description')}</p>
+                                <p className="font-medium">{t('features.traceable.title')}</p>
+                                <p className="text-sm text-muted-foreground">{t('features.traceable.description')}</p>
                             </div>
                             <div className="text-center">
                                 <Globe className="mx-auto mb-2 h-8 w-8 text-primary" />
-                                <p className="font-medium">{tFeatures('connected.title')}</p>
-                                <p className="text-sm text-muted-foreground">{tFeatures('connected.description')}</p>
+                                <p className="font-medium">{t('features.connected.title')}</p>
+                                <p className="text-sm text-muted-foreground">{t('features.connected.description')}</p>
                             </div>
                         </div>
                     </div>
@@ -75,12 +70,11 @@ export function HeroSection() {
                                     <QrCode className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium">{t('qrCard.title')}</p>
-                                    <p className="text-xs text-muted-foreground">{t('qrCard.description')}</p>
+                                    <p className="text-sm font-medium">{t('features.qrCard.title')}</p>
+                                    <p className="text-xs text-muted-foreground">{t('features.qrCard.description')}</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
         </section>

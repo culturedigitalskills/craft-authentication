@@ -3,8 +3,12 @@ import { prisma } from '@/lib/prisma'
 import { dataQuerySchema, createDataRecordSchema } from '@/lib/validations/data'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function GET(request: NextRequest) {
+    const { unauthorized } = await requireAuth()
+    if (unauthorized) return unauthorized
+
     try {
         const searchParams = request.nextUrl.searchParams
         const queryParams = dataQuerySchema.parse(Object.fromEntries(searchParams))
@@ -54,6 +58,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const { unauthorized } = await requireAuth()
+    if (unauthorized) return unauthorized
+
     try {
         const body = await request.json()
         const validatedData = createDataRecordSchema.parse(body)

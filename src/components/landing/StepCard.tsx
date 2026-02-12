@@ -8,6 +8,7 @@ interface StepCardProps {
 }
 
 export function StepCard({ number, icon: Icon, title, description }: StepCardProps) {
+    
     return (
         <div className="relative flex flex-col items-center text-center space-y-4 p-6">
             {/* Step Number Badge */}
