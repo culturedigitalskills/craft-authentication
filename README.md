@@ -126,6 +126,7 @@ pnpm prisma:generate
 pnpm db:migrate
 
 # Start Next.js dev server
+pnpm i
 pnpm dev
 ```
 
