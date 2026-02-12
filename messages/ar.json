@@ -8,7 +8,26 @@
   "navbar": {
     "home": "الرئيسية",
     "about": "من نحن",
-    "login": "تسجيل الدخول"
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج"
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول",
+    "registerTitle": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "name": "الاسم الكامل",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "registering": "جارٍ إنشاء الحساب...",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "noAccount": "ليس لديك حساب؟",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين",
+    "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+    "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل."
   },
   "about": {
     "title": "حول SustainableCrafting",

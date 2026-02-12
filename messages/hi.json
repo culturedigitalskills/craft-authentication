@@ -8,7 +8,26 @@
   "navbar": {
     "home": "होम",
     "about": "हमारे बारे में",
-    "login": "लॉगिन"
+    "login": "लॉगिन",
+    "logout": "लॉगआउट"
+  },
+  "auth": {
+    "loginTitle": "साइन इन करें",
+    "registerTitle": "खाता बनाएं",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "name": "पूरा नाम",
+    "login": "साइन इन करें",
+    "register": "खाता बनाएं",
+    "signingIn": "साइन इन हो रहा है...",
+    "registering": "खाता बनाया जा रहा है...",
+    "invalidCredentials": "अमान्य ईमेल या पासवर्ड",
+    "noAccount": "खाता नहीं है?",
+    "haveAccount": "पहले से खाता है?",
+    "passwordMismatch": "पासवर्ड मेल नहीं खाते",
+    "registrationFailed": "पंजीकरण विफल। कृपया पुनः प्रयास करें।",
+    "emailExists": "इस ईमेल से पहले से एक खाता मौजूद है।"
   },
   "about": {
     "title": "सस्टेनेबल क्राफ्टिंग के बारे में",
