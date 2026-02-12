@@ -24,7 +24,7 @@
         "prod:db:migrate": "dotenv -e .env.production -- prisma migrate deploy",
         "prod:db:push": "dotenv -e .env.production -- prisma db push",
         "prod:db:studio": "dotenv -e .env.production -- prisma studio",
-        "test-deploy": "pnpm prod:docker:down && pnpm docker:build && pnpm prod:docker:up"
+        "test-deploy": "pnpm build-info && pnpm prod:docker:down && pnpm docker:build && pnpm prod:docker:up"
     },
     "dependencies": {
         "@auth/prisma-adapter": "^2.11.1",
