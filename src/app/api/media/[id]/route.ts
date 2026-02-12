@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { errorResponse } from '@/lib/validations/types'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -39,6 +40,9 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
 ) {
+    const { unauthorized } = await requireAuth()
+    if (unauthorized) return unauthorized
+
     try {
         const { id } = await params
         const fileData = await prisma.mediaFile.findUnique({ where: { id } })
