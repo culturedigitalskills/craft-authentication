@@ -6,8 +6,12 @@ import { randomUUID } from 'crypto'
 import { fileUploadSchema } from '@/lib/validations/media'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
+import { requireAuth } from '@/lib/auth-guard'
 
 export async function POST(request: NextRequest) {
+    const { unauthorized } = await requireAuth()
+    if (unauthorized) return unauthorized
+
     try {
         // Initialize Garage bucket if needed
         await initGarage()

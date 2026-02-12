@@ -8,7 +8,26 @@
   "navbar": {
     "home": "Inicio",
     "about": "Acerca de",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "registerTitle": "Crear cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "name": "Nombre completo",
+    "login": "Iniciar sesión",
+    "register": "Crear cuenta",
+    "signingIn": "Iniciando sesión...",
+    "registering": "Creando cuenta...",
+    "invalidCredentials": "Correo electrónico o contraseña inválidos",
+    "noAccount": "¿No tienes una cuenta?",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "registrationFailed": "Error al registrarse. Inténtalo de nuevo.",
+    "emailExists": "Ya existe una cuenta con este correo electrónico."
   },
   "about": {
     "title": "Acerca de SustainableCrafting",

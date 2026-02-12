@@ -47,8 +47,8 @@ export function HowItWorksSection() {
                     <Card className='bg-primary/10 rounded-md'>
                     <CardHeader>
                      <Globe className="mx-auto mb-4 h-12 w-12 text-primary " strokeWidth={2.5} />
-                    <CardTitle>{t('howItWorks.steps.scan.title')}</CardTitle>
-                    <CardDescription>{t('howItWorks.steps.scan.description')}</CardDescription>
+                    <CardTitle>{t('howItWorks.steps.access.title')}</CardTitle>
+                    <CardDescription>{t('howItWorks.steps.access.description')}</CardDescription>
                     </CardHeader>
                     </Card>
                 

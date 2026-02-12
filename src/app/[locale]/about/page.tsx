@@ -1,4 +1,4 @@
-import { Container } from '@/components/Container';
+import { Container } from '@/components/layout/Container';
 import { useTranslations } from 'next-intl'
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';

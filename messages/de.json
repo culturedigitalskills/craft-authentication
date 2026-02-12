@@ -8,7 +8,26 @@
   "navbar": {
     "home": "Startseite",
     "about": "Über uns",
-    "login": "Anmelden"
+    "login": "Anmelden",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "loginTitle": "Anmelden",
+    "registerTitle": "Konto erstellen",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "name": "Vollständiger Name",
+    "login": "Anmelden",
+    "register": "Konto erstellen",
+    "signingIn": "Anmeldung läuft...",
+    "registering": "Konto wird erstellt...",
+    "invalidCredentials": "Ungültige E-Mail oder Passwort",
+    "noAccount": "Noch kein Konto?",
+    "haveAccount": "Bereits ein Konto?",
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "registrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "emailExists": "Ein Konto mit dieser E-Mail-Adresse existiert bereits."
   },
   "about": {
     "title": "Über SustainableCrafting",
