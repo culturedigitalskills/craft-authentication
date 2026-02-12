@@ -9,14 +9,20 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 - **Storage**: Garage (S3-compatible, AGPL v3)
 - **UI**: shadcn/ui + Tailwind CSS v3 + Radix primitives
 - **Validation**: Zod
-- **Linting**: ESLint + Prettier (single quotes, 4-space tabs, no semicolons)
+- **Linting**: ESLint + Prettier (single quotes, 4 spaces, no semicolons)
 - **Package Manager**: pnpm
 
 ## API Endpoints
 
-### Health Check
+### Info
 
-- `GET /health` - Service health status
+- `GET /info` - Service status
+
+### Authentication
+
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/signin` - Sign in (managed by NextAuth)
+- `GET/POST /api/auth/[...nextauth]` - NextAuth routes (signin, callback, signout, etc.)
 
 ### Example Data Management
 
@@ -83,6 +89,7 @@ cp garage.toml.example garage.toml
 ```
 
 - Uses `localhost` for Postgres and Garage endpoints
+- `DATABASE_URL_APP` is not used locally; `DATABASE_URL` is used by Prisma CLI and the Next.js dev server
 - Runs Next.js on your machine (`pnpm dev`)
 - Starts only Postgres + Garage containers (`pnpm docker:up`)
 
@@ -96,7 +103,8 @@ cp garage.toml.example garage.toml
 # Set admin_token in garage.toml to match GARAGE_ADMIN_TOKEN from .env.production
 ```
 
-- Uses container hostnames (`postgres`, `garage`) except for the DATABASE_URL
+- `DATABASE_URL_APP=postgresql://...@postgres:5432/...` – used by app container (container hostname like `postgres`, `garage`)
+- `DATABASE_URL=postgresql://...@localhost:5432/...` – used by Prisma CLI when running migrations locally
 - Starts all three containers: app, Postgres, Garage
 
 ## Quick Start
@@ -232,6 +240,7 @@ App runs on [http://localhost:3000](http://localhost:3000) by default (configure
 ```
 craft-authentication/
 ├── .vscode/              # VS Code settings (format on save, ESLint)
+│   └── settings.json     # Editor configuration
 ├── data/                 # Production data (git-ignored)
 │   ├── postgres/         # PostgreSQL database files
 │   ├── garage-data/      # Garage object storage
@@ -275,7 +284,7 @@ craft-authentication/
 ├── .prettierrc           # Prettier config (single quotes, 4 spaces, no semi)
 ├── eslint.config.mjs     # ESLint config (style rules)
 ├── prisma.config.ts      # Prisma 7 config
-└── tailwind.config.ts    # Tailwind + shadcn theme
+├── tailwind.config.ts    # Tailwind + shadcn theme
 ```
 
 ## Docker Notes
@@ -288,7 +297,7 @@ craft-authentication/
 
 ## ESLint / Prettier
 
-- **Single quotes**, **4-space tabs**, **no semicolons** enforced.
+- **Single quotes**, **4 spaces**, **no semicolons** enforced.
 - VS Code auto-fixes on save (`.vscode/settings.json`).
 - Run `pnpm lint:fix` to apply rules manually.
 
