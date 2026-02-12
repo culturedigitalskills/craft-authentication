@@ -1,0 +1,25 @@
+# v0.1.x -> v0.2.0
+
+### `.env.local` and .env.production
+
+add the following
+
+```.env
+GARAGE_RPC_SECRET=CHANGE_TO_RANDOM_SECRET_32_CHARS
+
+# Auth.js
+AUTH_SECRET=CHANGE_TO_RANDOM_SECRET_32_CHARS
+AUTH_URL=https://yourdomain.com
+```
+
+You can generate the secrets using `# Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`
+
+### Create `garage.toml``
+
+Copy the example:
+
+```bash
+cp garage.toml.example garage.toml
+```
+
+then edit `admin_token` and replace the value with the one you set in `GARAGE_RPC_SECRET`
