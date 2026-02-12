@@ -31,6 +31,7 @@ RUN npm install -g prisma@7
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/build-info.json ./build-info.json
 
 # Prisma schema + migrations for `prisma migrate deploy`
 COPY --from=builder /app/prisma ./prisma
