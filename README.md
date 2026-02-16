@@ -118,6 +118,9 @@ cp .env.local.example .env.local
 # Copy Garage config (admin_token not required for local dev)
 cp garage.toml.example garage.toml
 
+# Install packages
+pnpm i
+
 # Start Postgres + Garage containers
 pnpm docker:up
 
@@ -134,7 +137,6 @@ pnpm prisma:generate
 pnpm db:migrate
 
 # Start Next.js dev server
-pnpm i
 pnpm dev
 ```
 
