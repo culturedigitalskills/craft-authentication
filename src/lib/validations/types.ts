@@ -1,12 +1,29 @@
 import { NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 
-export type ErrorResponse = {
+export type BasicErrorResponse = {
     error: string
-    details?: any
+    message?: string
 }
 
-export function handleValidationError(error: ZodError): NextResponse<ErrorResponse> {
+export type ValidationErrorResponse = {
+    error: string
+    details: {
+        path: string
+        message: string
+        code: string
+    }[]
+}
+
+export type RateLimitErrorResponse = {
+    error: string
+    message: string
+    retryAfter: number
+}
+
+export type ErrorResponse = BasicErrorResponse | ValidationErrorResponse | RateLimitErrorResponse
+
+export function handleValidationError(error: ZodError): NextResponse<ValidationErrorResponse> {
     // ZodError uses `.issues`, not `.errors`
     const issues = (error as ZodError).issues ?? []
     const firstError = issues[0]
@@ -27,6 +44,6 @@ export function handleValidationError(error: ZodError): NextResponse<ErrorRespon
     )
 }
 
-export function errorResponse(message: string, status = 500): NextResponse<ErrorResponse> {
+export function errorResponse(message: string, status = 500): NextResponse<BasicErrorResponse> {
     return NextResponse.json({ error: message }, { status })
 }
