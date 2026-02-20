@@ -27,7 +27,13 @@
     "haveAccount": "لديك حساب بالفعل؟",
     "passwordMismatch": "كلمتا المرور غير متطابقتين",
     "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
-    "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل."
+    "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل.",
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح",
+      "passwordMin": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+      "passwordMismatch": "كلمتا المرور غير متطابقتين"
+    }
   },
   "about": {
     "title": "حول SustainableCrafting",

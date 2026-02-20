@@ -27,7 +27,13 @@
     "haveAccount": "Already have an account?",
     "passwordMismatch": "Passwords do not match",
     "registrationFailed": "Registration failed. Please try again.",
-    "emailExists": "An account with this email already exists."
+    "emailExists": "An account with this email already exists.",
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match"
+    }
   },
   "about": {
     "title": "About SustainableCrafting",

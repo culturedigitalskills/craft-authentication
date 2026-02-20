@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -14,29 +17,35 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import Link from 'next/link'
+import { loginRequestSchema } from '@/lib/validations/auth'
+
+type LoginFormData = z.infer<typeof loginRequestSchema>
 
 export function LoginForm() {
     const t = useTranslations('auth')
     const router = useRouter()
-    const [error, setError] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
+    const [serverError, setServerError] = useState<string | null>(null)
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<LoginFormData>({
+        resolver: zodResolver(loginRequestSchema),
+        mode: 'onBlur',
+    })
 
-        const formData = new FormData(e.currentTarget)
+    async function onSubmit(data: LoginFormData) {
+        setServerError(null)
+
         const result = await signIn('credentials', {
-            email: formData.get('email') as string,
-            password: formData.get('password') as string,
+            email: data.email,
+            password: data.password,
             redirect: false,
         })
 
-        setLoading(false)
-
         if (result?.error) {
-            setError(t('invalidCredentials'))
+            setServerError(t('invalidCredentials'))
         } else {
             router.push('/crafts')
             router.refresh()
@@ -49,37 +58,46 @@ export function LoginForm() {
                 <CardTitle>{t('loginTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {error && (
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {serverError && (
                         <div className="rounded bg-red-50 p-3 text-sm text-red-500">
-                            {error}
+                            {serverError}
                         </div>
                     )}
                     <div className="space-y-2">
                         <Label htmlFor="email">{t('email')}</Label>
                         <Input
                             id="email"
-                            name="email"
                             type="email"
-                            required
+                            aria-invalid={!!errors.email}
+                            {...register('email')}
                         />
+                        {errors.email && (
+                            <p className="text-sm text-red-500">
+                                {t('validation.emailInvalid')}
+                            </p>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="password">{t('password')}</Label>
                         <Input
                             id="password"
-                            name="password"
                             type="password"
-                            required
-                            minLength={8}
+                            aria-invalid={!!errors.password}
+                            {...register('password')}
                         />
+                        {errors.password && (
+                            <p className="text-sm text-red-500">
+                                {t('validation.passwordMin')}
+                            </p>
+                        )}
                     </div>
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={loading}
+                        disabled={isSubmitting}
                     >
-                        {loading ? t('signingIn') : t('login')}
+                        {isSubmitting ? t('signingIn') : t('login')}
                     </Button>
                     <p className="text-center text-sm text-muted-foreground">
                         {t('noAccount')}{' '}
