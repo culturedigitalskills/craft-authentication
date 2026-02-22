@@ -8,6 +8,7 @@
   "navbar": {
     "home": "Home",
     "about": "About",
+    "crafts": "Crafts",
     "login": "Login",
     "logout": "Logout"
   },
@@ -103,6 +104,28 @@
       "certificates": "Immutable digital certificates for each craft",
       "connection": "Direct connection between artisans and customers",
       "supply": "Transparent supply chain from creation to sale"
+    } ,
+    "crafts": {
+      "welcomeTitle": "Explore Crafts",
+      "description": "Discover authentic handmade crafts from skilled artisans around the world. Each piece is verified and tells a unique story of tradition and craftsmanship.",
+      "explore": {
+        "noImageAvailable": "No image available",
+        "craftDetails": "Craft Details",
+        "artisan": "Artisan",
+        "materials": "Materials",
+        "techniques": "Techniques",
+        "by": "by"
+      },
+      "details":{
+          "createdBy": "Created by",
+          "createdOn": "Created on",
+          "backToCrafts": "Back to Crafts",
+          "noDescription": "No description available",          
+          "qrCodeTitle" : "Share this craft",
+          "qrCodeDescription": "Please scan this QR code to share this craft."
+      },
+      "welcomeTitleCraft":"Craft Details"
+      
     }    
 }
 
