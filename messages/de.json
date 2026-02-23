@@ -27,7 +27,9 @@
     "haveAccount": "Bereits ein Konto?",
     "passwordMismatch": "Passwörter stimmen nicht überein",
     "registrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-    "emailExists": "Ein Konto mit dieser E-Mail-Adresse existiert bereits."
+    "emailExists": "Ein Konto mit dieser E-Mail-Adresse existiert bereits.",
+    "orDivider": "oder",
+    "continueWithGoogle": "Weiter mit Google"
   },
   "about": {
     "title": "Über SustainableCrafting",
