@@ -18,10 +18,10 @@ export function HowItWorksSection() {
                 </div>
 
                 {/* Steps Grid */}
-                <div className="mb-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4 ">
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
 
                     <Card className='bg-primary/10 rounded-md'>
-                    <CardHeader>
+                    <CardHeader className="text-center items-center space-y-3">
                      <Camera className="mx-auto mb-4 h-12 w-12 text-primary " strokeWidth={2.5} />
                     <CardTitle>{t('howItWorks.steps.record.title')}</CardTitle>
                     <CardDescription>{t('howItWorks.steps.record.description')}</CardDescription>
@@ -29,7 +29,7 @@ export function HowItWorksSection() {
                     </Card>
 
                     <Card className='bg-primary/10 rounded-md'>
-                    <CardHeader>
+                    <CardHeader className="text-center items-center space-y-3">
                      <QrCode className="mx-auto mb-4 h-12 w-12 text-primary " strokeWidth={2.5} />
                     <CardTitle>{t('howItWorks.steps.generate.title')}</CardTitle>
                     <CardDescription>{t('howItWorks.steps.generate.description')}</CardDescription>
@@ -37,7 +37,7 @@ export function HowItWorksSection() {
                     </Card>
                     
                     <Card className='bg-primary/10 rounded-md'>
-                    <CardHeader>
+                    <CardHeader className="text-center items-center space-y-3">
                      <Smartphone className="mx-auto mb-4 h-12 w-12 text-primary " strokeWidth={2.5} />
                     <CardTitle>{t('howItWorks.steps.scan.title')}</CardTitle>
                     <CardDescription>{t('howItWorks.steps.scan.description')}</CardDescription>
@@ -45,7 +45,7 @@ export function HowItWorksSection() {
                     </Card>
 
                     <Card className='bg-primary/10 rounded-md'>
-                    <CardHeader>
+                    <CardHeader className="text-center items-center space-y-3">
                      <Globe className="mx-auto mb-4 h-12 w-12 text-primary " strokeWidth={2.5} />
                     <CardTitle>{t('howItWorks.steps.access.title')}</CardTitle>
                     <CardDescription>{t('howItWorks.steps.access.description')}</CardDescription>
