@@ -8,6 +8,7 @@
   "navbar": {
     "home": "Startseite",
     "about": "Über uns",
+    "crafts": "Handwerke",
     "login": "Anmelden",
     "logout": "Abmelden"
   },
@@ -109,5 +110,9 @@
     "certificates": "Unveränderliche digitale Zertifikate für jedes Handwerk",
     "connection": "Direkte Verbindung zwischen Kunsthandwerkern und Kunden",
     "supply": "Transparente Lieferkette von der Herstellung bis zum Verkauf"
+  },
+  "crafts": {
+    "welcomeTitle": "Handwerke entdecken",
+    "description": "Entdecken Sie authentische handgefertigte Produkte von erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes Stück ist verifiziert und erzählt eine einzigartige Geschichte von Tradition und Handwerkskunst."
   }
 }
