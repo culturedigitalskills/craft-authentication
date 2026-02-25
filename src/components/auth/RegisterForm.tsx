@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -14,57 +17,57 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import Link from 'next/link'
+import { registerRequestSchema } from '@/lib/validations/auth'
+
+const registerFormSchema = registerRequestSchema
+    .extend({ confirmPassword: z.string().min(1) })
+    .refine((data) => data.password === data.confirmPassword, {
+        path: ['confirmPassword'],
+    })
+
+type RegisterFormData = z.infer<typeof registerFormSchema>
 
 export function RegisterForm() {
     const t = useTranslations('auth')
     const router = useRouter()
-    const [error, setError] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
+    const [serverError, setServerError] = useState<string | null>(null)
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<RegisterFormData>({
+        resolver: zodResolver(registerFormSchema),
+        mode: 'onBlur',
+    })
 
-        const formData = new FormData(e.currentTarget)
-        const password = formData.get('password') as string
-        const confirmPassword = formData.get('confirmPassword') as string
-
-        if (password !== confirmPassword) {
-            setError(t('passwordMismatch'))
-            setLoading(false)
-            return
-        }
+    async function onSubmit(data: RegisterFormData) {
+        setServerError(null)
 
         try {
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: formData.get('name'),
-                    email: formData.get('email'),
-                    password,
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
                 }),
             })
 
             if (!res.ok) {
-                const data = await res.json()
-                if (res.status === 409) {
-                    setError(t('emailExists'))
-                } else {
-                    setError(data.error || t('registrationFailed'))
-                }
-                setLoading(false)
+                const json = await res.json()
+                setServerError(
+                    res.status === 409 ? t('emailExists') : (json.error || t('registrationFailed'))
+                )
                 return
             }
 
             const result = await signIn('credentials', {
-                email: formData.get('email') as string,
-                password,
+                email: data.email,
+                password: data.password,
                 redirect: false,
             })
-
-            setLoading(false)
 
             if (result?.error) {
                 router.push('/login')
@@ -74,8 +77,7 @@ export function RegisterForm() {
                 router.refresh()
             }
         } catch {
-            setError(t('registrationFailed'))
-            setLoading(false)
+            setServerError(t('registrationFailed'))
         }
     }
 
@@ -85,39 +87,53 @@ export function RegisterForm() {
                 <CardTitle>{t('registerTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {error && (
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {serverError && (
                         <div className="rounded bg-red-50 p-3 text-sm text-red-500">
-                            {error}
+                            {serverError}
                         </div>
                     )}
                     <div className="space-y-2">
                         <Label htmlFor="name">{t('name')}</Label>
                         <Input
                             id="name"
-                            name="name"
                             type="text"
-                            required
+                            aria-invalid={!!errors.name}
+                            {...register('name')}
                         />
+                        {errors.name && (
+                            <p className="text-sm text-red-500">
+                                {t('validation.nameRequired')}
+                            </p>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="email">{t('email')}</Label>
                         <Input
                             id="email"
-                            name="email"
                             type="email"
-                            required
+                            aria-invalid={!!errors.email}
+                            {...register('email')}
                         />
+                        {errors.email && (
+                            <p className="text-sm text-red-500">
+                                {t('validation.emailInvalid')}
+                            </p>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="password">{t('password')}</Label>
                         <Input
                             id="password"
-                            name="password"
                             type="password"
-                            required
-                            minLength={8}
+                            aria-invalid={!!errors.password}
+                            {...register('password')}
                         />
+                        {errors.password && (
+                            <p className="text-sm text-red-500">
+                                {t('validation.passwordMin')}
+                            </p>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="confirmPassword">
@@ -125,18 +141,22 @@ export function RegisterForm() {
                         </Label>
                         <Input
                             id="confirmPassword"
-                            name="confirmPassword"
                             type="password"
-                            required
-                            minLength={8}
+                            aria-invalid={!!errors.confirmPassword}
+                            {...register('confirmPassword')}
                         />
+                        {errors.confirmPassword && (
+                            <p className="text-sm text-red-500">
+                                {t('validation.passwordMismatch')}
+                            </p>
+                        )}
                     </div>
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={loading}
+                        disabled={isSubmitting}
                     >
-                        {loading ? t('registering') : t('register')}
+                        {isSubmitting ? t('registering') : t('register')}
                     </Button>
                     <div className="relative my-4">
                         <div className="absolute inset-0 flex items-center">
