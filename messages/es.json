@@ -34,6 +34,8 @@
       "passwordMin": "La contraseña debe tener al menos 8 caracteres",
       "passwordMismatch": "Las contraseñas no coinciden"
     }
+    "orDivider": "o",
+    "continueWithGoogle": "Continuar con Google"
   },
   "about": {
     "title": "Acerca de SustainableCrafting",

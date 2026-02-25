@@ -34,6 +34,8 @@
       "passwordMin": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
       "passwordMismatch": "كلمتا المرور غير متطابقتين"
     }
+    "orDivider": "أو",
+    "continueWithGoogle": "المتابعة مع Google"
   },
   "about": {
     "title": "حول SustainableCrafting",
