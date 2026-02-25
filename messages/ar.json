@@ -27,7 +27,9 @@
     "haveAccount": "لديك حساب بالفعل؟",
     "passwordMismatch": "كلمتا المرور غير متطابقتين",
     "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
-    "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل."
+    "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل.",
+    "orDivider": "أو",
+    "continueWithGoogle": "المتابعة مع Google"
   },
   "about": {
     "title": "حول SustainableCrafting",

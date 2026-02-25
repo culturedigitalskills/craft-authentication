@@ -27,7 +27,9 @@
     "haveAccount": "पहले से खाता है?",
     "passwordMismatch": "पासवर्ड मेल नहीं खाते",
     "registrationFailed": "पंजीकरण विफल। कृपया पुनः प्रयास करें।",
-    "emailExists": "इस ईमेल से पहले से एक खाता मौजूद है।"
+    "emailExists": "इस ईमेल से पहले से एक खाता मौजूद है।",
+    "orDivider": "या",
+    "continueWithGoogle": "Google से जारी रखें"
   },
   "about": {
     "title": "सस्टेनेबल क्राफ्टिंग के बारे में",
