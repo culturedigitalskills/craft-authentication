@@ -125,7 +125,26 @@
     "updateSuccess": "تم تحديث الملف بنجاح!",
     "createFailed": "فشل إنشاء الملف. يرجى المحاولة مرة أخرى.",
     "updateFailed": "فشل تحديث الملف. يرجى المحاولة مرة أخرى.",
-    "yearsLabel": "سنوات"
+    "yearsLabel": "سنوات",
+    "country": "البلد",
+    "region": "المنطقة",
+    "selectCountry": "اختر بلدًا",
+    "selectRegion": "اختر منطقة",
+    "uploadPhoto": "رفع صورة",
+    "changePhoto": "تغيير الصورة",
+    "photoUploading": "جارٍ الرفع...",
+    "photoUploadFailed": "فشل رفع الصورة",
+    "personalInfo": "المعلومات الشخصية",
+    "craftExperience": "الخبرة الحرفية",
+    "location": "الموقع",
+    "publicProfileLink": "عرض الملف العام"
+  },
+  "artisanProfile": {
+    "about": "نبذة",
+    "craftJourney": "المسيرة الحرفية",
+    "yearsExperience": "سنوات من الخبرة",
+    "learnedFrom": "تعلّم من",
+    "notFound": "الحرفي غير موجود"
   },
   "crafts": {
     "welcomeTitle": "استكشف الحِرف",

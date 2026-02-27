@@ -6,7 +6,7 @@ import { z } from 'zod'
  */
 export const registerRequestSchema = z.object({
     name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
-    email: z.string().email('Invalid email address'),
+    email: z.email('Invalid email address'),
     password: z
         .string()
         .min(8, 'Password must be at least 8 characters')
@@ -18,7 +18,7 @@ export const registerRequestSchema = z.object({
  * Used by NextAuth Credentials provider
  */
 export const loginRequestSchema = z.object({
-    email: z.string().email('Invalid email address'),
+    email: z.email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
 })
 
@@ -26,9 +26,9 @@ export const loginRequestSchema = z.object({
  * Schema for user response object (safe user data without sensitive fields)
  */
 export const userResponseSchema = z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string().nullable(),
-    email: z.string().email(),
+    email: z.email(),
     image: z.string().nullable().optional(),
 })
 
@@ -45,9 +45,9 @@ export const registerResponseSchema = z.object({
  * Used by NextAuth after successful authentication
  */
 export const authResponseSchema = z.object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string().nullable(),
-    email: z.string().email(),
+    email: z.email(),
     image: z.string().nullable().optional(),
 })
 
@@ -78,7 +78,7 @@ export const simpleErrorResponseSchema = z.object({
  * Schema for JWT token payload
  */
 export const jwtTokenSchema = z.object({
-    sub: z.string().uuid().optional(),
+    sub: z.uuid().optional(),
     iat: z.number().optional(),
     exp: z.number().optional(),
 })
@@ -88,9 +88,9 @@ export const jwtTokenSchema = z.object({
  */
 export const sessionSchema = z.object({
     user: z.object({
-        id: z.string().uuid(),
+        id: z.uuid(),
         name: z.string().nullable(),
-        email: z.string().email(),
+        email: z.email(),
         image: z.string().nullable(),
     }),
     expires: z.string(),

@@ -38,11 +38,17 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 - `POST /api/artisans` - Create artisan profile (authenticated)
 - `PUT /api/artisans/:id` - Update artisan profile (owner only)
 
+### Geographic Data
+
+- `GET /api/countries` - List all countries
+- `GET /api/countries/:countryId/regions` - List regions for a country
+
 ### Media Management
 
 - `GET /api/media` - List all media files (with pagination)
 - `GET /api/media/:id` - Retrieve media file
 - `POST /api/media/upload` - Upload image or video file
+- `POST /api/media/attachments` - Link media to an entity (authenticated)
 - `DELETE /api/media/:id` - Delete media file
 
 ## Usage Examples

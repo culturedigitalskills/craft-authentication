@@ -36,5 +36,15 @@ export const fileUploadSchema = z.object({
         ),
 })
 
+export const CreateMediaAttachmentSchema = z.object({
+    mediaId: z.uuid(),
+    entityType: z.string().min(1),
+    entityId: z.uuid(),
+    attachmentType: z.enum(['HERO', 'GALLERY', 'PROCESS']),
+    isPrimary: z.boolean().default(false),
+    displayOrder: z.number().int().min(0).default(0),
+})
+
 export type MediaQuery = z.infer<typeof mediaQuerySchema>
 export type FileUpload = z.infer<typeof fileUploadSchema>
+export type CreateMediaAttachment = z.infer<typeof CreateMediaAttachmentSchema>

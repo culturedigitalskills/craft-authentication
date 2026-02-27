@@ -125,7 +125,26 @@
     "updateSuccess": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!",
     "createFailed": "प्रोफ़ाइल बनाने में विफल। कृपया पुनः प्रयास करें।",
     "updateFailed": "प्रोफ़ाइल अपडेट करने में विफल। कृपया पुनः प्रयास करें।",
-    "yearsLabel": "वर्ष"
+    "yearsLabel": "वर्ष",
+    "country": "देश",
+    "region": "क्षेत्र",
+    "selectCountry": "एक देश चुनें",
+    "selectRegion": "एक क्षेत्र चुनें",
+    "uploadPhoto": "फोटो अपलोड करें",
+    "changePhoto": "फोटो बदलें",
+    "photoUploading": "अपलोड हो रहा है...",
+    "photoUploadFailed": "फोटो अपलोड करने में विफल",
+    "personalInfo": "व्यक्तिगत जानकारी",
+    "craftExperience": "शिल्प अनुभव",
+    "location": "स्थान",
+    "publicProfileLink": "सार्वजनिक प्रोफ़ाइल देखें"
+  },
+  "artisanProfile": {
+    "about": "परिचय",
+    "craftJourney": "शिल्प यात्रा",
+    "yearsExperience": "वर्षों का अनुभव",
+    "learnedFrom": "सीखने का स्रोत",
+    "notFound": "कारीगर नहीं मिला"
   },
   "crafts": {
     "welcomeTitle": "शिल्पों का अन्वेषण करें",
