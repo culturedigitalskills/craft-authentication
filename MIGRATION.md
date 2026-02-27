@@ -1,3 +1,27 @@
+# v0.2.x -> v0.3.0
+
+### `.env.local` and `.env.production`
+
+Add the following for Google OAuth:
+
+```.env
+# Google OAuth
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
+```
+
+Get credentials from the [Google Cloud Console](https://console.cloud.google.com/apis/credentials):
+1. Sign in with any Google account.
+2. Create a new project.
+3. Set up OAuth consent screen.
+4. Go to Credentials and create credentials.
+5. Select Web application.
+6. Add authorized redirect URI: `https://yourdomain.com/api/auth/callback/google`
+7. For local development use: `http://localhost:20100/api/auth/callback/google`
+8. Get the Client ID and Secret.
+
+---
+
 # v0.1.x -> v0.2.0
 
 ### `.env.local` and .env.production
