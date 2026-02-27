@@ -10,7 +10,8 @@
     "about": "Acerca de",
     "crafts": "Artesanías",
     "login": "Iniciar sesión",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "profile": "Perfil"
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
@@ -102,6 +103,29 @@
     "certificates": "Certificados digitales inmutables para cada artesanía",
     "connection": "Conexión directa entre artesanos y clientes",
     "supply": "Cadena de suministro transparente desde la creación hasta la venta"
+  },
+  "profile": {
+    "title": "Perfil de Artesano",
+    "createTitle": "Crea tu Perfil de Artesano",
+    "editTitle": "Edita tu Perfil de Artesano",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "bio": "Biografía",
+    "bioPlaceholder": "Cuéntanos sobre ti y tu artesanía...",
+    "yearsOfExperience": "Años de experiencia",
+    "learningSource": "¿Cómo aprendiste tu oficio?",
+    "learningSourcePlaceholder": "Ej., Tradición familiar, Aprendizaje, Autodidacta...",
+    "save": "Guardar perfil",
+    "saving": "Guardando...",
+    "update": "Actualizar perfil",
+    "updating": "Actualizando...",
+    "edit": "Editar perfil",
+    "cancelEdit": "Cancelar",
+    "createSuccess": "¡Perfil creado exitosamente!",
+    "updateSuccess": "¡Perfil actualizado exitosamente!",
+    "createFailed": "Error al crear el perfil. Inténtalo de nuevo.",
+    "updateFailed": "Error al actualizar el perfil. Inténtalo de nuevo.",
+    "yearsLabel": "años"
   },
   "crafts": {
       "welcomeTitle": "Explorar artesanías",

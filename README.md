@@ -32,6 +32,12 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 - `PUT /api/data/:id` - Update data record
 - `DELETE /api/data/:id` - Delete data record
 
+### Artisan Profile
+
+- `GET /api/artisans/me` - Get current user's artisan profile
+- `POST /api/artisans` - Create artisan profile (authenticated)
+- `PUT /api/artisans/:id` - Update artisan profile (owner only)
+
 ### Media Management
 
 - `GET /api/media` - List all media files (with pagination)

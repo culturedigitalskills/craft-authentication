@@ -10,7 +10,8 @@
     "about": "About",
     "crafts": "Crafts",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "profile": "Profile"
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -105,6 +106,29 @@
       "connection": "Direct connection between artisans and customers",
       "supply": "Transparent supply chain from creation to sale"
     } ,
+    "profile": {
+      "title": "Artisan Profile",
+      "createTitle": "Create Your Artisan Profile",
+      "editTitle": "Edit Your Artisan Profile",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us about yourself and your craft...",
+      "yearsOfExperience": "Years of Experience",
+      "learningSource": "How did you learn your craft?",
+      "learningSourcePlaceholder": "e.g., Family tradition, Apprenticeship, Self-taught...",
+      "save": "Save Profile",
+      "saving": "Saving...",
+      "update": "Update Profile",
+      "updating": "Updating...",
+      "edit": "Edit Profile",
+      "cancelEdit": "Cancel",
+      "createSuccess": "Profile created successfully!",
+      "updateSuccess": "Profile updated successfully!",
+      "createFailed": "Failed to create profile. Please try again.",
+      "updateFailed": "Failed to update profile. Please try again.",
+      "yearsLabel": "years"
+    },
     "crafts": {
       "welcomeTitle": "Explore Crafts",
       "description": "Discover authentic handmade crafts from skilled artisans around the world. Each piece is verified and tells a unique story of tradition and craftsmanship.",
