@@ -135,7 +135,26 @@
       "updateSuccess": "Profile updated successfully!",
       "createFailed": "Failed to create profile. Please try again.",
       "updateFailed": "Failed to update profile. Please try again.",
-      "yearsLabel": "years"
+      "yearsLabel": "years",
+      "country": "Country",
+      "region": "Region",
+      "selectCountry": "Select a country",
+      "selectRegion": "Select a region",
+      "uploadPhoto": "Upload Photo",
+      "changePhoto": "Change Photo",
+      "photoUploading": "Uploading...",
+      "photoUploadFailed": "Failed to upload photo",
+      "personalInfo": "Personal Information",
+      "craftExperience": "Craft Experience",
+      "location": "Location",
+      "publicProfileLink": "View Public Profile"
+    },
+    "artisanProfile": {
+      "about": "About",
+      "craftJourney": "Craft Journey",
+      "yearsExperience": "years of experience",
+      "learnedFrom": "Learned from",
+      "notFound": "Artisan not found"
     },
     "crafts": {
       "welcomeTitle": "Explore Crafts",

@@ -133,7 +133,26 @@
     "updateSuccess": "Profil erfolgreich aktualisiert!",
     "createFailed": "Profil konnte nicht erstellt werden. Bitte versuche es erneut.",
     "updateFailed": "Profil konnte nicht aktualisiert werden. Bitte versuche es erneut.",
-    "yearsLabel": "Jahre"
+    "yearsLabel": "Jahre",
+    "country": "Land",
+    "region": "Region",
+    "selectCountry": "Land auswählen",
+    "selectRegion": "Region auswählen",
+    "uploadPhoto": "Foto hochladen",
+    "changePhoto": "Foto ändern",
+    "photoUploading": "Wird hochgeladen...",
+    "photoUploadFailed": "Foto-Upload fehlgeschlagen",
+    "personalInfo": "Persönliche Informationen",
+    "craftExperience": "Handwerkserfahrung",
+    "location": "Standort",
+    "publicProfileLink": "Öffentliches Profil ansehen"
+  },
+  "artisanProfile": {
+    "about": "Über",
+    "craftJourney": "Handwerksweg",
+    "yearsExperience": "Jahre Erfahrung",
+    "learnedFrom": "Gelernt von",
+    "notFound": "Handwerker nicht gefunden"
   },
   "crafts": {
     "welcomeTitle": "Handwerke entdecken",

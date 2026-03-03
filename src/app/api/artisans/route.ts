@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
                 bio: validatedData.bio,
                 yearsOfExperience: validatedData.yearsOfExperience,
                 learningSource: validatedData.learningSource,
+                regionId: validatedData.regionId,
                 slug,
             },
         })

@@ -2,26 +2,46 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { ProfilePhotoUpload } from './ProfilePhotoUpload'
+import { LocationSelect } from './LocationSelect'
+import {
+    MapPin,
+    Clock,
+    GraduationCap,
+    User,
+    Pencil,
+    ExternalLink,
+} from 'lucide-react'
 
 interface Artisan {
     id: string
     firstName: string
     lastName: string
+    slug: string
     bio: string | null
     yearsOfExperience: number | null
     learningSource: string | null
+    regionId: string | null
+    region: {
+        id: string
+        name: string
+        country: { id: string; name: string }
+    } | null
 }
 
 interface ArtisanProfileFormProps {
     artisan: Artisan | null
+    photoUrl: string | null
 }
 
-export function ArtisanProfileForm({ artisan }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({ artisan, photoUrl }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const [isEditing, setIsEditing] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -34,6 +54,8 @@ export function ArtisanProfileForm({ artisan }: ArtisanProfileFormProps) {
         artisan?.yearsOfExperience?.toString() ?? ''
     )
     const [learningSource, setLearningSource] = useState(artisan?.learningSource ?? '')
+    const [regionId, setRegionId] = useState<string | null>(artisan?.regionId ?? null)
+    const [uploadedPhotoId, setUploadedPhotoId] = useState<string | null>(null)
 
     const isCreateMode = !artisan
     const showForm = isCreateMode || isEditing
@@ -50,6 +72,7 @@ export function ArtisanProfileForm({ artisan }: ArtisanProfileFormProps) {
         if (bio) data.bio = bio
         if (yearsOfExperience) data.yearsOfExperience = parseInt(yearsOfExperience, 10)
         if (learningSource) data.learningSource = learningSource
+        if (regionId) data.regionId = regionId
 
         try {
             const url = isCreateMode ? '/api/artisans' : `/api/artisans/${artisan.id}`
@@ -61,8 +84,21 @@ export function ArtisanProfileForm({ artisan }: ArtisanProfileFormProps) {
                 body: JSON.stringify(data),
             })
 
-            if (!res.ok) {
-                throw new Error('Request failed')
+            if (!res.ok) throw new Error('Request failed')
+
+            if (isCreateMode && uploadedPhotoId) {
+                const newArtisan = await res.json()
+                await fetch('/api/media/attachments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mediaId: uploadedPhotoId,
+                        entityType: 'Artisan',
+                        entityId: newArtisan.id,
+                        attachmentType: 'HERO',
+                        isPrimary: true,
+                    }),
+                })
             }
 
             setMessage({
@@ -70,7 +106,6 @@ export function ArtisanProfileForm({ artisan }: ArtisanProfileFormProps) {
                 type: 'success',
             })
 
-            // Reload to show updated data from server
             window.location.reload()
         } catch {
             setMessage({
@@ -89,24 +124,143 @@ export function ArtisanProfileForm({ artisan }: ArtisanProfileFormProps) {
         setBio(artisan?.bio ?? '')
         setYearsOfExperience(artisan?.yearsOfExperience?.toString() ?? '')
         setLearningSource(artisan?.learningSource ?? '')
+        setRegionId(artisan?.regionId ?? null)
         setMessage(null)
     }
 
+    const locationText = artisan?.region
+        ? `${artisan.region.name}, ${artisan.region.country.name}`
+        : null
+
+    // ── View mode — scroll sections layout ──
+    if (!showForm && artisan) {
+        return (
+            <div className="-mt-16">
+                {/* ── Hero Banner ── */}
+                <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-24">
+                    <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/[0.07] blur-3xl" />
+                    <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
+
+                    <div className="relative mx-auto max-w-4xl px-4 text-center">
+                        {/* Avatar */}
+                        <div className="mx-auto mb-4 h-28 w-28 overflow-hidden rounded-full border-4 border-background shadow-xl sm:h-32 sm:w-32">
+                            {photoUrl ? (
+                                <Image
+                                    src={photoUrl}
+                                    alt={`${artisan.firstName} ${artisan.lastName}`}
+                                    width={128}
+                                    height={128}
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center bg-muted">
+                                    <User className="h-10 w-10 text-muted-foreground" />
+                                </div>
+                            )}
+                        </div>
+
+                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                            {artisan.firstName} {artisan.lastName}
+                        </h1>
+
+                        {locationText && (
+                            <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                                <MapPin className="h-4 w-4" />
+                                {locationText}
+                            </p>
+                        )}
+
+                        <div className="mt-4 flex flex-wrap justify-center gap-3">
+                            <Button onClick={() => setIsEditing(true)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                {t('edit')}
+                            </Button>
+                            <Button variant="outline" asChild>
+                                <Link href={`/artisans/${artisan.slug}`}>
+                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                    {t('publicProfileLink')}
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+
+                {message && (
+                    <div className="mx-auto max-w-4xl px-4">
+                        <div
+                            className={`mt-6 rounded-lg p-3 text-sm ${
+                                message.type === 'success'
+                                    ? 'bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200'
+                                    : 'bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200'
+                            }`}
+                        >
+                            {message.text}
+                        </div>
+                    </div>
+                )}
+
+                {/* ── Stats Section ── */}
+                <section className="border-b border-border/50 bg-background py-8">
+                    <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 sm:grid-cols-3">
+                        {artisan.yearsOfExperience !== null && (
+                            <div className="rounded-lg bg-muted/60 p-5 text-center">
+                                <Clock className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <p className="font-semibold">{artisan.yearsOfExperience} {t('yearsLabel')}</p>
+                                <p className="text-xs text-muted-foreground">{t('craftExperience')}</p>
+                            </div>
+                        )}
+                        {artisan.learningSource && (
+                            <div className="rounded-lg bg-muted/60 p-5 text-center">
+                                <GraduationCap className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <p className="font-semibold">{artisan.learningSource}</p>
+                                <p className="text-xs text-muted-foreground">{t('learningSource')}</p>
+                            </div>
+                        )}
+                        {locationText && (
+                            <div className="rounded-lg bg-muted/60 p-5 text-center">
+                                <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <p className="font-semibold">{locationText}</p>
+                                <p className="text-xs text-muted-foreground">{t('location')}</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* ── About Section ── */}
+                {artisan.bio && (
+                    <section className="bg-muted/40 py-10">
+                        <div className="mx-auto max-w-3xl px-4">
+                            <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                                {t('bio')}
+                            </h2>
+                            <div className="border-l-2 border-primary/30 pl-5">
+                                <p className="text-base leading-relaxed text-foreground/80">
+                                    {artisan.bio}
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* ── Gallery placeholder section (future) ── */}
+                {/* Will be implemented with masonry grid when gallery feature is added */}
+            </div>
+        )
+    }
+
+    // ── Create / Edit mode ──
     return (
-        <Card className="mx-auto max-w-2xl">
-            <CardHeader>
-                <CardTitle>
-                    {isCreateMode
-                        ? t('createTitle')
-                        : isEditing
-                          ? t('editTitle')
-                          : t('title')}
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
+            <div className="bg-gradient-to-br from-card via-muted/50 to-card px-6 py-6">
+                <h1 className="text-center text-2xl font-bold tracking-tight">
+                    {isCreateMode ? t('createTitle') : t('editTitle')}
+                </h1>
+            </div>
+
+            <CardContent className="p-6">
                 {message && (
                     <div
-                        className={`mb-4 rounded-md p-3 text-sm ${
+                        className={`mb-6 rounded-lg p-3 text-sm ${
                             message.type === 'success'
                                 ? 'bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200'
                                 : 'bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200'
@@ -116,132 +270,117 @@ export function ArtisanProfileForm({ artisan }: ArtisanProfileFormProps) {
                     </div>
                 )}
 
-                {showForm ? (
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="firstName">{t('firstName')}</Label>
-                                <Input
-                                    id="firstName"
-                                    value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    required
-                                />
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    <ProfilePhotoUpload
+                        artisanId={artisan?.id ?? null}
+                        currentPhotoUrl={photoUrl}
+                        onPhotoUploaded={setUploadedPhotoId}
+                    />
+
+                    <div>
+                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                            <User className="h-4 w-4" />
+                            {t('personalInfo')}
+                        </h3>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="firstName">{t('firstName')}</Label>
+                                    <Input
+                                        id="firstName"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="lastName">{t('lastName')}</Label>
+                                    <Input
+                                        id="lastName"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        required
+                                    />
+                                </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="lastName">{t('lastName')}</Label>
-                                <Input
-                                    id="lastName"
-                                    value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    required
+                                <Label htmlFor="bio">{t('bio')}</Label>
+                                <Textarea
+                                    id="bio"
+                                    value={bio}
+                                    onChange={(e) => setBio(e.target.value)}
+                                    placeholder={t('bioPlaceholder')}
+                                    rows={4}
                                 />
                             </div>
                         </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="bio">{t('bio')}</Label>
-                            <Textarea
-                                id="bio"
-                                value={bio}
-                                onChange={(e) => setBio(e.target.value)}
-                                placeholder={t('bioPlaceholder')}
-                                rows={4}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="yearsOfExperience">{t('yearsOfExperience')}</Label>
-                            <Input
-                                id="yearsOfExperience"
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={yearsOfExperience}
-                                onChange={(e) => setYearsOfExperience(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="learningSource">{t('learningSource')}</Label>
-                            <Input
-                                id="learningSource"
-                                value={learningSource}
-                                onChange={(e) => setLearningSource(e.target.value)}
-                                placeholder={t('learningSourcePlaceholder')}
-                            />
-                        </div>
-
-                        <div className="flex gap-3">
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting
-                                    ? isCreateMode
-                                        ? t('saving')
-                                        : t('updating')
-                                    : isCreateMode
-                                      ? t('save')
-                                      : t('update')}
-                            </Button>
-                            {isEditing && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleCancelEdit}
-                                >
-                                    {t('cancelEdit')}
-                                </Button>
-                            )}
-                        </div>
-                    </form>
-                ) : (
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    {t('firstName')}
-                                </p>
-                                <p>{artisan.firstName}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    {t('lastName')}
-                                </p>
-                                <p>{artisan.lastName}</p>
-                            </div>
-                        </div>
-
-                        {artisan.bio && (
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    {t('bio')}
-                                </p>
-                                <p>{artisan.bio}</p>
-                            </div>
-                        )}
-
-                        {artisan.yearsOfExperience !== null && (
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    {t('yearsOfExperience')}
-                                </p>
-                                <p>
-                                    {artisan.yearsOfExperience} {t('yearsLabel')}
-                                </p>
-                            </div>
-                        )}
-
-                        {artisan.learningSource && (
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    {t('learningSource')}
-                                </p>
-                                <p>{artisan.learningSource}</p>
-                            </div>
-                        )}
-
-                        <Button onClick={() => setIsEditing(true)}>{t('edit')}</Button>
                     </div>
-                )}
+
+                    <div className="border-t border-border pt-6">
+                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                            <GraduationCap className="h-4 w-4" />
+                            {t('craftExperience')}
+                        </h3>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="yearsOfExperience">
+                                    {t('yearsOfExperience')}
+                                </Label>
+                                <Input
+                                    id="yearsOfExperience"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    value={yearsOfExperience}
+                                    onChange={(e) => setYearsOfExperience(e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="learningSource">{t('learningSource')}</Label>
+                                <Input
+                                    id="learningSource"
+                                    value={learningSource}
+                                    onChange={(e) => setLearningSource(e.target.value)}
+                                    placeholder={t('learningSourcePlaceholder')}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-border pt-6">
+                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                            <MapPin className="h-4 w-4" />
+                            {t('location')}
+                        </h3>
+                        <LocationSelect
+                            initialCountryId={artisan?.region?.country.id}
+                            initialRegionId={artisan?.regionId ?? undefined}
+                            onRegionChange={setRegionId}
+                        />
+                    </div>
+
+                    <div className="flex gap-3 border-t border-border pt-6">
+                        <Button type="submit" size="lg" disabled={isSubmitting}>
+                            {isSubmitting
+                                ? isCreateMode
+                                    ? t('saving')
+                                    : t('updating')
+                                : isCreateMode
+                                  ? t('save')
+                                  : t('update')}
+                        </Button>
+                        {isEditing && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="lg"
+                                onClick={handleCancelEdit}
+                            >
+                                {t('cancelEdit')}
+                            </Button>
+                        )}
+                    </div>
+                </form>
             </CardContent>
         </Card>
     )

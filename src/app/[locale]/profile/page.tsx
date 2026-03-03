@@ -1,7 +1,6 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { Container } from '@/components/layout/Container'
 import { ArtisanProfileForm } from '@/components/profile/ArtisanProfileForm'
 
 export default async function ProfilePage() {
@@ -16,15 +15,35 @@ export default async function ProfilePage() {
             id: true,
             firstName: true,
             lastName: true,
+            slug: true,
             bio: true,
             yearsOfExperience: true,
             learningSource: true,
+            regionId: true,
+            region: {
+                select: {
+                    id: true,
+                    name: true,
+                    country: { select: { id: true, name: true } },
+                },
+            },
         },
     })
 
-    return (
-        <Container>
-            <ArtisanProfileForm artisan={artisan} />
-        </Container>
-    )
+    // Fetch profile photo via MediaAttachment (polymorphic)
+    const photoAttachment = artisan
+        ? await prisma.mediaAttachment.findFirst({
+              where: {
+                  entityType: 'Artisan',
+                  entityId: artisan.id,
+                  attachmentType: 'HERO',
+                  isPrimary: true,
+              },
+              select: { mediaId: true },
+          })
+        : null
+
+    const photoUrl = photoAttachment ? `/api/media/${photoAttachment.mediaId}` : null
+
+    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} />
 }

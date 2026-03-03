@@ -133,7 +133,26 @@
     "updateSuccess": "¡Perfil actualizado exitosamente!",
     "createFailed": "Error al crear el perfil. Inténtalo de nuevo.",
     "updateFailed": "Error al actualizar el perfil. Inténtalo de nuevo.",
-    "yearsLabel": "años"
+    "yearsLabel": "años",
+    "country": "País",
+    "region": "Región",
+    "selectCountry": "Selecciona un país",
+    "selectRegion": "Selecciona una región",
+    "uploadPhoto": "Subir foto",
+    "changePhoto": "Cambiar foto",
+    "photoUploading": "Subiendo...",
+    "photoUploadFailed": "Error al subir la foto",
+    "personalInfo": "Información personal",
+    "craftExperience": "Experiencia artesanal",
+    "location": "Ubicación",
+    "publicProfileLink": "Ver perfil público"
+  },
+  "artisanProfile": {
+    "about": "Acerca de",
+    "craftJourney": "Trayectoria artesanal",
+    "yearsExperience": "años de experiencia",
+    "learnedFrom": "Aprendido de",
+    "notFound": "Artesano no encontrado"
   },
   "crafts": {
       "welcomeTitle": "Explorar artesanías",
