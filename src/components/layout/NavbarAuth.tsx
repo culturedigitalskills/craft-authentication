@@ -16,6 +16,12 @@ export function NavbarAuth() {
     if (session?.user) {
         return (
             <div className="flex items-center gap-4">
+                <Link
+                    href="/profile"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                    {t('profile')}
+                </Link>
                 <span className="text-sm text-muted-foreground">
                     {session.user.name || session.user.email}
                 </span>

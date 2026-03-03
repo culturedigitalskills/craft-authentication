@@ -10,7 +10,8 @@
     "about": "Über uns",
     "crafts": "Handwerke",
     "login": "Anmelden",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "profile": "Profil"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -110,6 +111,29 @@
     "certificates": "Unveränderliche digitale Zertifikate für jedes Handwerk",
     "connection": "Direkte Verbindung zwischen Kunsthandwerkern und Kunden",
     "supply": "Transparente Lieferkette von der Herstellung bis zum Verkauf"
+  },
+  "profile": {
+    "title": "Handwerkerprofil",
+    "createTitle": "Erstelle dein Handwerkerprofil",
+    "editTitle": "Bearbeite dein Handwerkerprofil",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "bio": "Über mich",
+    "bioPlaceholder": "Erzähle uns von dir und deinem Handwerk...",
+    "yearsOfExperience": "Jahre Erfahrung",
+    "learningSource": "Wie hast du dein Handwerk gelernt?",
+    "learningSourcePlaceholder": "z.B., Familientradition, Ausbildung, Autodidakt...",
+    "save": "Profil speichern",
+    "saving": "Wird gespeichert...",
+    "update": "Profil aktualisieren",
+    "updating": "Wird aktualisiert...",
+    "edit": "Profil bearbeiten",
+    "cancelEdit": "Abbrechen",
+    "createSuccess": "Profil erfolgreich erstellt!",
+    "updateSuccess": "Profil erfolgreich aktualisiert!",
+    "createFailed": "Profil konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "updateFailed": "Profil konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+    "yearsLabel": "Jahre"
   },
   "crafts": {
     "welcomeTitle": "Handwerke entdecken",

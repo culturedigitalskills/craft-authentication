@@ -47,3 +47,21 @@ cp garage.toml.example garage.toml
 ```
 
 then edit `admin_token` and replace the value with the one you set in `GARAGE_RPC_SECRET`
+
+# v0.2.x -> v0.3.0
+
+### Database Schema
+
+Added full platform database schema for artisans, crafts, QR verification, and verifiable credentials.
+
+**New tables**: Country, Region, Community, Artisan, ArtisanCommunityMembership, CraftCategory, Technique, ArtisanTechnique, Material, ProductType, ProductTypeMaterial, ProductTypeTechnique, Batch, BatchArtisan, BatchTag, TagScan, VerifiableCredential, MediaAttachment
+
+**Modified tables**: User (added `role` and `isActive` fields)
+
+Run the database migration after deployment:
+
+```bash
+prisma migrate deploy
+```
+
+No new environment variables required.
