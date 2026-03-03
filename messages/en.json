@@ -35,7 +35,7 @@
       "emailInvalid": "Please enter a valid email address",
       "passwordMin": "Password must be at least 8 characters",
       "passwordMismatch": "Passwords do not match"
-    }
+    },
     "orDivider": "or",
     "continueWithGoogle": "Continue with Google"
   },

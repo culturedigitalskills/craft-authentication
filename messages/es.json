@@ -35,7 +35,7 @@
       "emailInvalid": "Por favor, introduce una dirección de correo electrónico válida",
       "passwordMin": "La contraseña debe tener al menos 8 caracteres",
       "passwordMismatch": "Las contraseñas no coinciden"
-    }
+    },
     "orDivider": "o",
     "continueWithGoogle": "Continuar con Google"
   },
