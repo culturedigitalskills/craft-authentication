@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { RateLimitErrorResponse } from './validations/types'
 
 const authLimiter = new RateLimiterMemory({
-    points: 5,
+    points: 100,
     duration: 1 * 60, // 1 minute
 })
 
 const apiLimiter = new RateLimiterMemory({
-    points: 5,
+    points: 100,
     duration: 1, // 1 second
 })
 
