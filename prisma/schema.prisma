@@ -169,9 +169,6 @@ model Artisan {
     user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
     region            Region?                      @relation(fields: [regionId], references: [id])
     memberships       ArtisanCommunityMembership[]
-    techniques        ArtisanTechnique[]
-    productTypes      ProductType[]
-    batchArtisans     BatchArtisan[]
 
     @@index([regionId])
 }
@@ -190,147 +187,6 @@ model ArtisanCommunityMembership {
     @@unique([artisanId, communityId])
 }
 
-// Craft Taxonomy
-
-model CraftCategory {
-    id                    String                 @id @default(uuid())
-    parentId              String?
-    code                  String                 @unique
-    name                  String
-    depth                 Int                    @default(0)
-    createdAt             DateTime               @default(now())
-    updatedAt             DateTime               @updatedAt
-    parent                CraftCategory?         @relation("CraftCategoryTree", fields: [parentId], references: [id])
-    children              CraftCategory[]        @relation("CraftCategoryTree")
-    techniques            Technique[]
-    productTypes          ProductType[]
-
-    @@index([parentId])
-}
-
-model Technique {
-    id                    String                  @id @default(uuid())
-    craftCategoryId       String
-    code                  String                  @unique
-    name                  String
-    description           String?
-    isTraditional         Boolean                 @default(false)
-    isUnescoListed        Boolean                 @default(false)
-    createdAt             DateTime                @default(now())
-    updatedAt             DateTime                @updatedAt
-    craftCategory         CraftCategory           @relation(fields: [craftCategoryId], references: [id])
-    artisanTechniques     ArtisanTechnique[]
-    productTypeTechniques ProductTypeTechnique[]
-
-    @@index([craftCategoryId])
-}
-
-model ArtisanTechnique {
-    id              String    @id @default(uuid())
-    artisanId       String
-    techniqueId     String
-    yearsPracticing Int?
-    artisan         Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
-    technique       Technique @relation(fields: [techniqueId], references: [id])
-
-    @@unique([artisanId, techniqueId])
-}
-
-model Material {
-    id                   String                @id @default(uuid())
-    code                 String                @unique
-    name                 String
-    isNatural            Boolean               @default(false)
-    isSustainable        Boolean               @default(false)
-    isLocallySourced     Boolean               @default(false)
-    createdAt            DateTime              @default(now())
-    updatedAt            DateTime              @updatedAt
-    productTypeMaterials ProductTypeMaterial[]
-}
-
-// Products
-
-model ProductType {
-    id                    String                 @id @default(uuid())
-    artisanId             String
-    craftCategoryId       String?
-    name                  String
-    slug                  String                 @unique
-    description           String?
-    story                 String?
-    avgProductionTime     Int?
-    isActive              Boolean                @default(true)
-    createdAt             DateTime               @default(now())
-    updatedAt             DateTime               @updatedAt
-    deletedAt             DateTime?
-    artisan               Artisan                @relation(fields: [artisanId], references: [id], onDelete: Cascade)
-    craftCategory         CraftCategory?         @relation(fields: [craftCategoryId], references: [id])
-    materials             ProductTypeMaterial[]
-    techniques            ProductTypeTechnique[]
-    batches               Batch[]
-
-    @@index([artisanId])
-    @@index([craftCategoryId])
-}
-
-model ProductTypeMaterial {
-    id            String      @id @default(uuid())
-    productTypeId String
-    materialId    String
-    isPrimary     Boolean     @default(false)
-    usageNotes    String?
-    productType   ProductType @relation(fields: [productTypeId], references: [id], onDelete: Cascade)
-    material      Material    @relation(fields: [materialId], references: [id])
-
-    @@unique([productTypeId, materialId])
-}
-
-model ProductTypeTechnique {
-    id            String      @id @default(uuid())
-    productTypeId String
-    techniqueId   String
-    isPrimary     Boolean     @default(false)
-    sequenceOrder Int?
-    productType   ProductType @relation(fields: [productTypeId], references: [id], onDelete: Cascade)
-    technique     Technique   @relation(fields: [techniqueId], references: [id])
-
-    @@unique([productTypeId, techniqueId])
-}
-
-// Batches
-
-model Batch {
-    id              String      @id @default(uuid())
-    productTypeId   String
-    batchCode       String      @unique
-    quantity        Int
-    productionStart DateTime?
-    productionEnd   DateTime?
-    productionNotes String?
-    createdAt       DateTime    @default(now())
-    updatedAt       DateTime    @updatedAt
-    deletedAt       DateTime?
-    productType     ProductType @relation(fields: [productTypeId], references: [id])
-    batchArtisans   BatchArtisan[]
-    tags            BatchTag[]
-    credentials     VerifiableCredential[]
-
-    @@index([productTypeId])
-}
-
-model BatchArtisan {
-    id                     String  @id @default(uuid())
-    batchId                String
-    artisanId              String
-    isLead                 Boolean @default(false)
-    contributionType       String?
-    contributionPercentage Float?
-    batch                  Batch   @relation(fields: [batchId], references: [id], onDelete: Cascade)
-    artisan                Artisan @relation(fields: [artisanId], references: [id])
-
-    @@unique([batchId, artisanId])
-}
-
 // QR Tags & Scanning
 
 model BatchTag {
@@ -343,7 +199,6 @@ model BatchTag {
     isActive      Boolean   @default(true)
     createdAt     DateTime  @default(now())
     deactivatedAt DateTime?
-    batch         Batch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
     scans         TagScan[]
 
     @@index([batchId])
@@ -367,7 +222,6 @@ model VerifiableCredential {
     credentialId      String   @unique
     issuerDid         String
     holderDid         String
-    batchId           String
     credentialType    String
     credentialSubject Json
     proof             Json
@@ -375,9 +229,7 @@ model VerifiableCredential {
     expirationDate    DateTime?
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
-    batch             Batch    @relation(fields: [batchId], references: [id])
 
-    @@index([batchId])
     @@index([holderDid])
 }
 
