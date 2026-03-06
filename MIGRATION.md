@@ -1,3 +1,32 @@
+# v0.3.x -> v0.4.0
+
+### Database Schema Rollback
+
+Removed unused craft taxonomy, product, and batch tables to simplify the schema. Removed models are saved in `prisma/schema-future.prisma.bak` for future reintroduction.
+
+**Removed tables**: CraftCategory, Technique, ArtisanTechnique, Material, ProductType, ProductTypeMaterial, ProductTypeTechnique, Batch, BatchArtisan
+
+**Modified tables**: VerifiableCredential (removed `batchId` column), BatchTag (removed Batch foreign key)
+
+**Removed duplicate migration**: `20260212183410_afterdeleting` was a duplicate of `init` + `authentication` and has been deleted.
+
+⚠️ **Database reset required**:
+
+```bash
+pnpm dotenv -e .env.local -- prisma migrate reset
+pnpm db:seed
+```
+
+### Seed Data
+
+Seed the database with countries and regions (required for the artisan profile location selector):
+
+```bash
+pnpm db:seed
+```
+
+---
+
 # v0.2.x -> v0.3.0
 
 ### `.env.local` and `.env.production`
@@ -19,6 +48,22 @@ Get credentials from the [Google Cloud Console](https://console.cloud.google.com
 6. Add authorized redirect URI: `https://yourdomain.com/api/auth/callback/google`
 7. For local development use: `http://localhost:20100/api/auth/callback/google`
 8. Get the Client ID and Secret.
+
+### Database Schema
+
+Added full platform database schema for artisans, crafts, QR verification, and verifiable credentials.
+
+**New tables**: Country, Region, Community, Artisan, ArtisanCommunityMembership, CraftCategory, Technique, ArtisanTechnique, Material, ProductType, ProductTypeMaterial, ProductTypeTechnique, Batch, BatchArtisan, BatchTag, TagScan, VerifiableCredential, MediaAttachment
+
+**Modified tables**: User (added `role` and `isActive` fields)
+
+Run the database migration after deployment:
+
+```bash
+prisma migrate deploy
+```
+
+No new environment variables required.
 
 ---
 
@@ -47,21 +92,3 @@ cp garage.toml.example garage.toml
 ```
 
 then edit `admin_token` and replace the value with the one you set in `GARAGE_RPC_SECRET`
-
-# v0.2.x -> v0.3.0
-
-### Database Schema
-
-Added full platform database schema for artisans, crafts, QR verification, and verifiable credentials.
-
-**New tables**: Country, Region, Community, Artisan, ArtisanCommunityMembership, CraftCategory, Technique, ArtisanTechnique, Material, ProductType, ProductTypeMaterial, ProductTypeTechnique, Batch, BatchArtisan, BatchTag, TagScan, VerifiableCredential, MediaAttachment
-
-**Modified tables**: User (added `role` and `isActive` fields)
-
-Run the database migration after deployment:
-
-```bash
-prisma migrate deploy
-```
-
-No new environment variables required.
