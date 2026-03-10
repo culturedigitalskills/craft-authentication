@@ -147,7 +147,14 @@
       "personalInfo": "Personal Information",
       "craftExperience": "Craft Experience",
       "location": "Location",
-      "publicProfileLink": "View Public Profile"
+      "publicProfileLink": "View Public Profile",
+      "coverPhoto": "Cover Photo",
+      "uploadCover": "Upload Cover Photo",
+      "changeCover": "Change Cover",
+      "coverUploadFailed": "Failed to upload cover photo",
+      "gallery": "Gallery",
+      "uploadGallery": "Add Photos",
+      "galleryEmpty": "No gallery photos yet"
     },
     "artisanProfile": {
       "about": "About",

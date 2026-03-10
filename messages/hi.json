@@ -139,7 +139,14 @@
     "personalInfo": "व्यक्तिगत जानकारी",
     "craftExperience": "शिल्प अनुभव",
     "location": "स्थान",
-    "publicProfileLink": "सार्वजनिक प्रोफ़ाइल देखें"
+    "publicProfileLink": "सार्वजनिक प्रोफ़ाइल देखें",
+    "coverPhoto": "कवर फ़ोटो",
+    "uploadCover": "कवर फ़ोटो अपलोड करें",
+    "changeCover": "कवर बदलें",
+    "coverUploadFailed": "कवर फ़ोटो अपलोड करने में विफल",
+    "gallery": "गैलरी",
+    "uploadGallery": "फ़ोटो जोड़ें",
+    "galleryEmpty": "अभी तक कोई गैलरी फ़ोटो नहीं"
   },
   "artisanProfile": {
     "about": "परिचय",

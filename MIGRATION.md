@@ -10,12 +10,27 @@ Removed unused craft taxonomy, product, and batch tables to simplify the schema.
 
 **Removed duplicate migration**: `20260212183410_afterdeleting` was a duplicate of `init` + `authentication` and has been deleted.
 
-⚠️ **Database reset required**:
+**Database reset required**:
 
 ```bash
 pnpm dotenv -e .env.local -- prisma migrate reset
 pnpm db:seed
 ```
+
+### Cover Photo Support
+
+Added `COVER` to the `AttachmentType` enum, enabling artisan profile cover/banner images alongside the existing `HERO` (profile photo) type.
+
+**Schema change**: `AttachmentType` enum now includes `HERO`, `COVER`, `GALLERY`, `PROCESS`.
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
+No new environment variables required.
 
 ### Seed Data
 

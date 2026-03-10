@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
+import { CoverPhotoUpload } from './CoverPhotoUpload'
 import { LocationSelect } from './LocationSelect'
 import {
     MapPin,
@@ -18,6 +19,7 @@ import {
     User,
     Pencil,
     ExternalLink,
+    ImagePlus,
 } from 'lucide-react'
 
 interface Artisan {
@@ -39,9 +41,10 @@ interface Artisan {
 interface ArtisanProfileFormProps {
     artisan: Artisan | null
     photoUrl: string | null
+    coverUrl: string | null
 }
 
-export function ArtisanProfileForm({ artisan, photoUrl }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({ artisan, photoUrl, coverUrl }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const [isEditing, setIsEditing] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -56,6 +59,7 @@ export function ArtisanProfileForm({ artisan, photoUrl }: ArtisanProfileFormProp
     const [learningSource, setLearningSource] = useState(artisan?.learningSource ?? '')
     const [regionId, setRegionId] = useState<string | null>(artisan?.regionId ?? null)
     const [uploadedPhotoId, setUploadedPhotoId] = useState<string | null>(null)
+    const [uploadedCoverId, setUploadedCoverId] = useState<string | null>(null)
 
     const isCreateMode = !artisan
     const showForm = isCreateMode || isEditing
@@ -86,19 +90,43 @@ export function ArtisanProfileForm({ artisan, photoUrl }: ArtisanProfileFormProp
 
             if (!res.ok) throw new Error('Request failed')
 
-            if (isCreateMode && uploadedPhotoId) {
+            if (isCreateMode) {
                 const newArtisan = await res.json()
-                await fetch('/api/media/attachments', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        mediaId: uploadedPhotoId,
-                        entityType: 'Artisan',
-                        entityId: newArtisan.id,
-                        attachmentType: 'HERO',
-                        isPrimary: true,
-                    }),
-                })
+                const attachmentPromises = []
+
+                if (uploadedPhotoId) {
+                    attachmentPromises.push(
+                        fetch('/api/media/attachments', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                mediaId: uploadedPhotoId,
+                                entityType: 'Artisan',
+                                entityId: newArtisan.id,
+                                attachmentType: 'HERO',
+                                isPrimary: true,
+                            }),
+                        })
+                    )
+                }
+
+                if (uploadedCoverId) {
+                    attachmentPromises.push(
+                        fetch('/api/media/attachments', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                mediaId: uploadedCoverId,
+                                entityType: 'Artisan',
+                                entityId: newArtisan.id,
+                                attachmentType: 'COVER',
+                                isPrimary: true,
+                            }),
+                        })
+                    )
+                }
+
+                await Promise.all(attachmentPromises)
             }
 
             setMessage({
@@ -138,8 +166,20 @@ export function ArtisanProfileForm({ artisan, photoUrl }: ArtisanProfileFormProp
             <div className="-mt-16">
                 {/* ── Hero Banner ── */}
                 <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-24">
-                    <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/[0.07] blur-3xl" />
-                    <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
+                    {coverUrl ? (
+                        <Image
+                            src={coverUrl}
+                            alt="Cover photo"
+                            fill
+                            className="object-cover"
+                        />
+                    ) : (
+                        <>
+                            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/[0.07] blur-3xl" />
+                            <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
+                        </>
+                    )}
+                    {coverUrl && <div className="absolute inset-0 bg-black/40" />}
 
                     <div className="relative mx-auto max-w-4xl px-4 text-center">
                         {/* Avatar */}
@@ -159,12 +199,12 @@ export function ArtisanProfileForm({ artisan, photoUrl }: ArtisanProfileFormProp
                             )}
                         </div>
 
-                        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                        <h1 className={`text-2xl font-bold tracking-tight sm:text-3xl ${coverUrl ? 'text-white' : ''}`}>
                             {artisan.firstName} {artisan.lastName}
                         </h1>
 
                         {locationText && (
-                            <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <p className={`mt-1.5 inline-flex items-center gap-1.5 text-sm ${coverUrl ? 'text-white/80' : 'text-muted-foreground'}`}>
                                 <MapPin className="h-4 w-4" />
                                 {locationText}
                             </p>
@@ -271,6 +311,18 @@ export function ArtisanProfileForm({ artisan, photoUrl }: ArtisanProfileFormProp
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-8">
+                    <div>
+                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                            <ImagePlus className="h-4 w-4" />
+                            {t('coverPhoto')}
+                        </h3>
+                        <CoverPhotoUpload
+                            artisanId={artisan?.id ?? null}
+                            currentCoverUrl={coverUrl}
+                            onCoverUploaded={setUploadedCoverId}
+                        />
+                    </div>
+
                     <ProfilePhotoUpload
                         artisanId={artisan?.id ?? null}
                         currentPhotoUrl={photoUrl}

@@ -20,6 +20,7 @@ enum TagType {
 
 enum AttachmentType {
     HERO
+    COVER
     GALLERY
     PROCESS
 }

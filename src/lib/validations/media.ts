@@ -40,7 +40,7 @@ export const CreateMediaAttachmentSchema = z.object({
     mediaId: z.uuid(),
     entityType: z.string().min(1),
     entityId: z.uuid(),
-    attachmentType: z.enum(['HERO', 'GALLERY', 'PROCESS']),
+    attachmentType: z.enum(['HERO', 'COVER', 'GALLERY', 'PROCESS']),
     isPrimary: z.boolean().default(false),
     displayOrder: z.number().int().min(0).default(0),
 })

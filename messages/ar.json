@@ -145,7 +145,14 @@
     "personalInfo": "المعلومات الشخصية",
     "craftExperience": "الخبرة الحرفية",
     "location": "الموقع",
-    "publicProfileLink": "عرض الملف العام"
+    "publicProfileLink": "عرض الملف العام",
+    "coverPhoto": "صورة الغلاف",
+    "uploadCover": "رفع صورة الغلاف",
+    "changeCover": "تغيير الغلاف",
+    "coverUploadFailed": "فشل رفع صورة الغلاف",
+    "gallery": "المعرض",
+    "uploadGallery": "إضافة صور",
+    "galleryEmpty": "لا توجد صور في المعرض بعد"
   },
   "artisanProfile": {
     "about": "نبذة",

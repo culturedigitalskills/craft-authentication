@@ -45,5 +45,20 @@ export default async function ProfilePage() {
 
     const photoUrl = photoAttachment ? `/api/media/${photoAttachment.mediaId}` : null
 
-    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} />
+    // Fetch cover photo via MediaAttachment
+    const coverAttachment = artisan
+        ? await prisma.mediaAttachment.findFirst({
+              where: {
+                  entityType: 'Artisan',
+                  entityId: artisan.id,
+                  attachmentType: 'COVER',
+                  isPrimary: true,
+              },
+              select: { mediaId: true },
+          })
+        : null
+
+    const coverUrl = coverAttachment ? `/api/media/${coverAttachment.mediaId}` : null
+
+    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} coverUrl={coverUrl} />
 }

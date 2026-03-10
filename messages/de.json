@@ -145,7 +145,14 @@
     "personalInfo": "Persönliche Informationen",
     "craftExperience": "Handwerkserfahrung",
     "location": "Standort",
-    "publicProfileLink": "Öffentliches Profil ansehen"
+    "publicProfileLink": "Öffentliches Profil ansehen",
+    "coverPhoto": "Titelbild",
+    "uploadCover": "Titelbild hochladen",
+    "changeCover": "Titelbild ändern",
+    "coverUploadFailed": "Fehler beim Hochladen des Titelbilds",
+    "gallery": "Galerie",
+    "uploadGallery": "Fotos hinzufügen",
+    "galleryEmpty": "Noch keine Galeriefotos"
   },
   "artisanProfile": {
     "about": "Über",

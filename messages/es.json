@@ -145,7 +145,14 @@
     "personalInfo": "Información personal",
     "craftExperience": "Experiencia artesanal",
     "location": "Ubicación",
-    "publicProfileLink": "Ver perfil público"
+    "publicProfileLink": "Ver perfil público",
+    "coverPhoto": "Foto de portada",
+    "uploadCover": "Subir foto de portada",
+    "changeCover": "Cambiar portada",
+    "coverUploadFailed": "Error al subir la foto de portada",
+    "gallery": "Galería",
+    "uploadGallery": "Agregar fotos",
+    "galleryEmpty": "Aún no hay fotos en la galería"
   },
   "artisanProfile": {
     "about": "Acerca de",
