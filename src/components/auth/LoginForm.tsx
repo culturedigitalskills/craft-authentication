@@ -47,7 +47,7 @@ export function LoginForm() {
         if (result?.error) {
             setServerError(t('invalidCredentials'))
         } else {
-            router.push('/crafts')
+            router.push('/auth/redirect')
             router.refresh()
         }
     }
@@ -113,7 +113,7 @@ export function LoginForm() {
                         type="button"
                         variant="outline"
                         className="w-full"
-                        onClick={() => signIn('google', { callbackUrl: '/crafts' })}
+                        onClick={() => signIn('google', { callbackUrl: '/auth/redirect' })}
                     >
                         <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                             <path
