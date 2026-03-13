@@ -6,12 +6,23 @@ import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
 
 export async function POST(request: NextRequest) {
-    const { unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireAuth()
     if (unauthorized) return unauthorized
 
     try {
         const body = await request.json()
         const validatedData = CreateMediaAttachmentSchema.parse(body)
+
+        // Verify the user owns the entity they're attaching to
+        if (validatedData.entityType === 'Artisan') {
+            const artisan = await prisma.artisan.findUnique({
+                where: { id: validatedData.entityId },
+                select: { userId: true },
+            })
+            if (!artisan || artisan.userId !== session!.user.id) {
+                return errorResponse('Forbidden', 403)
+            }
+        }
 
         // Remove existing primary attachment for this entity if replacing
         if (validatedData.isPrimary) {

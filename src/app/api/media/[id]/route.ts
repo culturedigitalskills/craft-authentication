@@ -40,7 +40,7 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
 ) {
-    const { unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireAuth()
     if (unauthorized) return unauthorized
 
     try {
@@ -49,6 +49,20 @@ export async function DELETE(
 
         if (!fileData) {
             return errorResponse('File not found', 404)
+        }
+
+        // Verify the user owns this media via attachment → artisan → user
+        const attachment = await prisma.mediaAttachment.findFirst({
+            where: { mediaId: id },
+        })
+        if (attachment) {
+            const artisan = await prisma.artisan.findUnique({
+                where: { id: attachment.entityId },
+                select: { userId: true },
+            })
+            if (!artisan || artisan.userId !== session!.user.id) {
+                return errorResponse('Forbidden', 403)
+            }
         }
 
         // We have two data items for a media file, a database

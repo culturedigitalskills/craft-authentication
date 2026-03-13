@@ -3,13 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { RateLimitErrorResponse } from './validations/types'
 
 const authLimiter = new RateLimiterMemory({
-    points: 100,
-    duration: 1 * 60, // 1 minute
+    points: 5,
+    duration: 1 * 60, // 5 attempts per minute for login/register
 })
 
 const apiLimiter = new RateLimiterMemory({
-    points: 100,
-    duration: 1, // 1 second
+    points: 60,
+    duration: 60, // 60 requests per minute for general API
 })
 
 /**
@@ -36,8 +36,12 @@ export async function applyRateLimit(
     session: { user?: { id?: string } } | null,
     pathname: string,
 ): Promise<NextResponse> {
-    // Determine which limiter to use based on route
-    const limiter = pathname.startsWith('/api/auth/') ? authLimiter : apiLimiter
+    // Only apply strict auth limiter to actual login/register attempts
+    // NextAuth session/csrf/providers/callback routes use the general limiter
+    const isAuthAttempt =
+        pathname === '/api/auth/callback/credentials' ||
+        pathname === '/api/auth/register'
+    const limiter = isAuthAttempt ? authLimiter : apiLimiter
     const clientId = getClientId(request, session)
 
     try {

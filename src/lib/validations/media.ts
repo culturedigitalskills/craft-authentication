@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
 const ALLOWED_EXTENSIONS = /\.(jpeg|jpg|png|gif|webp|mp4|avi|mov|wmv|flv|webm|mkv)$/i
+const ALLOWED_MIME_TYPES = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'video/mp4', 'video/avi', 'video/quicktime', 'video/x-ms-wmv',
+    'video/x-flv', 'video/webm', 'video/x-matroska',
+]
 const MAX_FILE_SIZE = (parseInt(process.env.MAX_MEDIA_SIZE ?? '100') || 100) * 1024 * 1024 // 100MB
 
 export const mediaQuerySchema = z.object({
@@ -24,6 +29,12 @@ export const fileUploadSchema = z.object({
             },
             {
                 message: 'Only image and video files are allowed',
+            },
+        )
+        .refine(
+            (file) => ALLOWED_MIME_TYPES.includes(file.type),
+            {
+                message: 'File MIME type is not allowed',
             },
         )
         .refine(
