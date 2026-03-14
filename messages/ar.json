@@ -152,14 +152,21 @@
     "coverUploadFailed": "فشل رفع صورة الغلاف",
     "gallery": "المعرض",
     "uploadGallery": "إضافة صور",
-    "galleryEmpty": "لا توجد صور في المعرض بعد"
+    "galleryEmpty": "لا توجد صور في المعرض بعد",
+    "galleryUploadFailed": "فشل في رفع صورة المعرض",
+    "galleryDeleteFailed": "فشل في حذف صورة المعرض",
+    "galleryDeleteConfirm": "حذف هذه الصورة؟",
+    "galleryDeleteYes": "حذف",
+    "galleryDeleteNo": "إلغاء"
   },
   "artisanProfile": {
     "about": "نبذة",
     "craftJourney": "المسيرة الحرفية",
     "yearsExperience": "سنوات من الخبرة",
     "learnedFrom": "تعلّم من",
-    "notFound": "الحرفي غير موجود"
+    "notFound": "الحرفي غير موجود",
+    "gallery": "معرض الصور",
+    "galleryEmpty": "لا توجد صور في المعرض بعد"
   },
   "crafts": {
     "welcomeTitle": "استكشف الحِرف",

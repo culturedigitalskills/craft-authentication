@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { LanguageSelect } from '../LanguageSelect';
+import { LanguageSelect } from '@/components/shared/LanguageSelect';
 import { NavbarAuth } from './NavbarAuth';
 
 

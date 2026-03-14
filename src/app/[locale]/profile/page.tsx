@@ -60,5 +60,24 @@ export default async function ProfilePage() {
 
     const coverUrl = coverAttachment ? `/api/media/${coverAttachment.mediaId}` : null
 
-    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} coverUrl={coverUrl} />
+    // Fetch gallery photos via MediaAttachment
+    const galleryAttachments = artisan
+        ? await prisma.mediaAttachment.findMany({
+              where: {
+                  entityType: 'Artisan',
+                  entityId: artisan.id,
+                  attachmentType: 'GALLERY',
+              },
+              select: { id: true, mediaId: true },
+              orderBy: { displayOrder: 'asc' },
+          })
+        : []
+
+    const galleryImages = galleryAttachments.map(a => ({
+        id: a.id,
+        mediaId: a.mediaId,
+        url: `/api/media/${a.mediaId}`,
+    }))
+
+    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} coverUrl={coverUrl} galleryImages={galleryImages} />
 }

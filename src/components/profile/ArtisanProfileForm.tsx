@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
+import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
 import {
     MapPin,
@@ -38,13 +39,20 @@ interface Artisan {
     } | null
 }
 
+interface GalleryImage {
+    id: string
+    mediaId: string
+    url: string
+}
+
 interface ArtisanProfileFormProps {
     artisan: Artisan | null
     photoUrl: string | null
     coverUrl: string | null
+    galleryImages: GalleryImage[]
 }
 
-export function ArtisanProfileForm({ artisan, photoUrl, coverUrl }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const [isEditing, setIsEditing] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -282,8 +290,18 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl }: ArtisanProfi
                     </section>
                 )}
 
-                {/* ── Gallery placeholder section (future) ── */}
-                {/* Will be implemented with masonry grid when gallery feature is added */}
+                {/* ── Gallery Section ── */}
+                <section className="py-10">
+                    <div className="mx-auto max-w-3xl px-4">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
+                            {t('gallery')}
+                        </h2>
+                        <GalleryUpload
+                            artisanId={artisan.id}
+                            initialImages={galleryImages}
+                        />
+                    </div>
+                </section>
             </div>
         )
     }
@@ -410,6 +428,19 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl }: ArtisanProfi
                             onRegionChange={setRegionId}
                         />
                     </div>
+
+                    {!isCreateMode && (
+                        <div className="border-t border-border pt-6">
+                            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                                <ImagePlus className="h-4 w-4" />
+                                {t('gallery')}
+                            </h3>
+                            <GalleryUpload
+                                artisanId={artisan?.id ?? null}
+                                initialImages={galleryImages}
+                            />
+                        </div>
+                    )}
 
                     <div className="flex gap-3 border-t border-border pt-6">
                         <Button type="submit" size="lg" disabled={isSubmitting}>

@@ -152,14 +152,21 @@
     "coverUploadFailed": "Fehler beim Hochladen des Titelbilds",
     "gallery": "Galerie",
     "uploadGallery": "Fotos hinzufügen",
-    "galleryEmpty": "Noch keine Galeriefotos"
+    "galleryEmpty": "Noch keine Galeriefotos",
+    "galleryUploadFailed": "Galeriefoto konnte nicht hochgeladen werden",
+    "galleryDeleteFailed": "Galeriefoto konnte nicht gelöscht werden",
+    "galleryDeleteConfirm": "Dieses Foto löschen?",
+    "galleryDeleteYes": "Löschen",
+    "galleryDeleteNo": "Abbrechen"
   },
   "artisanProfile": {
     "about": "Über",
     "craftJourney": "Handwerksweg",
     "yearsExperience": "Jahre Erfahrung",
     "learnedFrom": "Gelernt von",
-    "notFound": "Handwerker nicht gefunden"
+    "notFound": "Handwerker nicht gefunden",
+    "gallery": "Galerie",
+    "galleryEmpty": "Noch keine Galeriefotos"
   },
   "crafts": {
     "welcomeTitle": "Handwerke entdecken",

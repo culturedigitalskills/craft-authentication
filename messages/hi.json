@@ -146,14 +146,21 @@
     "coverUploadFailed": "कवर फ़ोटो अपलोड करने में विफल",
     "gallery": "गैलरी",
     "uploadGallery": "फ़ोटो जोड़ें",
-    "galleryEmpty": "अभी तक कोई गैलरी फ़ोटो नहीं"
+    "galleryEmpty": "अभी तक कोई गैलरी फ़ोटो नहीं",
+    "galleryUploadFailed": "गैलरी फ़ोटो अपलोड करने में विफल",
+    "galleryDeleteFailed": "गैलरी फ़ोटो हटाने में विफल",
+    "galleryDeleteConfirm": "यह फ़ोटो हटाएं?",
+    "galleryDeleteYes": "हटाएं",
+    "galleryDeleteNo": "रद्द करें"
   },
   "artisanProfile": {
     "about": "परिचय",
     "craftJourney": "शिल्प यात्रा",
     "yearsExperience": "वर्षों का अनुभव",
     "learnedFrom": "सीखने का स्रोत",
-    "notFound": "कारीगर नहीं मिला"
+    "notFound": "कारीगर नहीं मिला",
+    "gallery": "गैलरी",
+    "galleryEmpty": "अभी तक कोई गैलरी फ़ोटो नहीं"
   },
   "crafts": {
     "welcomeTitle": "शिल्पों का अन्वेषण करें",

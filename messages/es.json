@@ -152,14 +152,21 @@
     "coverUploadFailed": "Error al subir la foto de portada",
     "gallery": "Galería",
     "uploadGallery": "Agregar fotos",
-    "galleryEmpty": "Aún no hay fotos en la galería"
+    "galleryEmpty": "Aún no hay fotos en la galería",
+    "galleryUploadFailed": "Error al subir foto de galería",
+    "galleryDeleteFailed": "Error al eliminar foto de galería",
+    "galleryDeleteConfirm": "¿Eliminar esta foto?",
+    "galleryDeleteYes": "Eliminar",
+    "galleryDeleteNo": "Cancelar"
   },
   "artisanProfile": {
     "about": "Acerca de",
     "craftJourney": "Trayectoria artesanal",
     "yearsExperience": "años de experiencia",
     "learnedFrom": "Aprendido de",
-    "notFound": "Artesano no encontrado"
+    "notFound": "Artesano no encontrado",
+    "gallery": "Galería",
+    "galleryEmpty": "Aún no hay fotos en la galería"
   },
   "crafts": {
       "welcomeTitle": "Explorar artesanías",

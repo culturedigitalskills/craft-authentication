@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/dist/client/link';
 import Image from 'next/image';
 import { Calendar, User } from 'lucide-react';
-import { formatDateTime } from '@/components/formatDateTime';
+import { formatDateTime } from '@/components/shared/formatDateTime';
 
 
 // export default async function CraftsPage() {

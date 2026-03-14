@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { MapPin, Clock, GraduationCap, User } from 'lucide-react'
+import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 
@@ -70,6 +71,23 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     })
 
     const coverUrl = coverAttachment ? `/api/media/${coverAttachment.mediaId}` : null
+
+    const galleryAttachments = await prisma.mediaAttachment.findMany({
+        where: {
+            entityType: 'Artisan',
+            entityId: artisan.id,
+            attachmentType: 'GALLERY',
+        },
+        select: { id: true, mediaId: true },
+        orderBy: { displayOrder: 'asc' },
+    })
+
+    const galleryImages = galleryAttachments.map(a => ({
+        id: a.id,
+        mediaId: a.mediaId,
+        url: `/api/media/${a.mediaId}`,
+    }))
+
     const locationText = artisan.region
         ? `${artisan.region.name}, ${artisan.region.country.name}`
         : null
@@ -168,7 +186,17 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                 </section>
             )}
 
-            {/* ── Gallery section (future) ── */}
+            {/* ── Gallery Section ── */}
+            {galleryImages.length > 0 && (
+                <section className="py-10">
+                    <div className="mx-auto max-w-3xl px-4">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
+                            {t('gallery')}
+                        </h2>
+                        <GalleryGrid images={galleryImages} />
+                    </div>
+                </section>
+            )}
         </div>
     )
 }

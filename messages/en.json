@@ -154,14 +154,21 @@
       "coverUploadFailed": "Failed to upload cover photo",
       "gallery": "Gallery",
       "uploadGallery": "Add Photos",
-      "galleryEmpty": "No gallery photos yet"
+      "galleryEmpty": "No gallery photos yet",
+      "galleryUploadFailed": "Failed to upload gallery photo",
+      "galleryDeleteFailed": "Failed to delete gallery photo",
+      "galleryDeleteConfirm": "Delete this photo?",
+      "galleryDeleteYes": "Delete",
+      "galleryDeleteNo": "Cancel"
     },
     "artisanProfile": {
       "about": "About",
       "craftJourney": "Craft Journey",
       "yearsExperience": "years of experience",
       "learnedFrom": "Learned from",
-      "notFound": "Artisan not found"
+      "notFound": "Artisan not found",
+      "gallery": "Gallery",
+      "galleryEmpty": "No gallery photos yet"
     },
     "crafts": {
       "welcomeTitle": "Explore Crafts",

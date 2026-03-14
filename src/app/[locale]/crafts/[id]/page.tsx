@@ -5,9 +5,9 @@ import { useTranslations } from 'next-intl'
 import { useParams } from 'next/dist/client/components/navigation';
 import Link from 'next/link';
 import { Badge, User, Calendar, QrCode } from 'lucide-react';
-import { formatDateTime } from '@/components/formatDateTime';
+import { formatDateTime } from '@/components/shared/formatDateTime';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { QRCode } from '@/components/qrcode';
+import { QRCode } from '@/components/shared/qrcode';
 
 interface PageProps {
   params: Promise<{
