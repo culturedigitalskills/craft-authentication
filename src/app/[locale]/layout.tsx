@@ -44,7 +44,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
             <body
                 className={cn(
-                    'min-h-screen bg-background font-sans antialiased',
+                    'min-h-screen overflow-x-hidden bg-background font-sans antialiased',
                     geistSans.variable,
                     geistMono.variable,
                 )}
