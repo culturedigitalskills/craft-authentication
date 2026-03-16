@@ -14,12 +14,40 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { slug } = await params
     const artisan = await prisma.artisan.findUnique({
         where: { slug, deletedAt: null },
-        select: { firstName: true, lastName: true, bio: true },
+        select: { id: true, firstName: true, lastName: true, bio: true },
     })
     if (!artisan) return { title: 'Artisan Not Found' }
+
+    const title = `${artisan.firstName} ${artisan.lastName} — Artisan Profile`
+    const description = artisan.bio?.slice(0, 160) ?? `Discover the craft of ${artisan.firstName} ${artisan.lastName}.`
+
+    // Use profile photo as OG image if available
+    const photoAttachment = await prisma.mediaAttachment.findFirst({
+        where: {
+            entityType: 'Artisan',
+            entityId: artisan.id,
+            attachmentType: 'HERO',
+            isPrimary: true,
+        },
+        select: { mediaId: true },
+    })
+    const ogImage = photoAttachment ? `/api/media/${photoAttachment.mediaId}` : undefined
+
     return {
-        title: `${artisan.firstName} ${artisan.lastName} — Artisan Profile`,
-        description: artisan.bio?.slice(0, 160) ?? undefined,
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            type: 'profile',
+            ...(ogImage && { images: [{ url: ogImage, alt: title }] }),
+        },
+        twitter: {
+            card: ogImage ? 'summary_large_image' : 'summary',
+            title,
+            description,
+            ...(ogImage && { images: [ogImage] }),
+        },
     }
 }
 

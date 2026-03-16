@@ -18,8 +18,8 @@ export async function initGarage() {
         const headBucketCommand = new HeadBucketCommand({ Bucket: BUCKET_NAME })
         await s3Client.send(headBucketCommand)
         console.log(`Garage bucket '${BUCKET_NAME}' exists`)
-    } catch (error: any) {
-        if (error.name === 'NoSuchBucket') {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'NoSuchBucket') {
             try {
                 const createBucketCommand = new CreateBucketCommand({ Bucket: BUCKET_NAME })
                 await s3Client.send(createBucketCommand)

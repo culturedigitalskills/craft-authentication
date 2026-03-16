@@ -17,11 +17,11 @@ export async function GET(request: NextRequest) {
 
         const skip = (page - 1) * limit
 
-        let where: any = {}
+        const where: { mimeType?: { startsWith: string } } = {}
         if (type) {
             const typeFilter = type === 'image' ? 'image/' : type === 'video' ? 'video/' : null
             if (typeFilter) {
-                where = { mimeType: { startsWith: typeFilter } }
+                where.mimeType = { startsWith: typeFilter }
             }
         }
 

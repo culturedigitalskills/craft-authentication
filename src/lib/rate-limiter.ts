@@ -58,9 +58,10 @@ export async function applyRateLimit(
         )
 
         return response
-    } catch (rateLimiterRes: any) {
+    } catch (rateLimiterRes: unknown) {
         // Rate limit exceeded
-        const retryAfter = Math.ceil((rateLimiterRes.msBeforeNext || 1000) / 1000)
+        const rlRes = rateLimiterRes as { msBeforeNext?: number; consumedPoints?: number }
+        const retryAfter = Math.ceil((rlRes.msBeforeNext || 1000) / 1000)
 
         return NextResponse.json<RateLimitErrorResponse>(
             {
@@ -71,9 +72,9 @@ export async function applyRateLimit(
             {
                 status: 429,
                 headers: {
-                    'X-RateLimit-Limit': rateLimiterRes.consumedPoints.toString(),
+                    'X-RateLimit-Limit': (rlRes.consumedPoints ?? 0).toString(),
                     'X-RateLimit-Remaining': '0',
-                    'X-RateLimit-Reset': Math.ceil(rateLimiterRes.msBeforeNext / 1000).toString(),
+                    'X-RateLimit-Reset': retryAfter.toString(),
                     'Retry-After': retryAfter.toString(),
                 },
             },

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         })
         const response = await s3Client.send(getCommand)
 
-        const stream = response.Body as any
+        const stream = response.Body as ReadableStream
 
         const headers = new Headers()
         headers.set('Content-Type', fileData.mimeType)

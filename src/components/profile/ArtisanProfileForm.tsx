@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -54,6 +55,7 @@ interface ArtisanProfileFormProps {
 
 export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
+    const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
@@ -142,7 +144,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                 type: 'success',
             })
 
-            window.location.reload()
+            router.refresh()
         } catch {
             setMessage({
                 text: isCreateMode ? t('createFailed') : t('updateFailed'),

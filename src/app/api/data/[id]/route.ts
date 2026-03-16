@@ -45,7 +45,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         })
 
         return NextResponse.json(record)
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (error instanceof ZodError) {
             return handleValidationError(error)
         }
@@ -69,7 +69,7 @@ export async function DELETE(
             message: 'Data record deleted successfully',
             data: record,
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting data record:', error)
         return errorResponse('Failed to delete data record', 500)
     }
