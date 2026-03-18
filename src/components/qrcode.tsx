@@ -30,7 +30,12 @@ const getOklch = (color: string, fallback: [number, number, number]) => {
 };
 
 
-export const QRCode = ({data, foreground, background, margin, robustness = 'M', className,  ...props }: QRCodeProps) => {
+export const QRCode = ({data, 
+  foreground, 
+  background, 
+  margin, 
+  robustness = 'L', 
+  className,  ...props }: QRCodeProps) => {
     const [svg, setSVG] = useState<string | null>(null);
     useEffect(() => {
   

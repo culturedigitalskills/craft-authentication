@@ -8,153 +8,140 @@ import { Badge, User, Calendar, QrCode } from 'lucide-react';
 import { formatDateTime } from '@/components/formatDateTime';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { QRCode } from '@/components/qrcode';
+import { data } from 'tailwindcss/defaultTheme';
+import { cookies } from 'next/headers'
+import Gallery from '@/components/craft/Gallery'
 
 interface PageProps {
   params: Promise<{
     id: string;
   }>;
 }
- let crafts = [
-  {
-    "id": 1,
-    "title": "Macramé Wall Hanging",
-    "description": "A decorative textile art created by knotting rope or cord into intricate patterns. Using basic knots like the square knot and half hitch, you can craft stunning boho-style wall pieces that add texture and warmth to any room.",
-    "owner": "Sophie Hartwell",
-    "email": "sophie.hartwell@crafthaus.io",
-    "createdAt": "2025-03-12T08:24:11Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/7/70/Textile_piece%2C_macram%C3%A9_%28AM_16090-2%29.jpg"
-  },
-  {
-    "id": 2,
-    "title": "Hand-Thrown Pottery",
-    "description": "The ancient craft of shaping clay vessels on a spinning wheel. From bowls to vases, hand-thrown pottery combines rhythmic technique with creative instinct, resulting in uniquely imperfect pieces that carry the maker's touch in every curve.",
-    "owner": "Marcus Delgado",
-    "email": "m.delgado@clayworks.co",
-    "createdAt": "2025-04-07T14:03:55Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Pottenbakkersschijf.JPG"
-  },
-  {
-    "id": 3,
-    "title": "Linocut Printmaking",
-    "description": "A relief printing technique where designs are carved into a linoleum block, inked, and pressed onto paper or fabric. The bold, graphic quality of linocut prints makes it perfect for posters, greeting cards, and repeating textile patterns.",
-    "owner": "Yuki Tanaka",
-    "email": "yuki.tanaka@pressandink.studio",
-    "createdAt": "2025-05-19T11:47:30Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/1/12/Printing_Using_a_Linocut_Design.jpg"
-  },
-  {
-    "id": 4,
-    "title": "Soy Candle Making",
-    "description": "The craft of pouring scented soy wax into moulds or vessels with embedded wicks. By blending essential oils and botanicals, makers create bespoke candles with unique aromas and burn times far cleaner than traditional paraffin alternatives.",
-    "owner": "Clara Osei",
-    "email": "clara.osei@wickandwax.com",
-    "createdAt": "2025-06-02T09:15:00Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/b/be/Soy_tealight_candles.jpg"
-  },
-  {
-    "id": 5,
-    "title": "Bookbinding",
-    "description": "The art of assembling handmade books by folding, sewing, and gluing paper signatures into custom covers. From Coptic stitch journals to leather-bound notebooks, bookbinding produces heirloom-quality objects built to last generations.",
-    "owner": "Finn Calloway",
-    "email": "finn@spineandstitch.net",
-    "createdAt": "2025-07-28T16:52:43Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Bookbinding_tie_thread_1.jpg"
-  },
-  {
-    "id": 6,
-    "title": "Indigo Dyeing",
-    "description": "An ancient resist-dyeing technique using natural indigo pigment to produce striking blue patterns on fabric. Methods like shibori involve folding, twisting, or binding cloth before immersion, yielding one-of-a-kind wearable pieces.",
-    "owner": "Amara Diallo",
-    "email": "amara.diallo@indigostudio.co",
-    "createdAt": "2025-08-14T07:38:22Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/0/0c/GutierrezWorkshopTeotitlan073.jpg"
-  },
-  {
-    "id": 7,
-    "title": "Stained Glass",
-    "description": "The craft of cutting and joining coloured glass pieces with lead came or copper foil to form luminous panels. When light passes through the finished work, the colours shift and glow, transforming any window or frame into living art.",
-    "owner": "Petra Novák",
-    "email": "petra.novak@lumenglass.eu",
-    "createdAt": "2025-09-03T13:21:09Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Leonard_French_La_Trobe_03-2_cropped.jpg"
-  },
-  {
-    "id": 8,
-    "title": "Leather Tooling",
-    "description": "A craft of stamping and carving decorative patterns into vegetable-tanned leather using specialised tools. The dampened surface accepts deep impressions that dry permanently, making it ideal for belts, wallets, and journal covers.",
-    "owner": "Rodrigo Alves",
-    "email": "r.alves@hidecraft.io",
-    "createdAt": "2025-10-17T10:05:37Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/6/6c/For%C3%B2.JPG"
-  },
-  {
-    "id": 9,
-    "title": "Wet Felting",
-    "description": "A textile craft that bonds raw wool fibres together using hot water, soap, and agitation to create a dense, seamless fabric. Sculptural forms, bowls, and wall art can all be shaped during the felting process before the material sets.",
-    "owner": "Ingrid Sørensen",
-    "email": "ingrid.sorensen@woolform.dk",
-    "createdAt": "2025-11-25T18:44:50Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/5/5b/An_assortment_of_fiber_arts_created_by_one_teenage_artist_%2881c7f627-155d-451f-677b-05a5b8ebb4ff%29.JPG"
-  },
-  {
-    "id": 10,
-    "title": "Resin Casting",
-    "description": "The process of pouring pigmented or clear epoxy resin into moulds to encapsulate botanicals, pigments, or objects. Once cured, the result is a glass-like solid that can be shaped into jewellery, coasters, or sculptural decorative pieces.",
-    "owner": "Theo Abara",
-    "email": "theo@resinrift.studio",
-    "createdAt": "2025-12-31T23:59:01Z",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Resin_crafts.jpg"
-  }
-];
-export default async function CraftIDPage({ params }: PageProps) {
-    const { id } = await params;
 
+const formatDate = (timestamp: string) => 
+  new Date(timestamp).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+
+export default async function OneCraftPage({ params }: PageProps) {
+    const { id } = await params;
+    const cookieStore = await cookies()
+    const cookieHeader = cookieStore.toString()    
+
+    // retrieve craft data from API using id
     // const p = await params;  
     // const { craftid } = p;
-    console.log('Craft ID from URL:', id);
-
+    // console.log('Craft ID from URL:', id);
     // Construct the full URL for the QR code
     // console.log("process.env.NEXT_PUBLIC_BASE_URL:", process.env.NEXT_PUBLIC_BASE_URL);
     const currentPageUrl = `${process.env.AUTH_URL}/crafts/${id}`;
-    
-    return <OneCraftsPage craftid={id} currentPageUrl={currentPageUrl} />;
+    try {
+            // 1. fetch craft first
+
+            const urldata =  `${process.env.AUTH_URL}/api/data/${id}`            
+            const method = 'GET'
+            console.log('url: ', urldata) // Debug log to check data being submitted
+            console.log('method: ', method) // Debug log to check data being submitted
+
+            const res = await fetch(urldata, {
+                method,
+                credentials: 'include',  // sends cookies automatically
+                headers: { 
+                          'Content-Type': 'application/json',
+                          'Cookie': cookieHeader  // forward cookies to the API
+                      },
+                        // headers: { 'Content-Type': 'application/json' },
+            })
+            console.log('I did it',res)
+            if (!res.ok) 
+                throw new Error('Request failed')            
+
+
+            
+            const data = await res.json()
+            console.log('Data received from API:', data) // Debug log to check response data
+
+            // 2. extract media ids
+            const mediaIds: string[] = data?.data['mediaIds'] ?? []
+            console.log('**********Media IDs:', mediaIds)
+
+            // 3. fetch images using the ids
+            const images = await Promise.all(mediaIds.map(async (mediaId) => {
+              const urlmedia =  `${process.env.AUTH_URL}/api/media/${mediaId}`          
+              
+              const imagesRes = await fetch(urlmedia, {
+                  method,
+                  credentials: 'include',
+                  headers: { 
+                      'Content-Type': 'application/json',
+                      'Cookie': cookieHeader
+                  },
+              })
+              console.log('Image response:', imagesRes) // Debug log to check response status
+              if (!imagesRes.ok) 
+                  throw new Error('Image request failed')
+              return imagesRes
+            }))       
+
+            console.log('Images:', images)
+            return <RenderOneCraftPage craft={data} images={images} currentPageUrl={currentPageUrl} />
+            
+            // console.log('Response status:', res) // Debug log to check response status
+        } catch (error) {
+          console.log('Error:', error)
+          console.log('Error message:', (error as Error).message)
+          console.log('Error name:', (error as Error).name)
+        } 
+                        
 
 }
 
-function OneCraftsPage({craftid, currentPageUrl}: {craftid: string, currentPageUrl: string}) {
+function RenderOneCraftPage({craft, images, currentPageUrl}: {craft: any, images: any, currentPageUrl: string}) {
 
+    console.log('Craft in OneCraftsPage:', craft);
     const t = useTranslations();
+    const craftEditUrl = `create?id=${craft.id}`;
     
+    const galleryImages = images?.map((image: any) => ({
+      url: image.url,   // adjust these fields to match your API response structure
+      alt: image.name ?? craft?.data['name'],
+    })) ?? []    
 
       return (
     <Container> 
     {/* Main content */}
-    
     <div className="grid gap-8 lg:grid-cols-2">
     
     {/* Image section */}
-    <div className="space-y-4">
-      {crafts.find(c => c.id === parseInt(craftid))?.image ? (
-        <div className="relative aspect-square overflow-hidden rounded-lg border border-border">
-              <Image src={crafts.find(c => c.id === parseInt(craftid))?.image || ''} alt="Craft" fill className="object-cover" priority />
+    <div className="space-y-4 ">
 
-            {/* <img src={crafts.find(c => c.id === parseInt(craftid))?.image} alt="Craft" className="w-full max-w-md rounded-lg shadow-md" /> */}
-            
-        </div>
-
-      ) : (
-            <div className="flex aspect-square items-center justify-center rounded-lg border border-border bg-muted">
-              <p className="text-muted-foreground">{t('crafts.details.noDescription')}</p>
-            </div>
-      )}   
         <div>
-            <div className="mb-2 flex items-center gap-2 justify-center">
-              <h1 className="text-3xl font-bold tracking-tight">{crafts.find(c => c.id === parseInt(craftid))?.title || t('crafts.details.noDescription')}</h1>
+            <div className="mb-2 gap-2">
+              <h1 className="text-5xl font-bold tracking-tight">
+              {craft?.name}
+              </h1>
               {/* <Badge variant="outline" className="text-xs">
                 Public
               </Badge> */}
             </div>
-            <p className="mt-2 text-lg text-muted-foreground">{crafts.find(c => c.id === parseInt(craftid))?.description || t('crafts.details.noDescription')}</p>
+          <div>
+            <Gallery images={galleryImages} />
+            {/* rest of your component */}
+          </div>            
+            <div className="mt-2 text-lg">
+              <p className="font-bold">{t('crafts.details.description')}:</p>
+              {craft?.description}
+            </div>
+            
+              <div className="mt-2 text-lg">
+                <p className="font-bold">{t('crafts.details.materials')}:</p>
+                {craft?.data['material']}
+            </div>         
+              {/* {crafts.find(c => c.id === parseInt(craftid))?.description || t('crafts.details.noDescription')} */}
         </div>       
     </div>          
 
@@ -163,26 +150,38 @@ function OneCraftsPage({craftid, currentPageUrl}: {craftid: string, currentPageU
     {/* Metadata */}
           <div className="space-y-4">
             {/* Creator information */}
-            {crafts.find(c => c.id === parseInt(craftid))?.owner  && (
+            {/* {crafts.find(c => c.id === parseInt(craftid))?.owner  && ( */}
               <div className="flex items-center space-x-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{t('crafts.details.createdBy')}:</span>
-                <span className="text-sm font-bold rounded-lg border border-border bg-muted px-2 py-1">{crafts.find(c => c.id === parseInt(craftid))?.email || t('crafts.details.noDescription')}</span>
+                <span className="text-sm font-bold rounded-lg border border-border bg-muted px-2 py-1">
+                  {craft?.data['artisan'] }
+
+                  {/* {crafts.find(c => c.id === parseInt(craftid))?.email || t('crafts.details.noDescription')} */}
+                </span>
               </div>
-            )}
+            {/* )} */}
 
             {/* Created date */}
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">{t('crafts.details.createdOn')}:</span>
-              <span className="text-sm text-muted-foreground">{formatDateTime(crafts.find(c => c.id === parseInt(craftid))?.createdAt || '')}</span>
+              <span className="text-sm text-muted-foreground">
+                
+                {formatDate(craft?.data['createdOn']) }
+                {/* {formatDateTime(crafts.find(c => c.id === parseInt(craftid))?.createdAt || '')} */}
+              </span>
             </div>
 
             {/* Updated date if different */}
             <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Updated:</span>
-                <span className="text-sm text-muted-foreground">{formatDateTime(crafts.find(c => c.id === parseInt(craftid))?.createdAt || '')}</span>
+                <span className="text-sm font-medium">{t('crafts.details.updatedOn')}:</span>
+                <span className="text-sm text-muted-foreground">
+                {formatDate(craft?.data['updatedOn']) }
+
+                  {/* {formatDateTime(crafts.find(c => c.id === parseInt(craftid))?.createdAt || '')} */}
+                </span>
             </div>
             
           </div>
@@ -219,6 +218,16 @@ function OneCraftsPage({craftid, currentPageUrl}: {craftid: string, currentPageU
           )}*/}
     </div>
     </div>
+
+    {/* Give option to delete */}
+    <div className="flex flex-wrap gap-3 mt-8">
+      <Button variant="outline" asChild>
+          <Link href={craftEditUrl}>
+              {t('createCraft.editCraftTitle')}
+          </Link>
+      </Button>
+    </div>
+
     {/* Go back to crafts */}
     <hr className="my-8" />
     <div className="flex flex-wrap gap-3">
