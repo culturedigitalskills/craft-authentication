@@ -178,7 +178,9 @@
           "backToCrafts": "Back to Crafts",
           "noDescription": "No description available",          
           "qrCodeTitle" : "Share this craft",
-          "qrCodeDescription": "Please scan this QR code to share this craft."
+          "qrCodeDescription": "Please scan this QR code to share this craft.",
+          "visible":"Visible to others",
+          "notvisible":"Only visible to you"
       },
       "welcomeTitleCraft":"Craft Details"
       
@@ -192,8 +194,9 @@
         "createEdittHelper": "Use this form to edit your craft.",  
         "editCraftTitle": "Edit Craft",
         "saveCraft": "Save Craft",
-        "updateCraft": "Update Craft",
+        "updateCraft": "Update",
         "cancelEdit": "Cancel",
+        "deleteCraft": "Delete",
         "createCraftName": "Title:",
         "createCraftDescription": "Describe your craft in a few words:",
         "createCraftMaterial": "Material used:",

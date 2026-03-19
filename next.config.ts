@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
             port: '',
             search: '',
         },
+        {
+            protocol: 'http',
+            hostname: 'localhost',
+            port: '20100',
+            pathname: '/api/media/**',
+        },        
+        
         ],
     }    
 }

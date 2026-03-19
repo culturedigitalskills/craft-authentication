@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl'
 import { useParams } from 'next/dist/client/components/navigation';
 import Link from 'next/link';
-import { Badge, User, Calendar, QrCode } from 'lucide-react';
+import { Badge, User, Calendar, QrCode, Eye, EyeOff } from 'lucide-react';
 import { formatDateTime } from '@/components/formatDateTime';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { QRCode } from '@/components/qrcode';
@@ -81,13 +81,13 @@ export default async function OneCraftPage({ params }: PageProps) {
                       'Cookie': cookieHeader
                   },
               })
-              console.log('Image response:', imagesRes) // Debug log to check response status
+              // console.log('Image response:', imagesRes) // Debug log to check response status
               if (!imagesRes.ok) 
                   throw new Error('Image request failed')
               return imagesRes
             }))       
 
-            console.log('Images:', images)
+            // console.log('Images:', images)
             return <RenderOneCraftPage craft={data} images={images} currentPageUrl={currentPageUrl} />
             
             // console.log('Response status:', res) // Debug log to check response status
@@ -105,7 +105,7 @@ function RenderOneCraftPage({craft, images, currentPageUrl}: {craft: any, images
     console.log('Craft in OneCraftsPage:', craft);
     const t = useTranslations();
     const craftEditUrl = `create?id=${craft.id}`;
-    
+    console.log("craft?.isPublic",craft?.data['isPublic'])
     const galleryImages = images?.map((image: any) => ({
       url: image.url,   // adjust these fields to match your API response structure
       alt: image.name ?? craft?.data['name'],
@@ -124,9 +124,16 @@ function RenderOneCraftPage({craft, images, currentPageUrl}: {craft: any, images
               <h1 className="text-5xl font-bold tracking-tight">
               {craft?.name}
               </h1>
-              {/* <Badge variant="outline" className="text-xs">
-                Public
-              </Badge> */}
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium
+              ${craft?.data['isPublic'] 
+                ? 'bg-blue-100 text-blue-700' 
+                : 'bg-gray-100 text-gray-600'
+              }`}>
+              {craft?.data['isPublic']  
+                ? <><Eye className="h-3 w-3" /> {t('crafts.details.visible')}</> 
+                : <><EyeOff className="h-3 w-3" /> {t('crafts.details.notvisible')}</>
+              }
+            </span>
             </div>
           <div>
             <Gallery images={galleryImages} />
@@ -219,13 +226,15 @@ function RenderOneCraftPage({craft, images, currentPageUrl}: {craft: any, images
     </div>
     </div>
 
-    {/* Give option to delete */}
+    {/* Give option to edit */}
     <div className="flex flex-wrap gap-3 mt-8">
-      <Button variant="outline" asChild>
+      <Button className="border-gray-300 hover:bg-muted-foreground text-white" asChild>
           <Link href={craftEditUrl}>
               {t('createCraft.editCraftTitle')}
           </Link>
       </Button>
+
+  
     </div>
 
     {/* Go back to crafts */}

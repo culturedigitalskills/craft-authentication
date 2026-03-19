@@ -68,7 +68,8 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     const t = useTranslations('')
     const router = useRouter()
 
-    const [isEditing, setIsEditing] = useState(false)
+    const [isEditing, setIsEditing] = useState(!!craft)
+    const [isCreateMode, setIsCreateMode] = useState(!craft)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
     // const [id, setId] = useState(craft?.id ?? '')
@@ -114,7 +115,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     //     }
     // }, [data]) // re-runs when data changes
 
-    const isCreateMode = !craft
+    // const isCreateMode = !craft
     // console.log("****isediting: ", isEditing, "  isCreateMode: ", isCreateMode, "isSubmitting: ", isSubmitting) // Debug log to check mode
     // console.log('Craft in form:', craft) // Debug log to check craft data
     
@@ -133,28 +134,35 @@ export function CraftForm({ craft, user }: CraftFormProps) {
         if (isCreateMode) {
             setCreatedOn(timestamp)
         }
-
+        console.log("data?.material: ",data?.material)
+        console.log("material: ",material)
         const ids = await submitImages(images)        
         const craftdata = {
             // id: isCreateMode ? generateId() : craft?.id,
             name:  name,
             description:  description,
             data: {
-                    ...data,          // spread existing data
-                    'material': data?.material ?? material,
-                    'isPublic': data?.isPublic ?? isPublic,
+                    ...data,   
+                    'material': material,
+                    'isPublic': isPublic,
                     'artisan': data?.artisan ?? user ?? '',
                     'createdOn': data?.createdOn ?? timestamp,
-                    // createdOn: isCreateMode ? timestamp : createdOn,
                     'updatedOn': timestamp,
-                    'mediaIds': data?.mediaIds ?? ids,
+                    'mediaIds': data?.mediaIds ?? ids,       
+                    // 'material': data?.material ?? material,
+                    // 'isPublic': data?.isPublic ?? isPublic,
+                    // 'artisan': data?.artisan ?? user ?? '',
+                    // 'createdOn': data?.createdOn ?? timestamp,
+                    // // createdOn: isCreateMode ? timestamp : createdOn,
+                    // 'updatedOn': timestamp,
+                    // 'mediaIds': data?.mediaIds ?? ids,
 
                 }       
             }
         
-        // console.log('Submitting data:', craftdata) // Debug log to check data being submitted
+        console.log('Submitting data:', craftdata) // Debug log to check data being submitted
         try {
-            const url = isCreateMode ? '/api/data' : `/api/data/${craft.id}`
+            const url = isCreateMode ? '/api/data' : `/api/data/${craft?.id}`
             const method = isCreateMode ? 'POST' : 'PUT'
 
             const res = await fetch(url, {
@@ -172,16 +180,16 @@ export function CraftForm({ craft, user }: CraftFormProps) {
             })
 
             // 1. check the image file itself first
-            console.log('images array:', images)
-            console.log('image file:', images[0])
+            // console.log('images array:', images)
+            // console.log('image file:', images[0])
 
             // 2. then append and check
             const formData = new FormData()
             formData.append('file', images[0])
 
 
-            console.log('formData entries:', [...formData.entries()])
-            console.log('images:', images.length )
+            // console.log('formData entries:', [...formData.entries()])
+            // console.log('images:', images.length )
     
             // if (isCreateMode||isEditing) {
             const newCraft = await res.json()
@@ -207,9 +215,39 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     }
 
     function handleCancelEdit() {
-        // console.log("--->isediting: ", isEditing, "  isCreateMode: ", isCreateMode) // Debug log to check mode
-        setIsEditing(false)
-        setMessage(null)
+        router.push(`/crafts/${craft?.id}`) 
+    }
+    async function handleDelete() {
+        if (!confirm('Are you sure you want to delete this?')) return
+
+        const mediaidstodelete = data?.['mediaIds'] as string[]
+        if (mediaidstodelete && mediaidstodelete.length > 0) {
+        await Promise.all(mediaidstodelete.map(async (mediaId: string) => {
+            if (!mediaId) return  // skip null values
+            const res = await fetch(`/api/media/${mediaId}`, {
+                method: 'DELETE',
+            })
+
+            if (!res.ok) {
+                console.error(`Failed to delete media ${mediaId}`)
+            } else {
+                console.log(`Deleted media ${mediaId}`)
+            }
+         }))
+        }        
+
+        //delete the item
+        const url = `/api/data/${craft?.id}`
+        const res = await fetch(url, {
+            method: 'DELETE',
+        })
+
+        if (res.ok) {
+            router.push('/crafts')  // redirect back to list after delete
+        }        
+
+
+        
     }
 
     // console.log('showForm:', showForm) // Debug log to check craft prop
@@ -446,11 +484,10 @@ export function CraftForm({ craft, user }: CraftFormProps) {
             {images.length > 0 && <p>{images.length} {t('createCraft.imagesSelected')}</p>}
             </div>
 
-           
-
             </div >                                              
-                <div className="right-0 flex items-center justify-end gap-4">
-                        <Button type="submit" size="lg" disabled={isSubmitting}>
+                <div className="right-0 flex items-center justify-end gap-2">
+                        <Button className="border-gray-300 hover:bg-muted-foreground text-white"
+                        type="submit" disabled={isSubmitting}>
                             {isSubmitting
                                 ? isCreateMode                                
                                     ? t('createCraft.savingCraft')
@@ -459,16 +496,21 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                                   ? t('createCraft.saveCraft')
                                   : t('createCraft.updateCraft')}
                             </Button>
-                            {/* {isEditing && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="lg"
-                                    onClick={handleCancelEdit}
+                            {isEditing ? (
+                                <Button className="border-gray-300 hover:bg-muted-foreground text-white"
+                                onClick={handleCancelEdit}
                                 >
+                                   
                                     {t('createCraft.cancelEdit')}
                                 </Button>
-                            )} */}
+                                ) : null}
+                            {isEditing ? (
+                                <Button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                                onClick={handleDelete}>
+                                    {t('createCraft.deleteCraft')}
+                                </Button>
+                                ) : null}
+
                     </div>
 
                 </form>
