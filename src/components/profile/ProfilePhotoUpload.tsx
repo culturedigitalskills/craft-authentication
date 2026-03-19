@@ -45,7 +45,7 @@ export function ProfilePhotoUpload({
 
             if (!uploadRes.ok) throw new Error('Upload failed')
 
-            const { file: mediaFile } = await uploadRes.json()
+            const mediaFile = await uploadRes.json()
 
             // If artisan already exists, create the attachment now
             if (artisanId) {
@@ -88,6 +88,7 @@ export function ProfilePhotoUpload({
                         src={previewUrl}
                         alt="Profile photo"
                         fill
+                        sizes="128px"
                         className="object-cover"
                     />
                 ) : (

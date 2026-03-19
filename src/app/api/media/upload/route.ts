@@ -70,13 +70,7 @@ export async function POST(request: NextRequest) {
             return createdFile
         })
 
-        return NextResponse.json(
-            {
-                message: 'File uploaded successfully',
-                file: mediaFile,
-            },
-            { status: 201 },
-        )
+        return NextResponse.json(mediaFile, { status: 201 })
     } catch (error) {
         if (error instanceof ZodError) {
             return handleValidationError(error)

@@ -57,6 +57,7 @@ export function HeroSection() {
                                 src="/media/artisan_w.jpg"
                                 alt="Artisan at work"
                                 fill
+                                sizes="(max-width: 768px) 100vw, 50vw"
                                 className="object-cover"
                                 priority
                             />

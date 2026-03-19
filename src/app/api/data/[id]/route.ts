@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const record = await prisma.dataRecord.findUnique({ where: { id } })
 
         if (!record) {
-            return NextResponse.json({ error: 'Data record not found' }, { status: 404 })
+            return errorResponse('Data record not found', 404)
         }
 
         return NextResponse.json(record)
@@ -65,10 +65,7 @@ export async function DELETE(
         const { id } = await params
         const record = await prisma.dataRecord.delete({ where: { id } })
 
-        return NextResponse.json({
-            message: 'Data record deleted successfully',
-            data: record,
-        })
+        return NextResponse.json({ message: 'Data record deleted successfully' })
     } catch (error: unknown) {
         console.error('Error deleting data record:', error)
         return errorResponse('Failed to delete data record', 500)

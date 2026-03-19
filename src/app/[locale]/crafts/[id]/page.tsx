@@ -136,7 +136,7 @@ function OneCraftsPage({craftid, currentPageUrl}: {craftid: string, currentPageU
     <div className="space-y-4">
       {crafts.find(c => c.id === parseInt(craftid))?.image ? (
         <div className="relative aspect-square overflow-hidden rounded-lg border border-border">
-              <Image src={crafts.find(c => c.id === parseInt(craftid))?.image || ''} alt="Craft" fill className="object-cover" priority />
+              <Image src={crafts.find(c => c.id === parseInt(craftid))?.image || ''} alt="Craft" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" priority />
 
             {/* <img src={crafts.find(c => c.id === parseInt(craftid))?.image} alt="Craft" className="w-full max-w-md rounded-lg shadow-md" /> */}
             

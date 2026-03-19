@@ -129,6 +129,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         src={coverUrl}
                         alt="Cover photo"
                         fill
+                        sizes="100vw"
                         className="object-cover"
                         priority
                     />

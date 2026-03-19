@@ -181,6 +181,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                             src={coverUrl}
                             alt="Cover photo"
                             fill
+                            sizes="100vw"
                             className="object-cover"
                         />
                     ) : (

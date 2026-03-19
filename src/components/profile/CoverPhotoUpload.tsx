@@ -43,7 +43,7 @@ export function CoverPhotoUpload({
 
             if (!uploadRes.ok) throw new Error('Upload failed')
 
-            const { file: mediaFile } = await uploadRes.json()
+            const mediaFile = await uploadRes.json()
 
             if (artisanId) {
                 const attachRes = await fetch('/api/media/attachments', {
@@ -85,6 +85,7 @@ export function CoverPhotoUpload({
                         src={previewUrl}
                         alt="Cover photo"
                         fill
+                        sizes="100vw"
                         className="object-cover"
                     />
                 ) : (

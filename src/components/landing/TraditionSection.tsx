@@ -15,6 +15,7 @@ export function TraditionSection() {
                             src="/media/scan.jpg"
                             alt="QR code scanning"
                             fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
                             className="object-cover"
                         />
                     </div>

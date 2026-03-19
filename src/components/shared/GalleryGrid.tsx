@@ -30,6 +30,7 @@ export function GalleryGrid({ images }: GalleryGridProps) {
                             src={image.url}
                             alt="Gallery photo"
                             fill
+                            sizes="(max-width: 768px) 50vw, 25vw"
                             className="object-cover transition-transform group-hover:scale-105"
                         />
                     </div>
