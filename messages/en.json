@@ -9,6 +9,8 @@
     "home": "Home",
     "about": "About",
     "crafts": "Crafts",
+    "seecrafts": "Gallery",
+    "addcraft": "Add Craft",
     "login": "Login",
     "logout": "Logout",
     "profile": "Profile"
@@ -62,7 +64,7 @@
     },
   "landing": {
       "description": "Connect directly with skilled artisans from across the world. Every skillfully designed product tells an authentic story about the place, its histories, and the people who create them. Verify their authenticity through our innovative QR code system.",
-      "exploreCrafts": "Explore Crafts",
+      "exploreCrafts": "Gallery",
       "learnMore": "Learn More"
    },
   "features": {
@@ -171,7 +173,7 @@
       "galleryEmpty": "No gallery photos yet"
     },
     "crafts": {
-      "welcomeTitle": "Explore Crafts",
+      "welcomeTitle": "Gallery of Crafts",
       "description": "Discover authentic handmade crafts from skilled artisans around the world. Each piece is verified and tells a unique story of tradition and craftsmanship.",
       "explore": {
         "noImageAvailable": "No image available",
@@ -182,15 +184,55 @@
         "by": "by"
       },
       "details":{
+          "description": "Description",
+          "materials": "Materials",
           "createdBy": "Created by",
           "createdOn": "Created on",
+          "updatedOn": "Updated on",
           "backToCrafts": "Back to Crafts",
           "noDescription": "No description available",          
           "qrCodeTitle" : "Share this craft",
-          "qrCodeDescription": "Please scan this QR code to share this craft."
+          "qrCodeDescription": "Please scan this QR code to share this craft.",
+          "visible":"Visible to others",
+          "notvisible":"Only visible to you"
       },
       "welcomeTitleCraft":"Craft Details"
       
-    }    
+    },
+    "createCraft":{
+        "craftInfo": "Craft Information",
+        "craftTitle": "Craft Title",
+        "craftDescription": "Craft Description",
+        "createCraftTitle": "Create New Craft",
+        "createCraftHelper": "Use this form to create a new craft. Provide a title and description to share your craft with the world.",  
+        "createEdittHelper": "Use this form to edit your craft.",  
+        "editCraftTitle": "Edit Craft",
+        "saveCraft": "Save Craft",
+        "updateCraft": "Update",
+        "cancelEdit": "Cancel",
+        "deleteCraft": "Delete",
+        "createCraftName": "Title:",
+        "createCraftDescription": "Describe your craft in a few words:",
+        "createCraftMaterial": "Material used:",
+        "createCraftPublic": "Make this craft public",
+        "uploadImages": "Upload images of your craft",
+        "browse": "Browse files",
+        "imagesSelected": "image(s) selected",
+        "saving": "Saving...",
+        "updating": "Updating...",
+        "createFailed": "Failed to save craft. Please try again.",
+        "updateFailed": "Failed to update craft. Please try again.",
+        "savingCraft": "Saving craft...",
+        "updatingCraft": "Updating craft...",
+        "craftCreateSuccess": "Craft created successfully!",
+        "craftUpdateSuccess": "Craft updated successfully!" 
+
+    },    
+    "materials":{
+      "selectOne" : "Select one:",
+      "wool" : "Wool",
+      "cotton" : "Cotton",
+      "mix" : "Mix"
+    }
 }
 
