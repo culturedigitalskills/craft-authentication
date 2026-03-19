@@ -3,6 +3,9 @@ import { useTranslations } from 'next-intl'
 import { Camera, QrCode, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import ReactDOM from 'react-dom';
+import {QRCodeSVG} from 'qrcode.react';
+
 
 export function HeroSection() {
     const t = useTranslations()

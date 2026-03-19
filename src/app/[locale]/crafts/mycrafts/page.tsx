@@ -28,13 +28,19 @@ import { record } from 'zod/v3';
 export default async function CraftsPage(
   { searchParams }:
    { searchParams: { page?: string } }) {
-    
-  const params = await searchParams
-  const page = params.page ? parseInt(params.page) : 1
+    const session = await auth()        
 
-  const currentPageUrl = `${process.env.AUTH_URL}/crafts`
-  const cookieStore = await cookies()
-  const cookieHeader = cookieStore.toString()    
+    if (!session) {
+        redirect('/login')
+    }
+
+    
+    const params = await searchParams
+    const page = params.page ? parseInt(params.page) : 1
+
+    const currentPageUrl = `${process.env.AUTH_URL}/crafts`
+    const cookieStore = await cookies()
+    const cookieHeader = cookieStore.toString()    
 
   try {
       // 1. fetch craft first
@@ -92,10 +98,8 @@ export default async function CraftsPage(
     }))
 
     
-    return <RenderCraftsPage crafts={crafts} 
-    pagination={pagination} 
-    currentPage={page} 
-    currentPageUrl={currentPageUrl}/>
+    return <RenderCraftsPage crafts={crafts} pagination={pagination} 
+    currentPage={page} currentPageUrl={currentPageUrl} user={session.user.email}/>
 
     //   // console.log('Response status:', res) // Debug log to check response status
     } catch (error) {
@@ -106,11 +110,12 @@ export default async function CraftsPage(
 
 }
 
-function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
-   { crafts: any[], pagination: any, currentPage: number, currentPageUrl: string }) {
+function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl, user  }:
+   { crafts: any[], pagination: any, currentPage: number, currentPageUrl: string, user: any }) {
 
     const t = useTranslations();
-
+    //  console.log(crafts.length)
+    // console.log(user)
     return (
       // <div className="px-4 py-16"/>
         <Container>
@@ -127,13 +132,19 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
         </div> */}
         {/* Crafts Grid */}
        
+   
         {crafts.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     
-            {crafts.filter((craft) => craft.isPublic).map((craft) => {
-            //only display if IsPublic
+            {crafts.filter((craft) => craft.artisan===user).map((craft) => {
+
+              //only display if IsPublic
                
-            const craftUrl = `crafts/${craft.id}`;
+            // const owner = typeof craft.owner === 'object' ? craft.owner : null;
+            // const image = typeof craft.image === 'object' ? craft.image : null;
+            // const imageUrl = craft.image;
+            // const ownerId = typeof craft.owner === 'object' ? craft.owner.id : craft.owner;
+            const craftUrl = `${craft.id}`;
             return (
                 <Card key={craft.id} className="group transition-shadow duration-200 hover:shadow-lg">
                 <Link href={craftUrl} className="block">
@@ -142,11 +153,13 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
                     {craft.imageUrl ? (
                       <Image
                         src={craft.imageUrl}
+                        // src='http://localhost:20100/api/media/cc853642-5da8-4013-819f-4c4da2827425'
+                        //src='https://upload.wikimedia.org/wikipedia/commons/2/2a/Pottenbakkersschijf.JPG'
                         alt={craft.title}
                         fill
                         unoptimized
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover transition-transform duration-200 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 
                       />
                     ) : (

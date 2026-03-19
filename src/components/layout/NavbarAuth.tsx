@@ -3,7 +3,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
@@ -11,7 +11,6 @@ interface NavbarAuthProps {
     onAction?: () => void
     variant?: 'desktop' | 'mobile'
 }
-
 export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
     const { data: session, status } = useSession()
     const t = useTranslations('navbar')
@@ -61,6 +60,22 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         <User className="h-4 w-4" />
                         {t('profile')}
                     </Link>
+                    <Link
+                        href="/crafts/mycrafts"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <FolderOpen className="h-4 w-4" />
+                        {t('myitems')}
+                    </Link>      
+                    <Link
+                        href="/crafts/create"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <FolderUp className="h-4 w-4" />
+                        {t('addcraft')}
+                    </Link>                                        
                     <button
                         type="button"
                         onClick={() => { signOut({ callbackUrl: '/' }); onAction?.() }}
@@ -125,6 +140,29 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                             {t('profile')}
                         </Link>
                     </div>
+                    {/* My items */}
+                    <div className="py-1">
+                        <Link
+                            href="/mycrafts"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                            {t('myitems')}
+                        </Link>
+                    </div>
+                    {/* Add item */}
+                    <div className="py-1">
+                        <Link
+                            href="/create"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <FolderUp className="h-4 w-4 text-muted-foreground" />
+                            {t('addcraft')}
+                        </Link>
+                    </div>
+
 
                     {/* Logout */}
                     <div className="border-t border-border py-1">
