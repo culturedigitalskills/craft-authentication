@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/dist/client/link';
 import Image from 'next/image';
 import { Calendar, User } from 'lucide-react';
-import { formatDateTime } from '@/components/formatDateTime';
+import { formatDateTime } from '@/components/shared/formatDateTime';
 import PaginationControls from '@/components/craft/PaginationControls'
 import { cookies } from 'next/dist/server/request/cookies';
 import { publicDecrypt } from 'crypto';
