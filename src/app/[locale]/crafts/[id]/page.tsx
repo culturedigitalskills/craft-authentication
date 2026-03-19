@@ -1,3 +1,4 @@
+import { auth } from '@/lib/auth'
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -27,6 +28,7 @@ const formatDate = (timestamp: string) =>
   })
 
 export default async function OneCraftPage({ params }: PageProps) {
+    const session = await auth()      
     const { id } = await params;
     const cookieStore = await cookies()
     const cookieHeader = cookieStore.toString()    
@@ -65,11 +67,16 @@ export default async function OneCraftPage({ params }: PageProps) {
             console.log('Data received from API:', data) // Debug log to check response data
 
             // 2. extract media ids
-            const mediaIds: string[] = data?.data['mediaIds'] ?? []
-            console.log('**********Media IDs:', mediaIds)
+            const mediaIds: string[] = (data?.data['mediaIds'] as string[] ?? []).filter(Boolean)
+
+            
+            let images = null
 
             // 3. fetch images using the ids
-            const images = await Promise.all(mediaIds.map(async (mediaId) => {
+            if (mediaIds && mediaIds.length>0){
+                       
+
+              images = await Promise.all(mediaIds.map(async (mediaId) => {
               const urlmedia =  `${process.env.AUTH_URL}/api/media/${mediaId}`          
               
               const imagesRes = await fetch(urlmedia, {
@@ -85,9 +92,13 @@ export default async function OneCraftPage({ params }: PageProps) {
                   throw new Error('Image request failed')
               return imagesRes
             }))       
+          }
 
             // console.log('Images:', images)
-            return <RenderOneCraftPage craft={data} images={images} currentPageUrl={currentPageUrl} />
+            return <RenderOneCraftPage craft={data} 
+            images={images} 
+            currentPageUrl={currentPageUrl} 
+            user={session?.user.email ?? null}/>
             
             // console.log('Response status:', res) // Debug log to check response status
         } catch (error) {
@@ -99,12 +110,13 @@ export default async function OneCraftPage({ params }: PageProps) {
 
 }
 
-function RenderOneCraftPage({craft, images, currentPageUrl}: {craft: any, images: any, currentPageUrl: string}) {
+function RenderOneCraftPage({craft, images, currentPageUrl, user}: 
+  {craft: any, images: any, currentPageUrl: string, user: any}) {
 
-    console.log('Craft in OneCraftsPage:', craft);
+    // console.log('Craft in OneCraftsPage:', craft);
     const t = useTranslations();
     const craftEditUrl = `create?id=${craft.id}`;
-    console.log("craft?.isPublic",craft?.data['isPublic'])
+    // console.log("craft?.isPublic",craft?.data['isPublic'])
     const galleryImages = images?.map((image: any) => ({
       url: image.url,   // adjust these fields to match your API response structure
       alt: image.name ?? craft?.data['name'],
@@ -226,15 +238,15 @@ function RenderOneCraftPage({craft, images, currentPageUrl}: {craft: any, images
     </div>
 
     {/* Give option to edit */}
+    {(user===craft?.data['artisan']) && (
     <div className="flex flex-wrap gap-3 mt-8">
-      <Button className="border-gray-300 hover:bg-muted-foreground text-white" asChild>
-          <Link href={craftEditUrl}>
-              {t('createCraft.editCraftTitle')}
-          </Link>
-      </Button>
-
-  
+    <Button className="border-gray-300 hover:bg-muted-foreground text-white" asChild>
+      <Link href={craftEditUrl}>
+        {t('createCraft.editCraftTitle')}
+      </Link>
+    </Button>
     </div>
+    )}
 
     {/* Go back to crafts */}
     <hr className="my-8" />

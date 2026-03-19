@@ -34,9 +34,9 @@ export default async function CraftCreatePage(
                 data: true
             },
         })  
-        console.log('Craft from DB:', craft)  
+        // console.log('Craft from DB:', craft)  
     }
-    console.log('***Craft from DB:', craft)  
+    // console.log('***Craft from DB:', craft)  
 
 
     return <CraftForm user={session.user?.email ?? null} craft={craft} />

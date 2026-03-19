@@ -13,7 +13,8 @@
     "addcraft": "Add Craft",
     "login": "Login",
     "logout": "Logout",
-    "profile": "Profile"
+    "profile": "Profile",
+    "myitems": "My Crafts"
   },
   "auth": {
     "loginTitle": "Sign In",
