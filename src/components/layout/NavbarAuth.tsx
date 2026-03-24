@@ -143,7 +143,7 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     {/* My items */}
                     <div className="py-1">
                         <Link
-                            href="/mycrafts"
+                            href="/crafts/mycrafts"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
                             className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                         >
@@ -154,7 +154,7 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     {/* Add item */}
                     <div className="py-1">
                         <Link
-                            href="/create"
+                            href="/crafts/create"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
                             className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                         >
