@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl'
 import { useParams } from 'next/dist/client/components/navigation';
 import Link from 'next/link';
-import { Badge, User, Calendar, QrCode, Eye, EyeOff } from 'lucide-react';
+import { Badge, User, Calendar, QrCode, Eye, EyeOff, MapPin } from 'lucide-react';
 import { formatDateTime } from '@/components/shared/formatDateTime';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { QRCode } from '@/components/shared/qrcode';
@@ -26,6 +26,20 @@ const formatDate = (timestamp: string) =>
     hour: '2-digit',
     minute: '2-digit'
   })
+const getCity = async (lat: number, lng: number): Promise<string> => {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+  )
+  const data = await res.json()
+  
+  const city = data.address?.city 
+    ?? data.address?.town 
+    ?? data.address?.village 
+    ?? data.address?.county
+    ?? 'Unknown location'
+
+  return city
+}
 
 export default async function OneCraftPage({ params }: PageProps) {
     const session = await auth()      
@@ -57,7 +71,7 @@ export default async function OneCraftPage({ params }: PageProps) {
                       },
                         // headers: { 'Content-Type': 'application/json' },
             })
-            console.log('I did it',res)
+            // console.log('I did it',res)
             if (!res.ok) 
                 throw new Error('Request failed')            
 
@@ -93,12 +107,13 @@ export default async function OneCraftPage({ params }: PageProps) {
               return imagesRes
             }))       
           }
-
+              
             // console.log('Images:', images)
             return <RenderOneCraftPage craft={data} 
             images={images} 
             currentPageUrl={currentPageUrl} 
-            user={session?.user.email ?? null}/>
+            user={session?.user.email ?? null}
+             />
             
             // console.log('Response status:', res) // Debug log to check response status
         } catch (error) {
@@ -121,6 +136,7 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user}:
       url: image.url,   // adjust these fields to match your API response structure
       alt: image.name ?? craft?.data['name'],
     })) ?? []    
+  
 
       return (
     <Container> 
@@ -180,6 +196,23 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user}:
               </div>
             {/* )} */}
 
+            {/* Location */}
+          {craft?.data['place'] && (
+            <div className="flex items-center space-x-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">{t('crafts.details.createdWhere')}:</span>
+                <span className="text-sm text-muted-foreground">                  
+                <a 
+                  href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(craft?.data['place'])}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  {craft?.data['place']}
+                </a>
+              </span>
+            </div>
+            )}
             {/* Created date */}
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -198,9 +231,9 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user}:
                 <span className="text-sm text-muted-foreground">
                 {formatDate(craft?.data['updatedOn']) }
 
-                  {/* {formatDateTime(crafts.find(c => c.id === parseInt(craftid))?.createdAt || '')} */}
                 </span>
             </div>
+
             
           </div>
 
@@ -239,12 +272,12 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user}:
 
     {/* Give option to edit */}
     {(user===craft?.data['artisan']) && (
-    <div className="flex flex-wrap gap-3 mt-8">
-    <Button className="border-gray-300 hover:bg-muted-foreground text-white" asChild>
-      <Link href={craftEditUrl}>
-        {t('createCraft.editCraftTitle')}
-      </Link>
-    </Button>
+    <div className="right-0 flex items-center justify-end gap-2">
+      <Button className="border-gray-300 hover:bg-muted-foreground text-white" asChild>
+        <Link href={craftEditUrl}>
+          {t('createCraft.editCraftTitle')}
+        </Link>
+      </Button>
     </div>
     )}
 
