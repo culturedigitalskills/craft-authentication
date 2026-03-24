@@ -110,6 +110,7 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
    { crafts: any[], pagination: any, currentPage: number, currentPageUrl: string }) {
 
     const t = useTranslations();
+        console.log("sss ",crafts.length)
 
     return (
       // <div className="px-4 py-16"/>
@@ -126,8 +127,8 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
             {/* </div>
         </div> */}
         {/* Crafts Grid */}
-       
         {crafts.length > 0 ? (
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     
             {crafts.filter((craft) => craft.isPublic).map((craft) => {
@@ -191,8 +192,6 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
             );
             })}
     
-      
-
         
         </div>
         

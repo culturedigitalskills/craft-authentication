@@ -22,11 +22,6 @@ interface Craft {
     name: string  
     description: string | null   
     data: Prisma.JsonValue | null
-    // material: string | null
-    // isPublic: boolean
-    // artisan: string | null
-    // createdOn: Date     
-    // updatedOn: Date
 }
 
 interface CraftFormProps {
@@ -41,25 +36,26 @@ async function submitImages(images: File[]): Promise<string[]> {
     const ids = await Promise.all(images.map(async (image) => {
         const formData = new FormData()
         formData.append('file', image)
-        // console.log(image.name)
+        console.log(image.name)
 
         const url = '/api/media/upload' 
-        // console.log('url: ', url) // Debug log to check data being submitted
+        console.log('url: ', url) // Debug log to check data being submitted
         const method = 'POST'
-        // console.log('method: ', method) // Debug log to check data being submitted
-        // console.log('image: ', image) // Debug log to check data being submitted
-        // console.log('formData: ', [...formData.entries()]) // Debug log to check data being submitted
+        console.log('method: ', method) // Debug log to check data being submitted
+        console.log('image: ', image) // Debug log to check data being submitted
+        console.log('formData: ', [...formData.entries()]) // Debug log to check data being submitted
 
         const mediares = await fetch(url, {
             method: method,
             body: formData,
         })
         const newmedia = await mediares.json()
-        // console.log('*****Uploaded media:', newmedia?.file?.id) // Debug log to check created craft data
-        return newmedia?.file?.id  // return the id from each upload
+        console.log("response ",newmedia)
+        console.log('*****Uploaded media:', newmedia?.id) // Debug log to check created craft data
+        return newmedia?.id  // return the id from each upload
         
     }))
-    // console.log('All image ids:', ids)
+    console.log('All image ids:', ids)
     return ids  // e.g. ['abc123', 'def456']    
 
 }    
@@ -72,6 +68,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     const [isCreateMode, setIsCreateMode] = useState(!craft)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+    
     // const [id, setId] = useState(craft?.id ?? '')
     const [name, setName] = useState(craft?.name ?? '')
     const [description, setDescription] = useState(craft?.description ?? '')
@@ -81,20 +78,41 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     )
     const [material, setMaterial] = useState<string>(data?.['material'] as string ?? '')
     const [artisan, setArtisan] = useState<string>(data?.['artisan'] as string ?? '')
-    const [isPublic, setIsPublic] = useState(data?.['isPublic'] as boolean ?? 0)
+    const [isPublic, setIsPublic] = useState<boolean>(data?.['isPublic'] as boolean ?? false)
+    const [isSharedLocation, setIsSharedLocation] = useState<boolean>(
+    data?.['isSharedLocation'] === undefined ? true : Boolean(data?.['isSharedLocation'])
+    )
     const [createdOn, setCreatedOn] = useState(data?.['createdOn'] as string ?? '')
     const [updatedOn, setUpdatedOn] = useState(data?.['updatedOn'] as string ?? '')
+    const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)    
     const [mediaIds, setmediaIds] = useState(data?.['mediaIds'] as [] ?? '')
 
     useEffect(() => {
         setMaterial(data?.['material'] as string ?? '')
         setArtisan(data?.['artisan'] as string ?? '')
-        setIsPublic(data?.['isPublic'] as boolean ?? 0)
+        setIsPublic(data?.['isPublic'] as boolean ?? false)
+        setIsSharedLocation(data?.['isSharedLocation'] as boolean ?? true)
         setCreatedOn(data?.['CreatedOn'] as string ?? '')
         setUpdatedOn(data?.['updatedOn'] as string ?? '')
         setmediaIds(data?.['mediaIds'] as [] ?? '')
-    }, [data])  
 
+    }, [data])  
+    useEffect(() => {
+        if (!navigator.geolocation) return
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                            console.log(position.coords.latitude)
+
+            setLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+            })
+            },
+            (error) => {
+            console.error('Error getting location:', error.message)
+            }
+        )
+    }, [])    
 
     // const [material, setMaterial] = useState<string>(data?.['material'] as string ?? '')
     // const [material, setMaterial] = useState<string>('')
@@ -109,19 +127,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     // const [isPublic, setIsPublic] = useState(craft?.isPublic ?? false)
     // const [artisan, setArtisan] = useState(craft?.artisan ?? '')
     const [images, setImages] = useState<File[]>([])
-    // useEffect(() => {
-    //     if (record?.['material']) {
-    //         setMaterial(record['material'] as string)
-    //     }
-    // }, [data]) // re-runs when data changes
-
-    // const isCreateMode = !craft
-    // console.log("****isediting: ", isEditing, "  isCreateMode: ", isCreateMode, "isSubmitting: ", isSubmitting) // Debug log to check mode
-    // console.log('Craft in form:', craft) // Debug log to check craft data
-    
-    // const showForm = isCreateMode || isEditing
-    // console.log('^^^^^^^^^^^^^Submitting description:', description) // Debug log to check data being submitted
-   
+      
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         setIsSubmitting(true)
@@ -130,13 +136,28 @@ export function CraftForm({ craft, user }: CraftFormProps) {
         //gettimestamp for createOn field
         const getTimestamp = () => new Date().toISOString()
         const timestamp = getTimestamp()
-
+        // const location = getLocation()
         if (isCreateMode) {
             setCreatedOn(timestamp)
         }
         console.log("data?.material: ",data?.material)
         console.log("material: ",material)
+        console.log(location?.lat)
+        console.log(location?.lng)
+        
+        //get the city
+        let city = null
+        if (isSharedLocation && location?.lat && location?.lng) {
+                const geoRes = await fetch(`/api/geocode?lat=${location?.lat}&lng=${location?.lng}`)
+            const geoData = await geoRes.json()
+            city = geoData.city  
+        }
+                    
+        // deal with the images
         const ids = await submitImages(images)        
+        console.log("did it wait: ",ids)
+        console.log("data?.mediaIds: ", data?.mediaIds)
+        
         const craftdata = {
             // id: isCreateMode ? generateId() : craft?.id,
             name:  name,
@@ -145,10 +166,18 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     ...data,   
                     'material': material,
                     'isPublic': isPublic,
+                    'isSharedLocation': isSharedLocation,
                     'artisan': data?.artisan ?? user ?? '',
                     'createdOn': data?.createdOn ?? timestamp,
                     'updatedOn': timestamp,
+                    // keep existing if present, otherwise use new ids
                     'mediaIds': data?.mediaIds ?? ids,       
+                    // 'mediaIds': data?.mediaIds ?? ids,
+                    // merge existing and new ids together
+                    // 'mediaIds': [...(Array.isArray(data?.mediaIds) ? data.mediaIds : []), ...ids],                    
+                    //If data already has a location → keep it If not but we have a new GPS location → use that If neither → null
+                    'location': data?.location ? data.location : location ? { lat: location.lat, lng: location.lng } : null,
+                    'place': data?.city ?? city
                     // 'material': data?.material ?? material,
                     // 'isPublic': data?.isPublic ?? isPublic,
                     // 'artisan': data?.artisan ?? user ?? '',
@@ -156,7 +185,6 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     // // createdOn: isCreateMode ? timestamp : createdOn,
                     // 'updatedOn': timestamp,
                     // 'mediaIds': data?.mediaIds ?? ids,
-
                 }       
             }
         
@@ -180,16 +208,17 @@ export function CraftForm({ craft, user }: CraftFormProps) {
             })
 
             // 1. check the image file itself first
-            // console.log('images array:', images)
-            // console.log('image file:', images[0])
+            console.log('images array:', images)
+            console.log('image file:', images[0])
 
             // 2. then append and check
             const formData = new FormData()
             formData.append('file', images[0])
 
 
-            // console.log('formData entries:', [...formData.entries()])
-            // console.log('images:', images.length )
+            console.log('formData entries:', [...formData.entries()])
+            console.log('images:', images.length )
+
     
             // if (isCreateMode||isEditing) {
             const newCraft = await res.json()
@@ -249,129 +278,6 @@ export function CraftForm({ craft, user }: CraftFormProps) {
 
         
     }
-
-    // console.log('showForm:', showForm) // Debug log to check craft prop
-    // ── View mode — scroll sections layout ──
-    // if (!showForm && craft) {
-    //     console.log('show form not, and Craft data:', craft) // Debug log to check craft data
-    //     return (
-    //         <div className="-mt-16">
-    //             {/* ── Hero Banner ── */}
-    //             <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-24">
-    //                 <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/[0.07] blur-3xl" />
-    //                 <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
-
-    //                 <div className="relative mx-auto max-w-4xl px-4 text-center">
-    //                     {/* Avatar */}
-    //                     <div className="mx-auto mb-4 h-28 w-28 overflow-hidden rounded-full border-4 border-background shadow-xl sm:h-32 sm:w-32">
-    //                         {/* {photoUrl ? (
-    //                             <Image
-    //                                 src={photoUrl}
-    //                                 alt={`${artisan.firstName} ${artisan.lastName}`}
-    //                                 width={128}
-    //                                 height={128}
-    //                                 className="h-full w-full object-cover"
-    //                             />
-    //                         ) : (
-    //                             <div className="flex h-full w-full items-center justify-center bg-muted">
-    //                                 <User className="h-10 w-10 text-muted-foreground" />
-    //                             </div>
-    //                         )} */}
-    //                     </div>
-
-    //                     <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-    //                         {/* {artisan.firstName} {artisan.lastName} */}
-    //                     </h1>
-
-    //                     {/* {locationText && (
-    //                         <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-    //                             <MapPin className="h-4 w-4" />
-    //                             {locationText}
-    //                         </p>
-    //                     )} */}
-
-    //                     <div className="mt-4 flex flex-wrap justify-center gap-3">
-    //                         <Button onClick={() => setIsEditing(true)}>
-    //                             <Pencil className="mr-2 h-4 w-4" />
-    //                             {t('edit')}
-    //                         </Button>
-    //                         {/* <Button variant="outline" asChild>
-    //                             <Link href={`/artisans/2`}>
-    //                                 <ExternalLink className="mr-2 h-4 w-4" />
-    //                                 {t('publicProfileLink')}
-    //                             </Link>
-    //                         </Button> */}
-    //                     </div>
-    //                 </div>
-    //             </section>
-
-    //             {message && (
-    //                 <div className="mx-auto max-w-4xl px-4">
-    //                     <div
-    //                         className={`mt-6 rounded-lg p-3 text-sm ${
-    //                             message.type === 'success'
-    //                                 ? 'bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200'
-    //                                 : 'bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200'
-    //                         }`}
-    //                     >
-    //                         {message.text}
-    //                     </div>
-    //                 </div>
-    //             )}
-
-    //             {/* ── Stats Section ── */}
-    //             <section className="border-b border-border/50 bg-background py-8">
-    //                 <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 sm:grid-cols-3">
-    //                     {/* {artisan.yearsOfExperience !== null && (
-    //                         <div className="rounded-lg bg-muted/60 p-5 text-center">
-    //                             <Clock className="mx-auto mb-2 h-6 w-6 text-primary" />
-    //                             <p className="font-semibold">{artisan.yearsOfExperience} {t('yearsLabel')}</p>
-    //                             <p className="text-xs text-muted-foreground">{t('craftExperience')}</p>
-    //                         </div>
-    //                     )} */}
-    //                     {/* {artisan.learningSource && (
-    //                         <div className="rounded-lg bg-muted/60 p-5 text-center">
-    //                             <GraduationCap className="mx-auto mb-2 h-6 w-6 text-primary" />
-    //                             <p className="font-semibold">{artisan.learningSource}</p>
-    //                             <p className="text-xs text-muted-foreground">{t('learningSource')}</p>
-    //                         </div>
-    //                     )}
-    //                     {locationText && (
-    //                         <div className="rounded-lg bg-muted/60 p-5 text-center">
-    //                             <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" />
-    //                             <p className="font-semibold">{locationText}</p>
-    //                             <p className="text-xs text-muted-foreground">{t('location')}</p>
-    //                         </div>
-    //                     )} */}
-    //                 </div>
-    //             </section>
-
-    //             {/* ── About Section ── */}
-    //             {material && (
-    //                 <section className="bg-muted/40 py-10">
-    //                     <div className="mx-auto max-w-3xl px-4">
-    //                         <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
-    //                             {t('bio')}
-    //                         </h2>
-    //                         <div className="border-l-2 border-primary/30 pl-5">
-    //                             <p className="text-base leading-relaxed text-foreground/80">
-    //                                 {material}
-    //                             </p>
-    //                         </div>
-    //                     </div>
-    //                 </section>
-    //             )}
-
-    //             {/* ── Gallery placeholder section (future) ── */}
-    //             {/* Will be implemented with masonry grid when gallery feature is added */}
-    //         </div>
-    //     )
-    // }
-
-    // ── Create / Edit mode ──
-    // console.log("&&&&isediting: ", isEditing, "  isCreateMode: ", isCreateMode, "isSubmitting: ", isSubmitting) // Debug log to check mode
-
-    // if(craft) setIsEditing(true)
 
     return (
         <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
@@ -458,6 +364,19 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                 &nbsp;&nbsp;{t('createCraft.createCraftPublic')}
             </label>
             </div>
+            
+            {/* is craft public */}
+            <div className="space-y-2">
+            <label htmlFor="isSharedLocation">
+                <input
+                type="checkbox"
+                id="isSharedLocation"
+                checked={isSharedLocation}
+                onChange={(e) => setIsSharedLocation(e.target.checked)}
+                />
+                &nbsp;&nbsp;{t('createCraft.createCraftMakeLocationPublic')}
+            </label>
+            </div>            
 
             {/* upload images */}
 
