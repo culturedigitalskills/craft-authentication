@@ -1,3 +1,44 @@
+# v0.4.x -> v0.5.0
+
+### Community Renamed to Group
+
+Renamed `Community` to `Group` and `ArtisanCommunityMembership` to `ArtisanGroupMembership`. Groups are no longer tied to a region  the `regionId`, `latitude`, and `longitude` columns have been removed.
+
+**Renamed tables**: `Community` to `Group`, `ArtisanCommunityMembership` to `ArtisanGroupMembership`
+
+**Renamed columns**: `communityId` to `groupId` (in `ArtisanGroupMembership`)
+
+**Removed columns**: `regionId`, `latitude`, `longitude` (from `Group`)
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
+No new environment variables required.
+
+### Group Role Enum and Additional Fields
+
+Added `GroupRole` enum (`ADMIN`, `MEMBER`) for type-safe membership roles. Added `website`, `location`, and `isActive` fields to the `Group` model.
+
+**New enum**: `GroupRole` (`ADMIN`, `MEMBER`)
+
+**New columns on `Group`**: `website` (optional URL), `location` (optional text), `isActive` (boolean, defaults to true)
+
+**Modified columns**: `ArtisanGroupMembership.role` changed from `String?` to `GroupRole` enum with `@default(MEMBER)`. Existing NULL values are migrated to `MEMBER`.
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
+No new environment variables required.
+
+
 # v0.3.x -> v0.4.0
 
 ### Database Schema Rollback
@@ -40,8 +81,6 @@ Seed the database with countries and regions (required for the artisan profile l
 pnpm db:seed
 ```
 
----
-
 # v0.2.x -> v0.3.0
 
 ### `.env.local` and `.env.production`
@@ -68,7 +107,7 @@ Get credentials from the [Google Cloud Console](https://console.cloud.google.com
 
 Added full platform database schema for artisans, crafts, QR verification, and verifiable credentials.
 
-**New tables**: Country, Region, Community, Artisan, ArtisanCommunityMembership, CraftCategory, Technique, ArtisanTechnique, Material, ProductType, ProductTypeMaterial, ProductTypeTechnique, Batch, BatchArtisan, BatchTag, TagScan, VerifiableCredential, MediaAttachment
+**New tables**: Country, Region, Group (formerly Community), Artisan, ArtisanGroupMembership (formerly ArtisanCommunityMembership), CraftCategory, Technique, ArtisanTechnique, Material, ProductType, ProductTypeMaterial, ProductTypeTechnique, Batch, BatchArtisan, BatchTag, TagScan, VerifiableCredential, MediaAttachment
 
 **Modified tables**: User (added `role` and `isActive` fields)
 
@@ -80,7 +119,6 @@ prisma migrate deploy
 
 No new environment variables required.
 
----
 
 # v0.1.x -> v0.2.0
 

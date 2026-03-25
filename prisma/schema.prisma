@@ -25,6 +25,11 @@ enum AttachmentType {
     PROCESS
 }
 
+enum GroupRole {
+    ADMIN
+    MEMBER
+}
+
 // Auth Models
 
 model User {
@@ -125,31 +130,27 @@ model Region {
     createdAt   DateTime    @default(now())
     updatedAt   DateTime    @updatedAt
     country     Country     @relation(fields: [countryId], references: [id])
-    communities Community[]
     artisans    Artisan[]
 
     @@index([countryId])
 }
 
-// Communities & Artisans
+// Groups & Artisans
 
-model Community {
-    id            String                       @id @default(uuid())
-    regionId      String
+model Group {
+    id            String              @id @default(uuid())
     name          String
-    slug          String                       @unique
+    slug          String              @unique
     description   String?
-    latitude      Float?
-    longitude     Float?
-    isWomenLed    Boolean                      @default(false)
-    isCooperative Boolean                      @default(false)
-    isFairTrade   Boolean                      @default(false)
-    createdAt     DateTime                     @default(now())
-    updatedAt     DateTime                     @updatedAt
-    region        Region                       @relation(fields: [regionId], references: [id])
-    memberships   ArtisanCommunityMembership[]
-
-    @@index([regionId])
+    website       String?
+    location      String?
+    isWomenLed    Boolean             @default(false)
+    isCooperative Boolean             @default(false)
+    isFairTrade   Boolean             @default(false)
+    isActive      Boolean             @default(true)
+    createdAt     DateTime            @default(now())
+    updatedAt     DateTime            @updatedAt
+    memberships   ArtisanGroupMembership[]
 }
 
 model Artisan {
@@ -169,23 +170,23 @@ model Artisan {
     deletedAt         DateTime?
     user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
     region            Region?                      @relation(fields: [regionId], references: [id])
-    memberships       ArtisanCommunityMembership[]
+    memberships       ArtisanGroupMembership[]
 
     @@index([regionId])
 }
 
-model ArtisanCommunityMembership {
-    id          String    @id @default(uuid())
-    artisanId   String
-    communityId String
-    role        String?
-    isPrimary   Boolean   @default(false)
-    joinedDate  DateTime  @default(now())
-    leftDate    DateTime?
-    artisan     Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
-    community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+model ArtisanGroupMembership {
+    id         String    @id @default(uuid())
+    artisanId  String
+    groupId    String
+    role       GroupRole @default(MEMBER)
+    isPrimary  Boolean   @default(false)
+    joinedDate DateTime  @default(now())
+    leftDate   DateTime?
+    artisan    Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+    group      Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-    @@unique([artisanId, communityId])
+    @@unique([artisanId, groupId])
 }
 
 // QR Tags & Scanning
