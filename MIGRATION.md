@@ -19,6 +19,26 @@ pnpm prisma:generate
 
 No new environment variables required.
 
+### Group Role Enum and Additional Fields
+
+Added `GroupRole` enum (`ADMIN`, `MEMBER`) for type-safe membership roles. Added `website`, `location`, and `isActive` fields to the `Group` model.
+
+**New enum**: `GroupRole` (`ADMIN`, `MEMBER`)
+
+**New columns on `Group`**: `website` (optional URL), `location` (optional text), `isActive` (boolean, defaults to true)
+
+**Modified columns**: `ArtisanGroupMembership.role` changed from `String?` to `GroupRole` enum with `@default(MEMBER)`. Existing NULL values are migrated to `MEMBER`.
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
+No new environment variables required.
+
+
 # v0.3.x -> v0.4.0
 
 ### Database Schema Rollback

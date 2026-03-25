@@ -25,6 +25,11 @@ enum AttachmentType {
     PROCESS
 }
 
+enum GroupRole {
+    ADMIN
+    MEMBER
+}
+
 // Auth Models
 
 model User {
@@ -137,9 +142,12 @@ model Group {
     name          String
     slug          String              @unique
     description   String?
+    website       String?
+    location      String?
     isWomenLed    Boolean             @default(false)
     isCooperative Boolean             @default(false)
     isFairTrade   Boolean             @default(false)
+    isActive      Boolean             @default(true)
     createdAt     DateTime            @default(now())
     updatedAt     DateTime            @updatedAt
     memberships   ArtisanGroupMembership[]
@@ -171,7 +179,7 @@ model ArtisanGroupMembership {
     id         String    @id @default(uuid())
     artisanId  String
     groupId    String
-    role       String?
+    role       GroupRole @default(MEMBER)
     isPrimary  Boolean   @default(false)
     joinedDate DateTime  @default(now())
     leftDate   DateTime?
