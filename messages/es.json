@@ -9,6 +9,7 @@
     "home": "Inicio",
     "about": "Acerca de",
     "crafts": "Artesanías",
+    "groups": "Grupos",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
     "profile": "Perfil"
@@ -166,7 +167,8 @@
     "learnedFrom": "Aprendido de",
     "notFound": "Artesano no encontrado",
     "gallery": "Galería",
-    "galleryEmpty": "Aún no hay fotos en la galería"
+    "galleryEmpty": "Aún no hay fotos en la galería",
+    "groups": "Grupos"
   },
   "crafts": {
       "welcomeTitle": "Explorar artesanías",

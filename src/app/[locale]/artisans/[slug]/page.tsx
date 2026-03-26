@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { MapPin, Clock, GraduationCap, User } from 'lucide-react'
+import Link from 'next/link'
+import { MapPin, Clock, GraduationCap, User, Users } from 'lucide-react'
 import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
@@ -69,6 +70,18 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                     name: true,
                     regionType: true,
                     country: { select: { name: true } },
+                },
+            },
+            memberships: {
+                where: { leftDate: null },
+                select: {
+                    role: true,
+                    group: {
+                        select: {
+                            name: true,
+                            slug: true,
+                        },
+                    },
                 },
             },
         },
@@ -210,6 +223,35 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             <p className="text-base leading-relaxed text-foreground/80">
                                 {artisan.bio}
                             </p>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* ── Groups Section ── */}
+            {artisan.memberships.length > 0 && (
+                <section className="py-10">
+                    <div className="mx-auto max-w-3xl px-4">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
+                            <Users className="mr-1.5 inline h-4 w-4" />
+                            {t('groups')}
+                        </h2>
+                        <div className="flex flex-wrap gap-3">
+                            {artisan.memberships.map(m => (
+                                <Link
+                                    key={m.group.slug}
+                                    href={`/groups/${m.group.slug}`}
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
+                                    <Users className="h-4 w-4 text-muted-foreground" />
+                                    {m.group.name}
+                                    {m.role === 'ADMIN' && (
+                                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                            Admin
+                                        </span>
+                                    )}
+                                </Link>
+                            ))}
                         </div>
                     </div>
                 </section>

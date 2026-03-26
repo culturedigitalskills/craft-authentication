@@ -9,6 +9,7 @@
     "home": "Home",
     "about": "About",
     "crafts": "Crafts",
+    "groups": "Groups",
     "seecrafts": "Gallery",
     "addcraft": "Add Craft",
     "login": "Login",
@@ -171,7 +172,8 @@
       "learnedFrom": "Learned from",
       "notFound": "Artisan not found",
       "gallery": "Gallery",
-      "galleryEmpty": "No gallery photos yet"
+      "galleryEmpty": "No gallery photos yet",
+      "groups": "Groups"
     },
     "crafts": {
       "welcomeTitle": "Gallery of Crafts",

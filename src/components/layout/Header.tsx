@@ -62,6 +62,7 @@ export function Header() {
         { href: '/', label: t('navbar.home') },
         { href: '/about', label: t('navbar.about') },
         { href: '/crafts', label: t('navbar.crafts') },
+        { href: '/groups', label: t('navbar.groups') },
     ]
 
     function isActive(href: string) {

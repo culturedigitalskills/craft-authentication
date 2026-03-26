@@ -9,6 +9,7 @@
     "home": "होम",
     "about": "हमारे बारे में",
     "crafts": "शिल्प",
+    "groups": "समूह",
     "login": "लॉगिन",
     "logout": "लॉगआउट",
     "profile": "प्रोफ़ाइल"
@@ -160,7 +161,8 @@
     "learnedFrom": "सीखने का स्रोत",
     "notFound": "कारीगर नहीं मिला",
     "gallery": "गैलरी",
-    "galleryEmpty": "अभी तक कोई गैलरी फ़ोटो नहीं"
+    "galleryEmpty": "अभी तक कोई गैलरी फ़ोटो नहीं",
+    "groups": "समूह"
   },
   "crafts": {
     "welcomeTitle": "शिल्पों का अन्वेषण करें",
