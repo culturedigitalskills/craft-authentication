@@ -171,6 +171,37 @@
   "crafts": {
     "welcomeTitle": "استكشف الحِرف",
     "description": "اكتشف الحِرف اليدوية الأصيلة من حرفيين مهرة حول العالم. كل قطعة مُحققة وتروي قصة فريدة من التقاليد والحرفية."
-  }
-    
+  },
+    "groups": {
+        "title": "المجموعات",
+        "createGroup": "إنشاء مجموعة",
+        "editGroup": "تعديل المجموعة",
+        "deleteGroup": "حذف المجموعة",
+        "groupName": "اسم المجموعة",
+        "description": "الوصف",
+        "website": "الموقع الإلكتروني",
+        "location": "الموقع",
+        "womenLed": "بقيادة نسائية",
+        "cooperative": "تعاونية",
+        "fairTrade": "تجارة عادلة",
+        "members": "الأعضاء",
+        "noMembers": "لا يوجد أعضاء بعد",
+        "addMember": "إضافة عضو",
+        "removeMember": "إزالة عضو",
+        "memberRole": "الدور",
+        "admin": "مسؤول",
+        "member": "عضو",
+        "notFound": "المجموعة غير موجودة",
+        "empty": "لم يتم العثور على مجموعات",
+        "confirmDelete": "هل أنت متأكد من حذف هذه المجموعة؟",
+        "confirmRemoveMember": "إزالة هذا العضو من المجموعة؟",
+        "createSuccess": "تم إنشاء المجموعة بنجاح",
+        "updateSuccess": "تم تحديث المجموعة بنجاح",
+        "deleteSuccess": "تم حذف المجموعة بنجاح",
+        "memberAdded": "تمت إضافة العضو بنجاح",
+        "memberRemoved": "تمت إزالة العضو بنجاح",
+        "saveFailed": "فشل في حفظ المجموعة",
+        "deleteFailed": "فشل في حذف المجموعة",
+        "viewGroup": "عرض المجموعة"
+    }
 }

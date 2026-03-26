@@ -171,5 +171,37 @@
   "crafts": {
     "welcomeTitle": "Handwerke entdecken",
     "description": "Entdecken Sie authentische handgefertigte Produkte von erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes Stück ist verifiziert und erzählt eine einzigartige Geschichte von Tradition und Handwerkskunst."
-  }
+  },
+    "groups": {
+        "title": "Gruppen",
+        "createGroup": "Gruppe erstellen",
+        "editGroup": "Gruppe bearbeiten",
+        "deleteGroup": "Gruppe löschen",
+        "groupName": "Gruppenname",
+        "description": "Beschreibung",
+        "website": "Webseite",
+        "location": "Standort",
+        "womenLed": "Von Frauen geführt",
+        "cooperative": "Kooperative",
+        "fairTrade": "Fairer Handel",
+        "members": "Mitglieder",
+        "noMembers": "Noch keine Mitglieder",
+        "addMember": "Mitglied hinzufügen",
+        "removeMember": "Mitglied entfernen",
+        "memberRole": "Rolle",
+        "admin": "Administrator",
+        "member": "Mitglied",
+        "notFound": "Gruppe nicht gefunden",
+        "empty": "Keine Gruppen gefunden",
+        "confirmDelete": "Möchten Sie diese Gruppe wirklich löschen?",
+        "confirmRemoveMember": "Dieses Mitglied aus der Gruppe entfernen?",
+        "createSuccess": "Gruppe erfolgreich erstellt",
+        "updateSuccess": "Gruppe erfolgreich aktualisiert",
+        "deleteSuccess": "Gruppe erfolgreich gelöscht",
+        "memberAdded": "Mitglied erfolgreich hinzugefügt",
+        "memberRemoved": "Mitglied erfolgreich entfernt",
+        "saveFailed": "Gruppe konnte nicht gespeichert werden",
+        "deleteFailed": "Gruppe konnte nicht gelöscht werden",
+        "viewGroup": "Gruppe ansehen"
+    }
 }
