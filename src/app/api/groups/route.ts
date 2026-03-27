@@ -87,9 +87,11 @@ export async function POST(request: NextRequest) {
                 description: validatedData.description,
                 website: validatedData.website || null,
                 location: validatedData.location,
-                isWomenLed: validatedData.isWomenLed,
-                isCooperative: validatedData.isCooperative,
-                isFairTrade: validatedData.isFairTrade,
+                organizationType: validatedData.organizationType,
+                certifications: validatedData.certifications,
+                isHeritageCraft: validatedData.isHeritageCraft,
+                isOpenToMembers: validatedData.isOpenToMembers,
+                hasTrainingProgram: validatedData.hasTrainingProgram,
             },
         })
 

@@ -30,6 +30,18 @@ enum GroupRole {
     MEMBER
 }
 
+enum OrganizationType {
+    COOPERATIVE
+    COLLECTIVE
+    GUILD
+    ASSOCIATION
+    SOCIAL_ENTERPRISE
+    NONPROFIT
+    STUDIO
+    NETWORK
+    OTHER
+}
+
 // Auth Models
 
 model User {
@@ -138,19 +150,21 @@ model Region {
 // Groups & Artisans
 
 model Group {
-    id            String              @id @default(uuid())
-    name          String
-    slug          String              @unique
-    description   String?
-    website       String?
-    location      String?
-    isWomenLed    Boolean             @default(false)
-    isCooperative Boolean             @default(false)
-    isFairTrade   Boolean             @default(false)
-    isActive      Boolean             @default(true)
-    createdAt     DateTime            @default(now())
-    updatedAt     DateTime            @updatedAt
-    memberships   ArtisanGroupMembership[]
+    id                 String              @id @default(uuid())
+    name               String
+    slug               String              @unique
+    description        String?
+    website            String?
+    location           String?
+    organizationType   OrganizationType    @default(OTHER)
+    certifications     String[]            @default([])
+    isHeritageCraft    Boolean             @default(false)
+    isOpenToMembers    Boolean             @default(true)
+    hasTrainingProgram Boolean             @default(false)
+    isActive           Boolean             @default(true)
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    memberships        ArtisanGroupMembership[]
 }
 
 model Artisan {

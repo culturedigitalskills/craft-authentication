@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { Users, MapPin, Globe, Award, Heart, Handshake, User, ExternalLink, Settings } from 'lucide-react'
+import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, User, ExternalLink, Settings } from 'lucide-react'
 import type { Metadata } from 'next'
 
 interface PageProps {
@@ -78,6 +78,20 @@ export default async function GroupDetailPage({ params }: PageProps) {
     const admins = group.memberships.filter(m => m.role === 'ADMIN')
     const members = group.memberships.filter(m => m.role === 'MEMBER')
 
+    // Fetch group photos (cover + logo)
+    const [coverAttachment, logoAttachment] = await Promise.all([
+        prisma.mediaAttachment.findFirst({
+            where: { entityType: 'Group', entityId: group.id, attachmentType: 'COVER', isPrimary: true },
+            select: { mediaId: true },
+        }),
+        prisma.mediaAttachment.findFirst({
+            where: { entityType: 'Group', entityId: group.id, attachmentType: 'HERO', isPrimary: true },
+            select: { mediaId: true },
+        }),
+    ])
+    const coverUrl = coverAttachment ? `/api/media/${coverAttachment.mediaId}` : null
+    const logoUrl = logoAttachment ? `/api/media/${logoAttachment.mediaId}` : null
+
     // Fetch profile photos for all members
     const artisanIds = group.memberships.map(m => m.artisan.id)
     const photoAttachments = await prisma.mediaAttachment.findMany({
@@ -102,9 +116,38 @@ export default async function GroupDetailPage({ params }: PageProps) {
             </Link>
 
             {/* Group header */}
-            <div className="mb-8 rounded-lg border border-border bg-card p-6 sm:p-8">
+            <div className="mb-8 overflow-hidden rounded-lg border border-border bg-card">
+                {/* Cover photo */}
+                <div className="relative h-48 bg-gradient-to-br from-muted to-muted/50 sm:h-56">
+                    {coverUrl && (
+                        <Image
+                            src={coverUrl}
+                            alt={`${group.name} cover`}
+                            fill
+                            sizes="(max-width: 1152px) 100vw, 1152px"
+                            className="object-cover"
+                            priority
+                        />
+                    )}
+                </div>
+
+                <div className="p-6 sm:p-8">
+                {/* Logo + title row */}
                 <div className="flex items-start justify-between">
-                    <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
+                    <div className="flex items-center gap-4">
+                        {logoUrl && (
+                            <div className="relative -mt-16 h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-4 border-card bg-card shadow-md sm:h-24 sm:w-24">
+                                <Image
+                                    src={logoUrl}
+                                    alt={`${group.name} logo`}
+                                    fill
+                                    sizes="96px"
+                                    className="object-cover"
+                                />
+                            </div>
+                        )}
+                        <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
+                    </div>
                     {canManage && (
                         <Link
                             href={`/groups/${group.slug}/manage`}
@@ -147,28 +190,38 @@ export default async function GroupDetailPage({ params }: PageProps) {
                     )}
                 </div>
 
-                {(group.isWomenLed || group.isCooperative || group.isFairTrade) && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        {group.isWomenLed && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-pink-50 px-3 py-1 text-sm font-medium text-pink-700">
-                                <Heart className="h-3.5 w-3.5" />
-                                {t('womenLed')}
-                            </span>
-                        )}
-                        {group.isCooperative && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
-                                <Handshake className="h-3.5 w-3.5" />
-                                {t('cooperative')}
-                            </span>
-                        )}
-                        {group.isFairTrade && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
-                                <Award className="h-3.5 w-3.5" />
-                                {t('fairTrade')}
-                            </span>
-                        )}
-                    </div>
-                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {group.organizationType !== 'OTHER' && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                            {t(`orgType_${group.organizationType}`)}
+                        </span>
+                    )}
+                    {group.isHeritageCraft && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">
+                            <BookOpen className="h-3.5 w-3.5" />
+                            {t('heritageCraft')}
+                        </span>
+                    )}
+                    {group.isOpenToMembers && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
+                            <DoorOpen className="h-3.5 w-3.5" />
+                            {t('openToMembers')}
+                        </span>
+                    )}
+                    {group.hasTrainingProgram && (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">
+                            <GraduationCap className="h-3.5 w-3.5" />
+                            {t('trainingProgram')}
+                        </span>
+                    )}
+                    {group.certifications.map(cert => (
+                        <span key={cert} className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
+                            <Award className="h-3.5 w-3.5" />
+                            {t(`cert_${cert}`)}
+                        </span>
+                    ))}
+                </div>
+                </div>
             </div>
 
             {/* Members */}

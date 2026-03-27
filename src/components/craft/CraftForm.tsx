@@ -404,7 +404,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
             </div>
 
             </div >                                              
-                <div className="right-0 flex items-center justify-end gap-2">
+                <div className="flex items-center justify-end gap-2">
                         <Button className="border-gray-300 hover:bg-muted-foreground text-white"
                         type="submit" disabled={isSubmitting}>
                             {isSubmitting

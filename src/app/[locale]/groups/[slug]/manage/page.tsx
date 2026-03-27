@@ -62,6 +62,20 @@ export default async function GroupManagePage({ params }: PageProps) {
         artisan: m.artisan,
     }))
 
+    // Fetch group photos
+    const [logoAttachment, coverAttachment] = await Promise.all([
+        prisma.mediaAttachment.findFirst({
+            where: { entityType: 'Group', entityId: group.id, attachmentType: 'HERO', isPrimary: true },
+            select: { mediaId: true },
+        }),
+        prisma.mediaAttachment.findFirst({
+            where: { entityType: 'Group', entityId: group.id, attachmentType: 'COVER', isPrimary: true },
+            select: { mediaId: true },
+        }),
+    ])
+    const logoUrl = logoAttachment ? `/api/media/${logoAttachment.mediaId}` : null
+    const coverUrl = coverAttachment ? `/api/media/${coverAttachment.mediaId}` : null
+
     return (
         <div className="container mx-auto max-w-6xl px-4 py-10">
             <GroupManageForm
@@ -72,11 +86,15 @@ export default async function GroupManagePage({ params }: PageProps) {
                     description: group.description,
                     website: group.website,
                     location: group.location,
-                    isWomenLed: group.isWomenLed,
-                    isCooperative: group.isCooperative,
-                    isFairTrade: group.isFairTrade,
+                    organizationType: group.organizationType,
+                    certifications: group.certifications,
+                    isHeritageCraft: group.isHeritageCraft,
+                    isOpenToMembers: group.isOpenToMembers,
+                    hasTrainingProgram: group.hasTrainingProgram,
                 }}
                 members={members}
+                logoUrl={logoUrl}
+                coverUrl={coverUrl}
             />
         </div>
     )

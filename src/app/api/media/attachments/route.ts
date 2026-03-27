@@ -22,6 +22,24 @@ export async function POST(request: NextRequest) {
             if (!artisan || artisan.userId !== session!.user.id) {
                 return errorResponse('Forbidden', 403)
             }
+        } else if (validatedData.entityType === 'Group') {
+            // Site admins can attach to any group
+            if (session!.user.role !== 'ADMIN') {
+                // Check if user is a group admin
+                const artisan = await prisma.artisan.findUnique({
+                    where: { userId: session!.user.id },
+                    select: { id: true },
+                })
+                const membership = artisan
+                    ? await prisma.artisanGroupMembership.findUnique({
+                          where: { artisanId_groupId: { artisanId: artisan.id, groupId: validatedData.entityId } },
+                          select: { role: true },
+                      })
+                    : null
+                if (!membership || membership.role !== 'ADMIN') {
+                    return errorResponse('Forbidden', 403)
+                }
+            }
         }
 
         // Remove existing primary attachment for this entity if replacing

@@ -1,5 +1,33 @@
-# v0.4.x -> v0.5.0
+# v0.5.x -> v0.6.0
 
+### Group Classification System
+
+Replaced the simple boolean flags (`isWomenLed`, `isCooperative`, `isFairTrade`) with a proper classification system based on real-world artisan organization standards.
+
+**New enum**: `OrganizationType` (`COOPERATIVE`, `COLLECTIVE`, `GUILD`, `ASSOCIATION`, `SOCIAL_ENTERPRISE`, `NONPROFIT`, `STUDIO`, `NETWORK`, `OTHER`)
+
+**New columns on `Group`**:
+- `organizationType` (OrganizationType enum, defaults to `OTHER`)
+- `certifications` (String array — values: `WFTO_FAIR_TRADE`, `FAIRTRADE_CERTIFIED`, `NEST_ETHICAL_HANDCRAFT`, `BCORP`, `UNESCO_ICH`, `FAIR_TRADE_FEDERATION`)
+- `isHeritageCraft` (boolean, defaults to false)
+- `isOpenToMembers` (boolean, defaults to true)
+- `hasTrainingProgram` (boolean, defaults to false)
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
+No new environment variables required.
+
+# v0.4.x -> v0.5.0
+Description
+Completed the Groups feature (Phases 5–7) and replaced placeholder group flags with a research-backed classification system. Added group photo uploads, artisan self-service, searchable member management, and standardized action button alignment across all forms.
+
+Changes
+Added OrganizationType enum (Cooperative, Collective, Guild, Association, Social
 ### Community Renamed to Group
 
 Renamed `Community` to `Group` and `ArtisanCommunityMembership` to `ArtisanGroupMembership`. Groups are no longer tied to a region  the `regionId`, `latitude`, and `longitude` columns have been removed.

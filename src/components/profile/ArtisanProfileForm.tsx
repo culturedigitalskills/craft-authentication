@@ -22,6 +22,9 @@ import {
     Pencil,
     ExternalLink,
     ImagePlus,
+    Users,
+    Shield,
+    LogOut,
 } from 'lucide-react'
 
 interface Artisan {
@@ -46,14 +49,21 @@ interface GalleryImage {
     url: string
 }
 
+interface MyGroup {
+    membershipId: string
+    role: string
+    group: { id: string; name: string; slug: string }
+}
+
 interface ArtisanProfileFormProps {
     artisan: Artisan | null
     photoUrl: string | null
     coverUrl: string | null
     galleryImages: GalleryImage[]
+    myGroups?: MyGroup[]
 }
 
-export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages, myGroups = [] }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
@@ -70,6 +80,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
     const [regionId, setRegionId] = useState<string | null>(artisan?.regionId ?? null)
     const [uploadedPhotoId, setUploadedPhotoId] = useState<string | null>(null)
     const [uploadedCoverId, setUploadedCoverId] = useState<string | null>(null)
+    const [groups, setGroups] = useState(myGroups)
+    const [confirmLeave, setConfirmLeave] = useState<string | null>(null)
 
     const isCreateMode = !artisan
     const showForm = isCreateMode || isEditing
@@ -164,6 +176,19 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
         setLearningSource(artisan?.learningSource ?? '')
         setRegionId(artisan?.regionId ?? null)
         setMessage(null)
+    }
+
+    async function handleLeaveGroup(membershipId: string, groupId: string) {
+        try {
+            const res = await fetch(`/api/groups/${groupId}/members/${membershipId}`, {
+                method: 'DELETE',
+            })
+            if (!res.ok) throw new Error('Failed to leave group')
+            setGroups(prev => prev.filter(g => g.membershipId !== membershipId))
+            setConfirmLeave(null)
+        } catch {
+            alert(t('leaveGroupFailed'))
+        }
     }
 
     const locationText = artisan?.region
@@ -288,6 +313,75 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                                 <p className="text-base leading-relaxed text-foreground/80">
                                     {artisan.bio}
                                 </p>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* ── My Groups Section ── */}
+                {groups.length > 0 && (
+                    <section className="border-b border-border/50 bg-background py-10">
+                        <div className="mx-auto max-w-3xl px-4">
+                            <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
+                                {t('myGroups')}
+                            </h2>
+                            <div className="space-y-2">
+                                {groups.map(g => (
+                                    <div
+                                        key={g.membershipId}
+                                        className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                                                {g.role === 'ADMIN' ? (
+                                                    <Shield className="h-4 w-4 text-primary" />
+                                                ) : (
+                                                    <Users className="h-4 w-4 text-muted-foreground" />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Link
+                                                    href={`/groups/${g.group.slug}`}
+                                                    className="text-sm font-medium hover:text-primary"
+                                                >
+                                                    {g.group.name}
+                                                </Link>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {g.role === 'ADMIN' ? t('groupAdmin') : t('groupMember')}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {confirmLeave === g.membershipId ? (
+                                            <div className="flex items-center gap-1">
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => handleLeaveGroup(g.membershipId, g.group.id)}
+                                                >
+                                                    {t('confirmLeave')}
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => setConfirmLeave(null)}
+                                                >
+                                                    {t('cancel')}
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setConfirmLeave(g.membershipId)}
+                                                className="text-muted-foreground hover:text-destructive"
+                                            >
+                                                <LogOut className="mr-1.5 h-4 w-4" />
+                                                {t('leaveGroup')}
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </section>
@@ -445,7 +539,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                         </div>
                     )}
 
-                    <div className="flex gap-3 border-t border-border pt-6">
+                    <div className="flex justify-end gap-3 border-t border-border pt-6">
                         <Button type="submit" size="lg" disabled={isSubmitting}>
                             {isSubmitting
                                 ? isCreateMode

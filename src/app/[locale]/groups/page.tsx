@@ -2,7 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
-import { Users, MapPin, Globe, Award, Heart, Handshake, Plus } from 'lucide-react'
+import Image from 'next/image'
+import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, Plus } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -22,6 +23,19 @@ export default async function GroupsPage() {
             _count: { select: { memberships: true } },
         },
     })
+
+    // Fetch logos for all groups
+    const groupIds = groups.map(g => g.id)
+    const logoAttachments = await prisma.mediaAttachment.findMany({
+        where: {
+            entityType: 'Group',
+            entityId: { in: groupIds },
+            attachmentType: 'HERO',
+            isPrimary: true,
+        },
+        select: { entityId: true, mediaId: true },
+    })
+    const logoMap = new Map(logoAttachments.map(a => [a.entityId, `/api/media/${a.mediaId}`]))
 
     return (
         <div className="container mx-auto max-w-6xl px-4 py-10">
@@ -51,9 +65,26 @@ export default async function GroupsPage() {
                             href={`/groups/${group.slug}`}
                             className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30 hover:shadow-md"
                         >
-                            <h2 className="text-lg font-semibold transition-colors group-hover:text-primary">
-                                {group.name}
-                            </h2>
+                            <div className="flex items-center gap-3">
+                                {logoMap.get(group.id) ? (
+                                    <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg">
+                                        <Image
+                                            src={logoMap.get(group.id)!}
+                                            alt={group.name}
+                                            fill
+                                            sizes="40px"
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-muted">
+                                        <Users className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                )}
+                                <h2 className="text-lg font-semibold transition-colors group-hover:text-primary">
+                                    {group.name}
+                                </h2>
+                            </div>
 
                             {group.description && (
                                 <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
@@ -82,28 +113,37 @@ export default async function GroupsPage() {
                                 )}
                             </div>
 
-                            {(group.isWomenLed || group.isCooperative || group.isFairTrade) && (
-                                <div className="mt-3 flex flex-wrap gap-2">
-                                    {group.isWomenLed && (
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-pink-50 px-2.5 py-0.5 text-xs font-medium text-pink-700">
-                                            <Heart className="h-3 w-3" />
-                                            {t('womenLed')}
-                                        </span>
-                                    )}
-                                    {group.isCooperative && (
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                                            <Handshake className="h-3 w-3" />
-                                            {t('cooperative')}
-                                        </span>
-                                    )}
-                                    {group.isFairTrade && (
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                                            <Award className="h-3 w-3" />
-                                            {t('fairTrade')}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                {group.organizationType && group.organizationType !== 'OTHER' && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                                        {t(`orgType_${group.organizationType}`)}
+                                    </span>
+                                )}
+                                {group.isHeritageCraft && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                                        <BookOpen className="h-3 w-3" />
+                                        {t('heritageCraft')}
+                                    </span>
+                                )}
+                                {group.isOpenToMembers && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                        <DoorOpen className="h-3 w-3" />
+                                        {t('openToMembers')}
+                                    </span>
+                                )}
+                                {group.hasTrainingProgram && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-700">
+                                        <GraduationCap className="h-3 w-3" />
+                                        {t('trainingProgram')}
+                                    </span>
+                                )}
+                                {group.certifications?.map(cert => (
+                                    <span key={cert} className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                                        <Award className="h-3 w-3" />
+                                        {t(`cert_${cert}`)}
+                                    </span>
+                                ))}
+                            </div>
                         </Link>
                     ))}
                 </div>

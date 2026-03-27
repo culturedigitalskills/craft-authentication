@@ -1,13 +1,36 @@
 import { z } from 'zod'
 
+const OrganizationTypeEnum = z.enum([
+    'COOPERATIVE',
+    'COLLECTIVE',
+    'GUILD',
+    'ASSOCIATION',
+    'SOCIAL_ENTERPRISE',
+    'NONPROFIT',
+    'STUDIO',
+    'NETWORK',
+    'OTHER',
+])
+
+const CertificationEnum = z.enum([
+    'WFTO_FAIR_TRADE',
+    'FAIRTRADE_CERTIFIED',
+    'NEST_ETHICAL_HANDCRAFT',
+    'BCORP',
+    'UNESCO_ICH',
+    'FAIR_TRADE_FEDERATION',
+])
+
 export const CreateGroupSchema = z.object({
     name: z.string().min(1, 'Group name is required').max(200),
     description: z.string().max(2000).optional(),
     website: z.string().url('Must be a valid URL').max(500).optional().or(z.literal('')),
     location: z.string().max(255).optional(),
-    isWomenLed: z.boolean().default(false),
-    isCooperative: z.boolean().default(false),
-    isFairTrade: z.boolean().default(false),
+    organizationType: OrganizationTypeEnum.default('OTHER'),
+    certifications: z.array(CertificationEnum).default([]),
+    isHeritageCraft: z.boolean().default(false),
+    isOpenToMembers: z.boolean().default(true),
+    hasTrainingProgram: z.boolean().default(false),
 })
 
 export const UpdateGroupSchema = z.object({
@@ -15,9 +38,11 @@ export const UpdateGroupSchema = z.object({
     description: z.string().max(2000).optional(),
     website: z.string().url('Must be a valid URL').max(500).optional().or(z.literal('')),
     location: z.string().max(255).optional(),
-    isWomenLed: z.boolean().optional(),
-    isCooperative: z.boolean().optional(),
-    isFairTrade: z.boolean().optional(),
+    organizationType: OrganizationTypeEnum.optional(),
+    certifications: z.array(CertificationEnum).optional(),
+    isHeritageCraft: z.boolean().optional(),
+    isOpenToMembers: z.boolean().optional(),
+    hasTrainingProgram: z.boolean().optional(),
     isActive: z.boolean().optional(),
 })
 

@@ -6,6 +6,27 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
+const ORGANIZATION_TYPES = [
+    'COOPERATIVE',
+    'COLLECTIVE',
+    'GUILD',
+    'ASSOCIATION',
+    'SOCIAL_ENTERPRISE',
+    'NONPROFIT',
+    'STUDIO',
+    'NETWORK',
+    'OTHER',
+] as const
+
+const CERTIFICATIONS = [
+    'WFTO_FAIR_TRADE',
+    'FAIRTRADE_CERTIFIED',
+    'NEST_ETHICAL_HANDCRAFT',
+    'BCORP',
+    'UNESCO_ICH',
+    'FAIR_TRADE_FEDERATION',
+] as const
+
 export function GroupCreateForm() {
     const t = useTranslations('groups')
     const router = useRouter()
@@ -17,10 +38,21 @@ export function GroupCreateForm() {
         description: '',
         website: '',
         location: '',
-        isWomenLed: false,
-        isCooperative: false,
-        isFairTrade: false,
+        organizationType: 'OTHER' as string,
+        certifications: [] as string[],
+        isHeritageCraft: false,
+        isOpenToMembers: true,
+        hasTrainingProgram: false,
     })
+
+    function toggleCertification(cert: string) {
+        setForm(f => ({
+            ...f,
+            certifications: f.certifications.includes(cert)
+                ? f.certifications.filter(c => c !== cert)
+                : [...f.certifications, cert],
+        }))
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -118,33 +150,74 @@ export function GroupCreateForm() {
                     </div>
                 </div>
 
+                {/* Organization type */}
+                <div>
+                    <label htmlFor="organizationType" className="mb-1.5 block text-sm font-medium">
+                        {t('organizationType')}
+                    </label>
+                    <select
+                        id="organizationType"
+                        value={form.organizationType}
+                        onChange={e => setForm(f => ({ ...f, organizationType: e.target.value }))}
+                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                        {ORGANIZATION_TYPES.map(type => (
+                            <option key={type} value={type}>
+                                {t(`orgType_${type}`)}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Certifications */}
+                <div>
+                    <p className="mb-2 text-sm font-medium">{t('certifications')}</p>
+                    <div className="flex flex-wrap gap-2">
+                        {CERTIFICATIONS.map(cert => (
+                            <button
+                                key={cert}
+                                type="button"
+                                onClick={() => toggleCertification(cert)}
+                                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                                    form.certifications.includes(cert)
+                                        ? 'border-primary bg-primary/10 text-primary'
+                                        : 'border-border text-muted-foreground hover:border-primary/40'
+                                }`}
+                            >
+                                {t(`cert_${cert}`)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Boolean attributes */}
                 <div className="flex flex-wrap gap-6">
                     <label className="flex items-center gap-2 text-sm">
                         <input
                             type="checkbox"
-                            checked={form.isWomenLed}
-                            onChange={e => setForm(f => ({ ...f, isWomenLed: e.target.checked }))}
+                            checked={form.isHeritageCraft}
+                            onChange={e => setForm(f => ({ ...f, isHeritageCraft: e.target.checked }))}
                             className="rounded border-input"
                         />
-                        {t('womenLed')}
+                        {t('heritageCraft')}
                     </label>
                     <label className="flex items-center gap-2 text-sm">
                         <input
                             type="checkbox"
-                            checked={form.isCooperative}
-                            onChange={e => setForm(f => ({ ...f, isCooperative: e.target.checked }))}
+                            checked={form.isOpenToMembers}
+                            onChange={e => setForm(f => ({ ...f, isOpenToMembers: e.target.checked }))}
                             className="rounded border-input"
                         />
-                        {t('cooperative')}
+                        {t('openToMembers')}
                     </label>
                     <label className="flex items-center gap-2 text-sm">
                         <input
                             type="checkbox"
-                            checked={form.isFairTrade}
-                            onChange={e => setForm(f => ({ ...f, isFairTrade: e.target.checked }))}
+                            checked={form.hasTrainingProgram}
+                            onChange={e => setForm(f => ({ ...f, hasTrainingProgram: e.target.checked }))}
                             className="rounded border-input"
                         />
-                        {t('fairTrade')}
+                        {t('trainingProgram')}
                     </label>
                 </div>
 
@@ -152,13 +225,15 @@ export function GroupCreateForm() {
                     <p className="text-sm text-destructive">{error}</p>
                 )}
 
-                <button
-                    type="submit"
-                    disabled={saving}
-                    className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-                >
-                    {saving ? 'Creating...' : t('createGroup')}
-                </button>
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                    >
+                        {saving ? 'Creating...' : t('createGroup')}
+                    </button>
+                </div>
             </form>
         </div>
     )

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { Trash2, UserPlus, Shield, User, ArrowLeft } from 'lucide-react'
+import { GroupPhotoUpload } from './GroupPhotoUpload'
 
 interface GroupData {
     id: string
@@ -13,9 +14,11 @@ interface GroupData {
     description: string | null
     website: string | null
     location: string | null
-    isWomenLed: boolean
-    isCooperative: boolean
-    isFairTrade: boolean
+    organizationType: string
+    certifications: string[]
+    isHeritageCraft: boolean
+    isOpenToMembers: boolean
+    hasTrainingProgram: boolean
 }
 
 interface Member {
@@ -32,26 +35,42 @@ interface Member {
 interface GroupManageFormProps {
     group: GroupData
     members: Member[]
+    logoUrl: string | null
+    coverUrl: string | null
 }
 
-export function GroupManageForm({ group, members: initialMembers }: GroupManageFormProps) {
+export function GroupManageForm({ group, members: initialMembers, logoUrl, coverUrl }: GroupManageFormProps) {
     const t = useTranslations('groups')
     const router = useRouter()
     const [saving, setSaving] = useState(false)
     const [members, setMembers] = useState(initialMembers)
-    const [addArtisanId, setAddArtisanId] = useState('')
     const [addError, setAddError] = useState('')
     const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchResults, setSearchResults] = useState<{ id: string; firstName: string; lastName: string; slug: string }[]>([])
+    const [selectedArtisan, setSelectedArtisan] = useState<{ id: string; firstName: string; lastName: string } | null>(null)
+    const [searching, setSearching] = useState(false)
 
     const [form, setForm] = useState({
         name: group.name,
         description: group.description || '',
         website: group.website || '',
         location: group.location || '',
-        isWomenLed: group.isWomenLed,
-        isCooperative: group.isCooperative,
-        isFairTrade: group.isFairTrade,
+        organizationType: group.organizationType,
+        certifications: group.certifications,
+        isHeritageCraft: group.isHeritageCraft,
+        isOpenToMembers: group.isOpenToMembers,
+        hasTrainingProgram: group.hasTrainingProgram,
     })
+
+    function toggleCertification(cert: string) {
+        setForm(f => ({
+            ...f,
+            certifications: f.certifications.includes(cert)
+                ? f.certifications.filter(c => c !== cert)
+                : [...f.certifications, cert],
+        }))
+    }
 
     async function handleSave(e: React.FormEvent) {
         e.preventDefault()
@@ -71,16 +90,41 @@ export function GroupManageForm({ group, members: initialMembers }: GroupManageF
         }
     }
 
-    async function handleAddMember(e: React.FormEvent) {
-        e.preventDefault()
+    async function handleSearch(query: string) {
+        setSearchQuery(query)
+        setSelectedArtisan(null)
         setAddError('')
-        if (!addArtisanId.trim()) return
+
+        if (query.trim().length < 2) {
+            setSearchResults([])
+            return
+        }
+
+        setSearching(true)
+        try {
+            const res = await fetch(`/api/artisans/search?q=${encodeURIComponent(query.trim())}`)
+            if (res.ok) {
+                const results = await res.json()
+                // Filter out artisans already in the group
+                const memberIds = new Set(members.map(m => m.artisan.id))
+                setSearchResults(results.filter((a: { id: string }) => !memberIds.has(a.id)))
+            }
+        } catch {
+            // silently fail search
+        } finally {
+            setSearching(false)
+        }
+    }
+
+    async function handleAddMember() {
+        if (!selectedArtisan) return
+        setAddError('')
 
         try {
             const res = await fetch(`/api/groups/${group.id}/members`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ artisanId: addArtisanId.trim() }),
+                body: JSON.stringify({ artisanId: selectedArtisan.id }),
             })
             if (!res.ok) {
                 const data = await res.json()
@@ -89,7 +133,9 @@ export function GroupManageForm({ group, members: initialMembers }: GroupManageF
             }
             const membership = await res.json()
             setMembers(prev => [...prev, membership])
-            setAddArtisanId('')
+            setSelectedArtisan(null)
+            setSearchQuery('')
+            setSearchResults([])
         } catch {
             setAddError('Failed to add member')
         }
@@ -136,6 +182,25 @@ export function GroupManageForm({ group, members: initialMembers }: GroupManageF
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
                 <h1 className="text-2xl font-bold">{t('editGroup')}: {group.name}</h1>
+            </div>
+
+            {/* Photos */}
+            <div className="rounded-lg border border-border bg-card p-6">
+                <h2 className="mb-4 text-lg font-semibold">Photos</h2>
+                <div className="space-y-5">
+                    <GroupPhotoUpload
+                        groupId={group.id}
+                        currentUrl={coverUrl}
+                        attachmentType="COVER"
+                        label="Cover Photo"
+                    />
+                    <GroupPhotoUpload
+                        groupId={group.id}
+                        currentUrl={logoUrl}
+                        attachmentType="HERO"
+                        label="Logo"
+                    />
+                </div>
             </div>
 
             {/* Group details form */}
@@ -196,43 +261,86 @@ export function GroupManageForm({ group, members: initialMembers }: GroupManageF
                     </div>
                 </div>
 
+                {/* Organization type */}
+                <div>
+                    <label htmlFor="organizationType" className="mb-1.5 block text-sm font-medium">
+                        {t('organizationType')}
+                    </label>
+                    <select
+                        id="organizationType"
+                        value={form.organizationType}
+                        onChange={e => setForm(f => ({ ...f, organizationType: e.target.value }))}
+                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                        {(['COOPERATIVE', 'COLLECTIVE', 'GUILD', 'ASSOCIATION', 'SOCIAL_ENTERPRISE', 'NONPROFIT', 'STUDIO', 'NETWORK', 'OTHER'] as const).map(type => (
+                            <option key={type} value={type}>
+                                {t(`orgType_${type}`)}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Certifications */}
+                <div>
+                    <p className="mb-2 text-sm font-medium">{t('certifications')}</p>
+                    <div className="flex flex-wrap gap-2">
+                        {(['WFTO_FAIR_TRADE', 'FAIRTRADE_CERTIFIED', 'NEST_ETHICAL_HANDCRAFT', 'BCORP', 'UNESCO_ICH', 'FAIR_TRADE_FEDERATION'] as const).map(cert => (
+                            <button
+                                key={cert}
+                                type="button"
+                                onClick={() => toggleCertification(cert)}
+                                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                                    form.certifications.includes(cert)
+                                        ? 'border-primary bg-primary/10 text-primary'
+                                        : 'border-border text-muted-foreground hover:border-primary/40'
+                                }`}
+                            >
+                                {t(`cert_${cert}`)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Boolean attributes */}
                 <div className="flex flex-wrap gap-6">
                     <label className="flex items-center gap-2 text-sm">
                         <input
                             type="checkbox"
-                            checked={form.isWomenLed}
-                            onChange={e => setForm(f => ({ ...f, isWomenLed: e.target.checked }))}
+                            checked={form.isHeritageCraft}
+                            onChange={e => setForm(f => ({ ...f, isHeritageCraft: e.target.checked }))}
                             className="rounded border-input"
                         />
-                        {t('womenLed')}
+                        {t('heritageCraft')}
                     </label>
                     <label className="flex items-center gap-2 text-sm">
                         <input
                             type="checkbox"
-                            checked={form.isCooperative}
-                            onChange={e => setForm(f => ({ ...f, isCooperative: e.target.checked }))}
+                            checked={form.isOpenToMembers}
+                            onChange={e => setForm(f => ({ ...f, isOpenToMembers: e.target.checked }))}
                             className="rounded border-input"
                         />
-                        {t('cooperative')}
+                        {t('openToMembers')}
                     </label>
                     <label className="flex items-center gap-2 text-sm">
                         <input
                             type="checkbox"
-                            checked={form.isFairTrade}
-                            onChange={e => setForm(f => ({ ...f, isFairTrade: e.target.checked }))}
+                            checked={form.hasTrainingProgram}
+                            onChange={e => setForm(f => ({ ...f, hasTrainingProgram: e.target.checked }))}
                             className="rounded border-input"
                         />
-                        {t('fairTrade')}
+                        {t('trainingProgram')}
                     </label>
                 </div>
 
-                <button
-                    type="submit"
-                    disabled={saving}
-                    className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-                >
-                    {saving ? 'Saving...' : t('editGroup')}
-                </button>
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                    >
+                        {saving ? 'Saving...' : t('editGroup')}
+                    </button>
+                </div>
             </form>
 
             {/* Members management */}
@@ -240,22 +348,57 @@ export function GroupManageForm({ group, members: initialMembers }: GroupManageF
                 <h2 className="mb-4 text-lg font-semibold">{t('members')}</h2>
 
                 {/* Add member */}
-                <form onSubmit={handleAddMember} className="mb-6 flex gap-3">
-                    <input
-                        type="text"
-                        value={addArtisanId}
-                        onChange={e => { setAddArtisanId(e.target.value); setAddError('') }}
-                        placeholder="Artisan ID"
-                        className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    />
-                    <button
-                        type="submit"
-                        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                    >
-                        <UserPlus className="h-4 w-4" />
-                        {t('addMember')}
-                    </button>
-                </form>
+                <div className="mb-6">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={selectedArtisan ? `${selectedArtisan.firstName} ${selectedArtisan.lastName}` : searchQuery}
+                            onChange={e => handleSearch(e.target.value)}
+                            placeholder={t('searchArtisan')}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        />
+                        {searching && (
+                            <div className="absolute right-3 top-2.5 text-xs text-muted-foreground">...</div>
+                        )}
+                        {searchResults.length > 0 && !selectedArtisan && (
+                            <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-card shadow-lg">
+                                {searchResults.map(a => (
+                                    <button
+                                        key={a.id}
+                                        type="button"
+                                        onClick={() => {
+                                            setSelectedArtisan({ id: a.id, firstName: a.firstName, lastName: a.lastName })
+                                            setSearchResults([])
+                                        }}
+                                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+                                    >
+                                        <User className="h-4 w-4 text-muted-foreground" />
+                                        {a.firstName} {a.lastName}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {selectedArtisan && (
+                        <div className="mt-2 flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={handleAddMember}
+                                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                            >
+                                <UserPlus className="h-4 w-4" />
+                                {t('addMember')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setSelectedArtisan(null); setSearchQuery('') }}
+                                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
+                            >
+                                {t('cancel')}
+                            </button>
+                        </div>
+                    )}
+                </div>
                 {addError && (
                     <p className="mb-4 text-sm text-destructive">{addError}</p>
                 )}
