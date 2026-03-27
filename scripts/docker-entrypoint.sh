@@ -38,7 +38,6 @@ echo "[db] Running database migrations..."
 cd /app
 prisma migrate deploy 2>&1 || echo "[db] WARNING: prisma migrate deploy failed (non-fatal)"
 echo "[db] Migrations complete."
-npx tsx prisma/seed.ts
 
 # ---------------------------------------------------------------------------
 # 3. Garage Initialization (requires admin_token in garage.toml)
