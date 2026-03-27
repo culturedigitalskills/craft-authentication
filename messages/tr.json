@@ -1,0 +1,241 @@
+{
+  "locale": "en",
+  "initials": "SC",
+  "title": "Sustainable Crafting",
+  "subtitle": "Authentic Cultural Products",
+  "copyright": "© 2025 sustainablecrafting.org. All rights reserved.",
+  "madeWith": "Made with ❤️ for artisans worldwide",
+  "navbar": {
+    "home": "Home",
+    "about": "About",
+    "crafts": "Crafts",
+    "seecrafts": "Gallery",
+    "addcraft": "Add Craft",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "myitems": "My Crafts"
+  },
+  "auth": {
+    "loginTitle": "Sign In",
+    "registerTitle": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "login": "Sign In",
+    "register": "Create Account",
+    "signingIn": "Signing in...",
+    "registering": "Creating account...",
+    "invalidCredentials": "Invalid email or password",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "passwordMismatch": "Passwords do not match",
+    "registrationFailed": "Registration failed. Please try again.",
+    "emailExists": "An account with this email already exists.",
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "orDivider": "or",
+    "continueWithGoogle": "Continue with Google"
+  },
+  "about": {
+    "title": "About SustainableCrafting",
+    "missionTitle": "Our Mission",
+    "missionDescription": "At SustainableCrafting, our mission is to empower artisans worldwide by providing a platform that connects them directly with customers. We believe in preserving traditional crafts while promoting sustainability and authenticity in the global marketplace.",
+    "viewRepository" : "View our GitHub Repository",
+    "keyFeatures" : "The database includes a Prisma wired to Postgres via env-driven URLs for dev and Docker. UI includes the shadcn/ui with Tailwind v3, radix primitives, and reusable utilities. All packaged in a Docker container for easy deployment.",
+    "privacyPolicy": "Privacy Policy",
+    "contact": "Contact"
+
+  },
+  "footer": {
+    "description": "The project website has been produced and is managed by the University of Brighton. This project is funded by the UK's Arts and Humanities Research Council under the India-UK research into creative industries and cultural heritage with the title: Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries. (Grant No. OPP080)."
+    
+  },
+  "socialmedia": {
+      "title": "Follow Us",
+      "instagram": "Instagram",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "email": "Email"
+    },
+  "landing": {
+      "description": "Connect directly with skilled artisans from across the world. Every skillfully designed product tells an authentic story about the place, its histories, and the people who create them. Verify their authenticity through our innovative QR code system.",
+      "exploreCrafts": "Gallery",
+      "learnMore": "Learn More"
+   },
+  "features": {
+    "authentic": {
+      "title": "Authentic",
+      "description": "Access information on cultural products"
+    },
+    "traceable": {
+      "title": "Traceable",
+      "description": "QR-code signed verifier"
+    },
+    "connected": {
+      "title": "Connected",
+      "description": "Direct link to artisans and makers"
+    },
+    "qrCard": {
+      "title": "Scan to Verify",
+      "description": "Authenticate, trace and connect"
+    }          
+  },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Artisans across the world have the means to connect with customers through a few simple steps:",
+      "steps": {
+        "record": {
+          "title": "Record",
+          "description": "Artisans document their work with our mobile app during the crafting process."
+        },
+        "generate": {
+          "title": "Generate QR",
+          "description": "The system creates a unique signature linking to artisan profile and creation process."
+        },
+        "scan": {
+          "title": "Scan & Verify",
+          "description": "Customers scan QR code to verify authenticity and learn the product's story."
+        },
+        "access": {
+          "title": "Global Access",
+          "description": "Audiences learn about the processes and stories of artisans worldwide."
+        }
+      }
+    },
+    "tradition": {
+      "title": "Bridging Tradition with Technology",
+      "description": "Our QR code system creates an unbreakable link between handmade crafts and their creators. Each scan reveals the artisan's story, the materials used, and the traditional techniques that make every piece unique and valuable."
+    },
+    "benefits": {
+      "certificates": "Immutable digital certificates for each craft",
+      "connection": "Direct connection between artisans and customers",
+      "supply": "Transparent supply chain from creation to sale"
+    } ,
+    "profile": {
+      "title": "Artisan Profile",
+      "createTitle": "Create Your Artisan Profile",
+      "editTitle": "Edit Your Artisan Profile",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us about yourself and your craft...",
+      "yearsOfExperience": "Years of Experience",
+      "learningSource": "How did you learn your craft?",
+      "learningSourcePlaceholder": "e.g., Family tradition, Apprenticeship, Self-taught...",
+      "save": "Save Profile",
+      "saving": "Saving...",
+      "update": "Update Profile",
+      "updating": "Updating...",
+      "edit": "Edit Profile",
+      "cancelEdit": "Cancel",
+      "createSuccess": "Profile created successfully!",
+      "updateSuccess": "Profile updated successfully!",
+      "createFailed": "Failed to create profile. Please try again.",
+      "updateFailed": "Failed to update profile. Please try again.",
+      "yearsLabel": "years",
+      "country": "Country",
+      "region": "Region",
+      "selectCountry": "Select a country",
+      "selectRegion": "Select a region",
+      "uploadPhoto": "Upload Photo",
+      "changePhoto": "Change Photo",
+      "photoUploading": "Uploading...",
+      "photoUploadFailed": "Failed to upload photo",
+      "personalInfo": "Personal Information",
+      "craftExperience": "Craft Experience",
+      "location": "Location",
+      "publicProfileLink": "View Public Profile",
+      "coverPhoto": "Cover Photo",
+      "uploadCover": "Upload Cover Photo",
+      "changeCover": "Change Cover",
+      "coverUploadFailed": "Failed to upload cover photo",
+      "gallery": "Gallery",
+      "uploadGallery": "Add Photos",
+      "galleryEmpty": "No gallery photos yet",
+      "galleryUploadFailed": "Failed to upload gallery photo",
+      "galleryDeleteFailed": "Failed to delete gallery photo",
+      "galleryDeleteConfirm": "Delete this photo?",
+      "galleryDeleteYes": "Delete",
+      "galleryDeleteNo": "Cancel"
+    },
+    "artisanProfile": {
+      "about": "About",
+      "craftJourney": "Craft Journey",
+      "yearsExperience": "years of experience",
+      "learnedFrom": "Learned from",
+      "notFound": "Artisan not found",
+      "gallery": "Gallery",
+      "galleryEmpty": "No gallery photos yet"
+    },
+    "crafts": {
+      "welcomeTitle": "Gallery of Crafts",
+      "description": "Discover authentic handmade crafts from skilled artisans around the world. Each piece is verified and tells a unique story of tradition and craftsmanship.",
+      "explore": {
+        "noImageAvailable": "No image available",
+        "craftDetails": "Craft Details",
+        "artisan": "Artisan",
+        "materials": "Materials",
+        "techniques": "Techniques",
+        "by": "by"
+      },
+      "details":{
+          "description": "Description",
+          "materials": "Materials",
+          "createdBy": "Created by",
+          "createdWhere": "Created at",
+          "createdOn": "Created on",
+          "updatedOn": "Updated on",
+          "backToCrafts": "Back to Crafts",
+          "noDescription": "No description available",          
+          "qrCodeTitle" : "Share this craft",
+          "qrCodeDescription": "Please scan this QR code to share this craft.",
+          "visible":"Visible to others",
+          "notvisible":"Only visible to you"
+      },
+      "welcomeTitleCraft":"Craft Details"
+      
+    },
+    "createCraft":{
+        "craftInfo": "Craft Information",
+        "craftTitle": "Craft Title",
+        "craftDescription": "Craft Description",
+        "createCraftTitle": "Create New Craft",
+        "createCraftHelper": "Use this form to create a new craft. Provide a title and description to share your craft with the world.",  
+        "createEdittHelper": "Use this form to edit your craft.",  
+        "editCraftTitle": "Edit Craft",
+        "saveCraft": "Save Craft",
+        "updateCraft": "Update",
+        "cancelEdit": "Cancel",
+        "deleteCraft": "Delete",
+        "createCraftName": "Title:",
+        "createCraftDescription": "Describe your craft in a few words:",
+        "createCraftMaterial": "Material used:",
+        "createCraftPublic": "Make this craft public",
+        "createCraftMakeLocationPublic": "Share my location",
+        "uploadImages": "Upload images of your craft",
+        "browse": "Browse files",
+        "imagesSelected": "image(s) selected",
+        "saving": "Saving...",
+        "updating": "Updating...",
+        "createFailed": "Failed to save craft. Please try again.",
+        "updateFailed": "Failed to update craft. Please try again.",
+        "savingCraft": "Saving craft...",
+        "updatingCraft": "Updating craft...",
+        "craftCreateSuccess": "Craft created successfully!",
+        "craftUpdateSuccess": "Craft updated successfully!" 
+
+    },    
+    "materials":{
+      "selectOne" : "Select one:",
+      "wool" : "Wool",
+      "cotton" : "Cotton",
+      "mix" : "Mix"
+    }
+}
+
