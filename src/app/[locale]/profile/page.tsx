@@ -19,14 +19,8 @@ export default async function ProfilePage() {
             bio: true,
             yearsOfExperience: true,
             learningSource: true,
-            regionId: true,
-            region: {
-                select: {
-                    id: true,
-                    name: true,
-                    country: { select: { id: true, name: true } },
-                },
-            },
+            country: true,
+            region: true,
         },
     })
 

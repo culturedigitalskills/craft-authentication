@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Label } from '@/components/ui/label'
 import {
@@ -10,77 +10,51 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-
-interface Country {
-    id: string
-    isoCode: string
-    name: string
-}
-
-interface Region {
-    id: string
-    name: string
-    regionType: string | null
-}
+import { countries } from '@/data/locations'
 
 interface LocationSelectProps {
-    initialCountryId?: string
-    initialRegionId?: string
-    onRegionChange: (regionId: string | null) => void
+    initialCountry?: string
+    initialRegion?: string
+    onLocationChange: (country: string | null, region: string | null) => void
 }
 
 export function LocationSelect({
-    initialCountryId,
-    initialRegionId,
-    onRegionChange,
+    initialCountry,
+    initialRegion,
+    onLocationChange,
 }: LocationSelectProps) {
     const t = useTranslations('profile')
-    const [countries, setCountries] = useState<Country[]>([])
-    const [regions, setRegions] = useState<Region[]>([])
-    const [selectedCountryId, setSelectedCountryId] = useState(initialCountryId ?? '')
-    const [selectedRegionId, setSelectedRegionId] = useState(initialRegionId ?? '')
+    const [selectedCountry, setSelectedCountry] = useState(initialCountry ?? '')
+    const [selectedRegion, setSelectedRegion] = useState(initialRegion ?? '')
 
-    useEffect(() => {
-        fetch('/api/countries')
-            .then((res) => res.json())
-            .then((data) => setCountries(data.countries ?? []))
-            .catch(() => {})
-    }, [])
+    const regions = useMemo(() => {
+        if (!selectedCountry) return []
+        const country = countries.find((c) => c.name === selectedCountry)
+        return country?.regions ?? []
+    }, [selectedCountry])
 
-    useEffect(() => {
-        if (!selectedCountryId) {
-            setRegions([])
-            return
-        }
-
-        fetch(`/api/countries/${selectedCountryId}/regions`)
-            .then((res) => res.json())
-            .then((data) => setRegions(data.regions ?? []))
-            .catch(() => {})
-    }, [selectedCountryId])
-
-    function handleCountryChange(countryId: string) {
-        setSelectedCountryId(countryId)
-        setSelectedRegionId('')
-        onRegionChange(null)
+    function handleCountryChange(countryName: string) {
+        setSelectedCountry(countryName)
+        setSelectedRegion('')
+        onLocationChange(countryName, null)
     }
 
-    function handleRegionChange(regionId: string) {
-        setSelectedRegionId(regionId)
-        onRegionChange(regionId)
+    function handleRegionChange(regionName: string) {
+        setSelectedRegion(regionName)
+        onLocationChange(selectedCountry, regionName)
     }
 
     return (
         <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
                 <Label>{t('country')}</Label>
-                <Select value={selectedCountryId} onValueChange={handleCountryChange}>
+                <Select value={selectedCountry} onValueChange={handleCountryChange}>
                     <SelectTrigger>
                         <SelectValue placeholder={t('selectCountry')} />
                     </SelectTrigger>
                     <SelectContent>
                         {countries.map((country) => (
-                            <SelectItem key={country.id} value={country.id}>
+                            <SelectItem key={country.isoCode} value={country.name}>
                                 {country.name}
                             </SelectItem>
                         ))}
@@ -90,16 +64,16 @@ export function LocationSelect({
             <div className="space-y-2">
                 <Label>{t('region')}</Label>
                 <Select
-                    value={selectedRegionId}
+                    value={selectedRegion}
                     onValueChange={handleRegionChange}
-                    disabled={!selectedCountryId || regions.length === 0}
+                    disabled={!selectedCountry || regions.length === 0}
                 >
                     <SelectTrigger>
                         <SelectValue placeholder={t('selectRegion')} />
                     </SelectTrigger>
                     <SelectContent>
                         {regions.map((region) => (
-                            <SelectItem key={region.id} value={region.id}>
+                            <SelectItem key={region.name} value={region.name}>
                                 {region.name}
                             </SelectItem>
                         ))}

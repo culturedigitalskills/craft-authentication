@@ -12,7 +12,6 @@
         "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
         "db:rollback": "dotenv -e .env.local -- prisma migrate deploy",
         "db:push": "dotenv -e .env.local -- prisma db push",
-        "db:seed": "dotenv -e .env.local -- npx tsx prisma/seed.ts",
         "build": "dotenv -e .env.production -- next build",
         "start": "dotenv -e .env.production -- next start",
         "lint": "eslint .",

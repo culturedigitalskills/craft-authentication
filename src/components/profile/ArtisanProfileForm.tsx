@@ -34,12 +34,8 @@ interface Artisan {
     bio: string | null
     yearsOfExperience: number | null
     learningSource: string | null
-    regionId: string | null
-    region: {
-        id: string
-        name: string
-        country: { id: string; name: string }
-    } | null
+    country: string | null
+    region: string | null
 }
 
 interface GalleryImage {
@@ -76,7 +72,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         artisan?.yearsOfExperience?.toString() ?? ''
     )
     const [learningSource, setLearningSource] = useState(artisan?.learningSource ?? '')
-    const [regionId, setRegionId] = useState<string | null>(artisan?.regionId ?? null)
+    const [country, setCountry] = useState<string | null>(artisan?.country ?? null)
+    const [region, setRegion] = useState<string | null>(artisan?.region ?? null)
     const [uploadedPhotoId, setUploadedPhotoId] = useState<string | null>(null)
     const [uploadedCoverId, setUploadedCoverId] = useState<string | null>(null)
     const [groups, setGroups] = useState(myGroups)
@@ -97,7 +94,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         if (bio) data.bio = bio
         if (yearsOfExperience) data.yearsOfExperience = parseInt(yearsOfExperience, 10)
         if (learningSource) data.learningSource = learningSource
-        if (regionId) data.regionId = regionId
+        if (country) data.country = country
+        if (region) data.region = region
 
         try {
             const url = isCreateMode ? '/api/artisans' : `/api/artisans/${artisan.id}`
@@ -173,7 +171,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         setBio(artisan?.bio ?? '')
         setYearsOfExperience(artisan?.yearsOfExperience?.toString() ?? '')
         setLearningSource(artisan?.learningSource ?? '')
-        setRegionId(artisan?.regionId ?? null)
+        setCountry(artisan?.country ?? null)
+        setRegion(artisan?.region ?? null)
         setMessage(null)
     }
 
@@ -190,8 +189,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         }
     }
 
-    const locationText = artisan?.region
-        ? `${artisan.region.name}, ${artisan.region.country.name}`
+    const locationText = artisan?.region && artisan?.country
+        ? `${artisan.region}, ${artisan.country}`
         : null
 
     // ── View mode — scroll sections layout ──
@@ -522,9 +521,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                     <div className="rounded-lg border border-border bg-card p-6">
                         <h2 className="mb-4 text-lg font-semibold">{t('location')}</h2>
                         <LocationSelect
-                            initialCountryId={artisan?.region?.country.id}
-                            initialRegionId={artisan?.regionId ?? undefined}
-                            onRegionChange={setRegionId}
+                            initialCountry={artisan?.country ?? undefined}
+                            initialRegion={artisan?.region ?? undefined}
+                            onLocationChange={(c, r) => {
+                                setCountry(c)
+                                setRegion(r)
+                            }}
                         />
                     </div>
 

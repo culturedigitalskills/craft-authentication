@@ -65,13 +65,8 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             bio: true,
             yearsOfExperience: true,
             learningSource: true,
-            region: {
-                select: {
-                    name: true,
-                    regionType: true,
-                    country: { select: { name: true } },
-                },
-            },
+            country: true,
+            region: true,
             memberships: {
                 where: { leftDate: null },
                 select: {
@@ -129,8 +124,8 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         url: `/api/media/${a.mediaId}`,
     }))
 
-    const locationText = artisan.region
-        ? `${artisan.region.name}, ${artisan.region.country.name}`
+    const locationText = artisan.region && artisan.country
+        ? `${artisan.region}, ${artisan.country}`
         : null
 
     return (

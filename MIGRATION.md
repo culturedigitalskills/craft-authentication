@@ -1,3 +1,26 @@
+# v0.6.x -> v0.7.0
+
+### Static Location Data
+
+Replaced the `Country` and `Region` database tables with a static TypeScript data file (`src/data/locations.ts`). Location data is now bundled with the app — no database seeding required.
+
+**Removed tables**: `Country`, `Region`
+
+**Modified table**: `Artisan` — replaced `regionId` (FK to Region) with `country` and `region` string fields
+
+**Removed API endpoints**: `GET /api/countries`, `GET /api/countries/[countryId]/regions`
+
+**Removed script**: `db:seed` — no longer needed
+
+The migration automatically copies existing location data from the Region/Country tables into the new string columns before dropping the old tables.
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
 # v0.5.x -> v0.6.0
 
 ### Group Classification System
@@ -83,7 +106,6 @@ Removed unused craft taxonomy, product, and batch tables to simplify the schema.
 
 ```bash
 pnpm dotenv -e .env.local -- prisma migrate reset
-pnpm db:seed
 ```
 
 ### Cover Photo Support
@@ -100,14 +122,6 @@ pnpm prisma:generate
 ```
 
 No new environment variables required.
-
-### Seed Data
-
-Seed the database with countries and regions (required for the artisan profile location selector):
-
-```bash
-pnpm db:seed
-```
 
 # v0.2.x -> v0.3.0
 
