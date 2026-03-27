@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -15,13 +14,13 @@ import { CoverPhotoUpload } from './CoverPhotoUpload'
 import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
 import {
+    ArrowLeft,
     MapPin,
     Clock,
     GraduationCap,
     User,
     Pencil,
     ExternalLink,
-    ImagePlus,
     Users,
     Shield,
     LogOut,
@@ -405,17 +404,27 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
 
     // ── Create / Edit mode ──
     return (
-        <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
-            <div className="bg-gradient-to-br from-card via-muted/50 to-card px-6 py-6">
-                <h1 className="text-center text-2xl font-bold tracking-tight">
-                    {isCreateMode ? t('createTitle') : t('editTitle')}
-                </h1>
-            </div>
+        <div className="container mx-auto max-w-4xl px-4 py-10">
+            <div className="space-y-8">
+                {/* Header with back button */}
+                <div className="flex items-center gap-4">
+                    {isEditing && (
+                        <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                    )}
+                    <h1 className="text-2xl font-bold tracking-tight">
+                        {isCreateMode ? t('createTitle') : t('editTitle')}
+                    </h1>
+                </div>
 
-            <CardContent className="p-6">
                 {message && (
                     <div
-                        className={`mb-6 rounded-lg p-3 text-sm ${
+                        className={`rounded-lg p-3 text-sm ${
                             message.type === 'success'
                                 ? 'bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200'
                                 : 'bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200'
@@ -426,33 +435,30 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-8">
-                    <div>
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <ImagePlus className="h-4 w-4" />
-                            {t('coverPhoto')}
-                        </h3>
-                        <CoverPhotoUpload
-                            artisanId={artisan?.id ?? null}
-                            currentCoverUrl={coverUrl}
-                            onCoverUploaded={setUploadedCoverId}
-                        />
+                    {/* Photos section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('coverPhoto')}</h2>
+                        <div className="space-y-5">
+                            <CoverPhotoUpload
+                                artisanId={artisan?.id ?? null}
+                                currentCoverUrl={coverUrl}
+                                onCoverUploaded={setUploadedCoverId}
+                            />
+                            <ProfilePhotoUpload
+                                artisanId={artisan?.id ?? null}
+                                currentPhotoUrl={photoUrl}
+                                onPhotoUploaded={setUploadedPhotoId}
+                            />
+                        </div>
                     </div>
 
-                    <ProfilePhotoUpload
-                        artisanId={artisan?.id ?? null}
-                        currentPhotoUrl={photoUrl}
-                        onPhotoUploaded={setUploadedPhotoId}
-                    />
-
-                    <div>
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <User className="h-4 w-4" />
-                            {t('personalInfo')}
-                        </h3>
-                        <div className="space-y-4">
+                    {/* Personal info section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('personalInfo')}</h2>
+                        <div className="space-y-5">
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="firstName">{t('firstName')}</Label>
+                                <div>
+                                    <Label htmlFor="firstName" className="mb-1.5 block text-sm font-medium">{t('firstName')}</Label>
                                     <Input
                                         id="firstName"
                                         value={firstName}
@@ -460,8 +466,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                         required
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="lastName">{t('lastName')}</Label>
+                                <div>
+                                    <Label htmlFor="lastName" className="mb-1.5 block text-sm font-medium">{t('lastName')}</Label>
                                     <Input
                                         id="lastName"
                                         value={lastName}
@@ -470,8 +476,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="bio">{t('bio')}</Label>
+                            <div>
+                                <Label htmlFor="bio" className="mb-1.5 block text-sm font-medium">{t('bio')}</Label>
                                 <Textarea
                                     id="bio"
                                     value={bio}
@@ -483,14 +489,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         </div>
                     </div>
 
-                    <div className="border-t border-border pt-6">
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <GraduationCap className="h-4 w-4" />
-                            {t('craftExperience')}
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="yearsOfExperience">
+                    {/* Craft experience section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('craftExperience')}</h2>
+                        <div className="space-y-5">
+                            <div>
+                                <Label htmlFor="yearsOfExperience" className="mb-1.5 block text-sm font-medium">
                                     {t('yearsOfExperience')}
                                 </Label>
                                 <Input
@@ -502,8 +506,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                     onChange={(e) => setYearsOfExperience(e.target.value)}
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="learningSource">{t('learningSource')}</Label>
+                            <div>
+                                <Label htmlFor="learningSource" className="mb-1.5 block text-sm font-medium">{t('learningSource')}</Label>
                                 <Input
                                     id="learningSource"
                                     value={learningSource}
@@ -514,11 +518,9 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         </div>
                     </div>
 
-                    <div className="border-t border-border pt-6">
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <MapPin className="h-4 w-4" />
-                            {t('location')}
-                        </h3>
+                    {/* Location section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('location')}</h2>
                         <LocationSelect
                             initialCountryId={artisan?.region?.country.id}
                             initialRegionId={artisan?.regionId ?? undefined}
@@ -526,12 +528,10 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         />
                     </div>
 
+                    {/* Gallery section (edit mode only) */}
                     {!isCreateMode && (
-                        <div className="border-t border-border pt-6">
-                            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                                <ImagePlus className="h-4 w-4" />
-                                {t('gallery')}
-                            </h3>
+                        <div className="rounded-lg border border-border bg-card p-6">
+                            <h2 className="mb-4 text-lg font-semibold">{t('gallery')}</h2>
                             <GalleryUpload
                                 artisanId={artisan?.id ?? null}
                                 initialImages={galleryImages}
@@ -539,8 +539,18 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         </div>
                     )}
 
-                    <div className="flex justify-end gap-3 border-t border-border pt-6">
-                        <Button type="submit" size="lg" disabled={isSubmitting}>
+                    {/* Action buttons */}
+                    <div className="flex justify-end gap-3">
+                        {isEditing && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleCancelEdit}
+                            >
+                                {t('cancelEdit')}
+                            </Button>
+                        )}
+                        <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting
                                 ? isCreateMode
                                     ? t('saving')
@@ -549,19 +559,9 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                   ? t('save')
                                   : t('update')}
                         </Button>
-                        {isEditing && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="lg"
-                                onClick={handleCancelEdit}
-                            >
-                                {t('cancelEdit')}
-                            </Button>
-                        )}
                     </div>
                 </form>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     )
 }

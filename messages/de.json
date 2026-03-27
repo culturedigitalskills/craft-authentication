@@ -12,7 +12,10 @@
     "groups": "Gruppen",
     "login": "Anmelden",
     "logout": "Abmelden",
-    "profile": "Profil"
+    "profile": "Profil",
+    "myitems": "Meine Handwerke",
+    "addcraft": "Handwerk hinzufügen",
+    "createGroup": "Gruppe erstellen"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -182,8 +185,10 @@
     "description": "Entdecken Sie authentische handgefertigte Produkte von erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes Stück ist verifiziert und erzählt eine einzigartige Geschichte von Tradition und Handwerkskunst."
   },
     "groups": {
-        "title": "Gruppen",
+        "title": "Handwerkergruppen",
+        "subtitle": "Entdecken Sie Handwerkergruppen, Genossenschaften, Gilden und Verbände aus aller Welt.",
         "createGroup": "Gruppe erstellen",
+        "createGroupHelper": "Erstellen Sie eine neue Handwerkergruppe, Genossenschaft oder Zunft.",
         "editGroup": "Gruppe bearbeiten",
         "deleteGroup": "Gruppe löschen",
         "groupName": "Gruppenname",

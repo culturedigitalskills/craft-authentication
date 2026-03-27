@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { ExternalLink, Pencil, User } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Pencil, User } from 'lucide-react'
 import { ProfilePhotoUpload } from '../profile/ProfilePhotoUpload'
 import { useRouter } from 'next/navigation'
 import { time } from 'console'
@@ -282,16 +282,26 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     return (
         <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
             <div className="bg-gradient-to-br from-card via-muted/50 to-card px-6 py-6">
-                <h1 className="text-left text-2xl font-bold tracking-tight">
-                    {isCreateMode ? 
-                    t('createCraft.createCraftTitle') : 
-                    t('createCraft.editCraftTitle')}
-                </h1>
-                <p className="text-left text-sm text-muted-foreground">
-                    {isCreateMode ? 
-                    t('createCraft.createCraftHelper') : 
-                    t('createCraft.createEdittHelper')}
-                </p>
+                <div className="flex items-center gap-3">
+                    <Link
+                        href="/crafts"
+                        className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                    </Link>
+                    <div>
+                        <h1 className="text-left text-2xl font-bold tracking-tight">
+                            {isCreateMode ?
+                            t('createCraft.createCraftTitle') :
+                            t('createCraft.editCraftTitle')}
+                        </h1>
+                        <p className="text-left text-sm text-muted-foreground">
+                            {isCreateMode ?
+                            t('createCraft.createCraftHelper') :
+                            t('createCraft.createEdittHelper')}
+                        </p>
+                    </div>
+                </div>
             </div>        
             <CardContent className="p-6">
                 {message && (
@@ -306,10 +316,10 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     </div>
                 )}  
 
-                <form onSubmit={handleSubmit} className="space-y-8">
+                <form onSubmit={handleSubmit} className="space-y-5">
 
                 <div className="space-y-2">
-                    <Label htmlFor="name" className="text-left font-medium">
+                    <Label htmlFor="name" className="mb-1.5 block text-sm font-medium">
                         {t('createCraft.createCraftName')}
                     </Label>
                     <Input
@@ -321,7 +331,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     />                    
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="description" className="text-left font-medium">
+                    <Label htmlFor="description" className="mb-1.5 block text-sm font-medium">
                         {t('createCraft.createCraftDescription')}
                     </Label>
                     <Textarea
@@ -333,7 +343,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     />                    
                 </div>    
                 <div className="space-y-2">
-                    <Label htmlFor="material" className="text-left font-medium">
+                    <Label htmlFor="material" className="mb-1.5 block text-sm font-medium">
                         {t('createCraft.createCraftMaterial')}
                     </Label>
                     <select
@@ -342,7 +352,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     onChange={(e) => {
                     setMaterial(e.target.value)
                     }}
-                    className="w-full rounded-md border border-gray-300 bg-blue-50 px-3 py-2 focus:border-blue-400 focus:outline-none"
+                    className="w-full rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                     >
                     <option value="">Select one</option>
                     <option value="Cotton">{t('materials.cotton')}</option>
@@ -381,7 +391,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
             {/* upload images */}
 
             <div className="space-y-2">
-            <Label htmlFor="material" className="text-left font-medium">
+            <Label htmlFor="material" className="mb-1.5 block text-sm font-medium">
                 {t('createCraft.uploadImages')}
             </Label>           
             <br/>     
@@ -395,8 +405,8 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     setImages(Array.from(e.target.files || []))
                 }
             />
-            <Button className="border-gray-300 hover:bg-muted-foreground text-white"
-             type="button" 
+            <Button variant="outline"
+             type="button"
              onClick={() => document.getElementById('images')?.click()}>
                {t('createCraft.browse')}
             </Button>
@@ -405,8 +415,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
 
             </div >                                              
                 <div className="flex items-center justify-end gap-2">
-                        <Button className="border-gray-300 hover:bg-muted-foreground text-white"
-                        type="submit" disabled={isSubmitting}>
+                        <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting
                                 ? isCreateMode                                
                                     ? t('createCraft.savingCraft')
@@ -416,7 +425,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                                   : t('createCraft.updateCraft')}
                             </Button>
                             {isEditing ? (
-                                <Button className="border-gray-300 hover:bg-muted-foreground text-white"
+                                <Button variant="outline"
                                 onClick={handleCancelEdit}
                                 >
                                    
@@ -424,7 +433,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                                 </Button>
                                 ) : null}
                             {isEditing ? (
-                                <Button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                                <Button variant="destructive"
                                 onClick={handleDelete}>
                                     {t('createCraft.deleteCraft')}
                                 </Button>

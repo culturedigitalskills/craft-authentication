@@ -39,7 +39,11 @@ export default async function CraftCreatePage(
     // console.log('***Craft from DB:', craft)  
 
 
-    return <CraftForm user={session.user?.email ?? null} craft={craft} />
+    return (
+        <div className="container mx-auto px-4 py-10">
+            <CraftForm user={session.user?.email ?? null} craft={craft} />
+        </div>
+    )
 
 
 }
