@@ -1,9 +1,8 @@
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
-import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, Plus } from 'lucide-react'
+import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -13,9 +12,6 @@ export const metadata: Metadata = {
 
 export default async function GroupsPage() {
     const t = await getTranslations('groups')
-    const session = await auth()
-    const isAdmin = session?.user?.role === 'ADMIN'
-
     const groups = await prisma.group.findMany({
         where: { isActive: true },
         orderBy: { name: 'asc' },
@@ -39,17 +35,9 @@ export default async function GroupsPage() {
 
     return (
         <div className="container mx-auto max-w-6xl px-4 py-10">
-            <div className="mb-8 flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-                {isAdmin && (
-                    <Link
-                        href="/groups/create"
-                        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                    >
-                        <Plus className="h-4 w-4" />
-                        {t('createGroup')}
-                    </Link>
-                )}
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+                <h1 className="mb-4 text-4xl font-bold">{t('title')}</h1>
+                <p className="text-lg text-muted-foreground">{t('subtitle')}</p>
             </div>
 
             {groups.length === 0 ? (

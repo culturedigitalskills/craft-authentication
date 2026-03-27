@@ -15,7 +15,8 @@
     "login": "Login",
     "logout": "Logout",
     "profile": "Profile",
-    "myitems": "My Crafts"
+    "myitems": "My Crafts",
+    "createGroup": "Create Group"
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -241,8 +242,10 @@
 
     },    
     "groups": {
-        "title": "Groups",
+        "title": "Artisan Groups",
+        "subtitle": "Browse artisan groups, cooperatives, guilds, and associations from around the world.",
         "createGroup": "Create Group",
+        "createGroupHelper": "Set up a new artisan group, cooperative, or guild.",
         "editGroup": "Edit Group",
         "deleteGroup": "Delete Group",
         "groupName": "Group Name",

@@ -12,7 +12,10 @@
     "groups": "Grupos",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "myitems": "Mis Artesanías",
+    "addcraft": "Agregar Artesanía",
+    "createGroup": "Crear Grupo"
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
@@ -182,8 +185,10 @@
       "description": "Descubre artesanías hechas a mano auténticas de artesanos expertos de todo el mundo. Cada pieza está verificada y cuenta una historia única de tradición y artesanía."
     },
     "groups": {
-        "title": "Grupos",
+        "title": "Grupos de Artesanos",
+        "subtitle": "Explora grupos de artesanos, cooperativas, gremios y asociaciones de todo el mundo.",
         "createGroup": "Crear Grupo",
+        "createGroupHelper": "Configura un nuevo grupo artesanal, cooperativa o gremio.",
         "editGroup": "Editar Grupo",
         "deleteGroup": "Eliminar Grupo",
         "groupName": "Nombre del Grupo",

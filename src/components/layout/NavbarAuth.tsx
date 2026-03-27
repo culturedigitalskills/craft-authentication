@@ -3,7 +3,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
@@ -75,7 +75,26 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     >
                         <FolderUp className="h-4 w-4" />
                         {t('addcraft')}
-                    </Link>                                        
+                    </Link>
+
+                    <div className="my-1 border-t border-border" />
+
+                    <Link
+                        href="/groups"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <Users className="h-4 w-4" />
+                        {t('groups')}
+                    </Link>
+                    <Link
+                        href="/groups/create"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <UserPlus className="h-4 w-4" />
+                        {t('createGroup')}
+                    </Link>
                     <button
                         type="button"
                         onClick={() => { signOut({ callbackUrl: '/' }); onAction?.() }}
@@ -163,6 +182,25 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         </Link>
                     </div>
 
+                    {/* Groups */}
+                    <div className="border-t border-border py-1">
+                        <Link
+                            href="/groups"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            {t('groups')}
+                        </Link>
+                        <Link
+                            href="/groups/create"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <UserPlus className="h-4 w-4 text-muted-foreground" />
+                            {t('createGroup')}
+                        </Link>
+                    </div>
 
                     {/* Logout */}
                     <div className="border-t border-border py-1">

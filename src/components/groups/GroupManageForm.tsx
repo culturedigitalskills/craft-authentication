@@ -181,7 +181,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
-                <h1 className="text-2xl font-bold">{t('editGroup')}: {group.name}</h1>
+                <h1 className="text-2xl font-bold tracking-tight">{t('editGroup')}: {group.name}</h1>
             </div>
 
             {/* Photos */}
