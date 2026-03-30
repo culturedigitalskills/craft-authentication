@@ -6,9 +6,6 @@ import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const { unauthorized } = await requireAuth()
-    if (unauthorized) return unauthorized
-
     try {
         const { id } = await params
         const record = await prisma.dataRecord.findUnique({ where: { id } })
