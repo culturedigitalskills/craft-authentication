@@ -80,12 +80,12 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     <div className="my-1 border-t border-border" />
 
                     <Link
-                        href="/groups"
+                        href="/groups/mygroups"
                         onClick={onAction}
                         className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                     >
                         <Users className="h-4 w-4" />
-                        {t('groups')}
+                        {t('mygroups')}
                     </Link>
                     <Link
                         href="/groups/create"
@@ -185,12 +185,12 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     {/* Groups */}
                     <div className="border-t border-border py-1">
                         <Link
-                            href="/groups"
+                            href="/groups/mygroups"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
                             className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                         >
                             <Users className="h-4 w-4 text-muted-foreground" />
-                            {t('groups')}
+                            {t('mygroups')}
                         </Link>
                         <Link
                             href="/groups/create"

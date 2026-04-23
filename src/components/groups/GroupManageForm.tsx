@@ -5,6 +5,17 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { Trash2, UserPlus, Shield, User, ArrowLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { GroupPhotoUpload } from './GroupPhotoUpload'
 
 interface GroupData {
@@ -174,14 +185,17 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-5">
                 <Link
                     href={`/groups/${group.slug}`}
-                    className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
-                <h1 className="text-2xl font-bold tracking-tight">{t('editGroup')}: {group.name}</h1>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">{group.name}</h1>
+                    <p className="text-sm text-primary-foreground/70">{t('editGroup')}</p>
+                </div>
             </div>
 
             {/* Photos */}
@@ -205,79 +219,78 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
 
             {/* Group details form */}
             <form onSubmit={handleSave} className="space-y-5 rounded-lg border border-border bg-card p-6">
-                <div>
-                    <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
+                <div className="space-y-2">
+                    <Label htmlFor="name">
                         {t('groupName')}
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="name"
                         type="text"
                         value={form.name}
                         onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         required
                     />
                 </div>
 
-                <div>
-                    <label htmlFor="description" className="mb-1.5 block text-sm font-medium">
+                <div className="space-y-2">
+                    <Label htmlFor="description">
                         {t('description')}
-                    </label>
-                    <textarea
+                    </Label>
+                    <Textarea
                         id="description"
                         value={form.description}
                         onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                         rows={4}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     />
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label htmlFor="website" className="mb-1.5 block text-sm font-medium">
+                    <div className="space-y-2">
+                        <Label htmlFor="website">
                             {t('website')}
-                        </label>
-                        <input
+                        </Label>
+                        <Input
                             id="website"
                             type="url"
                             value={form.website}
                             onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
                             placeholder="https://"
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                     </div>
 
-                    <div>
-                        <label htmlFor="location" className="mb-1.5 block text-sm font-medium">
+                    <div className="space-y-2">
+                        <Label htmlFor="location">
                             {t('location')}
-                        </label>
-                        <input
+                        </Label>
+                        <Input
                             id="location"
                             type="text"
                             value={form.location}
                             onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                     </div>
                 </div>
 
                 {/* Organization type */}
-                <div>
-                    <label htmlFor="organizationType" className="mb-1.5 block text-sm font-medium">
+                <div className="space-y-2">
+                    <Label htmlFor="organizationType">
                         {t('organizationType')}
-                    </label>
-                    <select
-                        id="organizationType"
+                    </Label>
+                    <Select
                         value={form.organizationType}
-                        onChange={e => setForm(f => ({ ...f, organizationType: e.target.value }))}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        onValueChange={value => setForm(f => ({ ...f, organizationType: value }))}
                     >
-                        {(['COOPERATIVE', 'COLLECTIVE', 'GUILD', 'ASSOCIATION', 'SOCIAL_ENTERPRISE', 'NONPROFIT', 'STUDIO', 'NETWORK', 'OTHER'] as const).map(type => (
-                            <option key={type} value={type}>
-                                {t(`orgType_${type}`)}
-                            </option>
-                        ))}
-                    </select>
+                        <SelectTrigger id="organizationType">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {(['COOPERATIVE', 'COLLECTIVE', 'GUILD', 'ASSOCIATION', 'SOCIAL_ENTERPRISE', 'NONPROFIT', 'STUDIO', 'NETWORK', 'OTHER'] as const).map(type => (
+                                <SelectItem key={type} value={type}>
+                                    {t(`orgType_${type}`)}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 {/* Certifications */}
@@ -333,13 +346,9 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 </div>
 
                 <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        disabled={saving}
-                        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-                    >
+                    <Button type="submit" disabled={saving}>
                         {saving ? 'Saving...' : t('editGroup')}
-                    </button>
+                    </Button>
                 </div>
             </form>
 
@@ -350,12 +359,11 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 {/* Add member */}
                 <div className="mb-6">
                     <div className="relative">
-                        <input
+                        <Input
                             type="text"
                             value={selectedArtisan ? `${selectedArtisan.firstName} ${selectedArtisan.lastName}` : searchQuery}
                             onChange={e => handleSearch(e.target.value)}
                             placeholder={t('searchArtisan')}
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         />
                         {searching && (
                             <div className="absolute right-3 top-2.5 text-xs text-muted-foreground">...</div>
@@ -381,21 +389,17 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                     </div>
                     {selectedArtisan && (
                         <div className="mt-2 flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={handleAddMember}
-                                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                            >
+                            <Button type="button" onClick={handleAddMember}>
                                 <UserPlus className="h-4 w-4" />
                                 {t('addMember')}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => { setSelectedArtisan(null); setSearchQuery('') }}
-                                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
                             >
                                 {t('cancel')}
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>
@@ -476,7 +480,10 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                     ))}
 
                     {members.length === 0 && (
-                        <p className="py-4 text-center text-sm text-muted-foreground">{t('noMembers')}</p>
+                        <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                            <User className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">{t('noMembers')}</p>
+                        </div>
                     )}
                 </div>
             </div>

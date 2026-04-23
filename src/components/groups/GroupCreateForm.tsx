@@ -7,6 +7,16 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 
 const ORGANIZATION_TYPES = [
     'COOPERATIVE',
@@ -85,19 +95,19 @@ export function GroupCreateForm() {
 
     return (
         <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
-            <div className="bg-gradient-to-br from-card via-muted/50 to-card px-6 py-6">
+            <div className="bg-primary px-6 py-6">
                 <div className="flex items-center gap-3">
                     <Link
                         href="/groups"
-                        className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
                     >
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                     <div>
-                        <h1 className="text-left text-2xl font-bold tracking-tight">
+                        <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
                             {t('createGroup')}
                         </h1>
-                        <p className="text-left text-sm text-muted-foreground">
+                        <p className="text-left text-sm text-primary-foreground/70">
                             {t('createGroupHelper')}
                         </p>
                     </div>
@@ -106,88 +116,85 @@ export function GroupCreateForm() {
 
             <CardContent className="p-6">
                 {error && (
-                    <div className="mb-6 rounded-lg bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
+                    <div className="mb-6 rounded-lg bg-red-50 p-3 text-sm text-red-800">
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                        <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">
                             {t('groupName')} *
-                        </label>
-                        <input
+                        </Label>
+                        <Input
                             id="name"
                             type="text"
                             value={form.name}
                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                            className="w-full rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                             required
                         />
                     </div>
 
-                    <div>
-                        <label htmlFor="description" className="mb-1.5 block text-sm font-medium">
+                    <div className="space-y-2">
+                        <Label htmlFor="description">
                             {t('description')}
-                        </label>
-                        <textarea
+                        </Label>
+                        <Textarea
                             id="description"
                             value={form.description}
                             onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                             rows={4}
-                            className="w-full rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                         />
                     </div>
 
                     <div className="grid gap-5 sm:grid-cols-2">
-                        <div>
-                            <label htmlFor="website" className="mb-1.5 block text-sm font-medium">
+                        <div className="space-y-2">
+                            <Label htmlFor="website">
                                 {t('website')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="website"
                                 type="url"
                                 value={form.website}
                                 onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
                                 placeholder="https://"
-                                className="w-full rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                             />
                         </div>
 
-                        <div>
-                            <label htmlFor="location" className="mb-1.5 block text-sm font-medium">
+                        <div className="space-y-2">
+                            <Label htmlFor="location">
                                 {t('location')}
-                            </label>
-                            <input
+                            </Label>
+                            <Input
                                 id="location"
                                 type="text"
                                 value={form.location}
                                 onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
-                                className="w-full rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
                             />
                         </div>
                     </div>
 
-                    {/* Organization type */}
-                    <div>
-                        <label htmlFor="organizationType" className="mb-1.5 block text-sm font-medium">
+                    <div className="space-y-2">
+                        <Label htmlFor="organizationType">
                             {t('organizationType')}
-                        </label>
-                        <select
-                            id="organizationType"
+                        </Label>
+                        <Select
                             value={form.organizationType}
-                            onChange={e => setForm(f => ({ ...f, organizationType: e.target.value }))}
-                            className="w-full rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none"
+                            onValueChange={value => setForm(f => ({ ...f, organizationType: value }))}
                         >
-                            {ORGANIZATION_TYPES.map(type => (
-                                <option key={type} value={type}>
-                                    {t(`orgType_${type}`)}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger id="organizationType">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {ORGANIZATION_TYPES.map(type => (
+                                    <SelectItem key={type} value={type}>
+                                        {t(`orgType_${type}`)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
-                    {/* Certifications */}
                     <div>
                         <p className="mb-2 text-sm font-medium">{t('certifications')}</p>
                         <div className="flex flex-wrap gap-2">
@@ -208,7 +215,6 @@ export function GroupCreateForm() {
                         </div>
                     </div>
 
-                    {/* Boolean attributes */}
                     <div className="flex flex-wrap gap-6">
                         <label className="flex items-center gap-2 text-sm">
                             <input

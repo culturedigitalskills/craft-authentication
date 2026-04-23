@@ -11,7 +11,7 @@ export function HeroSection() {
     const t = useTranslations()
 
     return (
-        <section className="bg-gradient-to-br from-background to-muted/20 ">
+        <section className="bg-gradient-to-br from-background to-muted/20 pb-16">
                 <div className="grid gap-12 md:grid-cols-2 items-center">
                     {/* Left Column - Text Content */}
                     <div>

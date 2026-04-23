@@ -14,7 +14,8 @@
     "login": "Login",
     "logout": "Logout",
     "profile": "Profile",
-    "myitems": "My Crafts"
+    "myitems": "My Crafts",
+    "mygroups": "My Communities"
   },
   "auth": {
     "loginTitle": "Sign In",

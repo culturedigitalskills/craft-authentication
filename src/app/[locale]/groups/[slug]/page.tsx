@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, User, ExternalLink, Settings } from 'lucide-react'
+import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, User, ExternalLink, Settings, ArrowLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 
 interface PageProps {
@@ -110,9 +110,9 @@ export default async function GroupDetailPage({ params }: PageProps) {
             {/* Back link */}
             <Link
                 href="/groups"
-                className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="mb-6 inline-flex rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-                ← {t('title')}
+                <ArrowLeft className="h-5 w-5" />
             </Link>
 
             {/* Group header */}
@@ -192,30 +192,30 @@ export default async function GroupDetailPage({ params }: PageProps) {
 
                 <div className="mt-4 flex flex-wrap gap-2">
                     {group.organizationType !== 'OTHER' && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                             {t(`orgType_${group.organizationType}`)}
                         </span>
                     )}
                     {group.isHeritageCraft && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-800">
                             <BookOpen className="h-3.5 w-3.5" />
                             {t('heritageCraft')}
                         </span>
                     )}
                     {group.isOpenToMembers && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-800">
                             <DoorOpen className="h-3.5 w-3.5" />
                             {t('openToMembers')}
                         </span>
                     )}
                     {group.hasTrainingProgram && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-3 py-1 text-sm font-medium text-sky-800">
                             <GraduationCap className="h-3.5 w-3.5" />
                             {t('trainingProgram')}
                         </span>
                     )}
                     {group.certifications.map(cert => (
-                        <span key={cert} className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
+                        <span key={cert} className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-800">
                             <Award className="h-3.5 w-3.5" />
                             {t(`cert_${cert}`)}
                         </span>
@@ -226,7 +226,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
 
             {/* Members */}
             <div>
-                <h2 className="mb-5 text-xl font-semibold">{t('members')}</h2>
+                <h2 className="mb-4 text-lg font-semibold">{t('members')}</h2>
 
                 {group.memberships.length === 0 ? (
                     <div className="rounded-lg border border-dashed border-border p-12 text-center">

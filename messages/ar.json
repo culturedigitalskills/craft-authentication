@@ -1,193 +1,197 @@
 {
-  "locale": "ar",
-  "initials": "SC",
-  "title": "الحِرف المستدامة",
-  "subtitle": "منتجات ثقافية أصيلة",
-  "copyright": "© 2025 sustainablecrafting.org. جميع الحقوق محفوظة.",
-  "madeWith": "صُنع بـ ❤️ من أجل الحرفيين حول العالم",
-  "navbar": {
-    "home": "الرئيسية",
-    "about": "من نحن",
-    "crafts": "الحِرف",
-    "groups": "المجموعات",
-    "login": "تسجيل الدخول",
-    "logout": "تسجيل الخروج",
-    "profile": "الملف الشخصي",
-    "myitems": "حِرفي",
-    "addcraft": "إضافة حرفة",
-    "createGroup": "إنشاء مجموعة"
-  },
-  "auth": {
-    "loginTitle": "تسجيل الدخول",
-    "registerTitle": "إنشاء حساب",
-    "email": "البريد الإلكتروني",
-    "password": "كلمة المرور",
-    "confirmPassword": "تأكيد كلمة المرور",
-    "name": "الاسم الكامل",
-    "login": "تسجيل الدخول",
-    "register": "إنشاء حساب",
-    "signingIn": "جارٍ تسجيل الدخول...",
-    "registering": "جارٍ إنشاء الحساب...",
-    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-    "noAccount": "ليس لديك حساب؟",
-    "haveAccount": "لديك حساب بالفعل؟",
-    "passwordMismatch": "كلمتا المرور غير متطابقتين",
-    "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
-    "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل.",
-    "validation": {
-      "nameRequired": "الاسم مطلوب",
-      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح",
-      "passwordMin": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
-      "passwordMismatch": "كلمتا المرور غير متطابقتين"
+    "locale": "ar",
+    "initials": "SC",
+    "title": "الحِرف المستدامة",
+    "subtitle": "منتجات ثقافية أصيلة",
+    "copyright": "© 2025 sustainablecrafting.org. جميع الحقوق محفوظة.",
+    "madeWith": "صُنع بـ ❤️ من أجل الحرفيين حول العالم",
+    "navbar": {
+        "home": "الرئيسية",
+        "about": "من نحن",
+        "crafts": "الحِرف",
+        "groups": "المجتمعات",
+        "login": "تسجيل الدخول",
+        "logout": "تسجيل الخروج",
+        "profile": "الملف الشخصي",
+        "myitems": "حِرفي",
+        "mygroups": "مجتمعاتي",
+        "addcraft": "إضافة حرفة",
+        "createGroup": "إنشاء مجتمع"
     },
-    "orDivider": "أو",
-    "continueWithGoogle": "المتابعة مع Google"
-  },
-  "about": {
-    "title": "حول SustainableCrafting",
-    "missionTitle": "مهمتنا",
-    "missionDescription": "في SustainableCrafting، تتمثل مهمتنا في تمكين الحرفيين حول العالم من خلال توفير منصة تربطهم مباشرةً بالعملاء. نؤمن بالحفاظ على الحِرف التقليدية مع تعزيز الاستدامة والأصالة في السوق العالمي.",
-    "viewRepository": "عرض مستودع GitHub الخاص بنا",
-    "keyFeatures": "تتضمن قاعدة البيانات Prisma متصلة بـ Postgres عبر عناوين URL تعتمد على متغيرات البيئة للتطوير وDocker. تتضمن واجهة المستخدم shadcn/ui مع Tailwind v3 وRadix primitives وأدوات قابلة لإعادة الاستخدام. جميعها مُعبأة داخل حاوية Docker لسهولة النشر.",
-    "privacyPolicy": "سياسة الخصوصية",
-    "contact": "اتصل بنا"
-  },
-  "footer": {
-    "description": "تم إنتاج موقع المشروع وإدارته من قبل جامعة برايتون. يتم تمويل هذا المشروع من قبل مجلس أبحاث الفنون والعلوم الإنسانية في المملكة المتحدة ضمن البحث المشترك بين الهند والمملكة المتحدة حول الصناعات الإبداعية والتراث الثقافي بعنوان: صياغة مستقبل مستدام: تمكين الحِرف الهندية في الصناعات الإبداعية. (رقم المنحة OPP080)."
-  },
-  "socialmedia": {
-    "title": "تابعنا",
-    "instagram": "إنستغرام",
-    "twitter": "تويتر",
-    "facebook": "فيسبوك",
-    "email": "البريد الإلكتروني"
-  },
-  "landing": {
-    "description": "تواصل مباشرةً مع حرفيين مهرة من جميع أنحاء العالم. كل منتج مُصمم بإتقان يروي قصة أصيلة عن المكان وتاريخه والأشخاص الذين صنعوه. تحقّق من أصالته من خلال نظام رمز الاستجابة السريعة (QR) المبتكر لدينا.",
-    "exploreCrafts": "استكشف الحِرف",
-    "learnMore": "اعرف المزيد"
-  },
-  "features": {
-    "authentic": {
-      "title": "أصيل",
-      "description": "الوصول إلى معلومات حول المنتجات الثقافية"
+    "auth": {
+        "loginTitle": "تسجيل الدخول",
+        "registerTitle": "إنشاء حساب",
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "confirmPassword": "تأكيد كلمة المرور",
+        "name": "الاسم الكامل",
+        "login": "تسجيل الدخول",
+        "register": "إنشاء حساب",
+        "signingIn": "جارٍ تسجيل الدخول...",
+        "registering": "جارٍ إنشاء الحساب...",
+        "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        "noAccount": "ليس لديك حساب؟",
+        "haveAccount": "لديك حساب بالفعل؟",
+        "passwordMismatch": "كلمتا المرور غير متطابقتين",
+        "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+        "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل.",
+        "validation": {
+            "nameRequired": "الاسم مطلوب",
+            "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح",
+            "passwordMin": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+            "passwordMismatch": "كلمتا المرور غير متطابقتين"
+        },
+        "orDivider": "أو",
+        "continueWithGoogle": "المتابعة مع Google"
     },
-    "traceable": {
-      "title": "قابل للتتبع",
-      "description": "أداة تحقق موقّعة برمز QR"
+    "about": {
+        "title": "حول SustainableCrafting",
+        "missionTitle": "مهمتنا",
+        "missionDescription": "في SustainableCrafting، تتمثل مهمتنا في تمكين الحرفيين حول العالم من خلال توفير منصة تربطهم مباشرةً بالعملاء. نؤمن بالحفاظ على الحِرف التقليدية مع تعزيز الاستدامة والأصالة في السوق العالمي.",
+        "viewRepository": "عرض مستودع GitHub الخاص بنا",
+        "keyFeatures": "تتضمن قاعدة البيانات Prisma متصلة بـ Postgres عبر عناوين URL تعتمد على متغيرات البيئة للتطوير وDocker. تتضمن واجهة المستخدم shadcn/ui مع Tailwind v3 وRadix primitives وأدوات قابلة لإعادة الاستخدام. جميعها مُعبأة داخل حاوية Docker لسهولة النشر.",
+        "privacyPolicy": "سياسة الخصوصية",
+        "contact": "اتصل بنا"
     },
-    "connected": {
-      "title": "متصل",
-      "description": "رابط مباشر مع الحرفيين والصنّاع"
+    "footer": {
+        "description": "تم إنتاج موقع المشروع وإدارته من قبل جامعة برايتون. يتم تمويل هذا المشروع من قبل مجلس أبحاث الفنون والعلوم الإنسانية في المملكة المتحدة ضمن البحث المشترك بين الهند والمملكة المتحدة حول الصناعات الإبداعية والتراث الثقافي بعنوان: صياغة مستقبل مستدام: تمكين الحِرف الهندية في الصناعات الإبداعية. (رقم المنحة OPP080)."
     },
-    "qrCard": {
-      "title": "امسح للتحقق",
-      "description": "تحقق، تتبع، وتواصل"
-    }
-  },
-  "howItWorks": {
-    "title": "كيف يعمل",
-    "subtitle": "يمكن للحرفيين حول العالم التواصل مع العملاء عبر بضع خطوات بسيطة:",
-    "steps": {
-      "record": {
-        "title": "تسجيل",
-        "description": "يقوم الحرفيون بتوثيق أعمالهم باستخدام تطبيقنا المحمول أثناء عملية التصنيع."
-      },
-      "generate": {
-        "title": "إنشاء رمز QR",
-        "description": "يقوم النظام بإنشاء توقيع فريد يربط بملف الحرفي وعملية الإنتاج."
-      },
-      "scan": {
-        "title": "المسح والتحقق",
-        "description": "يقوم العملاء بمسح رمز QR للتحقق من الأصالة والتعرّف على قصة المنتج."
-      },
-      "access": {
-        "title": "وصول عالمي",
-        "description": "يتعرّف الجمهور على عمليات وقصص الحرفيين حول العالم."
-      }
-    }
-  },
-  "tradition": {
-    "title": "ربط التراث بالتكنولوجيا",
-    "description": "ينشئ نظام رمز QR لدينا رابطًا غير قابل للكسر بين الحِرف اليدوية وصانعيها. يكشف كل مسح عن قصة الحرفي والمواد المستخدمة والتقنيات التقليدية التي تجعل كل قطعة فريدة وقيّمة."
-  },
-  "benefits": {
-    "certificates": "شهادات رقمية غير قابلة للتغيير لكل حرفة",
-    "connection": "اتصال مباشر بين الحرفيين والعملاء",
-    "supply": "سلسلة توريد شفافة من الإنتاج إلى البيع"
-  },
-  "profile": {
-    "title": "ملف الحرفي",
-    "createTitle": "أنشئ ملف الحرفي الخاص بك",
-    "editTitle": "عدّل ملف الحرفي الخاص بك",
-    "firstName": "الاسم الأول",
-    "lastName": "اسم العائلة",
-    "bio": "نبذة",
-    "bioPlaceholder": "أخبرنا عن نفسك وحرفتك...",
-    "yearsOfExperience": "سنوات الخبرة",
-    "learningSource": "كيف تعلمت حرفتك؟",
-    "learningSourcePlaceholder": "مثلاً، تقليد عائلي، تدريب مهني، تعلم ذاتي...",
-    "save": "حفظ الملف",
-    "saving": "جارٍ الحفظ...",
-    "update": "تحديث الملف",
-    "updating": "جارٍ التحديث...",
-    "edit": "تعديل الملف",
-    "cancelEdit": "إلغاء",
-    "createSuccess": "تم إنشاء الملف بنجاح!",
-    "updateSuccess": "تم تحديث الملف بنجاح!",
-    "createFailed": "فشل إنشاء الملف. يرجى المحاولة مرة أخرى.",
-    "updateFailed": "فشل تحديث الملف. يرجى المحاولة مرة أخرى.",
-    "yearsLabel": "سنوات",
-    "country": "البلد",
-    "region": "المنطقة",
-    "selectCountry": "اختر بلدًا",
-    "selectRegion": "اختر منطقة",
-    "uploadPhoto": "رفع صورة",
-    "changePhoto": "تغيير الصورة",
-    "photoUploading": "جارٍ الرفع...",
-    "photoUploadFailed": "فشل رفع الصورة",
-    "personalInfo": "المعلومات الشخصية",
-    "craftExperience": "الخبرة الحرفية",
-    "location": "الموقع",
-    "publicProfileLink": "عرض الملف العام",
-    "coverPhoto": "صورة الغلاف",
-    "uploadCover": "رفع صورة الغلاف",
-    "changeCover": "تغيير الغلاف",
-    "coverUploadFailed": "فشل رفع صورة الغلاف",
-    "gallery": "المعرض",
-    "uploadGallery": "إضافة صور",
-    "galleryEmpty": "لا توجد صور في المعرض بعد",
-    "galleryUploadFailed": "فشل في رفع صورة المعرض",
-    "galleryDeleteFailed": "فشل في حذف صورة المعرض",
-    "galleryDeleteConfirm": "حذف هذه الصورة؟",
-    "galleryDeleteYes": "حذف",
-    "galleryDeleteNo": "إلغاء",
-    "myGroups": "مجموعاتي",
-    "groupAdmin": "مسؤول",
-    "groupMember": "عضو",
-    "leaveGroup": "مغادرة",
-    "confirmLeave": "تأكيد المغادرة",
-    "leaveGroupFailed": "فشل في مغادرة المجموعة",
-    "cancel": "إلغاء"
-  },
-  "artisanProfile": {
-    "about": "نبذة",
-    "craftJourney": "المسيرة الحرفية",
-    "yearsExperience": "سنوات من الخبرة",
-    "learnedFrom": "تعلّم من",
-    "notFound": "الحرفي غير موجود",
-    "gallery": "معرض الصور",
-    "galleryEmpty": "لا توجد صور في المعرض بعد",
-    "groups": "المجموعات"
-  },
-  "crafts": {
-    "welcomeTitle": "استكشف الحِرف",
-    "description": "اكتشف الحِرف اليدوية الأصيلة من حرفيين مهرة حول العالم. كل قطعة مُحققة وتروي قصة فريدة من التقاليد والحرفية."
-  },
+    "socialmedia": {
+        "title": "تابعنا",
+        "instagram": "إنستغرام",
+        "twitter": "تويتر",
+        "facebook": "فيسبوك",
+        "email": "البريد الإلكتروني"
+    },
+    "landing": {
+        "description": "تواصل مباشرةً مع حرفيين مهرة من جميع أنحاء العالم. كل منتج مُصمم بإتقان يروي قصة أصيلة عن المكان وتاريخه والأشخاص الذين صنعوه. تحقّق من أصالته من خلال نظام رمز الاستجابة السريعة (QR) المبتكر لدينا.",
+        "exploreCrafts": "استكشف الحِرف",
+        "learnMore": "اعرف المزيد"
+    },
+    "features": {
+        "authentic": {
+            "title": "أصيل",
+            "description": "الوصول إلى معلومات حول المنتجات الثقافية"
+        },
+        "traceable": {
+            "title": "قابل للتتبع",
+            "description": "أداة تحقق موقّعة برمز QR"
+        },
+        "connected": {
+            "title": "متصل",
+            "description": "رابط مباشر مع الحرفيين والصنّاع"
+        },
+        "qrCard": {
+            "title": "امسح للتحقق",
+            "description": "تحقق، تتبع، وتواصل"
+        }
+    },
+    "howItWorks": {
+        "title": "كيف يعمل",
+        "subtitle": "يمكن للحرفيين حول العالم التواصل مع العملاء عبر بضع خطوات بسيطة:",
+        "steps": {
+            "record": {
+                "title": "تسجيل",
+                "description": "يقوم الحرفيون بتوثيق أعمالهم باستخدام تطبيقنا المحمول أثناء عملية التصنيع."
+            },
+            "generate": {
+                "title": "إنشاء رمز QR",
+                "description": "يقوم النظام بإنشاء توقيع فريد يربط بملف الحرفي وعملية الإنتاج."
+            },
+            "scan": {
+                "title": "المسح والتحقق",
+                "description": "يقوم العملاء بمسح رمز QR للتحقق من الأصالة والتعرّف على قصة المنتج."
+            },
+            "access": {
+                "title": "وصول عالمي",
+                "description": "يتعرّف الجمهور على عمليات وقصص الحرفيين حول العالم."
+            }
+        }
+    },
+    "tradition": {
+        "title": "ربط التراث بالتكنولوجيا",
+        "description": "ينشئ نظام رمز QR لدينا رابطًا غير قابل للكسر بين الحِرف اليدوية وصانعيها. يكشف كل مسح عن قصة الحرفي والمواد المستخدمة والتقنيات التقليدية التي تجعل كل قطعة فريدة وقيّمة."
+    },
+    "benefits": {
+        "certificates": "شهادات رقمية غير قابلة للتغيير لكل حرفة",
+        "connection": "اتصال مباشر بين الحرفيين والعملاء",
+        "supply": "سلسلة توريد شفافة من الإنتاج إلى البيع"
+    },
+    "profile": {
+        "title": "ملف الحرفي",
+        "createTitle": "أنشئ ملف الحرفي الخاص بك",
+        "editTitle": "عدّل ملف الحرفي الخاص بك",
+        "firstName": "الاسم الأول",
+        "lastName": "اسم العائلة",
+        "bio": "نبذة",
+        "bioPlaceholder": "أخبرنا عن نفسك وحرفتك...",
+        "yearsOfExperience": "سنوات الخبرة",
+        "learningSource": "كيف تعلمت حرفتك؟",
+        "learningSourcePlaceholder": "مثلاً، تقليد عائلي، تدريب مهني، تعلم ذاتي...",
+        "save": "حفظ الملف",
+        "saving": "جارٍ الحفظ...",
+        "update": "تحديث الملف",
+        "updating": "جارٍ التحديث...",
+        "edit": "تعديل الملف",
+        "cancelEdit": "إلغاء",
+        "createSuccess": "تم إنشاء الملف بنجاح!",
+        "updateSuccess": "تم تحديث الملف بنجاح!",
+        "createFailed": "فشل إنشاء الملف. يرجى المحاولة مرة أخرى.",
+        "updateFailed": "فشل تحديث الملف. يرجى المحاولة مرة أخرى.",
+        "yearsLabel": "سنوات",
+        "country": "البلد",
+        "region": "المنطقة",
+        "selectCountry": "اختر بلدًا",
+        "selectRegion": "اختر منطقة",
+        "uploadPhoto": "رفع صورة",
+        "changePhoto": "تغيير الصورة",
+        "photoUploading": "جارٍ الرفع...",
+        "photoUploadFailed": "فشل رفع الصورة",
+        "personalInfo": "المعلومات الشخصية",
+        "craftExperience": "الخبرة الحرفية",
+        "location": "الموقع",
+        "publicProfileLink": "عرض الملف العام",
+        "coverPhoto": "صورة الغلاف",
+        "uploadCover": "رفع صورة الغلاف",
+        "changeCover": "تغيير الغلاف",
+        "coverUploadFailed": "فشل رفع صورة الغلاف",
+        "gallery": "المعرض",
+        "uploadGallery": "إضافة صور",
+        "galleryEmpty": "لا توجد صور في المعرض بعد",
+        "galleryUploadFailed": "فشل في رفع صورة المعرض",
+        "galleryDeleteFailed": "فشل في حذف صورة المعرض",
+        "galleryDeleteConfirm": "حذف هذه الصورة؟",
+        "galleryDeleteYes": "حذف",
+        "galleryDeleteNo": "إلغاء",
+        "myGroups": "مجموعاتي",
+        "groupAdmin": "مسؤول",
+        "groupMember": "عضو",
+        "leaveGroup": "مغادرة",
+        "confirmLeave": "تأكيد المغادرة",
+        "leaveGroupFailed": "فشل في مغادرة المجموعة",
+        "cancel": "إلغاء"
+    },
+    "artisanProfile": {
+        "about": "نبذة",
+        "craftJourney": "المسيرة الحرفية",
+        "yearsExperience": "سنوات من الخبرة",
+        "learnedFrom": "تعلّم من",
+        "notFound": "الحرفي غير موجود",
+        "gallery": "معرض الصور",
+        "galleryEmpty": "لا توجد صور في المعرض بعد",
+        "groups": "المجموعات"
+    },
+    "crafts": {
+        "welcomeTitle": "استكشف الحِرف",
+        "description": "اكتشف الحِرف اليدوية الأصيلة من حرفيين مهرة حول العالم. كل قطعة مُحققة وتروي قصة فريدة من التقاليد والحرفية.",
+        "explore": {
+            "noCraftsFound": "لم يتم العثور على حرف."
+        }
+    },
     "groups": {
         "title": "مجموعات الحرفيين",
         "subtitle": "تصفح مجموعات الحرفيين والتعاونيات والنقابات والجمعيات من جميع أنحاء العالم.",
-        "createGroup": "إنشاء مجموعة",
+        "createGroup": "إنشاء مجتمع",
         "createGroupHelper": "أنشئ مجموعة حرفية أو تعاونية أو نقابة جديدة.",
         "editGroup": "تعديل المجموعة",
         "deleteGroup": "حذف المجموعة",
@@ -236,5 +240,16 @@
         "viewGroup": "عرض المجموعة",
         "searchArtisan": "ابحث عن حرفي بالاسم...",
         "cancel": "إلغاء"
+    },
+    "createCraft": {
+        "createCraftName": "عنوان الحرفة",
+        "createCraftDescription": "الوصف",
+        "createCraftDescriptionPlaceholder": "ما الذي يجعل هذه الحرفة مميزة — المواد أو التقنيات أو القصة؟",
+        "createCraftMaterial": "المادة",
+        "selectMaterial": "اختر مادة...",
+        "createCraftHelper": "شارك حرفتك مع العالم — أضف عنواناً ووصفاً وصوراً.",
+        "createEdittHelper": "حدّث تفاصيل حرفتك أدناه.",
+        "createCraftMakeLocationPublic": "مشاركة موقعي التقريبي مع الزوار",
+        "deleteCraftConfirm": "حذف هذه الحرفة؟ لا يمكن التراجع عن هذا."
     }
 }

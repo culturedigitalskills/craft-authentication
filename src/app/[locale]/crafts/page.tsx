@@ -10,8 +10,7 @@ import { Calendar, User } from 'lucide-react';
 import { formatDateTime } from '@/components/shared/formatDateTime';
 import PaginationControls from '@/components/craft/PaginationControls'
 import { cookies } from 'next/dist/server/request/cookies';
-import { publicDecrypt } from 'crypto';
-import { record } from 'zod/v3';
+import { prisma } from '@/lib/prisma'
 
 
 // export default async function CraftsPage() {
@@ -82,17 +81,31 @@ export default async function CraftsPage(
       return {
         id: record.id,
         title: record.name,
-        artisan: record.data.artisan,
+        artisanEmail: record.data.artisan as string | null,
         createdOn: record.data.createdOn,
-        email: record.data.artisan,
         isPublic: record.data.isPublic,
         mediaIds,
         imageUrl : url
       }
     }))
 
-    
-    return <RenderCraftsPage crafts={crafts} 
+    // Look up artisan names from emails — never expose emails publicly
+    const emails = [...new Set(crafts.map(c => c.artisanEmail).filter(Boolean))] as string[]
+    const artisanProfiles = emails.length > 0
+      ? await prisma.artisan.findMany({
+          where: { user: { email: { in: emails } } },
+          select: { firstName: true, lastName: true, slug: true, user: { select: { email: true } } },
+        })
+      : []
+    const artisanByEmail = new Map(artisanProfiles.map(a => [a.user.email, a]))
+
+    const craftsWithNames = crafts.map(c => ({
+      ...c,
+      artisanName: c.artisanEmail ? (() => { const a = artisanByEmail.get(c.artisanEmail!); return a ? `${a.firstName} ${a.lastName}` : null })() : null,
+      artisanSlug: c.artisanEmail ? artisanByEmail.get(c.artisanEmail!)?.slug ?? null : null,
+    }))
+
+    return <RenderCraftsPage crafts={craftsWithNames} 
     pagination={pagination} 
     currentPage={page} 
     currentPageUrl={currentPageUrl}/>
@@ -117,12 +130,9 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
         <Container>
         {/* <div className="px-4 py-16">
              */}
-             <div className="mx-auto mb-12 max-w-3xl text-center">
-                <h1 className="mb-8 text-4xl font-bold">{t('crafts.welcomeTitle')} </h1>
-                <p className="text-lg text-muted-foreground">
-                   {t('crafts.description')}
-                </p>
-
+             <div className="mb-12 text-center">
+                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('crafts.welcomeTitle')}</h1>
+                <p className="mt-3 text-lg text-muted-foreground">{t('crafts.description')}</p>
             </div>
             {/* </div>
         </div> */}
@@ -136,7 +146,7 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
                
             const craftUrl = `crafts/${craft.id}`;
             return (
-                <Card key={craft.id} className="group transition-shadow duration-200 hover:shadow-lg">
+                <Card key={craft.id} className="group transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
                 <Link href={craftUrl} className="block">
                     {/* Image */}
                     <div className="relative aspect-square overflow-hidden rounded-t-lg">
@@ -163,21 +173,21 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
                     </div>
 
                     {/* Content */}
-                    <CardHeader className="pb-2 bg-muted">
+                    <CardHeader className="pb-2">
                     <CardTitle className="line-clamp-1 transition-colors group-hover:text-primary">
                         {craft.title}
                     </CardTitle>
                     <CardDescription className="line-clamp-2">{craft.description}</CardDescription>
                     </CardHeader>
 
-                    <CardContent className="pt-0 bg-muted">
+                    <CardContent className="pt-0">
                     <div className="space-y-2">
                     {/* Creator information */}                        
-                    {craft.artisan && (
+                    {craft.artisanName && (
                         <div className="flex items-center space-x-2 text-sm">
                           <User className="h-3 w-3 text-muted-foreground" />
                           <span className="text-muted-foreground">{t('crafts.explore.by')}</span>
-                          <span className="font-medium">{craft.email}</span>
+                          <span className="font-medium">{craft.artisanName}</span>
                         </div>
                       )}
                     {/* Created date */}
@@ -196,8 +206,10 @@ function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
         </div>
         
         ) : (
-        <p className="text-center text-muted-foreground">No crafts found.</p>
-        
+        <div className="rounded-lg border border-dashed border-border p-12 text-center">
+            <User className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+            <p className="text-muted-foreground">{t('crafts.explore.noCraftsFound')}</p>
+        </div>
         )}
       <PaginationControls 
         currentPage={currentPage} 

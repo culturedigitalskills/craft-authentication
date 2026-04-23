@@ -406,17 +406,17 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         <div className="container mx-auto max-w-4xl px-4 py-10">
             <div className="space-y-8">
                 {/* Header with back button */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-5">
                     {isEditing && (
                         <button
                             type="button"
                             onClick={handleCancelEdit}
-                            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                            className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
                         >
                             <ArrowLeft className="h-5 w-5" />
                         </button>
                     )}
-                    <h1 className="text-2xl font-bold tracking-tight">
+                    <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">
                         {isCreateMode ? t('createTitle') : t('editTitle')}
                     </h1>
                 </div>

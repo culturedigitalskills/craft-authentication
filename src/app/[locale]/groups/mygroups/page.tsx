@@ -1,49 +1,75 @@
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
+import { getTranslations } from 'next-intl/server'
 import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Groups — Sustainable Crafting',
-    description: 'Browse artisan groups, associations, and cooperatives.',
+    title: 'My Groups — Sustainable Crafting',
+    description: 'Groups you belong to.',
 }
 
-export default async function GroupsPage() {
+export default async function MyGroupsPage() {
+    const session = await auth()
+    if (!session?.user) redirect('/login')
+
     const t = await getTranslations('groups')
-    const groups = await prisma.group.findMany({
-        where: { isActive: true },
-        orderBy: { name: 'asc' },
-        include: {
-            _count: { select: { memberships: true } },
-        },
+    const nt = await getTranslations('navbar')
+
+    const artisan = await prisma.artisan.findFirst({
+        where: { user: { email: session.user.email! } },
+        select: { id: true },
     })
+
+    const memberships = artisan
+        ? await prisma.artisanGroupMembership.findMany({
+              where: { artisanId: artisan.id, leftDate: null },
+              include: {
+                  group: {
+                      include: {
+                          _count: { select: { memberships: true } },
+                      },
+                  },
+              },
+              orderBy: { joinedDate: 'asc' },
+          })
+        : []
+
+    const groups = memberships.map(m => ({ ...m.group, memberRole: m.role }))
 
     // Fetch logos for all groups
     const groupIds = groups.map(g => g.id)
-    const logoAttachments = await prisma.mediaAttachment.findMany({
-        where: {
-            entityType: 'Group',
-            entityId: { in: groupIds },
-            attachmentType: 'HERO',
-            isPrimary: true,
-        },
-        select: { entityId: true, mediaId: true },
-    })
+    const logoAttachments = groupIds.length > 0
+        ? await prisma.mediaAttachment.findMany({
+              where: {
+                  entityType: 'Group',
+                  entityId: { in: groupIds },
+                  attachmentType: 'HERO',
+                  isPrimary: true,
+              },
+              select: { entityId: true, mediaId: true },
+          })
+        : []
     const logoMap = new Map(logoAttachments.map(a => [a.entityId, `/api/media/${a.mediaId}`]))
 
     return (
         <div className="container mx-auto max-w-6xl px-4 py-10">
             <div className="mb-12 text-center">
-                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('title')}</h1>
+                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{nt('mygroups')}</h1>
                 <p className="mt-3 text-lg text-muted-foreground">{t('subtitle')}</p>
             </div>
 
             {groups.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-border p-12 text-center">
                     <Users className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
-                    <p className="text-muted-foreground">{t('empty')}</p>
+                    <p className="mb-4 text-muted-foreground">{t('empty')}</p>
+                    <Button asChild>
+                        <Link href="/groups">{t('browseGroups')}</Link>
+                    </Button>
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -69,9 +95,14 @@ export default async function GroupsPage() {
                                         <Users className="h-5 w-5 text-muted-foreground" />
                                     </div>
                                 )}
-                                <h2 className="text-lg font-semibold transition-colors group-hover:text-primary">
-                                    {group.name}
-                                </h2>
+                                <div className="min-w-0">
+                                    <h2 className="truncate text-lg font-semibold transition-colors group-hover:text-primary">
+                                        {group.name}
+                                    </h2>
+                                    <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                                        {group.memberRole === 'ADMIN' ? t('admin') : t('member')}
+                                    </span>
+                                </div>
                             </div>
 
                             {group.description && (
@@ -85,14 +116,12 @@ export default async function GroupsPage() {
                                     <Users className="h-3.5 w-3.5" />
                                     {group._count.memberships} {t('members')}
                                 </span>
-
                                 {group.location && (
                                     <span className="inline-flex items-center gap-1">
                                         <MapPin className="h-3.5 w-3.5" />
                                         {group.location}
                                     </span>
                                 )}
-
                                 {group.website && (
                                     <span className="inline-flex items-center gap-1">
                                         <Globe className="h-3.5 w-3.5" />
