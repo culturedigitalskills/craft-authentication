@@ -52,7 +52,8 @@ export default function Gallery({ images }: GalleryProps) {
       {/* lightbox */}
       {lightboxOpen && (
         <div 
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.8)' }}
           onClick={() => setLightboxOpen(false)}
         >
           {/* close button */}

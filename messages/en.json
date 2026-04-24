@@ -9,6 +9,7 @@
         "home": "Home",
         "about": "About",
         "crafts": "Crafts",
+        "artisans": "Artisans",
         "groups": "Communities",
         "seecrafts": "Gallery",
         "addcraft": "Add Craft",
@@ -172,6 +173,17 @@
         "leaveGroupFailed": "Failed to leave group",
         "cancel": "Cancel"
     },
+    "artisans": {
+        "title": "Artisans",
+        "description": "Discover skilled artisans from around the world, each with a unique story of craft and tradition.",
+        "noArtisansFound": "No artisans found.",
+        "noResults": "No artisans match your search.",
+        "yearsExperience": "yrs experience",
+        "viewProfile": "View Profile",
+        "crafts": "Crafts",
+        "searchPlaceholder": "Search artisans...",
+        "artisansCount": "artisans"
+    },
     "artisanProfile": {
         "about": "About",
         "craftJourney": "Craft Journey",
@@ -180,7 +192,9 @@
         "notFound": "Artisan not found",
         "gallery": "Gallery",
         "galleryEmpty": "No gallery photos yet",
-        "groups": "Communities"
+        "groups": "Communities",
+        "crafts": "Crafts",
+        "noCrafts": "No public crafts yet."
     },
     "crafts": {
         "welcomeTitle": "Gallery of Crafts",
@@ -192,7 +206,10 @@
             "materials": "Materials",
             "techniques": "Techniques",
             "by": "by",
-            "noCraftsFound": "No crafts found."
+            "noCraftsFound": "No crafts found.",
+            "noResults": "No crafts match your search.",
+            "searchPlaceholder": "Search crafts...",
+            "craftsCount": "crafts"
         },
         "details": {
             "description": "Description",
@@ -203,10 +220,16 @@
             "updatedOn": "Updated on",
             "backToCrafts": "Back to Crafts",
             "noDescription": "No description available",
-            "qrCodeTitle": "Share this craft",
-            "qrCodeDescription": "Please scan this QR code to share this craft.",
-            "visible": "Visible to others",
-            "notvisible": "Only visible to you"
+            "qrCodeTitle": "Certificate of Authenticity",
+            "qrCodeDescription": "Share this craft.",
+            "qrScanGuidance": "Scan with your phone camera to verify authenticity",
+            "copyLink": "Copy link",
+            "linkCopied": "Copied!",
+            "visible": "Public",
+            "notvisible": "Private"
+        },
+        "mycrafts": {
+            "noCraftsYet": "You haven't added any crafts yet."
         },
         "welcomeTitleCraft": "Craft Details"
     },

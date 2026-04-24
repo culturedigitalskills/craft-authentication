@@ -42,7 +42,7 @@ RUN echo 'export default { datasource: { url: process.env.DATABASE_URL } }' > pr
 # Initialization scripts
 COPY scripts/docker-entrypoint.sh /app/docker-entrypoint.sh
 COPY scripts/init-garage-http.js  /app/scripts/init-garage-http.js
-RUN chmod +x /app/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /app/docker-entrypoint.sh && chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 3000
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

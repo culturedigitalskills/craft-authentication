@@ -125,10 +125,10 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
 
                                         {/* Public/private badge */}
                                         <div className="absolute left-2 top-2">
-                                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${
+                                            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur-sm ${
                                                 craft.isPublic
-                                                    ? 'bg-blue-100 text-blue-700'
-                                                    : 'bg-gray-100 text-gray-600'
+                                                    ? 'bg-warm text-warm-foreground'
+                                                    : 'bg-background/90 text-foreground'
                                             }`}>
                                                 {craft.isPublic
                                                     ? <><Eye className="h-3 w-3" />{t('crafts.details.visible')}</>
@@ -139,7 +139,7 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
                                     </div>
 
                                     <CardHeader className="pb-2">
-                                        <CardTitle className="line-clamp-1 transition-colors group-hover:text-primary">
+                                        <CardTitle className="line-clamp-1 transition-colors group-hover:text-warm">
                                             {craft.title}
                                         </CardTitle>
                                         <CardDescription className="line-clamp-2">{craft.description}</CardDescription>
@@ -154,11 +154,11 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
                                 </Link>
 
                                 {/* Edit button — outside the Link to avoid nesting */}
-                                <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                                <div className="absolute right-2 top-2">
                                     <Button size="sm" variant="secondary" asChild>
                                         <Link href={editUrl}>
                                             <Pencil className="mr-1 h-3 w-3" />
-                                            Edit
+                                            {t('createCraft.editCraftTitle')}
                                         </Link>
                                     </Button>
                                 </div>
@@ -169,7 +169,7 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
             ) : (
                 <div className="rounded-lg border border-dashed border-border p-12 text-center">
                     <Plus className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
-                    <p className="mb-4 text-muted-foreground">You haven't added any crafts yet.</p>
+                    <p className="mb-4 text-muted-foreground">{t('crafts.mycrafts.noCraftsYet')}</p>
                     <Button asChild>
                         <Link href="/crafts/create">{t('navbar.addcraft')}</Link>
                     </Button>

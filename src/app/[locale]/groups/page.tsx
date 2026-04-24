@@ -69,7 +69,7 @@ export default async function GroupsPage() {
                                         <Users className="h-5 w-5 text-muted-foreground" />
                                     </div>
                                 )}
-                                <h2 className="text-lg font-semibold transition-colors group-hover:text-primary">
+                                <h2 className="text-lg font-semibold transition-colors group-hover:text-warm">
                                     {group.name}
                                 </h2>
                             </div>
@@ -103,7 +103,7 @@ export default async function GroupsPage() {
 
                             <div className="mt-3 flex flex-wrap gap-2">
                                 {group.organizationType && group.organizationType !== 'OTHER' && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-warm/10 px-2.5 py-0.5 text-xs font-medium text-warm">
                                         {t(`orgType_${group.organizationType}`)}
                                     </span>
                                 )}

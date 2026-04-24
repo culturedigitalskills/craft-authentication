@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Menu, X } from 'lucide-react'
 import { NavbarAuth } from './NavbarAuth'
 import { LanguageSelect } from '@/components/shared/LanguageSelect'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 
 export function Header() {
     const t = useTranslations()
@@ -62,6 +63,7 @@ export function Header() {
         { href: '/', label: t('navbar.home') },
         { href: '/about', label: t('navbar.about') },
         { href: '/crafts', label: t('navbar.crafts') },
+        { href: '/artisans', label: t('navbar.artisans') },
         { href: '/groups', label: t('navbar.groups') },
     ]
 
@@ -72,7 +74,7 @@ export function Header() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 border-b border-border/40 bg-white/80 backdrop-blur-md">
+            <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
                 <div className="container mx-auto flex items-center justify-between px-4 py-3">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
@@ -89,7 +91,7 @@ export function Header() {
                     <nav ref={navRef} className="relative hidden items-center gap-1 md:flex">
                         {/* Sliding indicator */}
                         <span
-                            className="absolute -bottom-[13px] h-0.5 rounded-full bg-primary transition-all duration-300 ease-in-out"
+                            className="absolute -bottom-[13px] h-0.5 rounded-full bg-warm transition-all duration-300 ease-in-out"
                             style={{
                                 left: indicator.left,
                                 width: indicator.width,
@@ -104,7 +106,7 @@ export function Header() {
                                 data-active={isActive(link.href)}
                                 className={`rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                                     isActive(link.href)
-                                        ? 'text-primary'
+                                        ? 'text-warm'
                                         : 'text-muted-foreground hover:text-foreground'
                                 }`}
                             >
@@ -115,9 +117,10 @@ export function Header() {
                         {/* Separator */}
                         <div className="mx-3 h-5 w-px bg-border" />
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <NavbarAuth variant="desktop" />
                             <LanguageSelect isMobile={false} jsonlan={t('locale')} />
+                            <ThemeToggle />
                         </div>
                     </nav>
 
@@ -136,15 +139,16 @@ export function Header() {
             {/* Mobile slide-over menu */}
             {/* Backdrop */}
             <div
-                className={`fixed inset-0 z-50 bg-black/40 transition-opacity duration-300 md:hidden ${
+                className={`fixed inset-0 z-50 transition-opacity duration-300 md:hidden ${
                     menuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
+                style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }}
                 onClick={() => setMenuOpen(false)}
             />
 
             {/* Drawer */}
             <div
-                className={`fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-white shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
+                className={`fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-background shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
                     menuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
@@ -179,7 +183,7 @@ export function Header() {
                             onClick={() => setMenuOpen(false)}
                             className={`rounded-md px-3 py-3 text-base font-medium transition-colors ${
                                 isActive(link.href)
-                                    ? 'bg-primary/5 text-primary'
+                                    ? 'bg-warm/5 text-warm'
                                     : 'text-foreground hover:bg-muted'
                             }`}
                         >
@@ -191,8 +195,9 @@ export function Header() {
                 {/* Drawer auth & language */}
                 <div className="mt-auto border-t border-border px-4 py-4">
                     <NavbarAuth variant="mobile" onAction={() => setMenuOpen(false)} />
-                    <div className="mt-4">
+                    <div className="mt-4 flex items-center gap-3">
                         <LanguageSelect isMobile={true} jsonlan={t('locale')} />
+                        <ThemeToggle />
                     </div>
                 </div>
             </div>

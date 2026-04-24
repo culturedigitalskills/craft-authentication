@@ -181,7 +181,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                             href={group.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-primary transition-colors hover:text-primary/80"
+                            className="inline-flex items-center gap-1.5 text-warm transition-colors hover:text-warm/80"
                         >
                             <Globe className="h-4 w-4" />
                             {t('website')}
@@ -192,7 +192,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
 
                 <div className="mt-4 flex flex-wrap gap-2">
                     {group.organizationType !== 'OTHER' && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-warm/10 px-3 py-1 text-sm font-medium text-warm">
                             {t(`orgType_${group.organizationType}`)}
                         </span>
                     )}
@@ -308,11 +308,11 @@ function MemberCard({
                 )}
             </div>
             <div className="min-w-0">
-                <p className="font-medium transition-colors group-hover:text-primary">
+                <p className="font-medium transition-colors group-hover:text-warm">
                     {artisan.firstName} {artisan.lastName}
                 </p>
                 {isAdmin && (
-                    <span className="mt-0.5 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                    <span className="mt-0.5 inline-block rounded-full bg-warm/10 px-2 py-0.5 text-xs font-medium text-warm">
                         Admin
                     </span>
                 )}

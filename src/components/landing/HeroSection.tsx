@@ -19,7 +19,7 @@ export function HeroSection() {
                             {t('title')}
                         </h1>
                         <h2 className="mb-6 text-4xl font-bold leading-tight md:text-3xl">
-                            <span className="block text-primary">{t('subtitle')}</span>
+                            <span className="block text-warm">{t('subtitle')}</span>
                         </h2>
                         <p className="mb-8 text-xl leading-relaxed text-muted-foreground">
                             {t('landing.description')}
@@ -36,17 +36,17 @@ export function HeroSection() {
                         {/* Three icons below the description */}
                         <div className="grid grid-cols-3 gap-8 border-t pt-8">
                             <div className="text-center">
-                                <Camera className="mx-auto mb-2 h-8 w-8 text-primary" />
+                                <Camera className="mx-auto mb-2 h-8 w-8 text-warm" />
                                 <p className="font-medium">{t('features.authentic.title')}</p>
                                 <p className="text-sm text-muted-foreground">{t('features.authentic.description')}</p>
                             </div>
                             <div className="text-center">
-                                <QrCode className="mx-auto mb-2 h-8 w-8 text-primary" />
+                                <QrCode className="mx-auto mb-2 h-8 w-8 text-warm" />
                                 <p className="font-medium">{t('features.traceable.title')}</p>
                                 <p className="text-sm text-muted-foreground">{t('features.traceable.description')}</p>
                             </div>
                             <div className="text-center">
-                                <Globe className="mx-auto mb-2 h-8 w-8 text-primary" />
+                                <Globe className="mx-auto mb-2 h-8 w-8 text-warm" />
                                 <p className="font-medium">{t('features.connected.title')}</p>
                                 <p className="text-sm text-muted-foreground">{t('features.connected.description')}</p>
                             </div>
@@ -68,7 +68,7 @@ export function HeroSection() {
                         </div>
 
                         {/* Floating QR Code Card */}
-                        <div className="absolute -bottom-6 -left-6 rounded-xl border bg-white p-4 shadow-lg">
+                        <div className="absolute -bottom-6 -left-6 hidden rounded-xl border bg-background p-4 shadow-lg sm:block">
                             <div className="flex items-center space-x-3">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
                                     <QrCode className="h-6 w-6" />

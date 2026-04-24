@@ -9,6 +9,7 @@
         "home": "Startseite",
         "about": "Über uns",
         "crafts": "Handwerke",
+        "artisans": "Kunsthandwerker",
         "groups": "Gemeinschaften",
         "login": "Anmelden",
         "logout": "Abmelden",
@@ -179,13 +180,42 @@
         "notFound": "Handwerker nicht gefunden",
         "gallery": "Galerie",
         "galleryEmpty": "Noch keine Galeriefotos",
-        "groups": "Gruppen"
+        "groups": "Gemeinschaften",
+        "crafts": "Handwerke",
+        "noCrafts": "Noch keine öffentlichen Handwerke."
+    },
+    "artisans": {
+        "title": "Kunsthandwerker",
+        "description": "Entdecken Sie erfahrene Kunsthandwerker aus der ganzen Welt, jeder mit einer einzigartigen Geschichte.",
+        "noArtisansFound": "Keine Kunsthandwerker gefunden.",
+        "noResults": "Keine Kunsthandwerker entsprechen Ihrer Suche.",
+        "yearsExperience": "J. Erfahrung",
+        "viewProfile": "Profil ansehen",
+        "crafts": "Handwerke",
+        "searchPlaceholder": "Kunsthandwerker suchen...",
+        "artisansCount": "Kunsthandwerker"
     },
     "crafts": {
         "welcomeTitle": "Handwerke entdecken",
         "description": "Entdecken Sie authentische handgefertigte Produkte von erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes Stück ist verifiziert und erzählt eine einzigartige Geschichte von Tradition und Handwerkskunst.",
         "explore": {
-            "noCraftsFound": "Keine Handwerke gefunden."
+            "noCraftsFound": "Keine Handwerke gefunden.",
+            "noResults": "Keine Handwerke entsprechen Ihrer Suche.",
+            "searchPlaceholder": "Handwerke suchen...",
+            "craftsCount": "Handwerke",
+            "noImageAvailable": "Kein Bild verfügbar",
+            "by": "von"
+        },
+        "details": {
+            "qrCodeTitle": "Echtheitszertifikat",
+            "qrScanGuidance": "Scannen Sie mit der Handykamera, um die Echtheit zu überprüfen",
+            "copyLink": "Link kopieren",
+            "linkCopied": "Kopiert!",
+            "visible": "Öffentlich",
+            "notvisible": "Privat"
+        },
+        "mycrafts": {
+            "noCraftsYet": "Sie haben noch keine Handwerke hinzugefügt."
         }
     },
     "groups": {

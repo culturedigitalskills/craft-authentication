@@ -96,10 +96,10 @@ export default async function MyGroupsPage() {
                                     </div>
                                 )}
                                 <div className="min-w-0">
-                                    <h2 className="truncate text-lg font-semibold transition-colors group-hover:text-primary">
+                                    <h2 className="truncate text-lg font-semibold transition-colors group-hover:text-warm">
                                         {group.name}
                                     </h2>
-                                    <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                                    <span className="inline-block rounded-full bg-warm/10 px-2 py-0.5 text-xs font-medium text-warm">
                                         {group.memberRole === 'ADMIN' ? t('admin') : t('member')}
                                     </span>
                                 </div>
@@ -132,7 +132,7 @@ export default async function MyGroupsPage() {
 
                             <div className="mt-3 flex flex-wrap gap-2">
                                 {group.organizationType && group.organizationType !== 'OTHER' && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-warm/10 px-2.5 py-0.5 text-xs font-medium text-warm">
                                         {t(`orgType_${group.organizationType}`)}
                                     </span>
                                 )}

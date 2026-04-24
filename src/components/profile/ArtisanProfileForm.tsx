@@ -213,7 +213,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                             <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
                         </>
                     )}
-                    {coverUrl && <div className="absolute inset-0 bg-black/40" />}
+                    {coverUrl && <div className="absolute inset-0" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }} />}
 
                     <div className="relative mx-auto max-w-4xl px-4 text-center">
                         {/* Avatar */}
@@ -278,21 +278,21 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                     <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 sm:grid-cols-3">
                         {artisan.yearsOfExperience !== null && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
-                                <Clock className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <Clock className="mx-auto mb-2 h-6 w-6 text-warm" />
                                 <p className="font-semibold">{artisan.yearsOfExperience} {t('yearsLabel')}</p>
                                 <p className="text-xs text-muted-foreground">{t('craftExperience')}</p>
                             </div>
                         )}
                         {artisan.learningSource && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
-                                <GraduationCap className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <GraduationCap className="mx-auto mb-2 h-6 w-6 text-warm" />
                                 <p className="font-semibold">{artisan.learningSource}</p>
                                 <p className="text-xs text-muted-foreground">{t('learningSource')}</p>
                             </div>
                         )}
                         {locationText && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
-                                <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <MapPin className="mx-auto mb-2 h-6 w-6 text-warm" />
                                 <p className="font-semibold">{locationText}</p>
                                 <p className="text-xs text-muted-foreground">{t('location')}</p>
                             </div>
@@ -304,10 +304,10 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                 {artisan.bio && (
                     <section className="bg-muted/40 py-10">
                         <div className="mx-auto max-w-3xl px-4">
-                            <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                            <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm">
                                 {t('bio')}
                             </h2>
-                            <div className="border-l-2 border-primary/30 pl-5">
+                            <div className="border-l-2 border-warm/30 pl-5">
                                 <p className="text-base leading-relaxed text-foreground/80">
                                     {artisan.bio}
                                 </p>
@@ -320,7 +320,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                 {groups.length > 0 && (
                     <section className="border-b border-border/50 bg-background py-10">
                         <div className="mx-auto max-w-3xl px-4">
-                            <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
+                            <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
                                 {t('myGroups')}
                             </h2>
                             <div className="space-y-2">
@@ -332,7 +332,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                         <div className="flex items-center gap-3">
                                             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
                                                 {g.role === 'ADMIN' ? (
-                                                    <Shield className="h-4 w-4 text-primary" />
+                                                    <Shield className="h-4 w-4 text-warm" />
                                                 ) : (
                                                     <Users className="h-4 w-4 text-muted-foreground" />
                                                 )}
@@ -340,7 +340,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                             <div>
                                                 <Link
                                                     href={`/groups/${g.group.slug}`}
-                                                    className="text-sm font-medium hover:text-primary"
+                                                    className="text-sm font-medium hover:text-warm"
                                                 >
                                                     {g.group.name}
                                                 </Link>

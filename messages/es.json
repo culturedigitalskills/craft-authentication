@@ -9,6 +9,7 @@
         "home": "Inicio",
         "about": "Acerca de",
         "crafts": "Artesanías",
+        "artisans": "Artesanos",
         "groups": "Comunidades",
         "login": "Iniciar sesión",
         "logout": "Cerrar sesión",
@@ -179,13 +180,42 @@
         "notFound": "Artesano no encontrado",
         "gallery": "Galería",
         "galleryEmpty": "Aún no hay fotos en la galería",
-        "groups": "Grupos"
+        "groups": "Comunidades",
+        "crafts": "Artesanías",
+        "noCrafts": "Aún no hay artesanías públicas."
+    },
+    "artisans": {
+        "title": "Artesanos",
+        "description": "Descubre artesanos expertos de todo el mundo, cada uno con una historia única de arte y tradición.",
+        "noArtisansFound": "No se encontraron artesanos.",
+        "noResults": "Ningún artesano coincide con tu búsqueda.",
+        "yearsExperience": "años de exp.",
+        "viewProfile": "Ver perfil",
+        "crafts": "Artesanías",
+        "searchPlaceholder": "Buscar artesanos...",
+        "artisansCount": "artesanos"
     },
     "crafts": {
         "welcomeTitle": "Explorar artesanías",
         "description": "Descubre artesanías hechas a mano auténticas de artesanos expertos de todo el mundo. Cada pieza está verificada y cuenta una historia única de tradición y artesanía.",
         "explore": {
-            "noCraftsFound": "No se encontraron artesanías."
+            "noCraftsFound": "No se encontraron artesanías.",
+            "noResults": "Ninguna artesanía coincide con tu búsqueda.",
+            "searchPlaceholder": "Buscar artesanías...",
+            "craftsCount": "artesanías",
+            "noImageAvailable": "No hay imagen disponible",
+            "by": "por"
+        },
+        "details": {
+            "qrCodeTitle": "Certificado de Autenticidad",
+            "qrScanGuidance": "Escanea con la cámara de tu teléfono para verificar la autenticidad",
+            "copyLink": "Copiar enlace",
+            "linkCopied": "¡Copiado!",
+            "visible": "Público",
+            "notvisible": "Privado"
+        },
+        "mycrafts": {
+            "noCraftsYet": "Aún no has agregado ninguna artesanía."
         }
     },
     "groups": {

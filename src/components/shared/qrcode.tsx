@@ -88,27 +88,14 @@ export const QRCode = ({data,
   if (!svg) {
     return null;
   }
-  const stringsvg=`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-  console.log("Generated QR code SVG string:", stringsvg);
+  const stringsvg = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   return (
-    // <div
-    //   className={cn('size-full', '[&_svg]:size-full', className)}
-    //   // biome-ignore lint/security/noDangerouslySetInnerHtml: "Required for SVG"
-      
-    //   dangerouslySetInnerHTML={{ __html: svg }}
-    //   {...props}
-    // />
-    <div className="flex flex-col items-center space-y-5">
-    <div>
-       <img src={stringsvg} />
-    </div>
-    <div>
-      <a href={stringsvg} download="qrcode.svg" >
-        <Button>Download SVG</Button>
+    <div className="flex flex-col items-center gap-4">
+      <img src={stringsvg} alt="QR code" />
+      <a href={stringsvg} download="qrcode.svg">
+        <Button variant="outline" size="sm">Download SVG</Button>
       </a>
     </div>
-    </div>
-
   );
 };
 

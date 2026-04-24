@@ -49,7 +49,8 @@ export function GalleryLightbox({ images, currentIndex, onClose, onNavigate }: G
             aria-modal="true"
             aria-label={`Gallery image ${currentIndex + 1} of ${images.length}`}
             tabIndex={-1}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 outline-none"
+            className="fixed inset-0 z-50 flex items-center justify-center outline-none"
+            style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.9)' }}
             onClick={onClose}
         >
             <button

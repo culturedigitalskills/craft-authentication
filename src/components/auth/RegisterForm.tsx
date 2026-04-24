@@ -218,7 +218,7 @@ export function RegisterForm() {
                         {t('haveAccount')}{' '}
                         <Link
                             href="/login"
-                            className="text-primary hover:underline"
+                            className="text-warm hover:underline"
                         >
                             {t('login')}
                         </Link>
