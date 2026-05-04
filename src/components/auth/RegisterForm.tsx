@@ -48,7 +48,7 @@ export function RegisterForm() {
         setServerError(null)
 
         try {
-            const res = await fetch('/api/auth/register', {
+            const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -66,19 +66,14 @@ export function RegisterForm() {
                 return
             }
 
-            const result = await signIn('credentials', {
+            await signIn('credentials', {
                 email: data.email,
                 password: data.password,
                 redirect: false,
             })
 
-            if (result?.error) {
-                router.push('/login')
-                router.refresh()
-            } else {
-                router.push('/profile')
-                router.refresh()
-            }
+            router.push('/profile')
+            router.refresh()
         } catch {
             setServerError(t('registrationFailed'))
         }
@@ -223,7 +218,7 @@ export function RegisterForm() {
                         {t('haveAccount')}{' '}
                         <Link
                             href="/login"
-                            className="text-primary hover:underline"
+                            className="text-warm hover:underline"
                         >
                             {t('login')}
                         </Link>

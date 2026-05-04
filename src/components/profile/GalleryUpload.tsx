@@ -128,7 +128,8 @@ export function GalleryUpload({
                         />
                         {artisanId && confirmDelete === image.mediaId ? (
                             <div
-                                className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70"
+                                className="absolute inset-0 flex flex-col items-center justify-center gap-2"
+                                style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.7)' }}
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <p className="text-sm font-medium text-white">{t('galleryDeleteConfirm')}</p>
@@ -153,7 +154,8 @@ export function GalleryUpload({
                             <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); handleRemove(image) }}
-                                className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                className="absolute right-1.5 top-1.5 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
                             >
                                 <X className="h-4 w-4" />
                             </button>

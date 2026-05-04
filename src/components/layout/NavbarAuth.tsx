@@ -3,7 +3,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
@@ -75,7 +75,26 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     >
                         <FolderUp className="h-4 w-4" />
                         {t('addcraft')}
-                    </Link>                                        
+                    </Link>
+
+                    <div className="my-1 border-t border-border" />
+
+                    <Link
+                        href="/groups/mygroups"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <Users className="h-4 w-4" />
+                        {t('mygroups')}
+                    </Link>
+                    <Link
+                        href="/groups/create"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <UserPlus className="h-4 w-4" />
+                        {t('createGroup')}
+                    </Link>
                     <button
                         type="button"
                         onClick={() => { signOut({ callbackUrl: '/' }); onAction?.() }}
@@ -92,7 +111,7 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
             <Link
                 href="/login"
                 onClick={onAction}
-                className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+                className="inline-flex items-center justify-center rounded-md bg-warm px-4 py-2.5 text-sm font-medium text-warm-foreground transition-colors hover:bg-warm/90"
             >
                 {t('login')}
             </Link>
@@ -113,7 +132,7 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
 
                 {/* Dropdown */}
                 <div
-                    className={`absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-lg border border-border bg-white shadow-lg transition-all ${
+                    className={`absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-lg border border-border bg-background shadow-lg transition-all ${
                         dropdownOpen
                             ? 'visible translate-y-0 opacity-100'
                             : 'invisible -translate-y-1 opacity-0'
@@ -163,6 +182,25 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         </Link>
                     </div>
 
+                    {/* Groups */}
+                    <div className="border-t border-border py-1">
+                        <Link
+                            href="/groups/mygroups"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            {t('mygroups')}
+                        </Link>
+                        <Link
+                            href="/groups/create"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <UserPlus className="h-4 w-4 text-muted-foreground" />
+                            {t('createGroup')}
+                        </Link>
+                    </div>
 
                     {/* Logout */}
                     <div className="border-t border-border py-1">

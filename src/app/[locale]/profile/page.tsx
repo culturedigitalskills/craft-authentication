@@ -19,14 +19,8 @@ export default async function ProfilePage() {
             bio: true,
             yearsOfExperience: true,
             learningSource: true,
-            regionId: true,
-            region: {
-                select: {
-                    id: true,
-                    name: true,
-                    country: { select: { id: true, name: true } },
-                },
-            },
+            country: true,
+            region: true,
         },
     })
 
@@ -79,5 +73,24 @@ export default async function ProfilePage() {
         url: `/api/media/${a.mediaId}`,
     }))
 
-    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} coverUrl={coverUrl} galleryImages={galleryImages} />
+    // Fetch group memberships for the artisan
+    const groupMemberships = artisan
+        ? await prisma.artisanGroupMembership.findMany({
+              where: { artisanId: artisan.id, leftDate: null },
+              include: {
+                  group: {
+                      select: { id: true, name: true, slug: true },
+                  },
+              },
+              orderBy: { joinedDate: 'asc' },
+          })
+        : []
+
+    const myGroups = groupMemberships.map(m => ({
+        membershipId: m.id,
+        role: m.role,
+        group: m.group,
+    }))
+
+    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} coverUrl={coverUrl} galleryImages={galleryImages} myGroups={myGroups} />
 }

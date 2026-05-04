@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { SessionProvider } from '@/components/auth/SessionProvider'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import {routing} from '@/i8n/routing'
 //we are using the css in the main app folder
 import '../globals.css'
@@ -49,17 +50,19 @@ export default async function LocaleLayout({ children, params }: Props) {
                     geistMono.variable,
                 )}
             >
-                <SessionProvider>
-                    <NextIntlClientProvider messages={messages}>
-                        <div className="flex min-h-screen flex-col">
-                            <Header />
-                            <main className="flex-1">
-                                {children}
-                            </main>
-                            <Footer />
-                        </div>
-                    </NextIntlClientProvider>
-                </SessionProvider>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                    <SessionProvider>
+                        <NextIntlClientProvider messages={messages}>
+                            <div className="flex min-h-screen flex-col">
+                                <Header />
+                                <main className="flex-1">
+                                    {children}
+                                </main>
+                                <Footer />
+                            </div>
+                        </NextIntlClientProvider>
+                    </SessionProvider>
+                </ThemeProvider>
             </body>
         </html>
     )

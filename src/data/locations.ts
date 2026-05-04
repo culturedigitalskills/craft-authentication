@@ -1,11 +1,15 @@
-import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { Pool } from 'pg'
+export interface Region {
+    name: string
+    regionType: string
+}
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL_APP })
-const prisma = new PrismaClient({ adapter: new PrismaPg(pool) })
+export interface Country {
+    isoCode: string
+    name: string
+    regions: Region[]
+}
 
-const countriesWithRegions = [
+export const countries: Country[] = [
     {
         isoCode: 'MA',
         name: 'Morocco',
@@ -229,44 +233,3 @@ const countriesWithRegions = [
         ],
     },
 ]
-
-async function main() {
-    console.log('Seeding countries and regions...')
-
-    for (const { isoCode, name, regions } of countriesWithRegions) {
-        const country = await prisma.country.upsert({
-            where: { isoCode },
-            update: { name },
-            create: { isoCode, name },
-        })
-
-        for (const region of regions) {
-            const existing = await prisma.region.findFirst({
-                where: { countryId: country.id, name: region.name },
-            })
-            if (!existing) {
-                await prisma.region.create({
-                    data: {
-                        countryId: country.id,
-                        name: region.name,
-                        regionType: region.regionType,
-                    },
-                })
-            }
-        }
-
-        console.log(`  ${name} (${isoCode}): ${regions.length} regions`)
-    }
-
-    console.log('Seeding complete!')
-}
-
-main()
-    .catch((e) => {
-        console.error(e)
-        process.exit(1)
-    })
-    .finally(async () => {
-        await prisma.$disconnect()
-        await pool.end()
-    })

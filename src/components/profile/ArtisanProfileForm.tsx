@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -15,13 +14,16 @@ import { CoverPhotoUpload } from './CoverPhotoUpload'
 import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
 import {
+    ArrowLeft,
     MapPin,
     Clock,
     GraduationCap,
     User,
     Pencil,
     ExternalLink,
-    ImagePlus,
+    Users,
+    Shield,
+    LogOut,
 } from 'lucide-react'
 
 interface Artisan {
@@ -32,12 +34,8 @@ interface Artisan {
     bio: string | null
     yearsOfExperience: number | null
     learningSource: string | null
-    regionId: string | null
-    region: {
-        id: string
-        name: string
-        country: { id: string; name: string }
-    } | null
+    country: string | null
+    region: string | null
 }
 
 interface GalleryImage {
@@ -46,14 +44,21 @@ interface GalleryImage {
     url: string
 }
 
+interface MyGroup {
+    membershipId: string
+    role: string
+    group: { id: string; name: string; slug: string }
+}
+
 interface ArtisanProfileFormProps {
     artisan: Artisan | null
     photoUrl: string | null
     coverUrl: string | null
     galleryImages: GalleryImage[]
+    myGroups?: MyGroup[]
 }
 
-export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages, myGroups = [] }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
@@ -67,9 +72,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
         artisan?.yearsOfExperience?.toString() ?? ''
     )
     const [learningSource, setLearningSource] = useState(artisan?.learningSource ?? '')
-    const [regionId, setRegionId] = useState<string | null>(artisan?.regionId ?? null)
+    const [country, setCountry] = useState<string | null>(artisan?.country ?? null)
+    const [region, setRegion] = useState<string | null>(artisan?.region ?? null)
     const [uploadedPhotoId, setUploadedPhotoId] = useState<string | null>(null)
     const [uploadedCoverId, setUploadedCoverId] = useState<string | null>(null)
+    const [groups, setGroups] = useState(myGroups)
+    const [confirmLeave, setConfirmLeave] = useState<string | null>(null)
 
     const isCreateMode = !artisan
     const showForm = isCreateMode || isEditing
@@ -86,7 +94,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
         if (bio) data.bio = bio
         if (yearsOfExperience) data.yearsOfExperience = parseInt(yearsOfExperience, 10)
         if (learningSource) data.learningSource = learningSource
-        if (regionId) data.regionId = regionId
+        if (country) data.country = country
+        if (region) data.region = region
 
         try {
             const url = isCreateMode ? '/api/artisans' : `/api/artisans/${artisan.id}`
@@ -162,12 +171,26 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
         setBio(artisan?.bio ?? '')
         setYearsOfExperience(artisan?.yearsOfExperience?.toString() ?? '')
         setLearningSource(artisan?.learningSource ?? '')
-        setRegionId(artisan?.regionId ?? null)
+        setCountry(artisan?.country ?? null)
+        setRegion(artisan?.region ?? null)
         setMessage(null)
     }
 
-    const locationText = artisan?.region
-        ? `${artisan.region.name}, ${artisan.region.country.name}`
+    async function handleLeaveGroup(membershipId: string, groupId: string) {
+        try {
+            const res = await fetch(`/api/groups/${groupId}/members/${membershipId}`, {
+                method: 'DELETE',
+            })
+            if (!res.ok) throw new Error('Failed to leave group')
+            setGroups(prev => prev.filter(g => g.membershipId !== membershipId))
+            setConfirmLeave(null)
+        } catch {
+            alert(t('leaveGroupFailed'))
+        }
+    }
+
+    const locationText = artisan?.region && artisan?.country
+        ? `${artisan.region}, ${artisan.country}`
         : null
 
     // ── View mode — scroll sections layout ──
@@ -190,7 +213,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                             <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
                         </>
                     )}
-                    {coverUrl && <div className="absolute inset-0 bg-black/40" />}
+                    {coverUrl && <div className="absolute inset-0" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }} />}
 
                     <div className="relative mx-auto max-w-4xl px-4 text-center">
                         {/* Avatar */}
@@ -255,21 +278,21 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                     <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 sm:grid-cols-3">
                         {artisan.yearsOfExperience !== null && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
-                                <Clock className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <Clock className="mx-auto mb-2 h-6 w-6 text-warm" />
                                 <p className="font-semibold">{artisan.yearsOfExperience} {t('yearsLabel')}</p>
                                 <p className="text-xs text-muted-foreground">{t('craftExperience')}</p>
                             </div>
                         )}
                         {artisan.learningSource && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
-                                <GraduationCap className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <GraduationCap className="mx-auto mb-2 h-6 w-6 text-warm" />
                                 <p className="font-semibold">{artisan.learningSource}</p>
                                 <p className="text-xs text-muted-foreground">{t('learningSource')}</p>
                             </div>
                         )}
                         {locationText && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
-                                <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" />
+                                <MapPin className="mx-auto mb-2 h-6 w-6 text-warm" />
                                 <p className="font-semibold">{locationText}</p>
                                 <p className="text-xs text-muted-foreground">{t('location')}</p>
                             </div>
@@ -281,13 +304,82 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                 {artisan.bio && (
                     <section className="bg-muted/40 py-10">
                         <div className="mx-auto max-w-3xl px-4">
-                            <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                            <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm">
                                 {t('bio')}
                             </h2>
-                            <div className="border-l-2 border-primary/30 pl-5">
+                            <div className="border-l-2 border-warm/30 pl-5">
                                 <p className="text-base leading-relaxed text-foreground/80">
                                     {artisan.bio}
                                 </p>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* ── My Groups Section ── */}
+                {groups.length > 0 && (
+                    <section className="border-b border-border/50 bg-background py-10">
+                        <div className="mx-auto max-w-3xl px-4">
+                            <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
+                                {t('myGroups')}
+                            </h2>
+                            <div className="space-y-2">
+                                {groups.map(g => (
+                                    <div
+                                        key={g.membershipId}
+                                        className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                                                {g.role === 'ADMIN' ? (
+                                                    <Shield className="h-4 w-4 text-warm" />
+                                                ) : (
+                                                    <Users className="h-4 w-4 text-muted-foreground" />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Link
+                                                    href={`/groups/${g.group.slug}`}
+                                                    className="text-sm font-medium hover:text-warm"
+                                                >
+                                                    {g.group.name}
+                                                </Link>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {g.role === 'ADMIN' ? t('groupAdmin') : t('groupMember')}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {confirmLeave === g.membershipId ? (
+                                            <div className="flex items-center gap-1">
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => handleLeaveGroup(g.membershipId, g.group.id)}
+                                                >
+                                                    {t('confirmLeave')}
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => setConfirmLeave(null)}
+                                                >
+                                                    {t('cancel')}
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setConfirmLeave(g.membershipId)}
+                                                className="text-muted-foreground hover:text-destructive"
+                                            >
+                                                <LogOut className="mr-1.5 h-4 w-4" />
+                                                {t('leaveGroup')}
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </section>
@@ -311,17 +403,27 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
 
     // ── Create / Edit mode ──
     return (
-        <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
-            <div className="bg-gradient-to-br from-card via-muted/50 to-card px-6 py-6">
-                <h1 className="text-center text-2xl font-bold tracking-tight">
-                    {isCreateMode ? t('createTitle') : t('editTitle')}
-                </h1>
-            </div>
+        <div className="container mx-auto max-w-4xl px-4 py-10">
+            <div className="space-y-8">
+                {/* Header with back button */}
+                <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-5">
+                    {isEditing && (
+                        <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </button>
+                    )}
+                    <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">
+                        {isCreateMode ? t('createTitle') : t('editTitle')}
+                    </h1>
+                </div>
 
-            <CardContent className="p-6">
                 {message && (
                     <div
-                        className={`mb-6 rounded-lg p-3 text-sm ${
+                        className={`rounded-lg p-3 text-sm ${
                             message.type === 'success'
                                 ? 'bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200'
                                 : 'bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200'
@@ -332,33 +434,30 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-8">
-                    <div>
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <ImagePlus className="h-4 w-4" />
-                            {t('coverPhoto')}
-                        </h3>
-                        <CoverPhotoUpload
-                            artisanId={artisan?.id ?? null}
-                            currentCoverUrl={coverUrl}
-                            onCoverUploaded={setUploadedCoverId}
-                        />
+                    {/* Photos section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('coverPhoto')}</h2>
+                        <div className="space-y-5">
+                            <CoverPhotoUpload
+                                artisanId={artisan?.id ?? null}
+                                currentCoverUrl={coverUrl}
+                                onCoverUploaded={setUploadedCoverId}
+                            />
+                            <ProfilePhotoUpload
+                                artisanId={artisan?.id ?? null}
+                                currentPhotoUrl={photoUrl}
+                                onPhotoUploaded={setUploadedPhotoId}
+                            />
+                        </div>
                     </div>
 
-                    <ProfilePhotoUpload
-                        artisanId={artisan?.id ?? null}
-                        currentPhotoUrl={photoUrl}
-                        onPhotoUploaded={setUploadedPhotoId}
-                    />
-
-                    <div>
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <User className="h-4 w-4" />
-                            {t('personalInfo')}
-                        </h3>
-                        <div className="space-y-4">
+                    {/* Personal info section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('personalInfo')}</h2>
+                        <div className="space-y-5">
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="firstName">{t('firstName')}</Label>
+                                <div>
+                                    <Label htmlFor="firstName" className="mb-1.5 block text-sm font-medium">{t('firstName')}</Label>
                                     <Input
                                         id="firstName"
                                         value={firstName}
@@ -366,8 +465,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                                         required
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="lastName">{t('lastName')}</Label>
+                                <div>
+                                    <Label htmlFor="lastName" className="mb-1.5 block text-sm font-medium">{t('lastName')}</Label>
                                     <Input
                                         id="lastName"
                                         value={lastName}
@@ -376,8 +475,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="bio">{t('bio')}</Label>
+                            <div>
+                                <Label htmlFor="bio" className="mb-1.5 block text-sm font-medium">{t('bio')}</Label>
                                 <Textarea
                                     id="bio"
                                     value={bio}
@@ -389,14 +488,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                         </div>
                     </div>
 
-                    <div className="border-t border-border pt-6">
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <GraduationCap className="h-4 w-4" />
-                            {t('craftExperience')}
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="yearsOfExperience">
+                    {/* Craft experience section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('craftExperience')}</h2>
+                        <div className="space-y-5">
+                            <div>
+                                <Label htmlFor="yearsOfExperience" className="mb-1.5 block text-sm font-medium">
                                     {t('yearsOfExperience')}
                                 </Label>
                                 <Input
@@ -408,8 +505,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                                     onChange={(e) => setYearsOfExperience(e.target.value)}
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="learningSource">{t('learningSource')}</Label>
+                            <div>
+                                <Label htmlFor="learningSource" className="mb-1.5 block text-sm font-medium">{t('learningSource')}</Label>
                                 <Input
                                     id="learningSource"
                                     value={learningSource}
@@ -420,24 +517,23 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                         </div>
                     </div>
 
-                    <div className="border-t border-border pt-6">
-                        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                            <MapPin className="h-4 w-4" />
-                            {t('location')}
-                        </h3>
+                    {/* Location section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('location')}</h2>
                         <LocationSelect
-                            initialCountryId={artisan?.region?.country.id}
-                            initialRegionId={artisan?.regionId ?? undefined}
-                            onRegionChange={setRegionId}
+                            initialCountry={artisan?.country ?? undefined}
+                            initialRegion={artisan?.region ?? undefined}
+                            onLocationChange={(c, r) => {
+                                setCountry(c)
+                                setRegion(r)
+                            }}
                         />
                     </div>
 
+                    {/* Gallery section (edit mode only) */}
                     {!isCreateMode && (
-                        <div className="border-t border-border pt-6">
-                            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                                <ImagePlus className="h-4 w-4" />
-                                {t('gallery')}
-                            </h3>
+                        <div className="rounded-lg border border-border bg-card p-6">
+                            <h2 className="mb-4 text-lg font-semibold">{t('gallery')}</h2>
                             <GalleryUpload
                                 artisanId={artisan?.id ?? null}
                                 initialImages={galleryImages}
@@ -445,8 +541,18 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                         </div>
                     )}
 
-                    <div className="flex gap-3 border-t border-border pt-6">
-                        <Button type="submit" size="lg" disabled={isSubmitting}>
+                    {/* Action buttons */}
+                    <div className="flex justify-end gap-3">
+                        {isEditing && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleCancelEdit}
+                            >
+                                {t('cancelEdit')}
+                            </Button>
+                        )}
+                        <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting
                                 ? isCreateMode
                                     ? t('saving')
@@ -455,19 +561,9 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages 
                                   ? t('save')
                                   : t('update')}
                         </Button>
-                        {isEditing && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="lg"
-                                onClick={handleCancelEdit}
-                            >
-                                {t('cancelEdit')}
-                            </Button>
-                        )}
                     </div>
                 </form>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     )
 }

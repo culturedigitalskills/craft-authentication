@@ -30,6 +30,18 @@ enum GroupRole {
     MEMBER
 }
 
+enum OrganizationType {
+    COOPERATIVE
+    COLLECTIVE
+    GUILD
+    ASSOCIATION
+    SOCIAL_ENTERPRISE
+    NONPROFIT
+    STUDIO
+    NETWORK
+    OTHER
+}
+
 // Auth Models
 
 model User {
@@ -111,52 +123,31 @@ model DataRecord {
     @@index([createdAt], name: "idx_data_records_created_at")
 }
 
-// Geography
-
-model Country {
-    id        String   @id @default(uuid())
-    isoCode   String   @unique
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    regions   Region[]
-}
-
-model Region {
-    id          String      @id @default(uuid())
-    countryId   String
-    name        String
-    regionType  String?
-    createdAt   DateTime    @default(now())
-    updatedAt   DateTime    @updatedAt
-    country     Country     @relation(fields: [countryId], references: [id])
-    artisans    Artisan[]
-
-    @@index([countryId])
-}
-
 // Groups & Artisans
 
 model Group {
-    id            String              @id @default(uuid())
-    name          String
-    slug          String              @unique
-    description   String?
-    website       String?
-    location      String?
-    isWomenLed    Boolean             @default(false)
-    isCooperative Boolean             @default(false)
-    isFairTrade   Boolean             @default(false)
-    isActive      Boolean             @default(true)
-    createdAt     DateTime            @default(now())
-    updatedAt     DateTime            @updatedAt
-    memberships   ArtisanGroupMembership[]
+    id                 String              @id @default(uuid())
+    name               String
+    slug               String              @unique
+    description        String?
+    website            String?
+    location           String?
+    organizationType   OrganizationType    @default(OTHER)
+    certifications     String[]            @default([])
+    isHeritageCraft    Boolean             @default(false)
+    isOpenToMembers    Boolean             @default(true)
+    hasTrainingProgram Boolean             @default(false)
+    isActive           Boolean             @default(true)
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    memberships        ArtisanGroupMembership[]
 }
 
 model Artisan {
     id                String                       @id @default(uuid())
     userId            String                       @unique
-    regionId          String?
+    country           String?
+    region            String?
     firstName         String
     lastName          String
     slug              String                       @unique
@@ -169,10 +160,7 @@ model Artisan {
     updatedAt         DateTime                     @updatedAt
     deletedAt         DateTime?
     user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
-    region            Region?                      @relation(fields: [regionId], references: [id])
     memberships       ArtisanGroupMembership[]
-
-    @@index([regionId])
 }
 
 model ArtisanGroupMembership {

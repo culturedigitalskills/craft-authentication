@@ -1,10 +1,12 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { MapPin, Clock, GraduationCap, User } from 'lucide-react'
+import Link from 'next/link'
+import { MapPin, Clock, GraduationCap, User, Users, Package } from 'lucide-react'
 import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
+import { Card, CardContent } from '@/components/ui/card'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -64,17 +66,48 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             bio: true,
             yearsOfExperience: true,
             learningSource: true,
-            region: {
+            country: true,
+            region: true,
+            user: { select: { email: true } },
+            memberships: {
+                where: { leftDate: null },
                 select: {
-                    name: true,
-                    regionType: true,
-                    country: { select: { name: true } },
+                    role: true,
+                    group: {
+                        select: {
+                            name: true,
+                            slug: true,
+                        },
+                    },
                 },
             },
         },
     })
 
     if (!artisan) notFound()
+
+    // Fetch the artisan's public crafts
+    const artisanEmail = artisan.user.email
+    const craftRecords = await prisma.dataRecord.findMany({
+        where: {
+            AND: [
+                { data: { path: ['artisan'], equals: artisanEmail } },
+                { data: { path: ['isPublic'], equals: true } },
+            ],
+        },
+        select: { id: true, name: true, data: true },
+        orderBy: { createdAt: 'desc' },
+        take: 6,
+    })
+
+    // Fetch first media for each craft
+    const crafts = await Promise.all(
+        craftRecords.map(async record => {
+            const mediaIds = ((record.data as Record<string, unknown>)['mediaIds'] as string[] | undefined)?.filter(Boolean) ?? []
+            const imageUrl = mediaIds.length > 0 ? `/api/media/${mediaIds[0]}` : null
+            return { id: record.id, name: record.name, imageUrl }
+        })
+    )
 
     const photoAttachment = await prisma.mediaAttachment.findFirst({
         where: {
@@ -116,8 +149,8 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         url: `/api/media/${a.mediaId}`,
     }))
 
-    const locationText = artisan.region
-        ? `${artisan.region.name}, ${artisan.region.country.name}`
+    const locationText = artisan.region && artisan.country
+        ? `${artisan.region}, ${artisan.country}`
         : null
 
     return (
@@ -139,7 +172,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
                     </>
                 )}
-                {coverUrl && <div className="absolute inset-0 bg-black/40" />}
+                {coverUrl && <div className="absolute inset-0" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }} />}
 
                 <div className="relative mx-auto max-w-4xl px-4 text-center">
                     <div className="mx-auto mb-4 h-28 w-28 overflow-hidden rounded-full border-4 border-background shadow-xl sm:h-36 sm:w-36">
@@ -162,51 +195,46 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                     <h1 className={`text-3xl font-bold tracking-tight sm:text-4xl ${coverUrl ? 'text-white' : ''}`}>
                         {artisan.firstName} {artisan.lastName}
                     </h1>
-
-                    {locationText && (
-                        <p className={`mt-1.5 inline-flex items-center gap-1.5 ${coverUrl ? 'text-white/80' : 'text-muted-foreground'}`}>
-                            <MapPin className="h-4 w-4" />
-                            {locationText}
-                        </p>
-                    )}
                 </div>
             </section>
 
             {/* ── Stats Section ── */}
-            <section className="border-b border-border/50 bg-background py-8">
-                <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 px-4 sm:grid-cols-3">
-                    {artisan.yearsOfExperience !== null && (
-                        <div className="rounded-lg bg-muted/60 p-5 text-center">
-                            <Clock className="mx-auto mb-2 h-6 w-6 text-primary" />
-                            <p className="font-semibold">{artisan.yearsOfExperience} {t('yearsExperience')}</p>
-                            <p className="text-xs text-muted-foreground">{t('craftJourney')}</p>
+            {(artisan.yearsOfExperience !== null || artisan.learningSource || locationText) && (
+                <section className="border-b border-border/50 bg-background py-5">
+                    <div className="mx-auto max-w-4xl px-4">
+                        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                            {artisan.yearsOfExperience !== null && (
+                                <span className="flex items-center gap-1.5">
+                                    <Clock className="h-4 w-4 text-warm" />
+                                    <span className="font-medium text-foreground">{artisan.yearsOfExperience}</span>
+                                    {' '}{t('yearsExperience')}
+                                </span>
+                            )}
+                            {artisan.learningSource && (
+                                <span className="flex items-center gap-1.5">
+                                    <GraduationCap className="h-4 w-4 text-warm" />
+                                    {artisan.learningSource}
+                                </span>
+                            )}
+                            {locationText && (
+                                <span className="flex items-center gap-1.5">
+                                    <MapPin className="h-4 w-4 text-warm" />
+                                    {locationText}
+                                </span>
+                            )}
                         </div>
-                    )}
-                    {artisan.learningSource && (
-                        <div className="rounded-lg bg-muted/60 p-5 text-center">
-                            <GraduationCap className="mx-auto mb-2 h-6 w-6 text-primary" />
-                            <p className="font-semibold">{artisan.learningSource}</p>
-                            <p className="text-xs text-muted-foreground">{t('learnedFrom')}</p>
-                        </div>
-                    )}
-                    {locationText && (
-                        <div className="rounded-lg bg-muted/60 p-5 text-center">
-                            <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" />
-                            <p className="font-semibold">{locationText}</p>
-                            <p className="text-xs text-muted-foreground">{t('learnedFrom')}</p>
-                        </div>
-                    )}
-                </div>
-            </section>
+                    </div>
+                </section>
+            )}
 
             {/* ── About Section ── */}
             {artisan.bio && (
                 <section className="bg-muted/40 py-10">
-                    <div className="mx-auto max-w-3xl px-4">
-                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary">
+                    <div className="mx-auto max-w-4xl px-4">
+                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm">
                             {t('about')}
                         </h2>
-                        <div className="border-l-2 border-primary/30 pl-5">
+                        <div className="border-l-2 border-warm/30 pl-5">
                             <p className="text-base leading-relaxed text-foreground/80">
                                 {artisan.bio}
                             </p>
@@ -215,11 +243,81 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                 </section>
             )}
 
+            {/* ── Groups Section ── */}
+            {artisan.memberships.length > 0 && (
+                <section className="py-10">
+                    <div className="mx-auto max-w-4xl px-4">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
+                            <Users className="mr-1.5 inline h-4 w-4" />
+                            {t('groups')}
+                        </h2>
+                        <div className="flex flex-wrap gap-3">
+                            {artisan.memberships.map(m => (
+                                <Link
+                                    key={m.group.slug}
+                                    href={`/groups/${m.group.slug}`}
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
+                                    <Users className="h-4 w-4 text-muted-foreground" />
+                                    {m.group.name}
+                                    {m.role === 'ADMIN' && (
+                                        <span className="rounded-full bg-warm/10 px-2 py-0.5 text-xs text-warm">
+                                            Admin
+                                        </span>
+                                    )}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* ── Crafts Section ── */}
+            {crafts.length > 0 && (
+                <section className="py-10">
+                    <div className="mx-auto max-w-4xl px-4">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
+                            <Package className="mr-1.5 inline h-4 w-4" />
+                            {t('crafts')}
+                        </h2>
+                        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                            {crafts.map(craft => (
+                                <Card key={craft.id} className="group overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                                    <Link href={`/crafts/${craft.id}`} className="block">
+                                        <div className="relative aspect-square overflow-hidden bg-muted">
+                                            {craft.imageUrl ? (
+                                                <Image
+                                                    src={craft.imageUrl}
+                                                    alt={craft.name}
+                                                    fill
+                                                    unoptimized
+                                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                                    className="object-cover transition-transform duration-200 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full items-center justify-center">
+                                                    <Package className="h-10 w-10 text-muted-foreground/40" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <CardContent className="p-3">
+                                            <p className="line-clamp-1 text-sm font-medium transition-colors group-hover:text-warm">
+                                                {craft.name}
+                                            </p>
+                                        </CardContent>
+                                    </Link>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* ── Gallery Section ── */}
             {galleryImages.length > 0 && (
                 <section className="py-10">
-                    <div className="mx-auto max-w-3xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
+                    <div className="mx-auto max-w-4xl px-4">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
                             {t('gallery')}
                         </h2>
                         <GalleryGrid images={galleryImages} />

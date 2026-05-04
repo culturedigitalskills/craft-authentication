@@ -1,210 +1,178 @@
-import { auth } from '@/lib/auth'
-import { redirect } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Container } from '@/components/layout/Container';
-import { CardTitle, CardContent, CardDescription, CardHeader, Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/dist/client/link';
-import Image from 'next/image';
-import { Calendar, User } from 'lucide-react';
-import { formatDateTime } from '@/components/shared/formatDateTime';
+import { Container } from '@/components/layout/Container'
+import { CardTitle, CardContent, CardHeader, Card } from '@/components/ui/card'
+import Link from 'next/dist/client/link'
+import Image from 'next/image'
+import { Calendar, User } from 'lucide-react'
+import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
-import { cookies } from 'next/dist/server/request/cookies';
-import { publicDecrypt } from 'crypto';
-import { record } from 'zod/v3';
+import { prisma } from '@/lib/prisma'
+import { SearchInput } from '@/components/shared/SearchInput'
 
-
-// export default async function CraftsPage() {
-    // const session = await auth()        
-
-    // if (!session) {
-    //     redirect('/login')
-    // }
-    // return <CraftsPageContent session={session} />;
-
-// }
-// function CraftsPageContent({session}: {session: any}) {
+const LIMIT = 21
 
 export default async function CraftsPage(
-  { searchParams }:
-   { searchParams: { page?: string } }) {
-    
-  const params = await searchParams
-  const page = params.page ? parseInt(params.page) : 1
+    { searchParams }: { searchParams: Promise<{ page?: string; q?: string }> }
+) {
+    const params = await searchParams
+    const page = params.page ? Math.max(1, parseInt(params.page)) : 1
+    const q = params.q?.trim() ?? ''
+    const skip = (page - 1) * LIMIT
 
-  const currentPageUrl = `${process.env.AUTH_URL}/crafts`
-  const cookieStore = await cookies()
-  const cookieHeader = cookieStore.toString()    
-
-  try {
-      // 1. fetch craft first
-      const urldata =  `${process.env.AUTH_URL}/api/data/?page=${page}&limit=21`            
-      const method = 'GET'
-      // console.log('url: ', urldata) // Debug log to check data being submitted
-      // console.log('method: ', method) // Debug log to check data being submitted
-
-      const res = await fetch(urldata, {
-        method,
-        credentials: 'include',  // sends cookies automatically
-        headers: { 
-                  'Content-Type': 'application/json',
-                  'Cookie': cookieHeader  // forward cookies to the API
-              },
-      })
-      if (!res.ok) 
-        throw new Error('Request failed')  
-      const data = await res.json()
-      // console.log('full data:', JSON.stringify(data, null, 2))
-
-      //******************GET all crafts
-    const allcrafts = data.data
-    const pagination = data.pagination  // { currentPage, totalPages, totalCount, hasNext, hasPrev }
-
-    const crafts = await Promise.all(allcrafts.map(async (record: any) => {
-      const mediaIds = record.data['mediaIds']?.filter((id: any) => id !== null) ?? []
-      // console.log('Media IDs:', mediaIds[0])
-      let url = null
-
-      if (mediaIds.length > 0) {
-        const imageRes = await fetch(`${process.env.AUTH_URL}/api/media/${mediaIds[0]}`, {
-          method: 'GET',
-          headers: { 
-            // 'Content-Type': 'application/json',
-            'Cookie': cookieHeader
-          },
-        })
-        url = await imageRes.url
-        // console.log('Image URL:', mediaIds[0], "   ", url)
-      }else {
-        url = null
-      }
-
-      return {
-        id: record.id,
-        title: record.name,
-        artisan: record.data.artisan,
-        createdOn: record.data.createdOn,
-        email: record.data.artisan,
-        isPublic: record.data.isPublic,
-        mediaIds,
-        imageUrl : url
-      }
-    }))
-
-    
-    return <RenderCraftsPage crafts={crafts} 
-    pagination={pagination} 
-    currentPage={page} 
-    currentPageUrl={currentPageUrl}/>
-
-    //   // console.log('Response status:', res) // Debug log to check response status
-    } catch (error) {
-      console.log('Error:', error)
-      console.log('Error message:', (error as Error).message)
-      console.log('Error name:', (error as Error).name)
+    const whereClause = {
+        data: { path: ['isPublic'], equals: true },
+        ...(q ? { name: { contains: q, mode: 'insensitive' as const } } : {}),
     }
 
+    let craftsWithNames: any[] = []
+    let pagination = { currentPage: page, totalPages: 1, totalCount: 0, hasNext: false, hasPrev: false }
+
+    try {
+        const [craftRecords, totalCount] = await Promise.all([
+            prisma.dataRecord.findMany({
+                where: whereClause,
+                select: { id: true, name: true, data: true },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: LIMIT,
+            }),
+            prisma.dataRecord.count({ where: whereClause }),
+        ])
+
+        const crafts = craftRecords.map(record => {
+            const d = record.data as Record<string, any>
+            const mediaIds: string[] = (d['mediaIds'] as string[] ?? []).filter(Boolean)
+            return {
+                id: record.id,
+                title: record.name,
+                artisanEmail: d['artisan'] as string | null,
+                createdOn: d['createdOn'] as string,
+                material: (d['material'] as string | null) ?? null,
+                imageUrl: mediaIds.length > 0 ? `/api/media/${mediaIds[0]}` : null,
+            }
+        })
+
+        const emails = [...new Set(crafts.map(c => c.artisanEmail).filter(Boolean))] as string[]
+        const artisanProfiles = emails.length > 0
+            ? await prisma.artisan.findMany({
+                where: { user: { email: { in: emails } } },
+                select: { firstName: true, lastName: true, slug: true, user: { select: { email: true } } },
+            })
+            : []
+        const artisanByEmail = new Map(artisanProfiles.map(a => [a.user.email, a]))
+
+        craftsWithNames = crafts.map(c => {
+            const a = c.artisanEmail ? artisanByEmail.get(c.artisanEmail) : null
+            return {
+                ...c,
+                artisanName: a ? `${a.firstName} ${a.lastName}` : null,
+                artisanSlug: a?.slug ?? null,
+            }
+        })
+
+        const totalPages = Math.max(1, Math.ceil(totalCount / LIMIT))
+        pagination = { currentPage: page, totalPages, totalCount, hasNext: page < totalPages, hasPrev: page > 1 }
+    } catch (error) {
+        console.error('Error loading crafts:', error)
+    }
+
+    const currentPageUrl = `${process.env.AUTH_URL}/crafts`
+    return <RenderCraftsPage crafts={craftsWithNames} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} q={q} />
 }
 
-function RenderCraftsPage({ crafts,  pagination, currentPage, currentPageUrl  }:
-   { crafts: any[], pagination: any, currentPage: number, currentPageUrl: string }) {
-
-    const t = useTranslations();
-        console.log("sss ",crafts.length)
+function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }: {
+    crafts: any[]
+    pagination: any
+    currentPage: number
+    currentPageUrl: string
+    q: string
+}) {
+    const t = useTranslations()
 
     return (
-      // <div className="px-4 py-16"/>
         <Container>
-        {/* <div className="px-4 py-16">
-             */}
-             <div className="mx-auto mb-12 max-w-3xl text-center">
-                <h1 className="mb-8 text-4xl font-bold">{t('crafts.welcomeTitle')} </h1>
-                <p className="text-lg text-muted-foreground">
-                   {t('crafts.description')}
-                </p>
-
+            <div className="mb-8 text-center">
+                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('crafts.welcomeTitle')}</h1>
+                <p className="mt-3 text-lg text-muted-foreground">{t('crafts.description')}</p>
             </div>
-            {/* </div>
-        </div> */}
-        {/* Crafts Grid */}
-        {crafts.length > 0 ? (
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    
-            {crafts.filter((craft) => craft.isPublic).map((craft) => {
-            //only display if IsPublic
-               
-            const craftUrl = `crafts/${craft.id}`;
-            return (
-                <Card key={craft.id} className="group transition-shadow duration-200 hover:shadow-lg">
-                <Link href={craftUrl} className="block">
-                    {/* Image */}
-                    <div className="relative aspect-square overflow-hidden rounded-t-lg">
-                    {craft.imageUrl ? (
-                      <Image
-                        src={craft.imageUrl}
-                        alt={craft.title}
-                        fill
-                        unoptimized
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-200 group-hover:scale-105"
+            <div className="mb-6 flex items-center justify-between gap-4">
+                <SearchInput placeholder={t('crafts.explore.searchPlaceholder')} />
+                {pagination.totalCount > 0 && (
+                    <p className="shrink-0 text-sm text-muted-foreground">
+                        {pagination.totalCount} {t('crafts.explore.craftsCount')}
+                    </p>
+                )}
+            </div>
 
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-muted">
-                        <p className="text-muted-foreground">{t('crafts.explore.noImageAvailable')}</p>
-                      </div>
-                    )}
-                    {/* <div className="absolute right-2 top-2">
-                      <Badge variant="outline" className="bg-white/90 text-xs">
-                        Public
-                      </Badge>
-                    </div> */}                    
-                    </div>
+            {crafts.length > 0 ? (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {crafts.map((craft) => (
+                        <Card key={craft.id} className="group transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+                            <Link href={`crafts/${craft.id}`} className="block">
+                                <div className="relative aspect-square overflow-hidden rounded-t-lg">
+                                    {craft.imageUrl ? (
+                                        <Image
+                                            src={craft.imageUrl}
+                                            alt={craft.title}
+                                            fill
+                                            unoptimized
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            className="object-cover transition-transform duration-200 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div className="flex h-full items-center justify-center bg-muted">
+                                            <p className="text-muted-foreground">{t('crafts.explore.noImageAvailable')}</p>
+                                        </div>
+                                    )}
 
-                    {/* Content */}
-                    <CardHeader className="pb-2 bg-muted">
-                    <CardTitle className="line-clamp-1 transition-colors group-hover:text-primary">
-                        {craft.title}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2">{craft.description}</CardDescription>
-                    </CardHeader>
+                                    {/* Material reveal on hover */}
+                                    {craft.material && (
+                                        <div className="absolute inset-x-0 bottom-0 translate-y-full bg-warm px-3 py-1.5 transition-transform duration-200 group-hover:translate-y-0">
+                                            <p className="truncate text-xs font-medium text-warm-foreground">{craft.material}</p>
+                                        </div>
+                                    )}
+                                </div>
 
-                    <CardContent className="pt-0 bg-muted">
-                    <div className="space-y-2">
-                    {/* Creator information */}                        
-                    {craft.artisan && (
-                        <div className="flex items-center space-x-2 text-sm">
-                          <User className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-muted-foreground">{t('crafts.explore.by')}</span>
-                          <span className="font-medium">{craft.email}</span>
-                        </div>
-                      )}
-                    {/* Created date */}
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        <span>{formatDateTime(craft.createdOn)}</span>
-                      </div>                           
-                    </div>
-                    </CardContent>
-                </Link>    
-                </Card>
-            );
-            })}
-    
-        
-        </div>
-        
-        ) : (
-        <p className="text-center text-muted-foreground">No crafts found.</p>
-        
-        )}
-      <PaginationControls 
-        currentPage={currentPage} 
-        pagination={pagination} 
-        currentPageUrl={currentPageUrl} 
-      />  
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="line-clamp-1 transition-colors group-hover:text-warm">
+                                        {craft.title}
+                                    </CardTitle>
+                                </CardHeader>
+
+                                <CardContent className="pt-0">
+                                    <div className="space-y-1.5">
+                                        {craft.artisanName && (
+                                            <div className="flex items-center gap-1.5 text-sm">
+                                                <User className="h-3 w-3 shrink-0 text-muted-foreground" />
+                                                <span className="text-muted-foreground">{t('crafts.explore.by')}</span>
+                                                <span className="font-medium">{craft.artisanName}</span>
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                            <Calendar className="h-3 w-3 shrink-0" />
+                                            <span>{formatDateTime(craft.createdOn)}</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Link>
+                        </Card>
+                    ))}
+                </div>
+            ) : (
+                <div className="rounded-lg border border-dashed border-border p-12 text-center">
+                    <User className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+                    <p className="text-muted-foreground">
+                        {q ? t('crafts.explore.noResults') : t('crafts.explore.noCraftsFound')}
+                    </p>
+                </div>
+            )}
+
+            <PaginationControls
+                currentPage={currentPage}
+                pagination={pagination}
+                currentPageUrl={currentPageUrl}
+            />
         </Container>
     )
-
 }

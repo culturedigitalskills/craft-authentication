@@ -6,7 +6,8 @@ export const CreateArtisanSchema = z.object({
     bio: z.string().max(1000).optional(),
     yearsOfExperience: z.number().int().min(0).max(100).optional(),
     learningSource: z.string().max(255).optional(),
-    regionId: z.uuid().optional(),
+    country: z.string().max(100).optional(),
+    region: z.string().max(100).optional(),
 })
 
 export const UpdateArtisanSchema = z.object({
@@ -15,7 +16,8 @@ export const UpdateArtisanSchema = z.object({
     bio: z.string().max(1000).optional(),
     yearsOfExperience: z.number().int().min(0).max(100).optional(),
     learningSource: z.string().max(255).optional(),
-    regionId: z.uuid().nullish(),
+    country: z.string().max(100).nullish(),
+    region: z.string().max(100).nullish(),
 })
 
 export type CreateArtisan = z.infer<typeof CreateArtisanSchema>

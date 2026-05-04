@@ -6,7 +6,7 @@ import { TraditionSection } from '@/components/landing/TraditionSection'
 export default function Home() {
     return (
         // Landing Page Container
-        <Container>
+        <Container className="max-w-7xl pt-20">
             <HeroSection />
             <HowItWorksSection />
             <TraditionSection />

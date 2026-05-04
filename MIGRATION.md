@@ -1,5 +1,56 @@
-# v0.4.x -> v0.5.0
+# v0.6.x -> v0.7.0
 
+### Static Location Data
+
+Replaced the `Country` and `Region` database tables with a static TypeScript data file (`src/data/locations.ts`). Location data is now bundled with the app — no database seeding required.
+
+**Removed tables**: `Country`, `Region`
+
+**Modified table**: `Artisan` — replaced `regionId` (FK to Region) with `country` and `region` string fields
+
+**Removed API endpoints**: `GET /api/countries`, `GET /api/countries/[countryId]/regions`
+
+**Removed script**: `db:seed` — no longer needed
+
+The migration automatically copies existing location data from the Region/Country tables into the new string columns before dropping the old tables.
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
+# v0.5.x -> v0.6.0
+
+### Group Classification System
+
+Replaced the simple boolean flags (`isWomenLed`, `isCooperative`, `isFairTrade`) with a proper classification system based on real-world artisan organization standards.
+
+**New enum**: `OrganizationType` (`COOPERATIVE`, `COLLECTIVE`, `GUILD`, `ASSOCIATION`, `SOCIAL_ENTERPRISE`, `NONPROFIT`, `STUDIO`, `NETWORK`, `OTHER`)
+
+**New columns on `Group`**:
+- `organizationType` (OrganizationType enum, defaults to `OTHER`)
+- `certifications` (String array — values: `WFTO_FAIR_TRADE`, `FAIRTRADE_CERTIFIED`, `NEST_ETHICAL_HANDCRAFT`, `BCORP`, `UNESCO_ICH`, `FAIR_TRADE_FEDERATION`)
+- `isHeritageCraft` (boolean, defaults to false)
+- `isOpenToMembers` (boolean, defaults to true)
+- `hasTrainingProgram` (boolean, defaults to false)
+
+Run the migration after pulling:
+
+```bash
+pnpm db:migrate
+pnpm prisma:generate
+```
+
+No new environment variables required.
+
+# v0.4.x -> v0.5.0
+Description
+Completed the Groups feature (Phases 5–7) and replaced placeholder group flags with a research-backed classification system. Added group photo uploads, artisan self-service, searchable member management, and standardized action button alignment across all forms.
+
+Changes
+Added OrganizationType enum (Cooperative, Collective, Guild, Association, Social
 ### Community Renamed to Group
 
 Renamed `Community` to `Group` and `ArtisanCommunityMembership` to `ArtisanGroupMembership`. Groups are no longer tied to a region  the `regionId`, `latitude`, and `longitude` columns have been removed.
@@ -55,7 +106,6 @@ Removed unused craft taxonomy, product, and batch tables to simplify the schema.
 
 ```bash
 pnpm dotenv -e .env.local -- prisma migrate reset
-pnpm db:seed
 ```
 
 ### Cover Photo Support
@@ -72,14 +122,6 @@ pnpm prisma:generate
 ```
 
 No new environment variables required.
-
-### Seed Data
-
-Seed the database with countries and regions (required for the artisan profile location selector):
-
-```bash
-pnpm db:seed
-```
 
 # v0.2.x -> v0.3.0
 

@@ -152,7 +152,7 @@ export function LoginForm() {
                         {t('noAccount')}{' '}
                         <Link
                             href="/register"
-                            className="text-primary hover:underline"
+                            className="text-warm hover:underline"
                         >
                             {t('register')}
                         </Link>
