@@ -4,6 +4,8 @@ import { dataQuerySchema, createDataRecordSchema } from '@/lib/validations/data'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
+import { generateCraftVC } from '@/lib/did/vc'
+import { DOMAIN } from '@/lib/did/config'
 
 export async function GET(request: NextRequest) {
     try {
@@ -70,6 +72,46 @@ export async function POST(request: NextRequest) {
                 data,
             },
         })
+
+        // Issue a Verifiable Credential for the new craft (non-fatal)
+        try {
+            const craftData = record.data as Record<string, unknown>
+            const artisanEmail = (craftData['artisan'] as string) ?? ''
+            const firstMediaId = (craftData['mediaIds'] as string[] | undefined)?.[0] ?? null
+            const firstImageUrl = firstMediaId
+                ? `${process.env.AUTH_URL}/api/media/${firstMediaId}`
+                : null
+
+            const vc = await generateCraftVC(
+                record.id,
+                record.name,
+                record.description ?? '',
+                artisanEmail,
+                record.createdAt.toISOString(),
+                firstImageUrl,
+            )
+
+            const credentialId = `${DOMAIN}/credentials/crafts/${record.id}`
+            await prisma.verifiableCredential.upsert({
+                where: { credentialId },
+                create: {
+                    credentialId,
+                    issuerDid: vc.issuer.id,
+                    holderDid: artisanEmail,
+                    credentialType: 'CraftCredential',
+                    credentialSubject: vc.credentialSubject as object,
+                    proof: vc.proof as object,
+                    issuanceDate: new Date(vc.validFrom),
+                },
+                update: {
+                    credentialSubject: vc.credentialSubject as object,
+                    proof: vc.proof as object,
+                    issuanceDate: new Date(vc.validFrom),
+                },
+            })
+        } catch (vcError) {
+            console.error('VC issuance failed for craft', record.id, vcError)
+        }
 
         return NextResponse.json(record, { status: 201 })
     } catch (error) {

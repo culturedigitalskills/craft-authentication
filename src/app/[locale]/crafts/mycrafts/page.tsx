@@ -86,7 +86,7 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
 
     return (
         <Container>
-            <div className="mb-10 flex items-start justify-between gap-4">
+            <div className="mb-10 flex items-center justify-between gap-4">
                 <div>
                     <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('navbar.myitems')}</h1>
                     <p className="mt-3 text-lg text-muted-foreground">{artisanName}</p>

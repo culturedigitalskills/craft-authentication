@@ -12,6 +12,10 @@ import { QRCode } from '@/components/shared/qrcode';
 import { cookies } from 'next/headers'
 import Gallery from '@/components/craft/Gallery'
 import { QRCopyButton } from '@/components/craft/QRCopyButton'
+import { verifyCraftVC, type CraftCredential } from '@/lib/did/vc'
+// CraftCredential used for proof type cast below
+import { DOMAIN } from '@/lib/did/config'
+import { VerifiableCredentialCard } from '@/components/verifiableCredentialCard/page'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -111,6 +115,24 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
             }))       
           }
               
+            // 4. fetch and verify the craft's Verifiable Credential
+            const credentialId = `${DOMAIN}/credentials/crafts/${id}`
+            const vcRecord = await prisma.verifiableCredential.findUnique({
+                where: { credentialId },
+            })
+
+            let vcVerified: boolean | null = null
+            if (vcRecord) {
+                const proof = vcRecord.proof as CraftCredential['proof']
+                const result = await verifyCraftVC(
+                    vcRecord.credentialSubject as object,
+                    proof,
+                    vcRecord.issuerDid,
+                    proof.created,
+                )
+                vcVerified = result.verified
+            }
+
             return <RenderOneCraftPage craft={data}
             images={images}
             currentPageUrl={currentPageUrl}
@@ -118,6 +140,13 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
             backHref={backHref}
             artisanName={artisanName}
             artisanSlug={artisanSlug}
+            vcRecord={vcRecord ? {
+                credentialId: vcRecord.credentialId,
+                issuanceDate: vcRecord.issuanceDate,
+                issuerDid: vcRecord.issuerDid,
+                holderDid: vcRecord.holderDid,
+            } : null}
+            vcVerified={vcVerified}
              />
         } catch {
           return (
@@ -133,8 +162,15 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
         }
 }
 
-function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, artisanName, artisanSlug}:
-  {craft: any, images: any, currentPageUrl: string, user: any, backHref: string, artisanName: string | null, artisanSlug: string | null}) {
+interface VcData {
+    credentialId: string
+    issuanceDate: Date
+    issuerDid: string
+    holderDid: string
+}
+
+function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, artisanName, artisanSlug, vcRecord, vcVerified}:
+  {craft: any, images: any, currentPageUrl: string, user: any, backHref: string, artisanName: string | null, artisanSlug: string | null, vcRecord: VcData | null, vcVerified: boolean | null}) {
 
     const t = useTranslations();
     const craftEditUrl = `create?id=${craft.id}`;
@@ -147,13 +183,11 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
     <Container>
       {/* Top bar: back link + edit button */}
       <div className="mb-8 flex items-center justify-between">
-        <Link
-            href={backHref}
-            aria-label={t('crafts.details.backToCrafts')}
-            className="inline-flex rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
+        <Button variant="ghost" size="icon" asChild>
+          <Link href={backHref} aria-label={t('crafts.details.backToCrafts')}>
             <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-        </Link>
+          </Link>
+        </Button>
         {user === craft?.data['artisan'] && (
           <Button asChild>
             <Link href={craftEditUrl}>{t('createCraft.editCraftTitle')}</Link>
@@ -279,6 +313,14 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
                 {currentPageUrl}
               </p>
               <QRCopyButton url={currentPageUrl} label={t('crafts.details.copyLink')} copiedLabel={t('crafts.details.linkCopied')} />
+              <VerifiableCredentialCard
+                credentialId={vcRecord?.credentialId ?? null}
+                issuanceDate={vcRecord?.issuanceDate ?? null}
+                issuerName="Sustainable Crafting Registry"
+                holderDid={vcRecord?.holderDid ?? null}
+                verified={vcVerified}
+                craftId={craft.id ?? null}
+              />
             </CardContent>
           </Card>
 
