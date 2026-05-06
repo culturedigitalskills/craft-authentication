@@ -47,7 +47,7 @@
   "about": {
     "title": "About SustainableCrafting",
     "missionTitle": "Our Mission",
-    "missionDescription": "At SustainableCrafting, our mission is to empower artisans worldwide by providing a platform that connects them directly with customers. We believe in preserving traditional crafts while promoting sustainability and authenticity in the global marketplace.",
+    "missionDescription": "SustainableCrafting olarak, dünya genelindeki zanaatkârlara el yapımı ürünlerini belgelemek, birbirleriyle bağlantı kurmak ve sosyoekonomik faaliyetlerini desteklemek için dijital bir platform sunuyoruz. Her el sanatları geleneğinde var olan bilgiyi, becerileri ve kültürel mirası korumaya inanıyoruz. Misyonumuz; özgünlüğü savunmak, el yapımı her nesnenin arkasındaki insani hikâyeyi kutlamak ve onları yaratan usta zanaatkâr elleri çok sık unutuveren küresel bir pazarda sürdürülebilirliği teşvik etmektir.",
     "viewRepository" : "View our GitHub Repository",
     "keyFeatures" : "The database includes a Prisma wired to Postgres via env-driven URLs for dev and Docker. UI includes the shadcn/ui with Tailwind v3, radix primitives, and reusable utilities. All packaged in a Docker container for easy deployment.",
     "privacyPolicy": "Privacy Policy",
