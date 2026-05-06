@@ -1,3 +1,33 @@
+# v0.7.x -> v0.8.0
+
+### Verifiable Credentials
+
+Each craft now automatically receives a signed W3C Verifiable Credential (VC) on creation. Credentials are served publicly and can be verified independently without a database lookup.
+
+**New API endpoints**:
+- `GET /api/vc/[craftId]` — download the signed credential JSON for a craft
+- `POST /api/vc/verify` — verify a credential JSON without a database lookup
+- `GET /.well-known/did.json` — public DID document for `did:web` resolution
+
+**New page**: `GET /verify` — standalone credential verification page (no login required)
+
+**Configuration changes** — add to `.env.local` and `.env.production`:
+
+```env
+VC_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+VC_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n"
+```
+
+Generate the key pair once with:
+
+```bash
+node -e "const {generateKeyPairSync}=require('crypto');const {privateKey,publicKey}=generateKeyPairSync('rsa',{modulusLength:2048,publicKeyEncoding:{type:'spki',format:'pem'},privateKeyEncoding:{type:'pkcs8',format:'pem'}});console.log('VC_PRIVATE_KEY='+JSON.stringify(privateKey));console.log('VC_PUBLIC_KEY='+JSON.stringify(publicKey));"
+```
+
+> **Important**: add the keys to `.env` before the first craft is created after deployment. Crafts created without the keys will show "Certificate pending" and cannot be retroactively issued a credential without manual intervention.
+
+No database migrations required the `VerifiableCredential` table already exists in the schema.
+
 # v0.6.x -> v0.7.0
 
 ### Static Location Data
@@ -50,7 +80,7 @@ Description
 Completed the Groups feature (Phases 5–7) and replaced placeholder group flags with a research-backed classification system. Added group photo uploads, artisan self-service, searchable member management, and standardized action button alignment across all forms.
 
 Changes
-Added OrganizationType enum (Cooperative, Collective, Guild, Association, Social
+Added OrganizationType enum (Cooperative, Collective, Guild, Association, Social)
 ### Community Renamed to Group
 
 Renamed `Community` to `Group` and `ArtisanCommunityMembership` to `ArtisanGroupMembership`. Groups are no longer tied to a region  the `regionId`, `latitude`, and `longitude` columns have been removed.
