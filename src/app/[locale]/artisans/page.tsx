@@ -103,8 +103,8 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
 
                         return (
                             <Card key={artisan.id} className="group overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-                                <Link href={`/artisans/${artisan.slug}`} className="block">
                                     <div className="relative aspect-square overflow-hidden bg-muted">
+                                    <Link href={`/artisans/${artisan.slug}`} className="block">
                                         {photoUrl ? (
                                             <Image
                                                 src={photoUrl}
@@ -119,13 +119,15 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                                                 <User className="h-16 w-16 text-muted-foreground/40" />
                                             </div>
                                         )}
+                                    </Link>
                                     </div>
-
                                     <CardContent className="p-4">
+                                        <Link href={`/artisans/${artisan.slug}`} className="block">
+
                                         <h2 className="text-lg font-semibold leading-tight transition-colors group-hover:text-warm">
                                             {artisan.firstName} {artisan.lastName}
                                         </h2>
-
+                                        </Link>
                                         {location && (
                                             <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                                                 <MapPin className="h-3 w-3 shrink-0" />
@@ -146,7 +148,6 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                                             </p>
                                         )}
                                     </CardContent>
-                                </Link>
                             </Card>
                         )
                     })}
