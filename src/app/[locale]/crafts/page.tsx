@@ -88,7 +88,7 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
     q: string
 }) {
     const t = useTranslations()
-
+    console.log('Rendering CraftsPage with crafts:', crafts)
     return (
         <Container>
             <div className="mb-8 text-center">
@@ -109,7 +109,7 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {crafts.map((craft) => (
                         <Card key={craft.id} className="group transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-                            <Link href={`crafts/${craft.id}`} className="block">
+                                <Link href={`crafts/${craft.id}`} className="block">
                                 <div className="relative aspect-square overflow-hidden rounded-t-lg">
                                     {craft.imageUrl ? (
                                         <Image
@@ -133,10 +133,14 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                                         </div>
                                     )}
                                 </div>
+                                </Link>
 
                                 <CardHeader className="pb-2">
                                     <CardTitle className="line-clamp-1 transition-colors group-hover:text-warm">
+                                    <Link href={`crafts/${craft.id}`} className="block">
+    
                                         {craft.title}
+                                    </Link>  
                                     </CardTitle>
                                 </CardHeader>
 
@@ -146,7 +150,9 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                                             <div className="flex items-center gap-1.5 text-sm">
                                                 <User className="h-3 w-3 shrink-0 text-muted-foreground" />
                                                 <span className="text-muted-foreground">{t('crafts.explore.by')}</span>
-                                                <span className="font-medium">{craft.artisanName}</span>
+                                                <Link href={`artisans/${craft.artisanSlug}`}>
+                                                    <span className="font-medium">{craft.artisanName}</span>
+                                                </Link>
                                             </div>
                                         )}
                                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -155,7 +161,6 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                                         </div>
                                     </div>
                                 </CardContent>
-                            </Link>
                         </Card>
                     ))}
                 </div>

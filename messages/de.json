@@ -48,7 +48,7 @@
     "about": {
         "title": "Über SustainableCrafting",
         "missionTitle": "Unsere Mission",
-        "missionDescription": "Bei SustainableCrafting ist es unsere Mission, Kunsthandwerker weltweit zu stärken, indem wir eine Plattform bereitstellen, die sie direkt mit Kunden verbindet. Wir glauben daran, traditionelle Handwerke zu bewahren und gleichzeitig Nachhaltigkeit und Authentizität auf dem globalen Markt zu fördern.",
+        "missionDescription": "Bei SustainableCrafting bieten wir eine digitale Plattform, die Handwerkern weltweit ermöglicht, ihre handgefertigten Produkte zu dokumentieren, sich zu vernetzen und ihre sozioökonomischen Aktivitäten zu unterstützen. Wir glauben an die Bewahrung des Wissens, der Fähigkeiten und des kulturellen Erbes, das in jeder handwerklichen Tradition verwurzelt ist. Unsere Mission ist es, Authentizität zu fördern, die menschliche Geschichte hinter jedem handgefertigten Objekt zu feiern und Nachhaltigkeit in einem globalen Markt zu stärken, der allzu oft die geschickten Handwerkerhände vergisst, die sie erschaffen.",
         "viewRepository": "Unser GitHub-Repository ansehen",
         "keyFeatures": "Die Datenbank umfasst Prisma, das über umgebungsvariable URLs für Entwicklung und Docker mit Postgres verbunden ist. Die Benutzeroberfläche enthält shadcn/ui mit Tailwind v3, Radix-Primitives und wiederverwendbaren Hilfsfunktionen. Alles ist in einem Docker-Container für eine einfache Bereitstellung verpackt.",
         "privacyPolicy": "Datenschutzerklärung",

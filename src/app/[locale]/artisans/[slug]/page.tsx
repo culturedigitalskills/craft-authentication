@@ -161,7 +161,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         : null
 
     return (
-        <div className="-mt-16">
+        <div className="">
             {/* ── Hero Banner ── */}
             <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-16 pt-24">
                 {coverUrl ? (
