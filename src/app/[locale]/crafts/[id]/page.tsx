@@ -178,6 +178,9 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
       url: image.url,
       alt: image.name ?? craft?.data['name'],
     })) ?? []
+    const galleryVideos: string[] = Array.isArray(craft?.data?.['videos'])
+      ? (craft.data['videos'] as string[]).filter(Boolean)
+      : []
 
     return (
     <Container>
@@ -215,7 +218,7 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
 
         {/* Left: gallery only */}
         <div>
-          <Gallery images={galleryImages} />
+          <Gallery images={galleryImages} videos={galleryVideos} />
         </div>
 
         {/* Right: details */}

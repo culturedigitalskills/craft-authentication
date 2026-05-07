@@ -148,6 +148,7 @@
         "changePhoto": "Cambiar foto",
         "photoUploading": "Subiendo...",
         "photoUploadFailed": "Error al subir la foto",
+        "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
         "personalInfo": "Información personal",
         "craftExperience": "Experiencia artesanal",
         "location": "Ubicación",
@@ -170,7 +171,16 @@
         "leaveGroup": "Salir",
         "confirmLeave": "Confirmar Salida",
         "leaveGroupFailed": "Error al salir del grupo",
-        "cancel": "Cancelar"
+        "cancel": "Cancelar",
+        "socialAndHashtags": "Redes Sociales y Hashtags",
+        "socialInstagram": "Instagram",
+        "socialFacebook": "Facebook",
+        "socialTwitter": "X (Twitter)",
+        "socialTiktok": "TikTok",
+        "socialYoutube": "YouTube",
+        "socialWebsite": "Sitio web",
+        "hashtags": "Hashtags",
+        "addHashtag": "Añadir hashtag"
     },
     "artisanProfile": {
         "about": "Acerca de",
@@ -182,7 +192,8 @@
         "galleryEmpty": "Aún no hay fotos en la galería",
         "groups": "Comunidades",
         "crafts": "Artesanías",
-        "noCrafts": "Aún no hay artesanías públicas."
+        "noCrafts": "Aún no hay artesanías públicas.",
+        "connectWith": "Conectar"
     },
     "artisans": {
         "title": "Artesanos",
@@ -225,6 +236,7 @@
         "createGroupHelper": "Configura un nuevo grupo artesanal, cooperativa o gremio.",
         "editGroup": "Editar Grupo",
         "deleteGroup": "Eliminar Grupo",
+        "deleteConfirm": "¿Estás seguro? Esto no se puede deshacer.",
         "groupName": "Nombre del Grupo",
         "description": "Descripción",
         "website": "Sitio Web",
@@ -266,6 +278,7 @@
         "memberAdded": "Miembro agregado exitosamente",
         "memberRemoved": "Miembro eliminado exitosamente",
         "saveFailed": "Error al guardar el grupo",
+        "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
         "deleteFailed": "Error al eliminar el grupo",
         "viewGroup": "Ver Grupo",
         "searchArtisan": "Buscar artesano por nombre...",
@@ -280,6 +293,17 @@
         "createCraftHelper": "Comparte tu artesanía con el mundo: añade un título, descripción y fotos.",
         "createEdittHelper": "Actualiza los detalles de tu artesanía a continuación.",
         "createCraftMakeLocationPublic": "Compartir mi ubicación aproximada con los visitantes",
-        "deleteCraftConfirm": "¿Eliminar esta artesanía? Esto no se puede deshacer."
+        "deleteCraftConfirm": "¿Eliminar esta artesanía? Esto no se puede deshacer.",
+        "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
+        "deleteImage": "Eliminar imagen",
+        "deleteImageConfirm": "¿Eliminar esta imagen?",
+        "deleteImageYes": "Eliminar",
+        "deleteImageNo": "Cancelar",
+        "deleteImageFailed": "No se pudo eliminar la imagen. Por favor, inténtelo de nuevo.",
+        "videosLabel": "Videos de YouTube",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "Añadir",
+        "removeVideo": "Eliminar video",
+        "invalidYoutubeUrl": "No se pudo reconocer como un enlace de YouTube."
     }
 }

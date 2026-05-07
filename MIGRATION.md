@@ -1,3 +1,20 @@
+# v0.8.x -> v0.9.0
+
+### Artisan Social Fields
+
+Added social media handles, website, and hashtags to the `Artisan` model.
+
+**New columns on `Artisan`**:
+- `socialInstagram` (optional, max 100 chars)
+- `socialFacebook` (optional, max 100 chars)
+- `socialTwitter` (optional, max 100 chars)
+- `socialTiktok` (optional, max 100 chars)
+- `socialYoutube` (optional, max 100 chars)
+- `website` (optional, max 255 chars)
+- `hashtags` (String array, defaults to `[]`)
+
+
+
 # v0.7.x -> v0.8.0
 
 ### Verifiable Credentials

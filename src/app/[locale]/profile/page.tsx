@@ -21,6 +21,13 @@ export default async function ProfilePage() {
             learningSource: true,
             country: true,
             region: true,
+            socialInstagram: true,
+            socialFacebook: true,
+            socialTwitter: true,
+            socialTiktok: true,
+            socialYoutube: true,
+            website: true,
+            hashtags: true,
         },
     })
 

@@ -149,6 +149,7 @@
         "changePhoto": "Change Photo",
         "photoUploading": "Uploading...",
         "photoUploadFailed": "Failed to upload photo",
+        "fileTooLarge": "Image is too large. Maximum size is 8 MB.",
         "personalInfo": "Personal Information",
         "craftExperience": "Craft Experience",
         "location": "Location",
@@ -171,7 +172,16 @@
         "leaveGroup": "Leave",
         "confirmLeave": "Confirm Leave",
         "leaveGroupFailed": "Failed to leave group",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "socialAndHashtags": "Social & Hashtags",
+        "socialInstagram": "Instagram",
+        "socialFacebook": "Facebook",
+        "socialTwitter": "X (Twitter)",
+        "socialTiktok": "TikTok",
+        "socialYoutube": "YouTube",
+        "socialWebsite": "Website",
+        "hashtags": "Hashtags",
+        "addHashtag": "Add hashtag"
     },
     "artisans": {
         "title": "Artisans",
@@ -194,7 +204,8 @@
         "galleryEmpty": "No gallery photos yet",
         "groups": "Communities",
         "crafts": "Crafts",
-        "noCrafts": "No public crafts yet."
+        "noCrafts": "No public crafts yet.",
+        "connectWith": "Connect"
     },
     "crafts": {
         "welcomeTitle": "Gallery of Crafts",
@@ -263,7 +274,18 @@
         "craftUpdateSuccess": "Craft updated successfully!",
         "createCraftDescriptionPlaceholder": "What materials, techniques, or story makes this craft special?",
         "selectMaterial": "Choose a material...",
-        "deleteCraftConfirm": "Delete this craft? This cannot be undone."
+        "deleteCraftConfirm": "Delete this craft? This cannot be undone.",
+        "fileTooLarge": "Image is too large. Maximum size is 8 MB.",
+        "deleteImage": "Remove image",
+        "deleteImageConfirm": "Remove this image?",
+        "deleteImageYes": "Remove",
+        "deleteImageNo": "Cancel",
+        "deleteImageFailed": "Failed to remove image. Please try again.",
+        "videosLabel": "YouTube videos",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "Add",
+        "removeVideo": "Remove video",
+        "invalidYoutubeUrl": "Could not recognize that as a YouTube link."
     },
     "groups": {
         "title": "Artisan Communities",
@@ -273,6 +295,7 @@
         "createGroupHelper": "Set up a new artisan community, cooperative, or guild.",
         "editGroup": "Edit Community",
         "deleteGroup": "Delete Community",
+        "deleteConfirm": "Are you sure? This cannot be undone.",
         "groupName": "Community Name",
         "description": "Description",
         "website": "Website",
@@ -314,6 +337,7 @@
         "memberAdded": "Member added successfully",
         "memberRemoved": "Member removed successfully",
         "saveFailed": "Failed to save community",
+        "fileTooLarge": "Image is too large. Maximum size is 8 MB.",
         "deleteFailed": "Failed to delete community",
         "viewGroup": "View Community",
         "searchArtisan": "Search artisan by name...",

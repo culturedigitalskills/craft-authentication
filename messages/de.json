@@ -148,6 +148,7 @@
         "changePhoto": "Foto ändern",
         "photoUploading": "Wird hochgeladen...",
         "photoUploadFailed": "Foto-Upload fehlgeschlagen",
+        "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist 8 MB.",
         "personalInfo": "Persönliche Informationen",
         "craftExperience": "Handwerkserfahrung",
         "location": "Standort",
@@ -170,7 +171,16 @@
         "leaveGroup": "Verlassen",
         "confirmLeave": "Verlassen bestätigen",
         "leaveGroupFailed": "Gruppe konnte nicht verlassen werden",
-        "cancel": "Abbrechen"
+        "cancel": "Abbrechen",
+        "socialAndHashtags": "Soziale Medien & Hashtags",
+        "socialInstagram": "Instagram",
+        "socialFacebook": "Facebook",
+        "socialTwitter": "X (Twitter)",
+        "socialTiktok": "TikTok",
+        "socialYoutube": "YouTube",
+        "socialWebsite": "Website",
+        "hashtags": "Hashtags",
+        "addHashtag": "Hashtag hinzufügen"
     },
     "artisanProfile": {
         "about": "Über",
@@ -182,7 +192,8 @@
         "galleryEmpty": "Noch keine Galeriefotos",
         "groups": "Gemeinschaften",
         "crafts": "Handwerke",
-        "noCrafts": "Noch keine öffentlichen Handwerke."
+        "noCrafts": "Noch keine öffentlichen Handwerke.",
+        "connectWith": "Verbinden"
     },
     "artisans": {
         "title": "Kunsthandwerker",
@@ -225,6 +236,7 @@
         "createGroupHelper": "Erstellen Sie eine neue Handwerkergruppe, Genossenschaft oder Zunft.",
         "editGroup": "Gruppe bearbeiten",
         "deleteGroup": "Gruppe löschen",
+        "deleteConfirm": "Bist du sicher? Dies kann nicht rückgängig gemacht werden.",
         "groupName": "Gruppenname",
         "description": "Beschreibung",
         "website": "Webseite",
@@ -266,6 +278,7 @@
         "memberAdded": "Mitglied erfolgreich hinzugefügt",
         "memberRemoved": "Mitglied erfolgreich entfernt",
         "saveFailed": "Gruppe konnte nicht gespeichert werden",
+        "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist 8 MB.",
         "deleteFailed": "Gruppe konnte nicht gelöscht werden",
         "viewGroup": "Gruppe ansehen",
         "searchArtisan": "Handwerker nach Namen suchen...",
@@ -280,6 +293,17 @@
         "createCraftHelper": "Teile dein Handwerk mit der Welt — füge Titel, Beschreibung und Fotos hinzu.",
         "createEdittHelper": "Aktualisiere die Details deines Handwerks.",
         "createCraftMakeLocationPublic": "Meinen ungefähren Standort mit Besuchern teilen",
-        "deleteCraftConfirm": "Dieses Handwerk löschen? Dies kann nicht rückgängig gemacht werden."
+        "deleteCraftConfirm": "Dieses Handwerk löschen? Dies kann nicht rückgängig gemacht werden.",
+        "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist 8 MB.",
+        "deleteImage": "Bild entfernen",
+        "deleteImageConfirm": "Dieses Bild entfernen?",
+        "deleteImageYes": "Entfernen",
+        "deleteImageNo": "Abbrechen",
+        "deleteImageFailed": "Bild konnte nicht entfernt werden. Bitte versuchen Sie es erneut.",
+        "videosLabel": "YouTube-Videos",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "Hinzufügen",
+        "removeVideo": "Video entfernen",
+        "invalidYoutubeUrl": "Konnte nicht als YouTube-Link erkannt werden."
     }
 }

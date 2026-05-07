@@ -50,7 +50,7 @@ export default async function LocaleLayout({ children, params }: Props) {
                     geistMono.variable,
                 )}
             >
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                <ThemeProvider attribute="class" defaultTheme="light">
                     <SessionProvider>
                         <NextIntlClientProvider messages={messages}>
                             <div className="flex min-h-screen flex-col">

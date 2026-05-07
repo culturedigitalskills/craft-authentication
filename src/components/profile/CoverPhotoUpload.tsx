@@ -26,6 +26,12 @@ export function CoverPhotoUpload({
         const file = e.target.files?.[0]
         if (!file) return
 
+        if (file.size > 8 * 1024 * 1024) {
+            setError(t('fileTooLarge'))
+            e.target.value = ''
+            return
+        }
+
         setError(null)
         setIsUploading(true)
 

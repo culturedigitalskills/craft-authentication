@@ -156,6 +156,13 @@ model Artisan {
     learningSource    String?
     latitude          Float?
     longitude         Float?
+    socialInstagram   String?                      @db.VarChar(100)
+    socialFacebook    String?                      @db.VarChar(100)
+    socialTwitter     String?                      @db.VarChar(100)
+    socialTiktok      String?                      @db.VarChar(100)
+    socialYoutube     String?                      @db.VarChar(100)
+    website           String?                      @db.VarChar(255)
+    hashtags          String[]                     @default([])
     createdAt         DateTime                     @default(now())
     updatedAt         DateTime                     @updatedAt
     deletedAt         DateTime?

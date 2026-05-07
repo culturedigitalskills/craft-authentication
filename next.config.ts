@@ -4,6 +4,11 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const withNextIntl = createNextIntlPlugin('./src/i8n/requests.tsx')
 const nextConfig: NextConfig = {
     output: 'standalone',
+    experimental: {
+        serverActions: {
+            bodySizeLimit: '10mb',
+        },
+    },
     // Keep these as external packages so Next.js does not bundle them into the
     // server chunk. This ensures they are traced into the standalone node_modules
     // and remain resolvable by other scripts in the container (e.g. seed.mjs).

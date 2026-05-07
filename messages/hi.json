@@ -149,6 +149,7 @@
         "changePhoto": "फ़ोटो बदलें",
         "photoUploading": "अपलोड हो रहा है...",
         "photoUploadFailed": "फ़ोटो अपलोड करने में विफल",
+        "fileTooLarge": "छवि बहुत बड़ी है। अधिकतम आकार 8 MB है।",
         "personalInfo": "व्यक्तिगत जानकारी",
         "craftExperience": "शिल्प अनुभव",
         "location": "स्थान",
@@ -171,7 +172,16 @@
         "leaveGroup": "छोड़ें",
         "confirmLeave": "छोड़ने की पुष्टि करें",
         "leaveGroupFailed": "समूह छोड़ने में विफल",
-        "cancel": "रद्द करें"
+        "cancel": "रद्द करें",
+        "socialAndHashtags": "सोशल मीडिया और हैशटैग",
+        "socialInstagram": "इंस्टाग्राम",
+        "socialFacebook": "फेसबुक",
+        "socialTwitter": "एक्स (ट्विटर)",
+        "socialTiktok": "टिकटॉक",
+        "socialYoutube": "यूट्यूब",
+        "socialWebsite": "वेबसाइट",
+        "hashtags": "हैशटैग",
+        "addHashtag": "हैशटैग जोड़ें"
     },
     "artisanProfile": {
         "about": "के बारे में",
@@ -183,7 +193,8 @@
         "galleryEmpty": "अभी तक कोई गैलरी फ़ोटो नहीं",
         "groups": "समुदाय",
         "crafts": "शिल्प",
-        "noCrafts": "अभी तक कोई सार्वजनिक शिल्प नहीं।"
+        "noCrafts": "अभी तक कोई सार्वजनिक शिल्प नहीं।",
+        "connectWith": "जुड़ें"
     },
     "artisans": {
         "title": "कारीगर",
@@ -226,6 +237,7 @@
         "createGroupHelper": "एक नया कारीगर समूह, सहकारी या श्रेणी बनाएं।",
         "editGroup": "समूह संपादित करें",
         "deleteGroup": "समूह हटाएं",
+        "deleteConfirm": "क्या आप सुनिश्चित हैं? यह पूर्ववत नहीं किया जा सकता।",
         "groupName": "समूह का नाम",
         "description": "विवरण",
         "website": "वेबसाइट",
@@ -267,6 +279,7 @@
         "memberAdded": "सदस्य सफलतापूर्वक जोड़ा गया",
         "memberRemoved": "सदस्य सफलतापूर्वक हटाया गया",
         "saveFailed": "समूह सहेजने में विफल",
+        "fileTooLarge": "छवि बहुत बड़ी है। अधिकतम आकार 8 MB है।",
         "deleteFailed": "समूह हटाने में विफल",
         "viewGroup": "समूह देखें",
         "searchArtisan": "नाम से कारीगर खोजें...",
@@ -281,6 +294,17 @@
         "createCraftHelper": "अपने शिल्प को दुनिया के साथ साझा करें — शीर्षक, विवरण और फ़ोटो जोड़ें।",
         "createEdittHelper": "नीचे अपने शिल्प का विवरण अपडेट करें।",
         "createCraftMakeLocationPublic": "आगंतुकों के साथ मेरा अनुमानित स्थान साझा करें",
-        "deleteCraftConfirm": "इस शिल्प को हटाएं? यह पूर्ववत नहीं किया जा सकता।"
+        "deleteCraftConfirm": "इस शिल्प को हटाएं? यह पूर्ववत नहीं किया जा सकता।",
+        "fileTooLarge": "छवि बहुत बड़ी है। अधिकतम आकार 8 MB है।",
+        "deleteImage": "छवि हटाएं",
+        "deleteImageConfirm": "इस छवि को हटाएं?",
+        "deleteImageYes": "हटाएं",
+        "deleteImageNo": "रद्द करें",
+        "deleteImageFailed": "छवि हटाने में विफल। कृपया पुनः प्रयास करें।",
+        "videosLabel": "YouTube वीडियो",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "जोड़ें",
+        "removeVideo": "वीडियो हटाएं",
+        "invalidYoutubeUrl": "इसे YouTube लिंक के रूप में नहीं पहचाना जा सका।"
     }
 }

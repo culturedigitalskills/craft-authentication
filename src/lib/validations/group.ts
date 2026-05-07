@@ -22,7 +22,7 @@ const CertificationEnum = z.enum([
 ])
 
 export const CreateGroupSchema = z.object({
-    name: z.string().min(1, 'Group name is required').max(200),
+    name: z.string().min(1, 'Group name is required').max(200).regex(/\D/, 'Name must contain at least one letter'),
     description: z.string().max(2000).optional(),
     website: z.string().url('Must be a valid URL').max(500).optional().or(z.literal('')),
     location: z.string().max(255).optional(),
@@ -34,7 +34,7 @@ export const CreateGroupSchema = z.object({
 })
 
 export const UpdateGroupSchema = z.object({
-    name: z.string().min(1).max(200).optional(),
+    name: z.string().min(1).max(200).regex(/\D/, 'Name must contain at least one letter').optional(),
     description: z.string().max(2000).optional(),
     website: z.string().url('Must be a valid URL').max(500).optional().or(z.literal('')),
     location: z.string().max(255).optional(),

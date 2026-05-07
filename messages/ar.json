@@ -148,6 +148,7 @@
         "changePhoto": "تغيير الصورة",
         "photoUploading": "جارٍ الرفع...",
         "photoUploadFailed": "فشل رفع الصورة",
+        "fileTooLarge": "الصورة كبيرة جدًا. الحجم الأقصى هو 8 ميجابايت.",
         "personalInfo": "المعلومات الشخصية",
         "craftExperience": "الخبرة الحرفية",
         "location": "الموقع",
@@ -170,7 +171,16 @@
         "leaveGroup": "مغادرة",
         "confirmLeave": "تأكيد المغادرة",
         "leaveGroupFailed": "فشل في مغادرة المجموعة",
-        "cancel": "إلغاء"
+        "cancel": "إلغاء",
+        "socialAndHashtags": "التواصل الاجتماعي والوسوم",
+        "socialInstagram": "إنستغرام",
+        "socialFacebook": "فيسبوك",
+        "socialTwitter": "إكس (تويتر)",
+        "socialTiktok": "تيك توك",
+        "socialYoutube": "يوتيوب",
+        "socialWebsite": "الموقع الإلكتروني",
+        "hashtags": "الوسوم",
+        "addHashtag": "إضافة وسم"
     },
     "artisanProfile": {
         "about": "نبذة",
@@ -182,7 +192,8 @@
         "galleryEmpty": "لا توجد صور في المعرض بعد",
         "groups": "المجتمعات",
         "crafts": "الحِرف",
-        "noCrafts": "لا توجد حِرف عامة بعد."
+        "noCrafts": "لا توجد حِرف عامة بعد.",
+        "connectWith": "تواصل"
     },
     "artisans": {
         "title": "الحرفيون",
@@ -225,6 +236,7 @@
         "createGroupHelper": "أنشئ مجموعة حرفية أو تعاونية أو نقابة جديدة.",
         "editGroup": "تعديل المجموعة",
         "deleteGroup": "حذف المجموعة",
+        "deleteConfirm": "هل أنت متأكد؟ لا يمكن التراجع عن هذا.",
         "groupName": "اسم المجموعة",
         "description": "الوصف",
         "website": "الموقع الإلكتروني",
@@ -266,6 +278,7 @@
         "memberAdded": "تمت إضافة العضو بنجاح",
         "memberRemoved": "تمت إزالة العضو بنجاح",
         "saveFailed": "فشل في حفظ المجموعة",
+        "fileTooLarge": "الصورة كبيرة جدًا. الحجم الأقصى هو 8 ميجابايت.",
         "deleteFailed": "فشل في حذف المجموعة",
         "viewGroup": "عرض المجموعة",
         "searchArtisan": "ابحث عن حرفي بالاسم...",
@@ -280,6 +293,17 @@
         "createCraftHelper": "شارك حرفتك مع العالم — أضف عنواناً ووصفاً وصوراً.",
         "createEdittHelper": "حدّث تفاصيل حرفتك أدناه.",
         "createCraftMakeLocationPublic": "مشاركة موقعي التقريبي مع الزوار",
-        "deleteCraftConfirm": "حذف هذه الحرفة؟ لا يمكن التراجع عن هذا."
+        "deleteCraftConfirm": "حذف هذه الحرفة؟ لا يمكن التراجع عن هذا.",
+        "fileTooLarge": "الصورة كبيرة جدًا. الحجم الأقصى هو 8 ميجابايت.",
+        "deleteImage": "إزالة الصورة",
+        "deleteImageConfirm": "إزالة هذه الصورة؟",
+        "deleteImageYes": "إزالة",
+        "deleteImageNo": "إلغاء",
+        "deleteImageFailed": "فشل في إزالة الصورة. يرجى المحاولة مرة أخرى.",
+        "videosLabel": "مقاطع فيديو يوتيوب",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "إضافة",
+        "removeVideo": "إزالة الفيديو",
+        "invalidYoutubeUrl": "تعذر التعرف على ذلك كرابط يوتيوب."
     }
 }

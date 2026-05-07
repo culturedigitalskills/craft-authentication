@@ -111,6 +111,13 @@ export async function POST(request: NextRequest) {
                 country: validatedData.country,
                 region: validatedData.region,
                 slug,
+                socialInstagram: validatedData.socialInstagram,
+                socialFacebook: validatedData.socialFacebook,
+                socialTwitter: validatedData.socialTwitter,
+                socialTiktok: validatedData.socialTiktok,
+                socialYoutube: validatedData.socialYoutube,
+                website: validatedData.website,
+                hashtags: validatedData.hashtags ?? [],
             },
         })
 

@@ -149,6 +149,7 @@
       "changePhoto": "Change Photo",
       "photoUploading": "Uploading...",
       "photoUploadFailed": "Failed to upload photo",
+      "fileTooLarge": "Resim çok büyük. Maksimum boyut 8 MB.",
       "personalInfo": "Personal Information",
       "craftExperience": "Craft Experience",
       "location": "Location",
@@ -164,7 +165,16 @@
       "galleryDeleteFailed": "Failed to delete gallery photo",
       "galleryDeleteConfirm": "Delete this photo?",
       "galleryDeleteYes": "Delete",
-      "galleryDeleteNo": "Cancel"
+      "galleryDeleteNo": "Cancel",
+      "socialAndHashtags": "Sosyal Medya ve Hashtagler",
+      "socialInstagram": "Instagram",
+      "socialFacebook": "Facebook",
+      "socialTwitter": "X (Twitter)",
+      "socialTiktok": "TikTok",
+      "socialYoutube": "YouTube",
+      "socialWebsite": "Web Sitesi",
+      "hashtags": "Hashtagler",
+      "addHashtag": "Hashtag ekle"
     },
     "artisanProfile": {
       "about": "About",
@@ -176,7 +186,8 @@
       "galleryEmpty": "No gallery photos yet",
       "groups": "Communities",
       "crafts": "Crafts",
-      "noCrafts": "No public crafts yet."
+      "noCrafts": "No public crafts yet.",
+      "connectWith": "Bağlan"
     },
     "artisans": {
       "title": "Artisans",
@@ -253,9 +264,19 @@
         "savingCraft": "Saving craft...",
         "updatingCraft": "Updating craft...",
         "craftCreateSuccess": "Craft created successfully!",
-        "craftUpdateSuccess": "Craft updated successfully!" 
-
-    },    
+        "craftUpdateSuccess": "Craft updated successfully!",
+        "fileTooLarge": "Resim çok büyük. Maksimum boyut 8 MB.",
+        "deleteImage": "Resmi kaldır",
+        "deleteImageConfirm": "Bu resmi kaldırmak istiyor musunuz?",
+        "deleteImageYes": "Kaldır",
+        "deleteImageNo": "İptal",
+        "deleteImageFailed": "Resim kaldırılamadı. Lütfen tekrar deneyin.",
+        "videosLabel": "YouTube videoları",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "Ekle",
+        "removeVideo": "Videoyu kaldır",
+        "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı."
+    },
     "materials":{
       "selectOne" : "Select one:",
       "wool" : "Wool",
