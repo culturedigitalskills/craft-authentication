@@ -13,7 +13,7 @@ export default function OnboardingPage() {
 
                 <div className="grid gap-4 sm:grid-cols-2">
                     <Link
-                        href="/profile"
+                        href="/onboarding/artisan"
                         className="group flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8 text-center transition-colors hover:border-primary hover:bg-primary/5"
                     >
                         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary/20">
