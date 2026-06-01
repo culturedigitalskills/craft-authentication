@@ -3,7 +3,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
@@ -75,6 +75,14 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     >
                         <FolderUp className="h-4 w-4" />
                         {t('addcraft')}
+                    </Link>
+                    <Link
+                        href="/onboarding/story"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <BookOpen className="h-4 w-4" />
+                        {t('mystory')}
                     </Link>
 
                     <div className="my-1 border-t border-border" />
@@ -179,6 +187,14 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         >
                             <FolderUp className="h-4 w-4 text-muted-foreground" />
                             {t('addcraft')}
+                        </Link>
+                        <Link
+                            href="/onboarding/story"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <BookOpen className="h-4 w-4 text-muted-foreground" />
+                            {t('mystory')}
                         </Link>
                     </div>
 

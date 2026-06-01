@@ -17,6 +17,7 @@
         "myitems": "Mis Artesanías",
         "mygroups": "Mis Comunidades",
         "addcraft": "Agregar Artesanía",
+        "mystory": "Mi historia",
         "createGroup": "Crear Comunidad"
     },
     "auth": {
@@ -141,6 +142,79 @@
         "step6Hint": "Echa un vistazo rápido. Puedes editar todo más tarde desde tu página de perfil.",
         "reviewName": "Nombre",
         "reviewPhotos": "Fotos"
+    },
+    "craftStory": {
+        "stepLabel": "Paso {current} de {total}",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "begin": "Comenzar",
+        "saveExit": "Guardar y salir",
+        "saving": "Guardando...",
+        "publish": "Publicar mi historia",
+        "publishing": "Publicando...",
+        "writeYourAnswer": "Escribe tu respuesta",
+        "answerPlaceholder": "Tómate tu tiempo. Habla con naturalidad. No hay respuestas incorrectas.",
+        "questionLabel": "Pregunta {index}",
+        "publicHeading": "En sus propias palabras",
+        "publicTitle": "La historia de este oficio",
+        "errors": {
+            "saveFailed": "No pudimos guardar tu progreso. Inténtalo de nuevo.",
+            "publishFailed": "No pudimos publicar tu historia. Inténtalo de nuevo.",
+            "emptyStory": "Agrega al menos una respuesta escrita, una grabación o una foto del taller antes de publicar.",
+            "conflict": "Tu historia se actualizó en otra ventana. Recarga esta página para ver la última versión."
+        },
+        "banner": {
+            "startTitle": "Comparte la historia de tu oficio",
+            "startBody": "Cuéntanos sobre tu oficio con tus propias palabras, escribiendo, hablando o grabando.",
+            "startCta": "Comenzar mi historia",
+            "continueTitle": "Continúa tu historia",
+            "continueBody": "Estás en el paso {current} de {total}. Continúa desde donde lo dejaste.",
+            "continueCta": "Continuar",
+            "publishedBadge": "Tu historia está publicada",
+            "publishedBody": "Los visitantes pueden leerla en tu perfil público. Puedes seguir editándola cuando quieras.",
+            "view": "Ver",
+            "edit": "Editar"
+        },
+        "intro": {
+            "title": "Guía para compartir la historia de tu oficio",
+            "lead": "Esta página te ayudará a contar la historia de tu oficio con tus propias palabras. Estas preguntas solo están aquí para guiarte. Por favor habla con naturalidad y añade cualquier cosa que sientas importante.",
+            "formatsTitle": "Puedes compartir tu historia como:",
+            "formatText": "Texto escrito",
+            "formatAudio": "Grabación de audio",
+            "formatVideo": "Grabación de video",
+            "encouragement": "Por favor responde con tus propias palabras, como si le estuvieras contando tu historia a alguien que quiere entender tu oficio."
+        },
+        "step1": { "title": "Sobre ti", "prompt": "¿Puedes contarnos quién eres y cómo aprendiste este oficio?" },
+        "step2": { "title": "Sobre tu oficio", "prompt": "¿Puedes explicar tu oficio en palabras sencillas, incluyendo de dónde viene, cómo se hace y para qué sirve?" },
+        "step3": { "title": "Sentimientos, significado y conexiones", "prompt": "¿Qué significa este oficio para ti? ¿Hay sentimientos, eventos, tradiciones, símbolos o historias conectadas con él?" },
+        "step4": { "title": "Beneficios y oportunidades", "prompt": "¿Qué te ha dado este oficio a ti, a tu familia o a tu comunidad?" },
+        "step5": { "title": "Transmisión de conocimiento y futuras generaciones", "prompt": "¿Cómo se transmite este oficio a las personas más jóvenes? ¿Crees que puede continuar en el futuro?" },
+        "step6": { "title": "Desafíos y barreras", "prompt": "¿Qué dificultades enfrentas al practicar este oficio? ¿Qué tipo de apoyo ayudaría a mantenerlo vivo?" },
+        "step7": { "title": "Taller, herramientas y proceso", "prompt": "Graba o fotografía por separado tu taller, tus herramientas, tus materiales, cómo haces tu oficio y el lugar donde trabajas.", "saveFirst": "Guarda primero una respuesta en un paso anterior, luego vuelve para agregar fotos del taller." },
+        "review": {
+            "title": "Revisa tu historia",
+            "lead": "Echa un vistazo a lo que has compartido. Puedes volver y editar cualquier cosa antes de publicar.",
+            "notAnswered": "Sin responder",
+            "hasRecording": "Grabación adjunta",
+            "workshopCount": "{count, plural, =0 {Aún sin archivos} one {1 archivo} other {# archivos}}"
+        },
+        "uploader": {
+            "label": "O graba audio / video",
+            "chooseFile": "Elegir audio o video",
+            "replace": "Reemplazar grabación",
+            "remove": "Quitar",
+            "uploading": "Subiendo...",
+            "uploadFailed": "La subida falló. Inténtalo de nuevo.",
+            "hint": "MP3, WAV, MP4 o WebM. Hasta {max} MB."
+        },
+        "workshop": {
+            "addFile": "Agregar foto o video",
+            "removeItem": "Quitar",
+            "videoLabel": "Video",
+            "itemAlt": "Imagen del taller o del proceso",
+            "uploadFailed": "La subida falló. Inténtalo de nuevo.",
+            "deleteFailed": "No se pudo eliminar ese archivo. Inténtalo de nuevo."
+        }
     },
     "profile": {
         "title": "Perfil de Artesano",

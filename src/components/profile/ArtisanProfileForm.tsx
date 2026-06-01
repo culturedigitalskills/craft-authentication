@@ -13,6 +13,7 @@ import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
 import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
+import { CraftStoryBanner, type CraftStoryBannerProps } from './CraftStoryBanner'
 import {
     ArrowLeft,
     MapPin,
@@ -71,9 +72,10 @@ interface ArtisanProfileFormProps {
     coverUrl: string | null
     galleryImages: GalleryImage[]
     myGroups?: MyGroup[]
+    storyBanner?: CraftStoryBannerProps
 }
 
-export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages, myGroups = [] }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages, myGroups = [], storyBanner }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
@@ -342,6 +344,15 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         )}
                     </div>
                 </section>
+
+                {/* ── Craft Story Banner ── */}
+                {storyBanner && (
+                    <section className="bg-background py-6">
+                        <div className="mx-auto max-w-3xl px-4">
+                            <CraftStoryBanner {...storyBanner} />
+                        </div>
+                    </section>
+                )}
 
                 {/* ── About Section ── */}
                 {artisan.bio && (

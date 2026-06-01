@@ -1,10 +1,12 @@
 import { z } from 'zod'
 
-const ALLOWED_EXTENSIONS = /\.(jpeg|jpg|png|gif|webp|mp4|avi|mov|wmv|flv|webm|mkv)$/i
+const ALLOWED_EXTENSIONS = /\.(jpeg|jpg|png|gif|webp|mp4|avi|mov|wmv|flv|webm|mkv|mp3|wav|m4a|ogg|oga)$/i
 const ALLOWED_MIME_TYPES = [
     'image/jpeg', 'image/png', 'image/gif', 'image/webp',
     'video/mp4', 'video/avi', 'video/quicktime', 'video/x-ms-wmv',
     'video/x-flv', 'video/webm', 'video/x-matroska',
+    'audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a',
+    'audio/webm', 'audio/ogg',
 ]
 const MAX_FILE_SIZE = (parseInt(process.env.MAX_MEDIA_SIZE ?? '100') || 100) * 1024 * 1024 // 100MB
 

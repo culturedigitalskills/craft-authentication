@@ -13,6 +13,16 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const validatedData = CreateMediaAttachmentSchema.parse(body)
 
+        // Verify the user owns the underlying MediaFile they are trying to attach
+        const mediaFile = await prisma.mediaFile.findUnique({
+            where: { id: validatedData.mediaId },
+            select: { uploaderId: true },
+        })
+        if (!mediaFile) return errorResponse('Media file not found', 404)
+        if (mediaFile.uploaderId && mediaFile.uploaderId !== session!.user.id && session!.user.role !== 'ADMIN') {
+            return errorResponse('Forbidden', 403)
+        }
+
         // Verify the user owns the entity they're attaching to
         if (validatedData.entityType === 'Artisan') {
             const artisan = await prisma.artisan.findUnique({
@@ -40,6 +50,16 @@ export async function POST(request: NextRequest) {
                     return errorResponse('Forbidden', 403)
                 }
             }
+        } else if (validatedData.entityType === 'CraftStory') {
+            const story = await prisma.craftStory.findUnique({
+                where: { id: validatedData.entityId },
+                select: { artisan: { select: { userId: true } } },
+            })
+            if (!story || story.artisan.userId !== session!.user.id) {
+                return errorResponse('Forbidden', 403)
+            }
+        } else {
+            return errorResponse('Unsupported entity type', 400)
         }
 
         // Remove existing primary attachment for this entity if replacing
