@@ -2,11 +2,13 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { Container } from '@/components/layout/Container';
+import { PageHeader } from '@/components/layout/PageHeader'
 import Image from 'next/image'
 import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap } from 'lucide-react'
 import type { Metadata } from 'next'
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
 import PaginationControls from '@/components/craft/PaginationControls'
+import { SearchInput } from '@/components/shared/SearchInput'
 
 interface PageProps {
     searchParams: Promise<{ page?: string; q?: string }>
@@ -28,19 +30,29 @@ export default async function GroupsPage({ searchParams }: PageProps) {
     const t = await getTranslations('groups')
     const currentPageUrl = `${process.env.AUTH_URL}/groups`
 
+    const whereClause = {
+        isActive: true,
+        ...(q ? {
+            OR: [
+                { name: { contains: q, mode: 'insensitive' as const } },
+                { description: { contains: q, mode: 'insensitive' as const } },
+                { location: { contains: q, mode: 'insensitive' as const } },
+            ],
+        } : {}),
+    }
+
     const [groups, totalCount] = await Promise.all([
-    // const groups = await 
-    prisma.group.findMany({
-        where: { isActive: true },
-        orderBy: { name: 'asc' },
-        include: {
-            _count: { select: { memberships: true } },
-        },
-    }), prisma.group.count({
-        where: {
-            isActive: true,
-        },
-    })])
+        prisma.group.findMany({
+            where: whereClause,
+            orderBy: { name: 'asc' },
+            include: {
+                _count: { select: { memberships: true } },
+            },
+            skip,
+            take: limit,
+        }),
+        prisma.group.count({ where: whereClause }),
+    ])
 
     // Fetch logos for all groups
     const groupIds = groups.map(g => g.id)
@@ -64,25 +76,29 @@ export default async function GroupsPage({ searchParams }: PageProps) {
     }
     return (
         <Container>
-            <div className="mx-auto mb-12 max-w-3xl text-center">
-                <h1 className="mb-8 text-4xl font-bold">{t('title')}</h1>
-                <p className="text-lg text-muted-foreground">
-                    {t('subtitle')}
-                </p>
+            <PageHeader title={t('title')} description={t('subtitle')} />
+
+            <div className="mb-6 flex items-center justify-between gap-4">
+                <SearchInput placeholder={t('searchPlaceholder')} />
+                {totalCount > 0 && (
+                    <p className="shrink-0 text-sm text-muted-foreground">
+                        {totalCount} {t('groupsCount')}
+                    </p>
+                )}
             </div>
 
             {groups.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-border p-12 text-center">
                     <Users className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
-                    <p className="text-muted-foreground">{t('empty')}</p>
+                    <p className="text-muted-foreground">{q ? t('noResults') : t('empty')}</p>
                 </div>
             ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {groups.map(group => (
-                        <Card key={group.id} className="group flex flex-col transition-shadow duration-200 hover:shadow-lg">
+                        <Card key={group.id} className="group flex flex-col overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
                             <Link href={`/groups/${group.slug}`} className="flex flex-col h-full">
                                 {/* Hero Image */}
-                                <div className="relative w-full h-48 overflow-hidden rounded-t-lg bg-muted flex-shrink-0">
+                                <div className="relative aspect-square w-full overflow-hidden rounded-t-lg bg-muted flex-shrink-0">
                                     {logoMap.get(group.id) ? (
                                         <Image
                                             src={logoMap.get(group.id)!}
@@ -99,29 +115,28 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                                 </div>
 
                                 {/* Content */}
-                                <CardHeader className="pb-2 bg-muted flex-shrink-0">
-                                    <CardTitle className="line-clamp-1 transition-colors group-hover:text-primary">
+                                <CardHeader className="pb-2 flex-shrink-0">
+                                    <CardTitle className="line-clamp-1 transition-colors group-hover:text-warm">
                                         {group.name}
                                     </CardTitle>
+                                    {group.location && (
+                                        <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                                            <MapPin className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+                                            {group.location}
+                                        </p>
+                                    )}
                                     <CardDescription className="line-clamp-2">
                                         {group.description || 'No description available'}
                                     </CardDescription>
                                 </CardHeader>
 
-                                <CardContent className="flex flex-col flex-1 pt-4 pb-4 bg-muted space-y-3 overflow-hidden">
+                                <CardContent className="flex flex-col flex-1 pt-4 pb-4 space-y-3 overflow-hidden">
                                     {/* Info Row */}
                                     <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground flex-shrink-0">
                                         <span className="inline-flex items-center gap-1">
                                             <Users className="h-3.5 w-3.5" />
                                             {group._count.memberships} {t('members')}
                                         </span>
-
-                                        {group.location && (
-                                            <span className="inline-flex items-center gap-1">
-                                                <MapPin className="h-3.5 w-3.5" />
-                                                {group.location}
-                                            </span>
-                                        )}
 
                                         {group.website && (
                                             <span className="inline-flex items-center gap-1">

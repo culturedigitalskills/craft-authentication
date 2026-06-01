@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/layout/Container'
+import { PageHeader } from '@/components/layout/PageHeader'
 import Image from 'next/image'
 import Link from 'next/link'
 import { User, MapPin, Clock } from 'lucide-react'
@@ -78,10 +79,7 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
 
     return (
         <Container>
-            <div className="mb-8 text-center">
-                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('artisans.title')}</h1>
-                <p className="mt-3 text-lg text-muted-foreground">{t('artisans.description')}</p>
-            </div>
+            <PageHeader title={t('artisans.title')} description={t('artisans.description')} />
 
             <div className="mb-6 flex items-center justify-between gap-4">
                 <SearchInput placeholder={t('artisans.searchPlaceholder')} />
@@ -129,8 +127,8 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                                         </h2>
                                         </Link>
                                         {location && (
-                                            <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                                                <MapPin className="h-3 w-3 shrink-0" />
+                                            <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                                                <MapPin className="h-4 w-4 shrink-0" strokeWidth={2.5} />
                                                 {location}
                                             </p>
                                         )}
