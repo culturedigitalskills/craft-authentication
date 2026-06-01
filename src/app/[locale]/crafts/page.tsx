@@ -1,9 +1,10 @@
 import { useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { CardTitle, CardContent, CardHeader, Card } from '@/components/ui/card'
 import Link from 'next/dist/client/link'
 import Image from 'next/image'
-import { Calendar, User } from 'lucide-react'
+import { Calendar, User, MapPin, Layers } from 'lucide-react'
 import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
 import { prisma } from '@/lib/prisma'
@@ -48,6 +49,7 @@ export default async function CraftsPage(
                 artisanEmail: d['artisan'] as string | null,
                 createdOn: d['createdOn'] as string,
                 material: (d['material'] as string | null) ?? null,
+                place: d['isSharedLocation'] !== false ? ((d['place'] as string | null) ?? null) : null,
                 imageUrl: mediaIds.length > 0 ? `/api/media/${mediaIds[0]}` : null,
             }
         })
@@ -91,10 +93,7 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
     console.log('Rendering CraftsPage with crafts:', crafts)
     return (
         <Container>
-            <div className="mb-8 text-center">
-                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('crafts.welcomeTitle')}</h1>
-                <p className="mt-3 text-lg text-muted-foreground">{t('crafts.description')}</p>
-            </div>
+            <PageHeader title={t('crafts.welcomeTitle')} description={t('crafts.description')} />
 
             <div className="mb-6 flex items-center justify-between gap-4">
                 <SearchInput placeholder={t('crafts.explore.searchPlaceholder')} />
@@ -108,7 +107,7 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
             {crafts.length > 0 ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {crafts.map((craft) => (
-                        <Card key={craft.id} className="group transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+                        <Card key={craft.id} className="group overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
                                 <Link href={`crafts/${craft.id}`} className="block">
                                 <div className="relative aspect-square overflow-hidden rounded-t-lg">
                                     {craft.imageUrl ? (
@@ -125,23 +124,22 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                                             <p className="text-muted-foreground">{t('crafts.explore.noImageAvailable')}</p>
                                         </div>
                                     )}
-
-                                    {/* Material reveal on hover */}
-                                    {craft.material && (
-                                        <div className="absolute inset-x-0 bottom-0 translate-y-full bg-warm px-3 py-1.5 transition-transform duration-200 group-hover:translate-y-0">
-                                            <p className="truncate text-xs font-medium text-warm-foreground">{craft.material}</p>
-                                        </div>
-                                    )}
                                 </div>
                                 </Link>
 
                                 <CardHeader className="pb-2">
                                     <CardTitle className="line-clamp-1 transition-colors group-hover:text-warm">
                                     <Link href={`crafts/${craft.id}`} className="block">
-    
+
                                         {craft.title}
-                                    </Link>  
+                                    </Link>
                                     </CardTitle>
+                                    {craft.place && (
+                                        <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                                            <MapPin className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+                                            {craft.place}
+                                        </p>
+                                    )}
                                 </CardHeader>
 
                                 <CardContent className="pt-0">
@@ -153,6 +151,12 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                                                 <Link href={`artisans/${craft.artisanSlug}`}>
                                                     <span className="font-medium">{craft.artisanName}</span>
                                                 </Link>
+                                            </div>
+                                        )}
+                                        {craft.material && (
+                                            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                                                <Layers className="h-3 w-3 shrink-0" />
+                                                <span>{craft.material}</span>
                                             </div>
                                         )}
                                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
