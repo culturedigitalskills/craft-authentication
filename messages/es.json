@@ -17,6 +17,7 @@
         "myitems": "Mis Artesanías",
         "mygroups": "Mis Comunidades",
         "addcraft": "Agregar Artesanía",
+        "mystory": "Mi historia",
         "createGroup": "Crear Comunidad"
     },
     "auth": {
@@ -48,7 +49,7 @@
     "about": {
         "title": "Acerca de SustainableCrafting",
         "missionTitle": "Nuestra Misión",
-        "missionDescription": "En SustainableCrafting, nuestra misión es empoderar a artesanos de todo el mundo proporcionándoles una plataforma que los conecte directamente con los clientes. Creemos en preservar las artesanías tradicionales mientras promovemos la sostenibilidad y la autenticidad en el mercado global.",
+        "missionDescription": "En SustainableCrafting, ofrecemos una plataforma digital que permite a artesanos de todo el mundo documentar sus productos hechos a mano, conectarse entre sí y apoyar sus actividades socioeconómicas. Creemos en la preservación del conocimiento, las habilidades y el patrimonio cultural arraigado en cada tradición artesanal. Nuestra misión es defender la autenticidad, celebrar la historia humana detrás de cada objeto hecho a mano, y promover la sostenibilidad en un mercado global que con demasiada frecuencia olvida las hábiles manos artesanas que los crean.",
         "viewRepository": "Ver nuestro repositorio en GitHub",
         "keyFeatures": "La base de datos incluye Prisma conectado a Postgres mediante URLs basadas en variables de entorno para desarrollo y Docker. La interfaz de usuario incluye shadcn/ui con Tailwind v3, primitivas de Radix y utilidades reutilizables. Todo empaquetado en un contenedor Docker para un despliegue sencillo.",
         "privacyPolicy": "Política de privacidad",
@@ -118,6 +119,103 @@
         "connection": "Conexión directa entre artesanos y clientes",
         "supply": "Cadena de suministro transparente desde la creación hasta la venta"
     },
+    "onboardingWizard": {
+        "stepLabel": "Paso {current} de {total}",
+        "back": "Atrás",
+        "skip": "Omitir por ahora",
+        "next": "Siguiente",
+        "finish": "Crear perfil",
+        "creating": "Creando...",
+        "skipped": "Omitido",
+        "createFailed": "No se pudo crear tu perfil. Por favor, inténtalo de nuevo.",
+        "step1Title": "¿Cuál es tu nombre?",
+        "step1Hint": "Lo usaremos en tu perfil público de artesano.",
+        "step2Title": "Agrega tus fotos",
+        "step2Hint": "Una foto de perfil y una de portada ayudan a los compradores a conectarse contigo. Puedes agregarlas más tarde.",
+        "step3Title": "Cuéntanos sobre tu oficio",
+        "step3Hint": "Comparte una breve biografía, tus años de experiencia y cómo aprendiste tu oficio.",
+        "step4Title": "¿Dónde te encuentras?",
+        "step4Hint": "Esto ayuda a los compradores a descubrir artesanos de tu región.",
+        "step5Title": "Conecta tus redes sociales",
+        "step5Hint": "Enlaza tus perfiles sociales y agrega hashtags que describan tu trabajo.",
+        "step6Title": "Revisa tu perfil",
+        "step6Hint": "Echa un vistazo rápido. Puedes editar todo más tarde desde tu página de perfil.",
+        "reviewName": "Nombre",
+        "reviewPhotos": "Fotos"
+    },
+    "craftStory": {
+        "stepLabel": "Paso {current} de {total}",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "begin": "Comenzar",
+        "saveExit": "Guardar y salir",
+        "saving": "Guardando...",
+        "publish": "Publicar mi historia",
+        "publishing": "Publicando...",
+        "writeYourAnswer": "Escribe tu respuesta",
+        "answerPlaceholder": "Tómate tu tiempo. Habla con naturalidad. No hay respuestas incorrectas.",
+        "questionLabel": "Pregunta {index}",
+        "publicHeading": "En sus propias palabras",
+        "publicTitle": "La historia de este oficio",
+        "errors": {
+            "saveFailed": "No pudimos guardar tu progreso. Inténtalo de nuevo.",
+            "publishFailed": "No pudimos publicar tu historia. Inténtalo de nuevo.",
+            "emptyStory": "Agrega al menos una respuesta escrita, una grabación o una foto del taller antes de publicar.",
+            "conflict": "Tu historia se actualizó en otra ventana. Recarga esta página para ver la última versión."
+        },
+        "banner": {
+            "startTitle": "Comparte la historia de tu oficio",
+            "startBody": "Cuéntanos sobre tu oficio con tus propias palabras, escribiendo, hablando o grabando.",
+            "startCta": "Comenzar mi historia",
+            "continueTitle": "Continúa tu historia",
+            "continueBody": "Estás en el paso {current} de {total}. Continúa desde donde lo dejaste.",
+            "continueCta": "Continuar",
+            "publishedBadge": "Tu historia está publicada",
+            "publishedBody": "Los visitantes pueden leerla en tu perfil público. Puedes seguir editándola cuando quieras.",
+            "view": "Ver",
+            "edit": "Editar"
+        },
+        "intro": {
+            "title": "Guía para compartir la historia de tu oficio",
+            "lead": "Esta página te ayudará a contar la historia de tu oficio con tus propias palabras. Estas preguntas solo están aquí para guiarte. Por favor habla con naturalidad y añade cualquier cosa que sientas importante.",
+            "formatsTitle": "Puedes compartir tu historia como:",
+            "formatText": "Texto escrito",
+            "formatAudio": "Grabación de audio",
+            "formatVideo": "Grabación de video",
+            "encouragement": "Por favor responde con tus propias palabras, como si le estuvieras contando tu historia a alguien que quiere entender tu oficio."
+        },
+        "step1": { "title": "Sobre ti", "prompt": "¿Puedes contarnos quién eres y cómo aprendiste este oficio?" },
+        "step2": { "title": "Sobre tu oficio", "prompt": "¿Puedes explicar tu oficio en palabras sencillas, incluyendo de dónde viene, cómo se hace y para qué sirve?" },
+        "step3": { "title": "Sentimientos, significado y conexiones", "prompt": "¿Qué significa este oficio para ti? ¿Hay sentimientos, eventos, tradiciones, símbolos o historias conectadas con él?" },
+        "step4": { "title": "Beneficios y oportunidades", "prompt": "¿Qué te ha dado este oficio a ti, a tu familia o a tu comunidad?" },
+        "step5": { "title": "Transmisión de conocimiento y futuras generaciones", "prompt": "¿Cómo se transmite este oficio a las personas más jóvenes? ¿Crees que puede continuar en el futuro?" },
+        "step6": { "title": "Desafíos y barreras", "prompt": "¿Qué dificultades enfrentas al practicar este oficio? ¿Qué tipo de apoyo ayudaría a mantenerlo vivo?" },
+        "step7": { "title": "Taller, herramientas y proceso", "prompt": "Graba o fotografía por separado tu taller, tus herramientas, tus materiales, cómo haces tu oficio y el lugar donde trabajas.", "saveFirst": "Guarda primero una respuesta en un paso anterior, luego vuelve para agregar fotos del taller." },
+        "review": {
+            "title": "Revisa tu historia",
+            "lead": "Echa un vistazo a lo que has compartido. Puedes volver y editar cualquier cosa antes de publicar.",
+            "notAnswered": "Sin responder",
+            "hasRecording": "Grabación adjunta",
+            "workshopCount": "{count, plural, =0 {Aún sin archivos} one {1 archivo} other {# archivos}}"
+        },
+        "uploader": {
+            "label": "O graba audio / video",
+            "chooseFile": "Elegir audio o video",
+            "replace": "Reemplazar grabación",
+            "remove": "Quitar",
+            "uploading": "Subiendo...",
+            "uploadFailed": "La subida falló. Inténtalo de nuevo.",
+            "hint": "MP3, WAV, MP4 o WebM. Hasta {max} MB."
+        },
+        "workshop": {
+            "addFile": "Agregar foto o video",
+            "removeItem": "Quitar",
+            "videoLabel": "Video",
+            "itemAlt": "Imagen del taller o del proceso",
+            "uploadFailed": "La subida falló. Inténtalo de nuevo.",
+            "deleteFailed": "No se pudo eliminar ese archivo. Inténtalo de nuevo."
+        }
+    },
     "profile": {
         "title": "Perfil de Artesano",
         "createTitle": "Crea tu Perfil de Artesano",
@@ -148,6 +246,7 @@
         "changePhoto": "Cambiar foto",
         "photoUploading": "Subiendo...",
         "photoUploadFailed": "Error al subir la foto",
+        "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
         "personalInfo": "Información personal",
         "craftExperience": "Experiencia artesanal",
         "location": "Ubicación",
@@ -170,7 +269,16 @@
         "leaveGroup": "Salir",
         "confirmLeave": "Confirmar Salida",
         "leaveGroupFailed": "Error al salir del grupo",
-        "cancel": "Cancelar"
+        "cancel": "Cancelar",
+        "socialAndHashtags": "Redes Sociales y Hashtags",
+        "socialInstagram": "Instagram",
+        "socialFacebook": "Facebook",
+        "socialTwitter": "X (Twitter)",
+        "socialTiktok": "TikTok",
+        "socialYoutube": "YouTube",
+        "socialWebsite": "Sitio web",
+        "hashtags": "Hashtags",
+        "addHashtag": "Añadir hashtag"
     },
     "artisanProfile": {
         "about": "Acerca de",
@@ -182,7 +290,8 @@
         "galleryEmpty": "Aún no hay fotos en la galería",
         "groups": "Comunidades",
         "crafts": "Artesanías",
-        "noCrafts": "Aún no hay artesanías públicas."
+        "noCrafts": "Aún no hay artesanías públicas.",
+        "connectWith": "Conectar"
     },
     "artisans": {
         "title": "Artesanos",
@@ -225,6 +334,7 @@
         "createGroupHelper": "Configura un nuevo grupo artesanal, cooperativa o gremio.",
         "editGroup": "Editar Grupo",
         "deleteGroup": "Eliminar Grupo",
+        "deleteConfirm": "¿Estás seguro? Esto no se puede deshacer.",
         "groupName": "Nombre del Grupo",
         "description": "Descripción",
         "website": "Sitio Web",
@@ -266,6 +376,7 @@
         "memberAdded": "Miembro agregado exitosamente",
         "memberRemoved": "Miembro eliminado exitosamente",
         "saveFailed": "Error al guardar el grupo",
+        "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
         "deleteFailed": "Error al eliminar el grupo",
         "viewGroup": "Ver Grupo",
         "searchArtisan": "Buscar artesano por nombre...",
@@ -280,6 +391,17 @@
         "createCraftHelper": "Comparte tu artesanía con el mundo: añade un título, descripción y fotos.",
         "createEdittHelper": "Actualiza los detalles de tu artesanía a continuación.",
         "createCraftMakeLocationPublic": "Compartir mi ubicación aproximada con los visitantes",
-        "deleteCraftConfirm": "¿Eliminar esta artesanía? Esto no se puede deshacer."
+        "deleteCraftConfirm": "¿Eliminar esta artesanía? Esto no se puede deshacer.",
+        "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
+        "deleteImage": "Eliminar imagen",
+        "deleteImageConfirm": "¿Eliminar esta imagen?",
+        "deleteImageYes": "Eliminar",
+        "deleteImageNo": "Cancelar",
+        "deleteImageFailed": "No se pudo eliminar la imagen. Por favor, inténtelo de nuevo.",
+        "videosLabel": "Videos de YouTube",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "Añadir",
+        "removeVideo": "Eliminar video",
+        "invalidYoutubeUrl": "No se pudo reconocer como un enlace de YouTube."
     }
 }

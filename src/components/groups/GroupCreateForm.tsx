@@ -131,6 +131,7 @@ export function GroupCreateForm() {
                             type="text"
                             value={form.name}
                             onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                            pattern=".*\D.*"
                             required
                         />
                     </div>

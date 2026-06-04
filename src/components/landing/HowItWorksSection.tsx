@@ -63,15 +63,23 @@ export function HowItWorksSection() {
                     {steps.map((step, i) => {
                         const isPayoff = i === steps.length - 1
                         return (
-                            <div key={step.num} className="flex lg:flex-col gap-5 lg:gap-0">
+                            <div key={step.num} className="relative flex lg:flex-col gap-5 lg:gap-0">
                                 {/* Step number — sits on top of the connecting line */}
                                 <div
                                     className={`relative z-10 shrink-0 flex items-center justify-center w-[2.125rem] h-[2.125rem] rounded-full text-sm font-bold tabular-nums ${isPayoff ? 'bg-warm text-warm-foreground shadow-sm' : 'bg-background border-2 border-border text-muted-foreground'}`}
-                                    style={undefined}
                                     aria-label={`Step ${step.num}`}
                                 >
                                     {step.num}
                                 </div>
+
+                                {/* Mobile vertical connector — runs from below this circle through the gap to the next */}
+                                {!isPayoff && (
+                                    <div
+                                        className="absolute w-px bg-border lg:hidden"
+                                        style={{ left: '1.0625rem', top: '2.125rem', bottom: '-2.5rem' }}
+                                        aria-hidden="true"
+                                    />
+                                )}
 
                                 {/* Step content */}
                                 <div className="flex-1 lg:mt-8">

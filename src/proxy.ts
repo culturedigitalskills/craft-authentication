@@ -21,7 +21,7 @@ function generateCsp(nonce: string) {
             ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
             : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "img-src 'self' blob: data: https://*.wikimedia.org",
+        "img-src 'self' blob: data: https://*.wikimedia.org https://img.youtube.com",
         "font-src 'self' https://fonts.gstatic.com",
         isDev
             ? "connect-src 'self' ws://localhost:*"
@@ -30,6 +30,7 @@ function generateCsp(nonce: string) {
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
+        "frame-src 'self' https://www.youtube.com",
         "frame-ancestors 'none'",
         isDev ? '' : 'upgrade-insecure-requests',
     ].filter(Boolean).join('; ')

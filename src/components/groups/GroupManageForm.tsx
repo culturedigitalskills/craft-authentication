@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { Trash2, UserPlus, Shield, User, ArrowLeft } from 'lucide-react'
+import { Trash2, UserPlus, Shield, User, ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -54,6 +54,8 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     const t = useTranslations('groups')
     const router = useRouter()
     const [saving, setSaving] = useState(false)
+    const [deleting, setDeleting] = useState(false)
+    const [confirmDelete, setConfirmDelete] = useState(false)
     const [members, setMembers] = useState(initialMembers)
     const [addError, setAddError] = useState('')
     const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
@@ -81,6 +83,23 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 ? f.certifications.filter(c => c !== cert)
                 : [...f.certifications, cert],
         }))
+    }
+
+    async function handleDelete() {
+        if (!confirmDelete) {
+            setConfirmDelete(true)
+            return
+        }
+        setDeleting(true)
+        try {
+            const res = await fetch(`/api/groups/${group.id}`, { method: 'DELETE' })
+            if (!res.ok) throw new Error('Failed to delete')
+            router.push('/groups')
+        } catch {
+            alert(t('deleteFailed'))
+            setDeleting(false)
+            setConfirmDelete(false)
+        }
     }
 
     async function handleSave(e: React.FormEvent) {
@@ -228,6 +247,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                         type="text"
                         value={form.name}
                         onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                        pattern=".*\D.*"
                         required
                     />
                 </div>
@@ -345,8 +365,38 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                     </label>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex items-center justify-between">
+                    {confirmDelete ? (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-destructive">{t('deleteConfirm')}</span>
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                disabled={deleting}
+                                onClick={handleDelete}
+                            >
+                                {deleting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                                {t('deleteGroup')}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setConfirmDelete(false)}
+                            >
+                                {t('cancel')}
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={handleDelete}
+                        >
+                            {t('deleteGroup')}
+                        </Button>
+                    )}
                     <Button type="submit" disabled={saving}>
+                        {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                         {saving ? 'Saving...' : t('editGroup')}
                     </Button>
                 </div>

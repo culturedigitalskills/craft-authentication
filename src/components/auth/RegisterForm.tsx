@@ -72,7 +72,7 @@ export function RegisterForm() {
                 redirect: false,
             })
 
-            router.push('/profile')
+            router.push('/onboarding')
             router.refresh()
         } catch {
             setServerError(t('registrationFailed'))

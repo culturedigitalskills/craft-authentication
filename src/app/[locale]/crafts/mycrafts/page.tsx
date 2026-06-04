@@ -91,12 +91,14 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
                     <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('navbar.myitems')}</h1>
                     <p className="mt-3 text-lg text-muted-foreground">{artisanName}</p>
                 </div>
-                <Button asChild className="shrink-0">
-                    <Link href="/crafts/create">
-                        <Plus className="mr-2 h-4 w-4" />
-                        {t('navbar.addcraft')}
-                    </Link>
-                </Button>
+                {crafts.length > 0 && (
+                    <Button asChild className="shrink-0">
+                        <Link href="/crafts/create">
+                            <Plus className="mr-2 h-4 w-4" />
+                            {t('navbar.addcraft')}
+                        </Link>
+                    </Button>
+                )}
             </div>
 
             {crafts.length > 0 ? (

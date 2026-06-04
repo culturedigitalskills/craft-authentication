@@ -2,11 +2,13 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Clock, GraduationCap, User, Users, Package } from 'lucide-react'
+import { MapPin, Clock, GraduationCap, User, Users, Package, Instagram, Facebook, Twitter, Youtube, Globe, Hash } from 'lucide-react'
 import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { Card, CardContent } from '@/components/ui/card'
+import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
+import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -68,6 +70,13 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             learningSource: true,
             country: true,
             region: true,
+            socialInstagram: true,
+            socialFacebook: true,
+            socialTwitter: true,
+            socialTiktok: true,
+            socialYoutube: true,
+            website: true,
+            hashtags: true,
             user: { select: { email: true } },
             memberships: {
                 where: { leftDate: null },
@@ -149,12 +158,46 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         url: `/api/media/${a.mediaId}`,
     }))
 
+    const publishedStory = await prisma.craftStory.findUnique({
+        where: { artisanId: artisan.id },
+    })
+    const story = publishedStory && publishedStory.status === 'PUBLISHED' ? publishedStory : null
+
+    let workshopMedia: WorkshopMediaItem[] = []
+    let answerMediaMimeTypes: Record<string, string> = {}
+    if (story) {
+        const workshopAttachments = await prisma.mediaAttachment.findMany({
+            where: {
+                entityType: 'CraftStory',
+                entityId: story.id,
+                attachmentType: 'PROCESS',
+            },
+            include: { media: { select: { mimeType: true } } },
+            orderBy: { displayOrder: 'asc' },
+        })
+        workshopMedia = workshopAttachments.map(a => ({
+            mediaId: a.mediaId,
+            isVideo: (a.media.mimeType ?? '').startsWith('video/'),
+        }))
+
+        const answerMediaIds = ANSWER_MEDIA_FIELDS
+            .map(k => story[k])
+            .filter((v): v is string => Boolean(v))
+        if (answerMediaIds.length > 0) {
+            const files = await prisma.mediaFile.findMany({
+                where: { id: { in: answerMediaIds } },
+                select: { id: true, mimeType: true },
+            })
+            answerMediaMimeTypes = Object.fromEntries(files.map(f => [f.id, f.mimeType]))
+        }
+    }
+
     const locationText = artisan.region && artisan.country
         ? `${artisan.region}, ${artisan.country}`
         : null
 
     return (
-        <div className="-mt-16">
+        <div className="">
             {/* ── Hero Banner ── */}
             <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-16 pt-24">
                 {coverUrl ? (
@@ -238,6 +281,79 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             <p className="text-base leading-relaxed text-foreground/80">
                                 {artisan.bio}
                             </p>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* ── Craft Story Section ── */}
+            {story && (
+                <CraftStoryDisplay
+                    story={story}
+                    workshop={workshopMedia}
+                    answerMediaMimeTypes={answerMediaMimeTypes}
+                />
+            )}
+
+            {/* ── Connect Section ── */}
+            {(artisan.socialInstagram || artisan.socialFacebook || artisan.socialTwitter || artisan.socialTiktok || artisan.socialYoutube || artisan.website) && (
+                <section className="border-b border-border/50 bg-background py-8">
+                    <div className="mx-auto max-w-4xl px-4">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
+                            {t('connectWith')}
+                        </h2>
+                        <div className="flex flex-wrap gap-3">
+                            {artisan.socialInstagram && (
+                                <a href={`https://instagram.com/${artisan.socialInstagram}`} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                    <Instagram className="h-4 w-4" />@{artisan.socialInstagram}
+                                </a>
+                            )}
+                            {artisan.socialFacebook && (
+                                <a href={`https://facebook.com/${artisan.socialFacebook}`} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                    <Facebook className="h-4 w-4" />{artisan.socialFacebook}
+                                </a>
+                            )}
+                            {artisan.socialTwitter && (
+                                <a href={`https://x.com/${artisan.socialTwitter}`} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                    <Twitter className="h-4 w-4" />@{artisan.socialTwitter}
+                                </a>
+                            )}
+                            {artisan.socialTiktok && (
+                                <a href={`https://tiktok.com/@${artisan.socialTiktok}`} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                    <Hash className="h-4 w-4" />@{artisan.socialTiktok}
+                                </a>
+                            )}
+                            {artisan.socialYoutube && (
+                                <a href={`https://youtube.com/@${artisan.socialYoutube}`} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                    <Youtube className="h-4 w-4" />{artisan.socialYoutube}
+                                </a>
+                            )}
+                            {artisan.website && (
+                                <a href={artisan.website} target="_blank" rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                    <Globe className="h-4 w-4" />{artisan.website.replace(/^https?:\/\//, '')}
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* ── Hashtags Section ── */}
+            {artisan.hashtags.length > 0 && (
+                <section className="bg-muted/20 py-6">
+                    <div className="mx-auto max-w-4xl px-4">
+                        <div className="flex flex-wrap gap-2">
+                            {artisan.hashtags.map(tag => (
+                                <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                                    #{tag}
+                                </span>
+                            ))}
                         </div>
                     </div>
                 </section>

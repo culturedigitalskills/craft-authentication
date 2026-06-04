@@ -12,6 +12,7 @@
     "artisans": "Ustalar",
     "seecrafts": "Gallery",
     "addcraft": "Add Craft",
+    "mystory": "Hikayem",
     "login": "Login",
     "logout": "Logout",
     "profile": "Profile",
@@ -47,7 +48,7 @@
   "about": {
     "title": "About SustainableCrafting",
     "missionTitle": "Our Mission",
-    "missionDescription": "At SustainableCrafting, our mission is to empower artisans worldwide by providing a platform that connects them directly with customers. We believe in preserving traditional crafts while promoting sustainability and authenticity in the global marketplace.",
+    "missionDescription": "SustainableCrafting olarak, dünya genelindeki zanaatkârlara el yapımı ürünlerini belgelemek, birbirleriyle bağlantı kurmak ve sosyoekonomik faaliyetlerini desteklemek için dijital bir platform sunuyoruz. Her el sanatları geleneğinde var olan bilgiyi, becerileri ve kültürel mirası korumaya inanıyoruz. Misyonumuz; özgünlüğü savunmak, el yapımı her nesnenin arkasındaki insani hikâyeyi kutlamak ve onları yaratan usta zanaatkâr elleri çok sık unutuveren küresel bir pazarda sürdürülebilirliği teşvik etmektir.",
     "viewRepository" : "View our GitHub Repository",
     "keyFeatures" : "The database includes a Prisma wired to Postgres via env-driven URLs for dev and Docker. UI includes the shadcn/ui with Tailwind v3, radix primitives, and reusable utilities. All packaged in a Docker container for easy deployment.",
     "privacyPolicy": "Privacy Policy",
@@ -119,6 +120,103 @@
       "connection": "Direct connection between artisans and customers",
       "supply": "Transparent supply chain from creation to sale"
     } ,
+    "onboardingWizard": {
+      "stepLabel": "Adım {current} / {total}",
+      "back": "Geri",
+      "skip": "Şimdilik atla",
+      "next": "İleri",
+      "finish": "Profili oluştur",
+      "creating": "Oluşturuluyor...",
+      "skipped": "Atlandı",
+      "createFailed": "Profiliniz oluşturulamadı. Lütfen tekrar deneyin.",
+      "step1Title": "Adın ne?",
+      "step1Hint": "Bunu herkese açık zanaatkar profilinde kullanacağız.",
+      "step2Title": "Fotoğraflarını ekle",
+      "step2Hint": "Profil fotoğrafı ve kapak resmi alıcıların seninle bağlantı kurmasına yardımcı olur. Daha sonra da ekleyebilirsin.",
+      "step3Title": "Zanaatın hakkında bize anlat",
+      "step3Hint": "Kısa bir biyografi, deneyim yılların ve zanaatını nasıl öğrendiğini paylaş.",
+      "step4Title": "Nerede yaşıyorsun?",
+      "step4Hint": "Bu, alıcıların bölgenizdeki zanaatkarları keşfetmesine yardımcı olur.",
+      "step5Title": "Sosyal hesaplarını bağla",
+      "step5Hint": "Sosyal profillerini bağla ve işini tanımlayan etiketler ekle.",
+      "step6Title": "Profilini gözden geçir",
+      "step6Hint": "Hızlı bir bakış at. Daha sonra profil sayfanızdan her şeyi düzenleyebilirsiniz.",
+      "reviewName": "Ad",
+      "reviewPhotos": "Fotoğraflar"
+    },
+    "craftStory": {
+      "stepLabel": "Adım {current} / {total}",
+      "back": "Geri",
+      "next": "İleri",
+      "begin": "Başla",
+      "saveExit": "Kaydet ve çık",
+      "saving": "Kaydediliyor...",
+      "publish": "Hikayemi yayınla",
+      "publishing": "Yayınlanıyor...",
+      "writeYourAnswer": "Cevabını yaz",
+      "answerPlaceholder": "Acele etme. Doğal konuş. Yanlış cevap yok.",
+      "questionLabel": "Soru {index}",
+      "publicHeading": "Kendi sözleriyle",
+      "publicTitle": "Bu zanaatın hikayesi",
+      "errors": {
+        "saveFailed": "İlerlemenizi kaydedemedik. Lütfen tekrar deneyin.",
+        "publishFailed": "Hikayenizi yayınlayamadık. Lütfen tekrar deneyin.",
+        "emptyStory": "Yayınlamadan önce en az bir yazılı cevap, kayıt veya atölye fotoğrafı ekleyin.",
+        "conflict": "Hikayeniz başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükleyin."
+      },
+      "banner": {
+        "startTitle": "Zanaat hikayeni paylaş",
+        "startBody": "Bize zanaatından kendi sözlerinle, yazarak, konuşarak veya kaydederek bahset.",
+        "startCta": "Hikayene başla",
+        "continueTitle": "Zanaat hikayene devam et",
+        "continueBody": "Adım {current} / {total}. Bıraktığın yerden devam et.",
+        "continueCta": "Devam et",
+        "publishedBadge": "Zanaat hikayen yayında",
+        "publishedBody": "Ziyaretçiler herkese açık profilinde okuyabilir. İstediğin zaman düzenlemeye devam edebilirsin.",
+        "view": "Görüntüle",
+        "edit": "Düzenle"
+      },
+      "intro": {
+        "title": "Zanaat Hikayeni Paylaşma Kılavuzu",
+        "lead": "Bu sayfa zanaatının hikayesini kendi sözlerinle anlatmana yardımcı olacak. Bu sorular sadece sana yol göstermek için. Lütfen doğal konuş ve önemli hissettiğin her şeyi ekle.",
+        "formatsTitle": "Hikayeni şu şekillerde paylaşabilirsin:",
+        "formatText": "Yazılı metin",
+        "formatAudio": "Ses kaydı",
+        "formatVideo": "Video kaydı",
+        "encouragement": "Lütfen kendi sözlerinle cevapla, sanki zanaatını anlamak isteyen birine anlatıyormuşsun gibi."
+      },
+      "step1": { "title": "Kendin Hakkında", "prompt": "Bize kim olduğunu ve bu zanaatı ilk nasıl öğrendiğini anlatır mısın?" },
+      "step2": { "title": "Zanaatın Hakkında", "prompt": "Zanaatını basit kelimelerle, nereden geldiğini, nasıl yapıldığını ve ne için kullanıldığını dahil ederek açıklar mısın?" },
+      "step3": { "title": "Duygular, Anlam ve Bağlantılar", "prompt": "Bu zanaat senin için ne ifade ediyor? Onunla bağlantılı duygular, olaylar, gelenekler, semboller veya hikayeler var mı?" },
+      "step4": { "title": "Faydalar ve Fırsatlar", "prompt": "Bu zanaat sana, ailene veya topluluğuna ne kazandırdı?" },
+      "step5": { "title": "Bilgi Aktarımı ve Gelecek Nesiller", "prompt": "Bu zanaat genç insanlara nasıl aktarılıyor ve gelecekte devam edebileceğini düşünüyor musun?" },
+      "step6": { "title": "Zorluklar ve Engeller", "prompt": "Bu zanaatı uygularken ne tür zorluklarla karşılaşıyorsun ve onu yaşatmak için ne tür destek faydalı olur?" },
+      "step7": { "title": "Atölye, Aletler ve Süreç", "prompt": "Atölyeni, aletlerini, malzemelerini, zanaatını nasıl yaptığını ve çalıştığın yeri ayrı ayrı kaydet veya fotoğrafla.", "saveFirst": "Önce önceki bir adımda bir cevap kaydet, ardından atölye medyası eklemek için geri dön." },
+      "review": {
+        "title": "Hikayeni gözden geçir",
+        "lead": "Paylaştıklarına hızlı bir bakış at. Yayınlamadan önce her şeyi düzenleyebilirsin.",
+        "notAnswered": "Henüz cevaplanmadı",
+        "hasRecording": "Kayıt eklendi",
+        "workshopCount": "{count, plural, =0 {Henüz dosya yok} one {1 dosya} other {# dosya}}"
+      },
+      "uploader": {
+        "label": "Veya ses / video kaydet",
+        "chooseFile": "Ses veya video seç",
+        "replace": "Kaydı değiştir",
+        "remove": "Kaldır",
+        "uploading": "Yükleniyor...",
+        "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
+        "hint": "MP3, WAV, MP4 veya WebM. {max} MB'a kadar."
+      },
+      "workshop": {
+        "addFile": "Fotoğraf veya video ekle",
+        "removeItem": "Kaldır",
+        "videoLabel": "Video",
+        "itemAlt": "Atölye veya süreç görüntüsü",
+        "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
+        "deleteFailed": "Bu dosya silinemedi. Lütfen tekrar deneyin."
+      }
+    },
     "profile": {
       "title": "Artisan Profile",
       "createTitle": "Create Your Artisan Profile",
@@ -149,6 +247,7 @@
       "changePhoto": "Change Photo",
       "photoUploading": "Uploading...",
       "photoUploadFailed": "Failed to upload photo",
+      "fileTooLarge": "Resim çok büyük. Maksimum boyut 8 MB.",
       "personalInfo": "Personal Information",
       "craftExperience": "Craft Experience",
       "location": "Location",
@@ -164,7 +263,16 @@
       "galleryDeleteFailed": "Failed to delete gallery photo",
       "galleryDeleteConfirm": "Delete this photo?",
       "galleryDeleteYes": "Delete",
-      "galleryDeleteNo": "Cancel"
+      "galleryDeleteNo": "Cancel",
+      "socialAndHashtags": "Sosyal Medya ve Hashtagler",
+      "socialInstagram": "Instagram",
+      "socialFacebook": "Facebook",
+      "socialTwitter": "X (Twitter)",
+      "socialTiktok": "TikTok",
+      "socialYoutube": "YouTube",
+      "socialWebsite": "Web Sitesi",
+      "hashtags": "Hashtagler",
+      "addHashtag": "Hashtag ekle"
     },
     "artisanProfile": {
       "about": "About",
@@ -176,7 +284,8 @@
       "galleryEmpty": "No gallery photos yet",
       "groups": "Communities",
       "crafts": "Crafts",
-      "noCrafts": "No public crafts yet."
+      "noCrafts": "No public crafts yet.",
+      "connectWith": "Bağlan"
     },
     "artisans": {
       "title": "Artisans",
@@ -253,9 +362,19 @@
         "savingCraft": "Saving craft...",
         "updatingCraft": "Updating craft...",
         "craftCreateSuccess": "Craft created successfully!",
-        "craftUpdateSuccess": "Craft updated successfully!" 
-
-    },    
+        "craftUpdateSuccess": "Craft updated successfully!",
+        "fileTooLarge": "Resim çok büyük. Maksimum boyut 8 MB.",
+        "deleteImage": "Resmi kaldır",
+        "deleteImageConfirm": "Bu resmi kaldırmak istiyor musunuz?",
+        "deleteImageYes": "Kaldır",
+        "deleteImageNo": "İptal",
+        "deleteImageFailed": "Resim kaldırılamadı. Lütfen tekrar deneyin.",
+        "videosLabel": "YouTube videoları",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "Ekle",
+        "removeVideo": "Videoyu kaldır",
+        "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı."
+    },
     "materials":{
       "selectOne" : "Select one:",
       "wool" : "Wool",

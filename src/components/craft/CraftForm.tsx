@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -15,9 +16,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Loader2, X, Play, Youtube } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Prisma } from '@prisma/client'
+import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
 
 interface Craft {
     id: string
@@ -68,8 +70,15 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     const [createdOn, setCreatedOn] = useState(data?.['createdOn'] as string ?? '')
     const [updatedOn, setUpdatedOn] = useState(data?.['updatedOn'] as string ?? '')
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
-    const [mediaIds, setmediaIds] = useState(data?.['mediaIds'] as [] ?? '')
+    const [existingMediaIds, setExistingMediaIds] = useState<string[]>(
+        Array.isArray(data?.['mediaIds']) ? (data['mediaIds'] as string[]).filter(Boolean) : []
+    )
+    const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
     const [images, setImages] = useState<File[]>([])
+    const [videos, setVideos] = useState<string[]>(
+        Array.isArray(data?.['videos']) ? (data['videos'] as string[]).filter(Boolean) : []
+    )
+    const [videoInput, setVideoInput] = useState('')
 
     useEffect(() => {
         setMaterial(data?.['material'] as string ?? '')
@@ -78,8 +87,47 @@ export function CraftForm({ craft, user }: CraftFormProps) {
         setIsSharedLocation(data?.['isSharedLocation'] as boolean ?? true)
         setCreatedOn(data?.['CreatedOn'] as string ?? '')
         setUpdatedOn(data?.['updatedOn'] as string ?? '')
-        setmediaIds(data?.['mediaIds'] as [] ?? '')
+        setExistingMediaIds(
+            Array.isArray(data?.['mediaIds']) ? (data['mediaIds'] as string[]).filter(Boolean) : []
+        )
+        setVideos(
+            Array.isArray(data?.['videos']) ? (data['videos'] as string[]).filter(Boolean) : []
+        )
     }, [data])
+
+    function handleAddVideo() {
+        const id = extractYouTubeId(videoInput)
+        if (!id) {
+            setMessage({ text: t('createCraft.invalidYoutubeUrl'), type: 'error' })
+            return
+        }
+        if (videos.includes(id)) {
+            setVideoInput('')
+            return
+        }
+        setVideos(prev => [...prev, id])
+        setVideoInput('')
+        setMessage(null)
+    }
+
+    function handleRemoveVideo(id: string) {
+        setVideos(prev => prev.filter(v => v !== id))
+    }
+
+    async function handleRemoveExisting(mediaId: string) {
+        if (confirmDelete !== mediaId) {
+            setConfirmDelete(mediaId)
+            return
+        }
+        setConfirmDelete(null)
+        try {
+            const res = await fetch(`/api/media/${mediaId}`, { method: 'DELETE' })
+            if (!res.ok) throw new Error('Delete failed')
+            setExistingMediaIds(prev => prev.filter(id => id !== mediaId))
+        } catch {
+            setMessage({ text: t('createCraft.deleteImageFailed'), type: 'error' })
+        }
+    }
 
     useEffect(() => {
         if (!navigator.geolocation) return
@@ -124,7 +172,8 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                 artisan: data?.artisan ?? user ?? '',
                 createdOn: data?.createdOn ?? timestamp,
                 updatedOn: timestamp,
-                mediaIds: data?.mediaIds ?? ids,
+                mediaIds: [...existingMediaIds, ...ids],
+                videos,
                 location: data?.location ? data.location : location ? { lat: location.lat, lng: location.lng } : null,
                 place: data?.city ?? city,
             },
@@ -166,11 +215,9 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     async function handleDelete() {
         if (!confirm(t('createCraft.deleteCraftConfirm'))) return
 
-        const mediaidstodelete = data?.['mediaIds'] as string[]
-        if (mediaidstodelete?.length > 0) {
+        if (existingMediaIds.length > 0) {
             await Promise.all(
-                mediaidstodelete.map(async (mediaId: string) => {
-                    if (!mediaId) return
+                existingMediaIds.map(async (mediaId: string) => {
                     await fetch(`/api/media/${mediaId}`, { method: 'DELETE' })
                 })
             )
@@ -287,6 +334,63 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                         <Label htmlFor="images">
                             {t('createCraft.uploadImages')}
                         </Label>
+
+                        {existingMediaIds.length > 0 && (
+                            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                                {existingMediaIds.map((mediaId) => (
+                                    <div
+                                        key={mediaId}
+                                        className="group relative aspect-square overflow-hidden rounded-lg border border-border"
+                                    >
+                                        <Image
+                                            src={`/api/media/${mediaId}`}
+                                            alt="Craft photo"
+                                            fill
+                                            sizes="(max-width: 768px) 33vw, 25vw"
+                                            unoptimized
+                                            className="object-cover"
+                                        />
+                                        {confirmDelete === mediaId ? (
+                                            <div
+                                                className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-1.5 text-center"
+                                                style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.7)' }}
+                                            >
+                                                <p className="text-xs font-medium text-white">
+                                                    {t('createCraft.deleteImageConfirm')}
+                                                </p>
+                                                <div className="flex gap-1.5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveExisting(mediaId)}
+                                                        className="rounded-md bg-red-600 px-2 py-0.5 text-xs font-medium text-white hover:bg-red-700"
+                                                    >
+                                                        {t('createCraft.deleteImageYes')}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setConfirmDelete(null)}
+                                                        className="rounded-md bg-white/20 px-2 py-0.5 text-xs font-medium text-white hover:bg-white/30"
+                                                    >
+                                                        {t('createCraft.deleteImageNo')}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveExisting(mediaId)}
+                                                aria-label={t('createCraft.deleteImage')}
+                                                className="absolute right-1 top-1 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                                                style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
+                                            >
+                                                <X className="h-3.5 w-3.5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="flex items-center gap-3">
                             <Button
                                 variant="outline"
@@ -307,12 +411,80 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                             accept="image/*"
                             multiple
                             className="hidden"
-                            onChange={(e) => setImages(Array.from(e.target.files || []))}
+                            onChange={(e) => {
+                                const files = Array.from(e.target.files || [])
+                                const oversized = files.find(f => f.size > 8 * 1024 * 1024)
+                                if (oversized) {
+                                    setMessage({ text: t('createCraft.fileTooLarge'), type: 'error' })
+                                    e.target.value = ''
+                                    return
+                                }
+                                setImages(files)
+                            }}
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="videoUrl" className="flex items-center gap-1.5">
+                            <Youtube className="h-4 w-4" />
+                            {t('createCraft.videosLabel')}
+                        </Label>
+
+                        {videos.length > 0 && (
+                            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                {videos.map((id) => (
+                                    <div
+                                        key={id}
+                                        className="group relative aspect-video overflow-hidden rounded-lg border border-border bg-muted"
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={youtubeThumbnailUrl(id)}
+                                            alt="YouTube video"
+                                            className="absolute inset-0 h-full w-full object-cover"
+                                        />
+                                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                            <div className="rounded-full bg-black/60 p-2">
+                                                <Play className="h-5 w-5 fill-white text-white" />
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveVideo(id)}
+                                            aria-label={t('createCraft.removeVideo')}
+                                            className="absolute right-1 top-1 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                                            style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-2">
+                            <Input
+                                id="videoUrl"
+                                type="url"
+                                value={videoInput}
+                                onChange={(e) => setVideoInput(e.target.value)}
+                                placeholder={t('createCraft.youtubePlaceholder')}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault()
+                                        handleAddVideo()
+                                    }
+                                }}
+                            />
+                            <Button type="button" variant="outline" onClick={handleAddVideo}>
+                                {t('createCraft.addVideo')}
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-2">
                         <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                             {isSubmitting
                                 ? isCreateMode
                                     ? t('createCraft.savingCraft')

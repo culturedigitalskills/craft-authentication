@@ -13,6 +13,7 @@ import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
 import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
+import { CraftStoryBanner, type CraftStoryBannerProps } from './CraftStoryBanner'
 import {
     ArrowLeft,
     MapPin,
@@ -24,6 +25,14 @@ import {
     Users,
     Shield,
     LogOut,
+    Loader2,
+    Instagram,
+    Facebook,
+    Twitter,
+    Youtube,
+    Globe,
+    Hash,
+    X,
 } from 'lucide-react'
 
 interface Artisan {
@@ -36,6 +45,13 @@ interface Artisan {
     learningSource: string | null
     country: string | null
     region: string | null
+    socialInstagram: string | null
+    socialFacebook: string | null
+    socialTwitter: string | null
+    socialTiktok: string | null
+    socialYoutube: string | null
+    website: string | null
+    hashtags: string[]
 }
 
 interface GalleryImage {
@@ -56,9 +72,10 @@ interface ArtisanProfileFormProps {
     coverUrl: string | null
     galleryImages: GalleryImage[]
     myGroups?: MyGroup[]
+    storyBanner?: CraftStoryBannerProps
 }
 
-export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages, myGroups = [] }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages, myGroups = [], storyBanner }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
@@ -78,6 +95,14 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
     const [uploadedCoverId, setUploadedCoverId] = useState<string | null>(null)
     const [groups, setGroups] = useState(myGroups)
     const [confirmLeave, setConfirmLeave] = useState<string | null>(null)
+    const [socialInstagram, setSocialInstagram] = useState(artisan?.socialInstagram ?? '')
+    const [socialFacebook, setSocialFacebook] = useState(artisan?.socialFacebook ?? '')
+    const [socialTwitter, setSocialTwitter] = useState(artisan?.socialTwitter ?? '')
+    const [socialTiktok, setSocialTiktok] = useState(artisan?.socialTiktok ?? '')
+    const [socialYoutube, setSocialYoutube] = useState(artisan?.socialYoutube ?? '')
+    const [website, setWebsite] = useState(artisan?.website ?? '')
+    const [hashtags, setHashtags] = useState<string[]>(artisan?.hashtags ?? [])
+    const [hashtagInput, setHashtagInput] = useState('')
 
     const isCreateMode = !artisan
     const showForm = isCreateMode || isEditing
@@ -96,6 +121,13 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         if (learningSource) data.learningSource = learningSource
         if (country) data.country = country
         if (region) data.region = region
+        if (socialInstagram) data.socialInstagram = socialInstagram.replace(/^@/, '')
+        if (socialFacebook) data.socialFacebook = socialFacebook.replace(/^@/, '')
+        if (socialTwitter) data.socialTwitter = socialTwitter.replace(/^@/, '')
+        if (socialTiktok) data.socialTiktok = socialTiktok.replace(/^@/, '')
+        if (socialYoutube) data.socialYoutube = socialYoutube.replace(/^@/, '')
+        if (website) data.website = website
+        data.hashtags = hashtags
 
         try {
             const url = isCreateMode ? '/api/artisans' : `/api/artisans/${artisan.id}`
@@ -146,14 +178,11 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                 }
 
                 await Promise.all(attachmentPromises)
+                router.push(`/artisans/${newArtisan.slug}`)
+                return
             }
 
-            setMessage({
-                text: isCreateMode ? t('createSuccess') : t('updateSuccess'),
-                type: 'success',
-            })
-
-            router.refresh()
+            router.push(`/artisans/${artisan.slug}`)
         } catch {
             setMessage({
                 text: isCreateMode ? t('createFailed') : t('updateFailed'),
@@ -173,7 +202,23 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         setLearningSource(artisan?.learningSource ?? '')
         setCountry(artisan?.country ?? null)
         setRegion(artisan?.region ?? null)
+        setSocialInstagram(artisan?.socialInstagram ?? '')
+        setSocialFacebook(artisan?.socialFacebook ?? '')
+        setSocialTwitter(artisan?.socialTwitter ?? '')
+        setSocialTiktok(artisan?.socialTiktok ?? '')
+        setSocialYoutube(artisan?.socialYoutube ?? '')
+        setWebsite(artisan?.website ?? '')
+        setHashtags(artisan?.hashtags ?? [])
+        setHashtagInput('')
         setMessage(null)
+    }
+
+    function addHashtag() {
+        const tag = hashtagInput.replace(/^#/, '').trim()
+        if (tag && /^[A-Za-z0-9_]{1,50}$/.test(tag) && !hashtags.includes(tag) && hashtags.length < 20) {
+            setHashtags(prev => [...prev, tag])
+        }
+        setHashtagInput('')
     }
 
     async function handleLeaveGroup(membershipId: string, groupId: string) {
@@ -299,6 +344,15 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         )}
                     </div>
                 </section>
+
+                {/* ── Craft Story Banner ── */}
+                {storyBanner && (
+                    <section className="bg-background py-6">
+                        <div className="mx-auto max-w-3xl px-4">
+                            <CraftStoryBanner {...storyBanner} />
+                        </div>
+                    </section>
+                )}
 
                 {/* ── About Section ── */}
                 {artisan.bio && (
@@ -462,6 +516,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                         id="firstName"
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
+                                        pattern=".*\D.*"
                                         required
                                     />
                                 </div>
@@ -471,6 +526,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                         id="lastName"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
+                                        pattern=".*\D.*"
                                         required
                                     />
                                 </div>
@@ -530,6 +586,65 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         />
                     </div>
 
+                    {/* Social & Hashtags section */}
+                    <div className="rounded-lg border border-border bg-card p-6">
+                        <h2 className="mb-4 text-lg font-semibold">{t('socialAndHashtags')}</h2>
+                        <div className="space-y-4">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {[
+                                    { id: 'socialInstagram', label: t('socialInstagram'), icon: Instagram, value: socialInstagram, setter: setSocialInstagram, placeholder: 'yourhandle' },
+                                    { id: 'socialFacebook', label: t('socialFacebook'), icon: Facebook, value: socialFacebook, setter: setSocialFacebook, placeholder: 'yourhandle' },
+                                    { id: 'socialTwitter', label: t('socialTwitter'), icon: Twitter, value: socialTwitter, setter: setSocialTwitter, placeholder: 'yourhandle' },
+                                    { id: 'socialTiktok', label: t('socialTiktok'), icon: Hash, value: socialTiktok, setter: setSocialTiktok, placeholder: 'yourhandle' },
+                                    { id: 'socialYoutube', label: t('socialYoutube'), icon: Youtube, value: socialYoutube, setter: setSocialYoutube, placeholder: 'yourchannel' },
+                                    { id: 'website', label: t('socialWebsite'), icon: Globe, value: website, setter: setWebsite, placeholder: 'https://yoursite.com' },
+                                ].map(({ id, label, icon: Icon, value, setter, placeholder }) => (
+                                    <div key={id}>
+                                        <Label htmlFor={id} className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
+                                            <Icon className="h-4 w-4 text-muted-foreground" />
+                                            {label}
+                                        </Label>
+                                        <Input
+                                            id={id}
+                                            value={value}
+                                            onChange={e => setter(e.target.value)}
+                                            placeholder={placeholder}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div>
+                                <Label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
+                                    <Hash className="h-4 w-4 text-muted-foreground" />
+                                    {t('hashtags')}
+                                </Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        value={hashtagInput}
+                                        onChange={e => setHashtagInput(e.target.value)}
+                                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addHashtag() } }}
+                                        placeholder={t('addHashtag')}
+                                        className="flex-1"
+                                    />
+                                    <Button type="button" variant="outline" onClick={addHashtag}>+</Button>
+                                </div>
+                                {hashtags.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-1.5">
+                                        {hashtags.map(tag => (
+                                            <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                                                #{tag}
+                                                <button type="button" onClick={() => setHashtags(prev => prev.filter(t => t !== tag))}>
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Gallery section (edit mode only) */}
                     {!isCreateMode && (
                         <div className="rounded-lg border border-border bg-card p-6">
@@ -553,6 +668,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                             </Button>
                         )}
                         <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                             {isSubmitting
                                 ? isCreateMode
                                     ? t('saving')

@@ -14,6 +14,6 @@ export default async function AuthRedirectPage() {
     if (artisan) {
         redirect('/crafts')
     } else {
-        redirect('/profile')
+        redirect('/onboarding')
     }
 }
