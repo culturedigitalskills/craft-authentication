@@ -1,0 +1,281 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+// Enums
+
+enum Role {
+    ADMIN
+    ARTISAN
+}
+
+enum TagType {
+    QR
+    NFC
+}
+
+enum AttachmentType {
+    HERO
+    COVER
+    GALLERY
+    PROCESS
+}
+
+enum GroupRole {
+    ADMIN
+    MEMBER
+}
+
+enum OrganizationType {
+    COOPERATIVE
+    COLLECTIVE
+    GUILD
+    ASSOCIATION
+    SOCIAL_ENTERPRISE
+    NONPROFIT
+    STUDIO
+    NETWORK
+    OTHER
+}
+
+enum CraftStoryStatus {
+    DRAFT
+    PUBLISHED
+}
+
+// Auth Models
+
+model User {
+    id            String      @id @default(uuid())
+    name          String?
+    email         String      @unique
+    emailVerified DateTime?
+    password      String?
+    image         String?
+    role          Role        @default(ARTISAN)
+    isActive      Boolean     @default(true)
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+    accounts      Account[]
+    sessions      Session[]
+    artisan       Artisan?
+    mediaFiles    MediaFile[]
+}
+
+model Account {
+    id                String  @id @default(uuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(uuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+// Utility Models
+
+model MediaFile {
+    id               String            @id @default(uuid())
+    filename         String
+    originalName     String
+    mimeType         String
+    size             Int
+    bucket           String
+    objectKey        String
+    uploaderId       String?
+    createdAt        DateTime          @default(now())
+    updatedAt        DateTime          @default(now())
+    mediaAttachments MediaAttachment[]
+    uploader         User?             @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+
+    @@index([createdAt], name: "idx_media_files_created_at")
+    @@index([uploaderId], name: "idx_media_files_uploader_id")
+}
+
+model DataRecord {
+    id          String   @id @default(uuid())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @default(now())
+    name        String
+    description String?
+    data        Json
+
+    @@index([createdAt], name: "idx_data_records_created_at")
+}
+
+// Groups & Artisans
+
+model Group {
+    id                 String              @id @default(uuid())
+    name               String
+    slug               String              @unique
+    description        String?
+    website            String?
+    location           String?
+    organizationType   OrganizationType    @default(OTHER)
+    certifications     String[]            @default([])
+    isHeritageCraft    Boolean             @default(false)
+    isOpenToMembers    Boolean             @default(true)
+    hasTrainingProgram Boolean             @default(false)
+    isActive           Boolean             @default(true)
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    memberships        ArtisanGroupMembership[]
+}
+
+model Artisan {
+    id                String                       @id @default(uuid())
+    userId            String                       @unique
+    country           String?
+    region            String?
+    firstName         String
+    lastName          String
+    slug              String                       @unique
+    bio               String?
+    yearsOfExperience Int?
+    learningSource    String?
+    latitude          Float?
+    longitude         Float?
+    socialInstagram   String?                      @db.VarChar(100)
+    socialFacebook    String?                      @db.VarChar(100)
+    socialTwitter     String?                      @db.VarChar(100)
+    socialTiktok      String?                      @db.VarChar(100)
+    socialYoutube     String?                      @db.VarChar(100)
+    website           String?                      @db.VarChar(255)
+    hashtags          String[]                     @default([])
+    createdAt         DateTime                     @default(now())
+    updatedAt         DateTime                     @updatedAt
+    deletedAt         DateTime?
+    user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    memberships       ArtisanGroupMembership[]
+    craftStory        CraftStory?
+}
+
+model CraftStory {
+    id                      String           @id @default(uuid())
+    artisanId               String           @unique
+    status                  CraftStoryStatus @default(DRAFT)
+    lastStepReached         Int              @default(0)
+    answerSelfText          String?
+    answerSelfMediaId       String?
+    answerCraftText         String?
+    answerCraftMediaId      String?
+    answerMeaningText       String?
+    answerMeaningMediaId    String?
+    answerBenefitsText      String?
+    answerBenefitsMediaId   String?
+    answerFutureText        String?
+    answerFutureMediaId     String?
+    answerChallengesText    String?
+    answerChallengesMediaId String?
+    publishedAt             DateTime?
+    createdAt               DateTime         @default(now())
+    updatedAt               DateTime         @updatedAt
+    artisan                 Artisan          @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+}
+
+model ArtisanGroupMembership {
+    id         String    @id @default(uuid())
+    artisanId  String
+    groupId    String
+    role       GroupRole @default(MEMBER)
+    isPrimary  Boolean   @default(false)
+    joinedDate DateTime  @default(now())
+    leftDate   DateTime?
+    artisan    Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+    group      Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    @@unique([artisanId, groupId])
+}
+
+// QR Tags & Scanning
+
+model BatchTag {
+    id            String    @id @default(uuid())
+    batchId       String
+    itemNumber    Int
+    tagCode       String    @unique
+    tagType       TagType   @default(QR)
+    scanCount     Int       @default(0)
+    isActive      Boolean   @default(true)
+    createdAt     DateTime  @default(now())
+    deactivatedAt DateTime?
+    scans         TagScan[]
+
+    @@index([batchId])
+}
+
+model TagScan {
+    id          String   @id @default(uuid())
+    tagId       String
+    scannedAt   DateTime @default(now())
+    countryCode String?
+    city        String?
+    tag         BatchTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@index([tagId])
+}
+
+// Verifiable Credentials
+
+model VerifiableCredential {
+    id                String   @id @default(uuid())
+    credentialId      String   @unique
+    issuerDid         String
+    holderDid         String
+    credentialType    String
+    credentialSubject Json
+    proof             Json
+    issuanceDate      DateTime
+    expirationDate    DateTime?
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+
+    @@index([holderDid])
+}
+
+// Media Attachments
+
+model MediaAttachment {
+    id             String         @id @default(uuid())
+    mediaId        String
+    entityType     String
+    entityId       String
+    attachmentType AttachmentType @default(GALLERY)
+    isPrimary      Boolean        @default(false)
+    displayOrder   Int            @default(0)
+    createdAt      DateTime       @default(now())
+    media          MediaFile      @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+    @@index([entityType, entityId])
+    @@index([mediaId])
+}

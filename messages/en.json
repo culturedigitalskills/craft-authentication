@@ -1,0 +1,472 @@
+{
+    "locale": "en",
+    "initials": "SC",
+    "title": "Sustainable Crafting",
+    "subtitle": "Authentic Cultural Products",
+    "copyright": "© 2025 sustainablecrafting.org. All rights reserved.",
+    "madeWith": "Made with ❤️ for artisans worldwide",
+    "navbar": {
+        "home": "Home",
+        "about": "About",
+        "crafts": "Crafts",
+        "artisans": "Artisans",
+        "groups": "Communities",
+        "seecrafts": "Gallery",
+        "addcraft": "Add Craft",
+        "mystory": "My Story",
+        "login": "Login",
+        "logout": "Logout",
+        "profile": "Profile",
+        "myitems": "My Crafts",
+        "mygroups": "My Communities",
+        "createGroup": "Create Community"
+    },
+    "auth": {
+        "loginTitle": "Sign In",
+        "registerTitle": "Create Account",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "name": "Full Name",
+        "login": "Sign In",
+        "register": "Create Account",
+        "signingIn": "Signing in...",
+        "registering": "Creating account...",
+        "invalidCredentials": "Invalid email or password",
+        "noAccount": "Don't have an account?",
+        "haveAccount": "Already have an account?",
+        "passwordMismatch": "Passwords do not match",
+        "registrationFailed": "Registration failed. Please try again.",
+        "emailExists": "An account with this email already exists.",
+        "validation": {
+            "nameRequired": "Name is required",
+            "emailInvalid": "Please enter a valid email address",
+            "passwordMin": "Password must be at least 8 characters",
+            "passwordMismatch": "Passwords do not match"
+        },
+        "orDivider": "or",
+        "continueWithGoogle": "Continue with Google"
+    },
+    "about": {
+        "title": "About SustainableCrafting",
+        "missionTitle": "Our Mission",
+        "missionDescription": "At SustainableCrafting, we provide a digital platform to enable artisans worldwide to document their handmade products, connect, and support their socioeconomic activities. We believe in preserving the knowledge, skills, and cultural heritage embedded in every by-hand tradition. Our mission is to champion authenticity, celebrate the human story behind every handmade object, and promote sustainability in a global marketplace that too often forgets the skilled artisan hands that create them.",
+        "viewRepository": "View our GitHub Repository",
+        "keyFeatures": "The database includes a Prisma wired to Postgres via env-driven URLs for dev and Docker. UI includes the shadcn/ui with Tailwind v3, radix primitives, and reusable utilities. All packaged in a Docker container for easy deployment.",
+        "privacyPolicy": "Privacy Policy",
+        "contact": "Contact"
+    },
+    "footer": {
+        "description": "The project website has been produced and is managed by the University of Brighton. This project is funded by the UK's Arts and Humanities Research Council under the India-UK research into creative industries and cultural heritage with the title: Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries. (Grant No. OPP080)."
+    },
+    "socialmedia": {
+        "title": "Follow Us",
+        "instagram": "Instagram",
+        "twitter": "Twitter",
+        "facebook": "Facebook",
+        "email": "Email"
+    },
+    "landing": {
+        "description": "Connect directly with skilled artisans from across the world. Every skillfully designed product tells an authentic story about the place, its histories, and the people who create them. Verify their authenticity through our innovative QR code system.",
+        "exploreCrafts": "Gallery",
+        "learnMore": "Learn More"
+    },
+    "features": {
+        "authentic": {
+            "title": "Authentic",
+            "description": "Access information on cultural products"
+        },
+        "traceable": {
+            "title": "Traceable",
+            "description": "QR-code signed verifier"
+        },
+        "connected": {
+            "title": "Connected",
+            "description": "Direct link to artisans and makers"
+        },
+        "qrCard": {
+            "title": "Scan to Verify",
+            "description": "Authenticate, trace and connect"
+        }
+    },
+    "howItWorks": {
+        "title": "How It Works",
+        "subtitle": "Artisans across the world have the means to connect with customers through a few simple steps:",
+        "steps": {
+            "record": {
+                "title": "Record",
+                "description": "Artisans document their work with our mobile app during the crafting process."
+            },
+            "generate": {
+                "title": "Generate QR",
+                "description": "The system creates a unique signature linking to artisan profile and creation process."
+            },
+            "scan": {
+                "title": "Scan & Verify",
+                "description": "Customers scan QR code to verify authenticity and learn the product's story."
+            },
+            "access": {
+                "title": "Global Access",
+                "description": "Audiences learn about the processes and stories of artisans worldwide."
+            }
+        }
+    },
+    "tradition": {
+        "title": "Bridging Tradition with Technology",
+        "description": "Our QR code system creates an unbreakable link between handmade crafts and their creators. Each scan reveals the artisan's story, the materials used, and the traditional techniques that make every piece unique and valuable."
+    },
+    "benefits": {
+        "certificates": "Immutable digital certificates for each craft",
+        "connection": "Direct connection between artisans and customers",
+        "supply": "Transparent supply chain from creation to sale"
+    },
+    "onboardingWizard": {
+        "stepLabel": "Step {current} of {total}",
+        "back": "Back",
+        "skip": "Skip for now",
+        "next": "Next",
+        "finish": "Create profile",
+        "creating": "Creating...",
+        "skipped": "Skipped",
+        "createFailed": "Could not create your profile. Please try again.",
+        "step1Title": "What's your name?",
+        "step1Hint": "We'll use this on your public artisan profile.",
+        "step2Title": "Add your photos",
+        "step2Hint": "A profile photo and cover image help buyers connect with you. You can add them later if you'd like.",
+        "step3Title": "Tell us about your craft",
+        "step3Hint": "Share a short bio, your years of experience, and how you learned your craft.",
+        "step4Title": "Where are you based?",
+        "step4Hint": "This helps buyers discover artisans from your region.",
+        "step5Title": "Connect your socials",
+        "step5Hint": "Link your social profiles and add hashtags that describe your work.",
+        "step6Title": "Review your profile",
+        "step6Hint": "Take a quick look. You can edit anything later from your profile page.",
+        "reviewName": "Name",
+        "reviewPhotos": "Photos"
+    },
+    "craftStory": {
+        "stepLabel": "Step {current} of {total}",
+        "back": "Back",
+        "next": "Next",
+        "begin": "Begin",
+        "saveExit": "Save & exit",
+        "saving": "Saving...",
+        "publish": "Publish my story",
+        "publishing": "Publishing...",
+        "writeYourAnswer": "Write your answer",
+        "answerPlaceholder": "Take your time. Speak naturally. There is no wrong answer.",
+        "questionLabel": "Question {index}",
+        "publicHeading": "In their words",
+        "publicTitle": "The story of this craft",
+        "errors": {
+            "saveFailed": "We couldn't save your progress. Please try again.",
+            "publishFailed": "We couldn't publish your story. Please try again.",
+            "emptyStory": "Add at least one written answer, recording, or workshop photo before publishing.",
+            "conflict": "Your story was updated in another window. Reload this page to see the latest version."
+        },
+        "banner": {
+            "startTitle": "Share Your Craft Story",
+            "startBody": "Tell us about your craft in your own words, by writing, speaking, or recording.",
+            "startCta": "Start your story",
+            "continueTitle": "Continue your craft story",
+            "continueBody": "You're on step {current} of {total}. Pick up where you left off.",
+            "continueCta": "Continue",
+            "publishedBadge": "Your craft story is published",
+            "publishedBody": "Visitors can read it on your public profile. You can keep editing any time.",
+            "view": "View",
+            "edit": "Edit"
+        },
+        "intro": {
+            "title": "Guideline for Sharing Your Craft Story",
+            "lead": "This page will help you tell the story of your craft in your own words. These questions are only here to guide you. Please speak naturally and add anything you feel is important.",
+            "formatsTitle": "You can share your story as:",
+            "formatText": "Written text",
+            "formatAudio": "Audio recording",
+            "formatVideo": "Video recording",
+            "encouragement": "Please answer in your own words, like you are telling your story to someone who wants to understand your craft."
+        },
+        "step1": {
+            "title": "About Yourself",
+            "prompt": "Can you tell us who you are and how you first learned this craft?"
+        },
+        "step2": {
+            "title": "About Your Craft",
+            "prompt": "Can you explain your craft in simple words, including where it comes from, how it is made, and what it is used for?"
+        },
+        "step3": {
+            "title": "Feelings, Meaning, and Connections",
+            "prompt": "What does this craft mean to you? Are there any feelings, events, traditions, symbols, or stories connected to it?"
+        },
+        "step4": {
+            "title": "Benefits and Opportunities",
+            "prompt": "What has this craft brought to you, your family, or your community?"
+        },
+        "step5": {
+            "title": "Knowledge Transfer and Future Generations",
+            "prompt": "How is this craft passed on to younger people, and do you think it can continue in the future?"
+        },
+        "step6": {
+            "title": "Challenges and Barriers",
+            "prompt": "What difficulties do you face in practicing this craft, and what kind of support would help keep it alive?"
+        },
+        "step7": {
+            "title": "Workshop, Tools & Process",
+            "prompt": "Separately record or photograph your workshop, your tools, your materials, how you make your craft, and the place where you work.",
+            "saveFirst": "Save an answer in a previous step first, then come back to add workshop media."
+        },
+        "review": {
+            "title": "Review your story",
+            "lead": "Take a quick look at what you've shared. You can go back to edit anything before publishing.",
+            "notAnswered": "Not answered yet",
+            "hasRecording": "Recording attached",
+            "workshopCount": "{count, plural, =0 {No files yet} one {1 file} other {# files}}"
+        },
+        "uploader": {
+            "label": "Or record audio / video instead",
+            "chooseFile": "Choose audio or video",
+            "replace": "Replace recording",
+            "remove": "Remove",
+            "uploading": "Uploading...",
+            "uploadFailed": "Upload failed. Please try again.",
+            "hint": "MP3, WAV, MP4 or WebM. Up to {max} MB."
+        },
+        "workshop": {
+            "addFile": "Add photo or video",
+            "removeItem": "Remove",
+            "videoLabel": "Video",
+            "itemAlt": "Workshop or process image",
+            "uploadFailed": "Upload failed. Please try again.",
+            "deleteFailed": "Could not delete that file. Please try again."
+        }
+    },
+    "profile": {
+        "title": "Artisan Profile",
+        "createTitle": "Create Your Artisan Profile",
+        "editTitle": "Edit Your Artisan Profile",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "bio": "Bio",
+        "bioPlaceholder": "Tell us about yourself and your craft...",
+        "yearsOfExperience": "Years of Experience",
+        "learningSource": "How did you learn your craft?",
+        "learningSourcePlaceholder": "e.g., Family tradition, Apprenticeship, Self-taught...",
+        "save": "Save Profile",
+        "saving": "Saving...",
+        "update": "Update Profile",
+        "updating": "Updating...",
+        "edit": "Edit Profile",
+        "cancelEdit": "Cancel",
+        "createSuccess": "Profile created successfully!",
+        "updateSuccess": "Profile updated successfully!",
+        "createFailed": "Failed to create profile. Please try again.",
+        "updateFailed": "Failed to update profile. Please try again.",
+        "yearsLabel": "years",
+        "country": "Country",
+        "region": "Region",
+        "selectCountry": "Select a country",
+        "selectRegion": "Select a region",
+        "uploadPhoto": "Upload Photo",
+        "changePhoto": "Change Photo",
+        "photoUploading": "Uploading...",
+        "photoUploadFailed": "Failed to upload photo",
+        "fileTooLarge": "Image is too large. Maximum size is 8 MB.",
+        "personalInfo": "Personal Information",
+        "craftExperience": "Craft Experience",
+        "location": "Location",
+        "publicProfileLink": "View Public Profile",
+        "coverPhoto": "Cover Photo",
+        "uploadCover": "Upload Cover Photo",
+        "changeCover": "Change Cover",
+        "coverUploadFailed": "Failed to upload cover photo",
+        "gallery": "Gallery",
+        "uploadGallery": "Add Photos",
+        "galleryEmpty": "No gallery photos yet",
+        "galleryUploadFailed": "Failed to upload gallery photo",
+        "galleryDeleteFailed": "Failed to delete gallery photo",
+        "galleryDeleteConfirm": "Delete this photo?",
+        "galleryDeleteYes": "Delete",
+        "galleryDeleteNo": "Cancel",
+        "myGroups": "My Groups",
+        "groupAdmin": "Admin",
+        "groupMember": "Member",
+        "leaveGroup": "Leave",
+        "confirmLeave": "Confirm Leave",
+        "leaveGroupFailed": "Failed to leave group",
+        "cancel": "Cancel",
+        "socialAndHashtags": "Social & Hashtags",
+        "socialInstagram": "Instagram",
+        "socialFacebook": "Facebook",
+        "socialTwitter": "X (Twitter)",
+        "socialTiktok": "TikTok",
+        "socialYoutube": "YouTube",
+        "socialWebsite": "Website",
+        "hashtags": "Hashtags",
+        "addHashtag": "Add hashtag"
+    },
+    "artisans": {
+        "title": "Artisans",
+        "description": "Discover skilled artisans from around the world, each with a unique story of craft and tradition.",
+        "noArtisansFound": "No artisans found.",
+        "noResults": "No artisans match your search.",
+        "yearsExperience": "yrs experience",
+        "viewProfile": "View Profile",
+        "crafts": "Crafts",
+        "searchPlaceholder": "Search artisans...",
+        "artisansCount": "artisans"
+    },
+    "artisanProfile": {
+        "about": "About",
+        "craftJourney": "Craft Journey",
+        "yearsExperience": "years of experience",
+        "learnedFrom": "Learned from",
+        "notFound": "Artisan not found",
+        "gallery": "Gallery",
+        "galleryEmpty": "No gallery photos yet",
+        "groups": "Communities",
+        "crafts": "Crafts",
+        "noCrafts": "No public crafts yet.",
+        "connectWith": "Connect"
+    },
+    "crafts": {
+        "welcomeTitle": "Gallery of Crafts",
+        "description": "Discover authentic handmade crafts from skilled artisans around the world. Each piece is verified and tells a unique story of tradition and craftsmanship.",
+        "explore": {
+            "noImageAvailable": "No image available",
+            "craftDetails": "Craft Details",
+            "artisan": "Artisan",
+            "materials": "Materials",
+            "techniques": "Techniques",
+            "by": "by",
+            "noCraftsFound": "No crafts found.",
+            "noResults": "No crafts match your search.",
+            "searchPlaceholder": "Search crafts...",
+            "craftsCount": "crafts"
+        },
+        "details": {
+            "description": "Description",
+            "materials": "Materials",
+            "createdBy": "Created by",
+            "createdWhere": "Created at",
+            "createdOn": "Created on",
+            "updatedOn": "Updated on",
+            "backToCrafts": "Back to Crafts",
+            "noDescription": "No description available",
+            "qrCodeTitle": "Certificate of Authenticity",
+            "qrCodeDescription": "Share this craft.",
+            "qrScanGuidance": "Scan with your phone camera to verify authenticity",
+            "copyLink": "Copy link",
+            "linkCopied": "Copied!",
+            "visible": "Public",
+            "notvisible": "Private"
+        },
+        "mycrafts": {
+            "noCraftsYet": "You haven't added any crafts yet."
+        },
+        "welcomeTitleCraft": "Craft Details"
+    },
+    "createCraft": {
+        "craftInfo": "Craft Information",
+        "craftTitle": "Craft Title",
+        "craftDescription": "Craft Description",
+        "createCraftTitle": "Create New Craft",
+        "createCraftHelper": "Share your craft with the world — add a title, description, and photos.",
+        "createEdittHelper": "Update your craft details below.",
+        "editCraftTitle": "Edit Craft",
+        "saveCraft": "Save Craft",
+        "updateCraft": "Update",
+        "cancelEdit": "Cancel",
+        "deleteCraft": "Delete",
+        "createCraftName": "Craft title",
+        "createCraftDescription": "Description",
+        "createCraftMaterial": "Material",
+        "createCraftPublic": "Make this craft public",
+        "createCraftMakeLocationPublic": "Share my approximate location with visitors",
+        "uploadImages": "Upload images of your craft",
+        "browse": "Browse files",
+        "imagesSelected": "image(s) selected",
+        "saving": "Saving...",
+        "updating": "Updating...",
+        "createFailed": "Failed to save craft. Please try again.",
+        "updateFailed": "Failed to update craft. Please try again.",
+        "savingCraft": "Saving craft...",
+        "updatingCraft": "Updating craft...",
+        "craftCreateSuccess": "Craft created successfully!",
+        "craftUpdateSuccess": "Craft updated successfully!",
+        "createCraftDescriptionPlaceholder": "What materials, techniques, or story makes this craft special?",
+        "selectMaterial": "Choose a material...",
+        "deleteCraftConfirm": "Delete this craft? This cannot be undone.",
+        "fileTooLarge": "Image is too large. Maximum size is 8 MB.",
+        "deleteImage": "Remove image",
+        "deleteImageConfirm": "Remove this image?",
+        "deleteImageYes": "Remove",
+        "deleteImageNo": "Cancel",
+        "deleteImageFailed": "Failed to remove image. Please try again.",
+        "videosLabel": "YouTube videos",
+        "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
+        "addVideo": "Add",
+        "removeVideo": "Remove video",
+        "invalidYoutubeUrl": "Could not recognize that as a YouTube link."
+    },
+    "groups": {
+        "title": "Artisan Communities",
+        "subtitle": "Browse artisan communities, cooperatives, guilds, and associations from around the world.",
+        "browseGroups": "Browse All Communities",
+        "createGroup": "Create Community",
+        "createGroupHelper": "Set up a new artisan community, cooperative, or guild.",
+        "editGroup": "Edit Community",
+        "deleteGroup": "Delete Community",
+        "deleteConfirm": "Are you sure? This cannot be undone.",
+        "groupName": "Community Name",
+        "description": "Description",
+        "website": "Website",
+        "location": "Location",
+        "organizationType": "Organization Type",
+        "certifications": "Certifications",
+        "heritageCraft": "Heritage Craft",
+        "openToMembers": "Open to Members",
+        "trainingProgram": "Training Program",
+        "orgType_COOPERATIVE": "Cooperative",
+        "orgType_COLLECTIVE": "Collective",
+        "orgType_GUILD": "Guild",
+        "orgType_ASSOCIATION": "Association",
+        "orgType_SOCIAL_ENTERPRISE": "Social Enterprise",
+        "orgType_NONPROFIT": "Nonprofit",
+        "orgType_STUDIO": "Studio",
+        "orgType_NETWORK": "Network",
+        "orgType_OTHER": "Other",
+        "cert_WFTO_FAIR_TRADE": "WFTO Fair Trade",
+        "cert_FAIRTRADE_CERTIFIED": "Fairtrade Certified",
+        "cert_NEST_ETHICAL_HANDCRAFT": "Nest Ethical Handcraft",
+        "cert_BCORP": "B Corp",
+        "cert_UNESCO_ICH": "UNESCO Heritage",
+        "cert_FAIR_TRADE_FEDERATION": "Fair Trade Federation",
+        "members": "Members",
+        "noMembers": "No members yet",
+        "addMember": "Add Member",
+        "removeMember": "Remove Member",
+        "memberRole": "Role",
+        "admin": "Admin",
+        "member": "Member",
+        "notFound": "Community not found",
+        "empty": "No communities found",
+        "confirmDelete": "Are you sure you want to delete this community?",
+        "confirmRemoveMember": "Remove this member from the community?",
+        "createSuccess": "Community created successfully",
+        "updateSuccess": "Community updated successfully",
+        "deleteSuccess": "Community deleted successfully",
+        "memberAdded": "Member added successfully",
+        "memberRemoved": "Member removed successfully",
+        "saveFailed": "Failed to save community",
+        "fileTooLarge": "Image is too large. Maximum size is 8 MB.",
+        "deleteFailed": "Failed to delete community",
+        "viewGroup": "View Community",
+        "searchArtisan": "Search artisan by name...",
+        "cancel": "Cancel"
+    },
+    "materials": {
+        "selectOne": "Select one:",
+        "wool": "Wool",
+        "cotton": "Cotton",
+        "mix": "Mix"
+    }
+}
