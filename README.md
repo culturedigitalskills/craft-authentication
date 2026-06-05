@@ -52,6 +52,12 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 - `POST /api/media/attachments` - Link media to an entity (authenticated)
 - `DELETE /api/media/:id` - Delete media file
 
+### Verifiable Credentials
+
+- `GET /api/vc/:craftId` - Download signed credential JSON for a craft
+- `POST /api/vc/verify` - Verify a credential JSON
+- `GET /api/vc/signing-test` - Signing self-test endpoint (dev by default; production requires `VC_TEST_TOKEN` + `x-vc-test-token` header)
+
 ## Usage Examples
 
 ### Create Data Record
@@ -75,6 +81,19 @@ curl -X POST \
 
 ```bash
 curl http://localhost:3000/api/media
+```
+
+### Test VC signing health
+
+```bash
+curl http://localhost:3000/api/vc/signing-test
+```
+
+Production example (with token):
+
+```bash
+curl -H "x-vc-test-token: YOUR_VC_TEST_TOKEN" \
+  http://localhost:3000/api/vc/signing-test
 ```
 
 ## Data Persistence

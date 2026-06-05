@@ -5,6 +5,7 @@
 Added social media handles, website, and hashtags to the `Artisan` model.
 
 **New columns on `Artisan`**:
+
 - `socialInstagram` (optional, max 100 chars)
 - `socialFacebook` (optional, max 100 chars)
 - `socialTwitter` (optional, max 100 chars)
@@ -13,8 +14,6 @@ Added social media handles, website, and hashtags to the `Artisan` model.
 - `website` (optional, max 255 chars)
 - `hashtags` (String array, defaults to `[]`)
 
-
-
 # v0.7.x -> v0.8.0
 
 ### Verifiable Credentials
@@ -22,6 +21,7 @@ Added social media handles, website, and hashtags to the `Artisan` model.
 Each craft now automatically receives a signed W3C Verifiable Credential (VC) on creation. Credentials are served publicly and can be verified independently without a database lookup.
 
 **New API endpoints**:
+
 - `GET /api/vc/[craftId]` — download the signed credential JSON for a craft
 - `POST /api/vc/verify` — verify a credential JSON without a database lookup
 - `GET /.well-known/did.json` — public DID document for `did:web` resolution
@@ -30,9 +30,32 @@ Each craft now automatically receives a signed W3C Verifiable Credential (VC) on
 
 **Configuration changes** — add to `.env.local` and `.env.production`:
 
+Preferred (file-based secrets):
+
+```env
+VC_PRIVATE_KEY_PATH="/run/secrets/vc_private_key.pem"
+VC_PUBLIC_KEY_PATH="/run/secrets/vc_public_key.pem"
+```
+
+Fallback (inline PEM in env vars):
+
 ```env
 VC_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 VC_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n"
+```
+
+Optional signing-test token (recommended in production):
+
+```env
+VC_TEST_TOKEN="CHANGE_TO_RANDOM_TEST_TOKEN"
+```
+
+When set in production, call `GET /api/vc/signing-test` with header `x-vc-test-token: <VC_TEST_TOKEN>`.
+
+If you change `.env.production` (including `VC_TEST_TOKEN`), recreate the app container so new values are loaded:
+
+```bash
+docker compose --env-file .env.production up -d --force-recreate app
 ```
 
 Generate the key pair once with:
@@ -77,6 +100,7 @@ Replaced the simple boolean flags (`isWomenLed`, `isCooperative`, `isFairTrade`)
 **New enum**: `OrganizationType` (`COOPERATIVE`, `COLLECTIVE`, `GUILD`, `ASSOCIATION`, `SOCIAL_ENTERPRISE`, `NONPROFIT`, `STUDIO`, `NETWORK`, `OTHER`)
 
 **New columns on `Group`**:
+
 - `organizationType` (OrganizationType enum, defaults to `OTHER`)
 - `certifications` (String array — values: `WFTO_FAIR_TRADE`, `FAIRTRADE_CERTIFIED`, `NEST_ETHICAL_HANDCRAFT`, `BCORP`, `UNESCO_ICH`, `FAIR_TRADE_FEDERATION`)
 - `isHeritageCraft` (boolean, defaults to false)
@@ -93,14 +117,16 @@ pnpm prisma:generate
 No new environment variables required.
 
 # v0.4.x -> v0.5.0
+
 Description
 Completed the Groups feature (Phases 5–7) and replaced placeholder group flags with a research-backed classification system. Added group photo uploads, artisan self-service, searchable member management, and standardized action button alignment across all forms.
 
 Changes
 Added OrganizationType enum (Cooperative, Collective, Guild, Association, Social)
+
 ### Community Renamed to Group
 
-Renamed `Community` to `Group` and `ArtisanCommunityMembership` to `ArtisanGroupMembership`. Groups are no longer tied to a region  the `regionId`, `latitude`, and `longitude` columns have been removed.
+Renamed `Community` to `Group` and `ArtisanCommunityMembership` to `ArtisanGroupMembership`. Groups are no longer tied to a region the `regionId`, `latitude`, and `longitude` columns have been removed.
 
 **Renamed tables**: `Community` to `Group`, `ArtisanCommunityMembership` to `ArtisanGroupMembership`
 
@@ -135,7 +161,6 @@ pnpm prisma:generate
 ```
 
 No new environment variables required.
-
 
 # v0.3.x -> v0.4.0
 
@@ -183,6 +208,7 @@ AUTH_GOOGLE_SECRET=your-google-client-secret
 ```
 
 Get credentials from the [Google Cloud Console](https://console.cloud.google.com/apis/credentials):
+
 1. Sign in with any Google account.
 2. Create a new project.
 3. Set up OAuth consent screen.
@@ -207,7 +233,6 @@ prisma migrate deploy
 ```
 
 No new environment variables required.
-
 
 # v0.1.x -> v0.2.0
 
