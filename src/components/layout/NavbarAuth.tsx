@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession, signOut } from 'next-auth/react'
+import { useSession, signOut } from '@/lib/auth-client'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
 import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen } from 'lucide-react'
