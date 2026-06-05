@@ -1,3 +1,27 @@
+# v0.9.x -> v0.10.0
+
+### Better Auth Migration
+
+Migrated authentication from Auth.js/NextAuth to Better Auth. This change is fully transparent to users; existing bcrypt passwords and OAuth accounts will continue to work.
+
+**Schema Changes**:
+
+- Replaced `Session` model fields to match Better Auth session tracking.
+- Replaced `Account` model fields to match Better Auth account linking.
+- Replaced `VerificationToken` model with the `Verification` model.
+- Kept custom fields `role` and `isActive` on the `User` model.
+
+**Migration Steps**:
+
+1. Run database schema sync:
+    ```bash
+    pnpm db:push
+    ```
+2. Run the legacy credentials password migration script:
+    ```bash
+    node scripts/migrate-passwords.js .env.production
+    ```
+
 # v0.8.x -> v0.9.0
 
 ### Artisan Social Fields
