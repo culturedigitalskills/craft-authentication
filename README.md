@@ -5,6 +5,7 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 ## Stack
 
 - **Framework**: Next.js 16 (App Router, TypeScript)
+- **Runtime**: Node.js 24 LTS
 - **Database**: PostgreSQL 16 + Prisma 7
 - **Storage**: Garage (S3-compatible, AGPL v3)
 - **UI**: shadcn/ui + Tailwind CSS v3 + Radix primitives
