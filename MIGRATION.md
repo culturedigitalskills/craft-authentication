@@ -1,3 +1,25 @@
+# v0.10.0 -> v0.11.0
+
+### Hybrid Encrypted User Secrets Vault
+
+Implemented a hybrid client-side encryption vault (using Web Crypto API) to secure user secrets (e.g., OpenAI, Flux2 API keys). The Master Vault Key can be simultaneously wrapped using Recovery Tokens, Server KMS (escrow), or E2E WebAuthn PRF.
+
+**Schema Changes**:
+- Added `VaultWrapMode` enum.
+- Added `UserSecrets` table for storing client-side encrypted payload data.
+- Added `UserWrappedVaultKeys` table for storing wrapped keys per authentication wrap mode.
+- Added `master_key_hash` column to the `User` table to enforce downgrade protection.
+
+**Configuration Changes** (add to `.env.local` and `.env.production`):
+- `LOCAL_MASTER_KEY`: 256-bit symmetric key (hex or base64) used by the simulated KMS (`MockLocalKMS`).
+- `VAULT_SERVER_SECRET`: Secret key used to compute HMAC-SHA256 hashes of WebAuthn credential IDs for user privacy. (If left unset, defaults to `AUTH_SECRET`).
+
+**Migration Steps**:
+1. Run database migrations to apply the vault models:
+    ```bash
+    pnpm db:migrate
+    ```
+
 # v0.9.x -> v0.10.0
 
 ### Better Auth Migration
