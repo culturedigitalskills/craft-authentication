@@ -53,7 +53,7 @@ model User {
     id            String      @id @default(uuid())
     name          String?
     email         String      @unique
-    emailVerified DateTime?
+    emailVerified Boolean     @default(false)
     password      String?
     image         String?
     role          Role        @default(ARTISAN)

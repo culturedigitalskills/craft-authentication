@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { signIn } from '@/lib/auth-client'
+import { signIn, signUp } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Eye, EyeOff } from 'lucide-react'
@@ -48,29 +48,19 @@ export function RegisterForm() {
         setServerError(null)
 
         try {
-            const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: data.name,
-                    email: data.email,
-                    password: data.password,
-                }),
+            const res = await signUp({
+                name: data.name,
+                email: data.email,
+                password: data.password,
             })
 
-            if (!res.ok) {
-                const json = await res.json()
+            if (res.error) {
+                const isEmailExists = res.code === 'USER_ALREADY_EXISTS' || res.error.toLowerCase().includes('already exists')
                 setServerError(
-                    res.status === 409 ? t('emailExists') : (json.error || t('registrationFailed'))
+                    isEmailExists ? t('emailExists') : (res.error || t('registrationFailed'))
                 )
                 return
             }
-
-            await signIn('credentials', {
-                email: data.email,
-                password: data.password,
-                redirect: false,
-            })
 
             router.push('/onboarding')
             router.refresh()

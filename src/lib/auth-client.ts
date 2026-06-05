@@ -57,6 +57,26 @@ export async function signIn(provider: string, options?: { email?: string; passw
     return { error: 'Unknown provider' }
 }
 
+export async function signUp(options: { email: string; password?: string; name: string }) {
+    try {
+        const res = await authClient.signUp.email({
+            email: options.email,
+            password: options.password || '',
+            name: options.name,
+        })
+        if (res.error) {
+            return {
+                error: res.error.message || 'Registration failed',
+                code: res.error.code,
+                status: res.error.status,
+            }
+        }
+        return { error: null }
+    } catch (err: any) {
+        return { error: err.message || 'Registration failed' }
+    }
+}
+
 export async function signOut(options?: { callbackUrl?: string }) {
     await authClient.signOut()
     if (options?.callbackUrl) {
@@ -65,3 +85,4 @@ export async function signOut(options?: { callbackUrl?: string }) {
         window.location.reload()
     }
 }
+
