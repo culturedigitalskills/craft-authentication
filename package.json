@@ -2,6 +2,10 @@
     "name": "craft-authentication",
     "version": "0.2.0",
     "private": true,
+    "packageManager": "pnpm@11.5.2",
+    "engines": {
+        "node": ">=24"
+    },
     "scripts": {
         "dev": "node scripts/generate-build-info.js && dotenv -e .env.local -- next dev",
         "build-info": "node scripts/generate-build-info.js",
