@@ -8,3 +8,6 @@ allowBuilds:
 onlyBuiltDependencies:
     - '@prisma/engines'
     - prisma
+
+overrides:
+    kysely: "0.28.0"
