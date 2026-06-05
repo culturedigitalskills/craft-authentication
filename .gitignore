@@ -46,6 +46,7 @@ next-env.d.ts
 
 # garage config with secrets
 garage.toml
+/secrets
 
 # transient files
 build-info.json
