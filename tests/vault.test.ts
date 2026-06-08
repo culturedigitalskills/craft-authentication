@@ -9,20 +9,17 @@ import {
     decryptPayload,
     generateVerificationToken,
     asymmetricWrapMasterKey,
-    asymmetricWrapSecret
 } from '@/lib/crypto-vault'
 import { KMS } from '@/lib/kms'
 import { UserSecretsService } from '@/lib/user-secrets-service'
 
 // Import route handlers directly to execute them in-memory
 import { POST as initializePost } from '@/app/api/vault/initialize/route'
-import { POST as secretsPost, GET as secretsGet } from '@/app/api/vault/secrets/route'
+import { POST as secretsPost } from '@/app/api/vault/secrets/route'
+import { GET as secretsHasGet } from '@/app/api/vault/secrets/[type]/route'
 import { POST as rotateKeyPost } from '@/app/api/vault/rotate-key/route'
-import { DELETE as escrowDelete } from '@/app/api/vault/escrow/route'
-import { GET as keysGet } from '@/app/api/vault/keys/route'
+import { GET as vaultStatusGet } from '@/app/api/vault/status/route'
 import { GET as kmsPublicKeyGet } from '@/app/api/vault/kms-public-key/route'
-import { GET as functionsGet } from '@/app/api/vault/functions/route'
-import { POST as functionExecutePost } from '@/app/api/vault/functions/[name]/route'
 
 // Import Server Actions
 import { verifyClientDecodedKeyAction, verifyDecryptedSecretAction } from '@/app/actions/vault'
@@ -59,8 +56,8 @@ describe('Cryptographic Vault Integration Tests', () => {
     let wrappedKeyPayload: string
     let verificationToken: string
     let encryptedSecretPayload: string
-    const testSecretPlaintext = 'my-super-secret-openai-api-key-12345'
-    const secretType = 'OPENAI_API_KEY'
+    const testSecretPlaintext = 'my-super-secret-c2pa-private-key-12345'
+    const secretType = 'C2PA_PRIV'
 
     const originalFetch = globalThis.fetch
 
@@ -198,20 +195,14 @@ describe('Cryptographic Vault Integration Tests', () => {
         expect(postResponse.status).toBe(200)
         expect(postResBody.success).toBe(true)
 
-        // Step 3: Call GET /api/vault/secrets to retrieve the secret
-        const getRequest = new Request('http://localhost/api/vault/secrets', {
-            method: 'GET',
-        })
-
-        const getResponse = await secretsGet()
-        const getResBody = await getResponse.json()
-
-        expect(getResponse.status).toBe(200)
-        expect(getResBody.secrets.length).toBeGreaterThanOrEqual(1)
-
-        const retrievedSecret = getResBody.secrets.find((s: any) => s.type === secretType)
-        expect(retrievedSecret).toBeDefined()
-        expect(retrievedSecret.ciphertextData).toBe(encryptedSecretPayload)
+        // Step 3: Check presence via GET /api/vault/secrets/:type
+        const hasResponse = await secretsHasGet(
+            new Request(`http://localhost/api/vault/secrets/${secretType}`),
+            { params: Promise.resolve({ type: secretType }) }
+        )
+        const hasBody = await hasResponse.json()
+        expect(hasResponse.status).toBe(200)
+        expect(hasBody.present).toBe(true)
 
         // Step 4: Verify server-side decryption using UserSecretsService (KMS Escrow unwrapping)
         const serverDecryptedSecretKms = await UserSecretsService.getDecryptedSecret(testUser.id, secretType)
@@ -260,37 +251,17 @@ describe('Cryptographic Vault Integration Tests', () => {
         expect(kmsBody.publicKey).toBeDefined()
         expect(kmsBody.publicKey).toContain('BEGIN PUBLIC KEY')
 
-        // Step 3: Test GET /api/vault/functions
-        const funcsRes = await functionsGet()
-        const funcsBody = await funcsRes.json()
-        expect(funcsRes.status).toBe(200)
-        expect(funcsBody.functions).toBeDefined()
-        expect(funcsBody.functions.length).toBeGreaterThan(0)
-        const fluxFn = funcsBody.functions.find((f: any) => f.name === 'GENERATE_FLUX_IMAGE')
-        expect(fluxFn).toBeDefined()
-        expect(fluxFn.requiredSecretType).toBe('OPENROUTER_API_KEY')
-
-        // Step 4: Test POST /api/vault/functions/GENERATE_FLUX_IMAGE in escrow mode
-        const request = new Request('http://localhost/api/vault/functions/GENERATE_FLUX_IMAGE', {
-            method: 'POST',
-            body: JSON.stringify({
-                args: { prompt: 'a cute cat' }
-            })
-        })
-        const executeRes = await functionExecutePost(request, {
-            params: Promise.resolve({ name: 'GENERATE_FLUX_IMAGE' })
-        })
-        const executeBody = await executeRes.json()
-        expect(executeRes.status).toBe(200)
-        expect(executeBody.result.url).toBe('https://example.com/mock-image.png')
+        // Step 3: Test generateImageAction Server Action
+        const { generateImageAction } = await import('@/app/actions/generate-image')
+        const imageResult = await generateImageAction({ prompt: 'a cute cat' })
+        expect(imageResult.url).toBe('https://example.com/mock-image.png')
     })
 
     it('should enforce security guards and handle edge cases', async () => {
         // Edge Case A: Request without authentication (session = null -> 401 Unauthorized)
         mockSession.user.id = '' // clear session
         
-        const unauthReq = new Request('http://localhost/api/vault/keys', { method: 'GET' })
-        const unauthRes = await keysGet()
+        const unauthRes = await vaultStatusGet()
         expect(unauthRes.status).toBe(401)
         
         const unauthInitRes = await initializePost(new Request('http://localhost/api/vault/initialize', { method: 'POST' }))
@@ -323,42 +294,7 @@ describe('Cryptographic Vault Integration Tests', () => {
         const doubleInitRes = await initializePost(doubleInitReq)
         expect(doubleInitRes.status).toBe(409)
 
-        // Edge Case D: Attempting to delete escrow before E2E_PRF passkey wrapper is registered (400 Bad Request)
-        const deleteEscrowNoPrfReq = new Request('http://localhost/api/vault/escrow', {
-            method: 'DELETE',
-            body: JSON.stringify({
-                verification_token: verificationToken,
-            }),
-        })
-        const deleteEscrowNoPrfRes = await escrowDelete(deleteEscrowNoPrfReq)
-        const deleteEscrowNoPrfBody = await deleteEscrowNoPrfRes.json()
-        expect(deleteEscrowNoPrfRes.status).toBe(400)
-        expect(deleteEscrowNoPrfBody.error).toBe('Request failed')
-
-        // Edge Case E: Attempting to delete escrow with an invalid verification token (401 Unauthorized)
-        const mockPrfPayload = JSON.stringify({ ciphertext: 'abc', iv: 'def' })
-        const tempPrfKey = await prisma.userWrappedVaultKeys.create({
-            data: {
-                userId: testUser.id,
-                wrapMode: 'E2E_PRF',
-                wrappedKey: mockPrfPayload,
-                credentialId: 'temp-cred-id-hash',
-            }
-        })
-
-        const deleteEscrowBadTokenReq = new Request('http://localhost/api/vault/escrow', {
-            method: 'DELETE',
-            body: JSON.stringify({
-                verification_token: 'bogus-verification-token-base64',
-            }),
-        })
-        const deleteEscrowBadTokenRes = await escrowDelete(deleteEscrowBadTokenReq)
-        expect(deleteEscrowBadTokenRes.status).toBe(401)
-
-        // Clean up the temporary E2E_PRF key
-        await prisma.userWrappedVaultKeys.delete({ where: { id: tempPrfKey.id } })
-
-        // Edge Case F: Attempting key rotation with an invalid verification token (401 Unauthorized)
+        // Edge Case D: Attempting key rotation with an invalid verification token (401 Unauthorized)
         const rotateBadTokenReq = new Request('http://localhost/api/vault/rotate-key', {
             method: 'POST',
             body: JSON.stringify({
@@ -449,161 +385,4 @@ describe('Cryptographic Vault Integration Tests', () => {
         encryptedSecretPayload = newEncryptedSecretPayload
     })
 
-    it('should test E2E-only path by adding passkey wrapper (E2E_PRF) and deleting server escrow', async () => {
-        // Step 1: Simulate client-side passkey wrapper (E2E_PRF) creation
-        const mockPrfKeyBytes = crypto.randomBytes(32)
-        const mockPrfAesKey = await globalThis.crypto.subtle.importKey(
-            'raw',
-            mockPrfKeyBytes,
-            { name: 'AES-GCM' },
-            false,
-            ['encrypt', 'decrypt']
-        )
-        const mockPrfIv = crypto.randomBytes(12)
-        const prfWrappedKeyBuffer = await globalThis.crypto.subtle.encrypt(
-            { name: 'AES-GCM', iv: mockPrfIv },
-            mockPrfAesKey,
-            rawMasterKey
-        )
-        const prfWrappedKeyPayload = JSON.stringify({
-            ciphertext: Buffer.from(prfWrappedKeyBuffer).toString('base64'),
-            iv: mockPrfIv.toString('base64'),
-        })
-        const mockCredentialId = 'mock-credential-id-12345'
-
-        // Step 2: Add E2E_PRF wrapped key to the database via a key rotation
-        const kmsPublicKey = KMS.getPublicWrappingKey()
-        const newAsymmetricallyWrappedKey = await asymmetricWrapMasterKey(rawMasterKey, kmsPublicKey)
-
-        const rotateRequest = new Request('http://localhost/api/vault/rotate-key', {
-            method: 'POST',
-            body: JSON.stringify({
-                new_recovery_token_wrapped_key: wrappedKeyPayload,
-                new_sse_kms_asymmetrically_wrapped_key: newAsymmetricallyWrappedKey,
-                new_prf_wrapped_key: prfWrappedKeyPayload,
-                credential_id: mockCredentialId,
-                re_encrypted_secrets: [
-                    {
-                        type: secretType,
-                        ciphertext_data: encryptedSecretPayload,
-                    },
-                ],
-                verification_token: verificationToken,
-                new_verification_token: verificationToken,
-            }),
-        })
-
-        const rotateResponse = await rotateKeyPost(rotateRequest)
-        const rotateResBody = await rotateResponse.json()
-        expect(rotateResponse.status).toBe(200)
-        expect(rotateResBody.success).toBe(true)
-
-        // Verify that we now have 3 wrapped keys in the DB (RECOVERY_TOKEN, SSE_KMS, E2E_PRF)
-        const keysResponse = await keysGet()
-        const keysResBody = await keysResponse.json()
-        expect(keysResBody.wrappedKeys.length).toBe(3)
-
-        const e2eKey = keysResBody.wrappedKeys.find((k: any) => k.wrapMode === 'E2E_PRF')
-        expect(e2eKey).toBeDefined()
-        expect(e2eKey.credentialId).toBeDefined() // stored hashed on server
-
-        // Step 3: Delete the server escrow (SSE_KMS row) using DELETE /api/vault/escrow
-        const deleteRequest = new Request('http://localhost/api/vault/escrow', {
-            method: 'DELETE',
-            body: JSON.stringify({
-                verification_token: verificationToken,
-            }),
-        })
-
-        const deleteResponse = await escrowDelete(deleteRequest)
-        const deleteResBody = await deleteResponse.json()
-
-        expect(deleteResponse.status).toBe(200)
-        expect(deleteResBody.success).toBe(true)
-
-        // Step 4: Verify in database that SSE_KMS wrapped key row is gone
-        const keysPostDeleteResponse = await keysGet()
-        const keysPostDeleteResBody = await keysPostDeleteResponse.json()
-        expect(keysPostDeleteResBody.wrappedKeys.length).toBe(2)
-
-        const modes = keysPostDeleteResBody.wrappedKeys.map((k: any) => k.wrapMode)
-        expect(modes).toContain('RECOVERY_TOKEN')
-        expect(modes).toContain('E2E_PRF')
-        expect(modes).not.toContain('SSE_KMS')
-
-        // Step 5: Verify that calling UserSecretsService without providing the MasterVaultKey fails (server locked out)
-        await expect(
-            UserSecretsService.getDecryptedSecret(testUser.id, secretType)
-        ).rejects.toThrow(/KMS Escrow is disabled/)
-
-        // Step 6: Verify that calling UserSecretsService with the provided MasterVaultKey still works
-        const decryptedSecret = await UserSecretsService.getDecryptedSecret(
-            testUser.id,
-            secretType,
-            rawMasterKey
-        )
-        expect(decryptedSecret).toBe(testSecretPlaintext)
-
-        // Step 7: Test development-only Server Actions post-escrow-deletion
-        // Key verification should fail as SSE_KMS row is deleted
-        const verifyKeyResPost = await verifyClientDecodedKeyAction(
-            testUser.id,
-            Buffer.from(rawMasterKey).toString('base64')
-        )
-        expect(verifyKeyResPost.success).toBe(false)
-        expect(verifyKeyResPost.error).toContain('No SSE_KMS')
-
-        // Decryption without client key should fail
-        const verifySecretResPostFail = await verifyDecryptedSecretAction(
-            testUser.id,
-            secretType
-        )
-        expect(verifySecretResPostFail.success).toBe(false)
-        expect(verifySecretResPostFail.error).toContain('No server escrow')
-
-        // Decryption with client key should succeed
-        const verifySecretResPostSuccess = await verifyDecryptedSecretAction(
-            testUser.id,
-            secretType,
-            Buffer.from(rawMasterKey).toString('base64')
-        )
-        expect(verifySecretResPostSuccess.success).toBe(true)
-        expect(verifySecretResPostSuccess.decryptedValue).toBe(testSecretPlaintext)
-
-        // Step 8: Test POST /api/vault/functions/GENERATE_FLUX_IMAGE in E2E mode
-        // 8a. Execution without request_key should fail with 403 (Forbidden)
-        const failReq = new Request('http://localhost/api/vault/functions/GENERATE_FLUX_IMAGE', {
-            method: 'POST',
-            body: JSON.stringify({
-                args: { prompt: 'a cute dog' }
-            })
-        })
-        const failExecuteRes = await functionExecutePost(failReq, {
-            params: Promise.resolve({ name: 'GENERATE_FLUX_IMAGE' })
-        })
-        const failBody = await failExecuteRes.json()
-        expect(failExecuteRes.status).toBe(403)
-        expect(failBody.error).toContain('No SSE_KMS escrow found')
-
-        // 8b. Execution with client asymmetric-wrapped secret should succeed
-        const freshPublicKey = KMS.getPublicWrappingKey()
-        const wrappedSecret = await asymmetricWrapSecret('my-openrouter-key-12345', freshPublicKey)
-
-        const successReq = new Request('http://localhost/api/vault/functions/GENERATE_FLUX_IMAGE', {
-            method: 'POST',
-            body: JSON.stringify({
-                args: { prompt: 'a cute dog' },
-                request_key: {
-                    secret_type: 'OPENROUTER_API_KEY',
-                    encrypted_value: wrappedSecret,
-                }
-            })
-        })
-        const successExecuteRes = await functionExecutePost(successReq, {
-            params: Promise.resolve({ name: 'GENERATE_FLUX_IMAGE' })
-        })
-        const successExecuteBody = await successExecuteRes.json()
-        expect(successExecuteRes.status).toBe(200)
-        expect(successExecuteBody.result.url).toBe('https://example.com/mock-image.png')
-    })
 })

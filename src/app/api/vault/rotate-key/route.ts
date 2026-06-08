@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { KMS } from '@/lib/kms'
-import { getVaultServerSecret } from '@/lib/vault-config'
+import { RotateKeyBodySchema } from '@/lib/vault-types'
 import crypto from 'crypto'
 
 export async function POST(request: Request) {
@@ -11,43 +11,40 @@ export async function POST(request: Request) {
 
     const userId = session!.user.id
 
+    let body: unknown
     try {
-        const body = await request.json()
-        const {
-            new_recovery_token_wrapped_key,
-            new_prf_wrapped_key,
-            new_sse_kms_asymmetrically_wrapped_key,
-            credential_id,
-            re_encrypted_secrets,
-            verification_token,
-            new_verification_token,
-        } = body
+        body = await request.json()
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    }
 
-        if (!new_recovery_token_wrapped_key) {
-            return NextResponse.json({ error: 'Missing new_recovery_token_wrapped_key' }, { status: 400 })
-        }
+    const result = RotateKeyBodySchema.safeParse(body)
+    if (!result.success) {
+        return NextResponse.json({ error: 'Invalid request body', details: result.error.issues }, { status: 400 })
+    }
 
-        if (!verification_token) {
-            return NextResponse.json({ error: 'Missing verification_token' }, { status: 400 })
-        }
+    const {
+        new_recovery_token_wrapped_key,
+        new_sse_kms_asymmetrically_wrapped_key,
+        re_encrypted_secrets,
+        verification_token,
+        new_verification_token,
+    } = result.data
 
-        // A true key rotation re-encrypts secrets under a new MasterVaultKey and must
-        // supply a new_verification_token derived from that new key.
-        const secretsProvided = Array.isArray(re_encrypted_secrets) && re_encrypted_secrets.length > 0
-        if (secretsProvided && !new_verification_token) {
-            return NextResponse.json(
-                { error: 'new_verification_token is required when re_encrypted_secrets are provided' },
-                { status: 400 }
-            )
-        }
+    const secretsProvided = Array.isArray(re_encrypted_secrets) && re_encrypted_secrets.length > 0
+    if (secretsProvided && !new_verification_token) {
+        return NextResponse.json(
+            { error: 'new_verification_token is required when re_encrypted_secrets are provided' },
+            { status: 400 }
+        )
+    }
 
+    try {
         await prisma.$transaction(async (tx) => {
-            // Lock all affected rows to prevent concurrent key rotation or initialization
             await tx.$executeRaw`SELECT 1 FROM "User" WHERE id = ${userId} FOR UPDATE`
             await tx.$executeRaw`SELECT 1 FROM "UserWrappedVaultKeys" WHERE user_id = ${userId} FOR UPDATE`
             await tx.$executeRaw`SELECT 1 FROM "UserSecrets" WHERE user_id = ${userId} FOR UPDATE`
 
-            // Re-read masterKeyHash inside the transaction to avoid TOCTOU
             const user = await tx.user.findUnique({
                 where: { id: userId },
                 select: { masterKeyHash: true },
@@ -73,7 +70,6 @@ export async function POST(request: Request) {
                 throw err
             }
 
-            // Replace all wrapped keys
             await tx.userWrappedVaultKeys.deleteMany({ where: { userId } })
 
             await tx.userWrappedVaultKeys.create({
@@ -91,28 +87,12 @@ export async function POST(request: Request) {
                 })
             }
 
-            if (new_prf_wrapped_key && credential_id) {
-                const credentialIdHash = crypto
-                    .createHmac('sha256', getVaultServerSecret())
-                    .update(credential_id)
-                    .digest('base64')
-
-                await tx.userWrappedVaultKeys.create({
-                    data: {
-                        userId,
-                        wrapMode: 'E2E_PRF',
-                        wrappedKey: new_prf_wrapped_key,
-                        credentialId: credentialIdHash,
-                    },
-                })
-            }
-
             // Replace all secrets — delete then re-insert so orphaned secrets (encrypted
             // with the old key and omitted from the rotation) never silently persist.
             await tx.userSecrets.deleteMany({ where: { userId } })
 
             if (secretsProvided) {
-                for (const secret of re_encrypted_secrets) {
+                for (const secret of re_encrypted_secrets!) {
                     await tx.userSecrets.create({
                         data: {
                             userId,
@@ -123,9 +103,6 @@ export async function POST(request: Request) {
                 }
             }
 
-            // Update masterKeyHash to reflect the new verification token.
-            // If no new token is supplied (re-wrap without changing the key), the old hash
-            // is preserved — verification_token still matches the stored MasterVaultKey.
             const tokenForHash = new_verification_token ?? verification_token
             const newMasterKeyHash = crypto
                 .createHash('sha256')

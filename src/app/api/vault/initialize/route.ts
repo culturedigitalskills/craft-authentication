@@ -2,41 +2,41 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { KMS } from '@/lib/kms'
-import { getVaultServerSecret } from '@/lib/vault-config'
+import { InitializeVaultBodySchema } from '@/lib/vault-types'
 import crypto from 'crypto'
 
 export async function POST(request: Request) {
     const { session, unauthorized } = await requireAuth()
     if (unauthorized) return unauthorized
 
+    let body: unknown
     try {
-        const body = await request.json()
-        const {
-            user_id,
-            recovery_token_wrapped_key,
-            sse_kms_asymmetrically_wrapped_key,
-            prf_wrapped_key,
-            credential_id,
-            verification_token,
-        } = body
+        body = await request.json()
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    }
 
-        if (user_id !== session!.user.id) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-        }
+    const result = InitializeVaultBodySchema.safeParse(body)
+    if (!result.success) {
+        return NextResponse.json({ error: 'Invalid request body', details: result.error.issues }, { status: 400 })
+    }
 
-        if (!recovery_token_wrapped_key) {
-            return NextResponse.json({ error: 'Missing recovery_token_wrapped_key' }, { status: 400 })
-        }
+    const {
+        user_id,
+        recovery_token_wrapped_key,
+        sse_kms_asymmetrically_wrapped_key,
+        verification_token,
+    } = result.data
 
-        if (!verification_token) {
-            return NextResponse.json({ error: 'Missing verification_token' }, { status: 400 })
-        }
+    if (user_id !== session!.user.id) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
+    try {
         await prisma.$transaction(async (tx) => {
             // Lock the user row to serialize concurrent initialization attempts
             await tx.$executeRaw`SELECT 1 FROM "User" WHERE id = ${user_id} FOR UPDATE`
 
-            // Guard against re-initialization
             const existingKeyCount = await tx.userWrappedVaultKeys.count({
                 where: { userId: user_id },
             })
@@ -46,7 +46,6 @@ export async function POST(request: Request) {
                 throw err
             }
 
-            // 1. Store Recovery Token row
             await tx.userWrappedVaultKeys.create({
                 data: {
                     userId: user_id,
@@ -55,7 +54,6 @@ export async function POST(request: Request) {
                 },
             })
 
-            // 2. If Server Escrow (SSE_KMS) is provided
             if (sse_kms_asymmetrically_wrapped_key) {
                 const wrappedKey = await KMS.wrapMasterKey(sse_kms_asymmetrically_wrapped_key)
                 await tx.userWrappedVaultKeys.create({
@@ -67,24 +65,6 @@ export async function POST(request: Request) {
                 })
             }
 
-            // 3. If Passkey (E2E_PRF) wrapper is provided
-            if (prf_wrapped_key && credential_id) {
-                const credentialIdHash = crypto
-                    .createHmac('sha256', getVaultServerSecret())
-                    .update(credential_id)
-                    .digest('base64')
-
-                await tx.userWrappedVaultKeys.create({
-                    data: {
-                        userId: user_id,
-                        wrapMode: 'E2E_PRF',
-                        wrappedKey: prf_wrapped_key,
-                        credentialId: credentialIdHash,
-                    },
-                })
-            }
-
-            // 4. Store masterKeyHash = SHA-256(verification_token) for downgrade protection
             const masterKeyHash = crypto
                 .createHash('sha256')
                 .update(Buffer.from(verification_token, 'base64'))
@@ -99,9 +79,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true })
     } catch (err: any) {
         const status = err.statusCode ?? 500
-        return NextResponse.json(
-            { error: 'Request failed' },
-            { status }
-        )
+        return NextResponse.json({ error: 'Request failed' }, { status })
     }
 }
