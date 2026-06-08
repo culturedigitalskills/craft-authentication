@@ -521,4 +521,44 @@ subjectAltName = URI:urn:uuid:${userId}
         const certificatePem = await UserSecretsService.getDecryptedSecret(userId, 'C2PA_PUB')
         return { privateKey: privateKeyPem, certificate: certificatePem }
     }
+
+    /**
+     * Helper method to determine the C2PA state of a media file/asset buffer.
+     * Returns one of:
+     * - 'none': No C2PA manifest found.
+     * - 'invalid': C2PA manifest exists but could not be parsed/verified successfully.
+     * - 'valid': Valid C2PA manifest found, but does not belong to the target user.
+     * - 'owned': Valid C2PA manifest found, and the creator matches the target user.
+     */
+    static async getC2PAState(
+        mediaBuffer: Buffer,
+        targetUserId?: string
+    ): Promise<'none' | 'invalid' | 'valid' | 'owned'> {
+        try {
+            const inspect = await C2PAService.inspectManifest(mediaBuffer)
+            
+            if (!inspect.hasManifest) {
+                return 'none'
+            }
+
+            if (!inspect.authentic) {
+                return 'invalid'
+            }
+
+            let userId = targetUserId
+            if (!userId) {
+                const { auth } = await import('@/lib/auth')
+                const session = await auth()
+                userId = session?.user?.id
+            }
+
+            if (userId && inspect.creatorUserId && inspect.creatorUserId.trim().toLowerCase() === userId.trim().toLowerCase()) {
+                return 'owned'
+            }
+
+            return 'valid'
+        } catch (err) {
+            return 'invalid'
+        }
+    }
 }

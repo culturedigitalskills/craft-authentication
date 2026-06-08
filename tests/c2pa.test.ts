@@ -299,4 +299,21 @@ describe('C2PA Content Credentials Integration Tests', () => {
         await prisma.userSecrets.deleteMany({ where: { userId: customUser.id } })
         await prisma.user.delete({ where: { id: customUser.id } })
     })
+
+    it('should determine the correct quick c2pa state (none/owned/valid) for various assets and configurations', async () => {
+        // 1. Unsigned media should return 'none'
+        const stateNone = await C2PAService.getC2PAState(minimalPngBuffer, testUser1.id)
+        expect(stateNone).toBe('none')
+
+        // 2. Sign with User 1 credentials
+        const signedBuffer = await C2PAService.initializeManifest(testUser1.id, minimalPngBuffer, 'image/png')
+
+        // 3. Match against User 1 -> should return 'owned'
+        const stateOwned = await C2PAService.getC2PAState(signedBuffer, testUser1.id)
+        expect(stateOwned).toBe('owned')
+
+        // 4. Match against User 2 -> should return 'valid'
+        const stateValid = await C2PAService.getC2PAState(signedBuffer, testUser2.id)
+        expect(stateValid).toBe('valid')
+    })
 })
