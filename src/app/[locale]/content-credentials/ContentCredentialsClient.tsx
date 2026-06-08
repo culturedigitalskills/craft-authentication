@@ -51,6 +51,7 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
         hasManifest: boolean
         authentic: boolean
         artisanName?: string
+        creatorUserId?: string
         issuer?: string
         date?: string | null
         validationStatus: string[]
@@ -169,15 +170,18 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
             })
 
             if (!res.ok) {
-                const errData = await res.json().catch(() => ({}))
-                throw new Error(errData.error || 'Verification failed')
+                const errorData = await res.json().catch(() => ({}))
+                throw new Error(errorData.error || 'Verification failed')
             }
 
             const data = await res.json()
+            console.log('C2PA verification data:', data, 'current userId:', userId)
+            
             setVerifyResult({
-                hasManifest: data.manifest !== null,
+                hasManifest: data.hasManifest,
                 authentic: data.verified,
                 artisanName: data.artisanName,
+                creatorUserId: data.creatorUserId,
                 issuer: data.issuer,
                 date: data.date,
                 validationStatus: data.validationStatus,
@@ -494,6 +498,11 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
                                         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3">
                                             <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
                                             <div className="space-y-1">
+                                                {verifyResult.creatorUserId && userId && verifyResult.creatorUserId.trim().toLowerCase() === userId.trim().toLowerCase() && (
+                                                    <span className="inline-block px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase bg-emerald-600 text-white rounded mb-1">
+                                                        This is your creation
+                                                    </span>
+                                                )}
                                                 <h4 className="font-bold text-sm">
                                                     Authentic Credentials Secured
                                                 </h4>
