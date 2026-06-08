@@ -37,14 +37,12 @@ export class UserSecretsService {
     static async getDecryptedSecret(
         userId: string,
         secretType: string,
-        providedMasterKey?: string | Uint8Array
+        providedMasterKey?: Uint8Array
     ): Promise<string> {
         let masterKey: Uint8Array
 
         if (providedMasterKey) {
-            masterKey = typeof providedMasterKey === 'string'
-                ? Buffer.from(providedMasterKey, 'base64')
-                : new Uint8Array(providedMasterKey)
+            masterKey = providedMasterKey
         } else {
             // Attempt to retrieve and unwrap via KMS
             const sseKmsRecord = await prisma.userWrappedVaultKeys.findFirst({
