@@ -19,7 +19,8 @@
         "mygroups": "मेरे समुदाय",
         "addcraft": "शिल्प जोड़ें",
         "mystory": "मेरी कहानी",
-        "createGroup": "समुदाय बनाएं"
+        "createGroup": "समुदाय बनाएं",
+        "contentCredentials": "सामग्री क्रेडेंशियल"
     },
     "auth": {
         "loginTitle": "साइन इन करें",

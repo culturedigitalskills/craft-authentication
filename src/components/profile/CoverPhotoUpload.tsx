@@ -47,7 +47,10 @@ export function CoverPhotoUpload({
                 body: formData,
             })
 
-            if (!uploadRes.ok) throw new Error('Upload failed')
+            if (!uploadRes.ok) {
+                const errorData = await uploadRes.json().catch(() => ({}))
+                throw new Error(errorData.error || 'Upload failed')
+            }
 
             const mediaFile = await uploadRes.json()
 
@@ -64,13 +67,16 @@ export function CoverPhotoUpload({
                     }),
                 })
 
-                if (!attachRes.ok) throw new Error('Attachment failed')
+                if (!attachRes.ok) {
+                    const attachError = await attachRes.json().catch(() => ({}))
+                    throw new Error(attachError.error || 'Attachment failed')
+                }
             }
 
             onCoverUploaded(mediaFile.id)
             setPreviewUrl(`/api/media/${mediaFile.id}`)
-        } catch {
-            setError(t('coverUploadFailed'))
+        } catch (err: any) {
+            setError(err.message || t('coverUploadFailed'))
             setPreviewUrl(currentCoverUrl)
         } finally {
             setIsUploading(false)

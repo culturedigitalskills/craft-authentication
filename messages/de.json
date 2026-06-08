@@ -18,7 +18,8 @@
         "mygroups": "Meine Gemeinschaften",
         "addcraft": "Handwerk hinzufügen",
         "mystory": "Meine Geschichte",
-        "createGroup": "Gemeinschaft erstellen"
+        "createGroup": "Gemeinschaft erstellen",
+        "contentCredentials": "Inhaltsnachweise"
     },
     "auth": {
         "loginTitle": "Anmelden",

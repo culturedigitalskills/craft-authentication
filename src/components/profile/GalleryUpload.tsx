@@ -49,7 +49,10 @@ export function GalleryUpload({
                     body: formData,
                 })
 
-                if (!uploadRes.ok) throw new Error('Upload failed')
+                if (!uploadRes.ok) {
+                    const errorData = await uploadRes.json().catch(() => ({}))
+                    throw new Error(errorData.error || 'Upload failed')
+                }
 
                 const mediaFile = await uploadRes.json()
 
@@ -67,7 +70,10 @@ export function GalleryUpload({
                         }),
                     })
 
-                    if (!attachRes.ok) throw new Error('Attachment failed')
+                    if (!attachRes.ok) {
+                        const attachError = await attachRes.json().catch(() => ({}))
+                        throw new Error(attachError.error || 'Attachment failed')
+                    }
 
                     const attachment = await attachRes.json()
                     setImages(prev => [...prev, {
@@ -85,8 +91,8 @@ export function GalleryUpload({
                     onGalleryUploaded?.([...pendingIds, mediaFile.id])
                 }
             }
-        } catch {
-            setError(t('galleryUploadFailed'))
+        } catch (err: any) {
+            setError(err.message || t('galleryUploadFailed'))
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''

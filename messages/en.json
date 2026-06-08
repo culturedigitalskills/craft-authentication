@@ -19,7 +19,8 @@
         "profile": "Profile",
         "myitems": "My Crafts",
         "mygroups": "My Communities",
-        "createGroup": "Create Community"
+        "createGroup": "Create Community",
+        "contentCredentials": "Content Credentials"
     },
     "auth": {
         "loginTitle": "Sign In",

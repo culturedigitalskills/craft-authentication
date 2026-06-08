@@ -1,4 +1,43 @@
+# v0.11.0 -> v0.12.0
+
+### C2PA Content Credentials
+
+Added support for C2PA (Coalition for Content Provenance and Authenticity) signature manifest injection and verification. This enables artisans to secure their creations with cryptographically verifiable signatures.
+
+**Schema Changes**:
+- Added `c2paAutoRenew` boolean column to the `User` table (defaults to `false`).
+- Added `c2paCertExpiresAt` datetime column to the `User` table (nullable).
+
+**Configuration Changes** (add to `.env.local` and `.env.production`):
+- `C2PA_ROOT_KEY_PATH`: File path to `c2pa_root_key.pem`.
+- `C2PA_ROOT_CERT_PATH`: File path to `c2pa_root_cert.pem`.
+
+**Migration Steps**:
+
+1. Generate the C2PA Root CA key pair and certificate (run once):
+    ```bash
+    node scripts/generate-c2pa-root.mjs
+    ```
+    This script is interactive and prompts you for details. It generates `secrets/c2pa_root_key.pem` and `secrets/c2pa_root_cert.pem`.
+
+    > **Note on Renewal**: If this script is run again, it automatically renews the Root certificate using the existing private key, keeping previous Artisan cert signatures valid.
+
+2. Add the environment variables to your `.env.local` (and `.env.production` for deployment):
+    ```env
+    C2PA_ROOT_KEY_PATH="./secrets/c2pa_root_key.pem"
+    C2PA_ROOT_CERT_PATH="./secrets/c2pa_root_cert.pem"
+    ```
+
+    > [!WARNING]
+    > **Missing Certificate Error:** If the certificate files are missing or unreadable at startup or configuration evaluation time, the server will throw an error and refuse to initialize status or sign assets.
+
+3. Run database migrations to apply the schema updates:
+    ```bash
+    pnpm db:migrate
+    ```
+
 # v0.10.0 -> v0.11.0
+
 
 ### Hybrid Encrypted User Secrets Vault
 

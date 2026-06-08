@@ -153,6 +153,12 @@ cp garage.toml.example garage.toml
 # Install packages
 pnpm i
 
+# Generate C2PA Root CA key pair & certificate
+node scripts/generate-c2pa-root.mjs
+
+# Generate KMS wrapping keys & configurations
+node scripts/generate-kms-keys.mjs
+
 # Start Postgres + Garage containers
 pnpm docker:up
 
@@ -263,6 +269,36 @@ pnpm dotenv -e .env.local -- node scripts/rotate-kms-master-key.mjs \
 > **Do not restart the server between steps 2 and 3.** If the server reloads with the new
 > key before the script completes, any records still encrypted with the old key become
 > permanently unreadable.
+
+## C2PA Content Credentials
+
+The application uses C2PA to sign media files with authentic content credentials. Signing requires a self-signed Root CA certificate to sign Artisan credentials.
+
+### Setting Up Root CA Certificates
+
+Before starting the server (on new installations), you must generate the Root CA private key and certificate:
+
+```bash
+# Generate the Root CA key pair and certificate (run once)
+# This script is interactive and will prompt you for Country, Organization, and Common Name.
+node scripts/generate-c2pa-root.mjs
+```
+
+This generates `secrets/c2pa_root_key.pem` and `secrets/c2pa_root_cert.pem`.
+
+Add the following environment variables to your `.env.local` (and `.env.production` for deployment):
+
+```env
+C2PA_ROOT_KEY_PATH="./secrets/c2pa_root_key.pem"
+C2PA_ROOT_CERT_PATH="./secrets/c2pa_root_cert.pem"
+```
+
+> [!WARNING]
+> **Missing Certificate Error:** If the Root CA private key or certificate files are missing or unreadable, the application will throw a startup/execution error when checking status or executing C2PA operations.
+
+### Certificate Renewal
+
+If you execute `node scripts/generate-c2pa-root.mjs` while the Root CA key file already exists, it will automatically **renew the certificate** using the existing private key, keeping previous signatures valid.
 
 ## Available pnpm Scripts
 

@@ -1,6 +1,6 @@
 {
     "name": "craft-authentication",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "private": true,
     "packageManager": "pnpm@11.5.2",
     "engines": {
@@ -35,6 +35,8 @@
         "@atproto/api": "^0.18.21",
         "@aws-sdk/client-s3": "^3.996.0",
         "@better-auth/prisma-adapter": "^1.6.14",
+        "@contentauth/c2pa-node": "^0.5.5",
+        "@contentauth/c2pa-web": "^0.9.0",
         "@hookform/resolvers": "^5.2.2",
         "@prisma/adapter-pg": "^7.4.1",
         "@prisma/client": "^7.4.1",

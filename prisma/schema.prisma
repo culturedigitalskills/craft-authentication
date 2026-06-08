@@ -58,8 +58,10 @@ model User {
     image         String?
     role          Role                   @default(ARTISAN)
     isActive      Boolean                @default(true)
-    masterKeyHash String?                @map("master_key_hash")
-    createdAt     DateTime               @default(now())
+    masterKeyHash     String?                @map("master_key_hash")
+    c2paAutoRenew     Boolean                @default(false) @map("c2pa_auto_renew")
+    c2paCertExpiresAt DateTime?              @map("c2pa_cert_expires_at")
+    createdAt         DateTime               @default(now())
     updatedAt     DateTime               @updatedAt
     accounts      Account[]
     sessions      Session[]

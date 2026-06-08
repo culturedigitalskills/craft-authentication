@@ -38,7 +38,10 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
                 const formData = new FormData()
                 formData.append('file', file)
                 const uploadRes = await fetch('/api/media/upload', { method: 'POST', body: formData })
-                if (!uploadRes.ok) throw new Error('Upload failed')
+                if (!uploadRes.ok) {
+                    const errorData = await uploadRes.json().catch(() => ({}))
+                    throw new Error(errorData.error || 'Upload failed')
+                }
                 const mediaFile = await uploadRes.json()
 
                 const attachRes = await fetch('/api/media/attachments', {
@@ -52,7 +55,10 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
                         displayOrder: items.length,
                     }),
                 })
-                if (!attachRes.ok) throw new Error('Attachment failed')
+                if (!attachRes.ok) {
+                    const attachError = await attachRes.json().catch(() => ({}))
+                    throw new Error(attachError.error || 'Attachment failed')
+                }
                 const attachment = await attachRes.json()
 
                 setItems(prev => [
@@ -65,8 +71,8 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
                     },
                 ])
             }
-        } catch {
-            setError(t('uploadFailed'))
+        } catch (err: any) {
+            setError(err.message || t('uploadFailed'))
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''

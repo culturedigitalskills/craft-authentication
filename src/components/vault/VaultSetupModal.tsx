@@ -135,7 +135,7 @@ function IntroStep({ onNext, loading }: { onNext: () => void; loading: boolean }
             <div className="space-y-2">
                 <h2 className="text-xl font-semibold tracking-tight">Protect your API keys</h2>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-                    Your vault stores sensitive credentials — like API keys and signing certificates — encrypted so only you can access them.
+                    Your vault stores your sensitive credentials — like API keys and signing certificates — in a secure, encrypted format to protect them on our registry.
                 </p>
             </div>
 
