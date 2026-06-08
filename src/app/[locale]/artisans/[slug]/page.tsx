@@ -78,6 +78,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         where: { slug, deletedAt: null },
         select: {
             id: true,
+            userId: true,
             firstName: true,
             lastName: true,
             bio: true,
@@ -502,7 +503,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
                             {t('gallery')}
                         </h2>
-                        <GalleryGrid images={galleryImages} />
+                        <GalleryGrid images={galleryImages} artisanUserId={artisan.userId} />
                     </div>
                 </section>
             )}
