@@ -247,4 +247,56 @@ describe('C2PA Content Credentials Integration Tests', () => {
         })
         expect(userDb?.c2paCertExpiresAt?.getTime()).toBe(nearExpiry.getTime())
     })
+
+    it('should generate C2PA certificate with custom CN specified by request and verify CN in signed asset', async () => {
+        const customUserEmail = `c2pa-custom-cn-${crypto.randomUUID()}@example.com`
+        const hashedPassword = await hashPassword('SecurePassword3!')
+        const customUser = await prisma.user.create({
+            data: {
+                email: customUserEmail,
+                name: 'Original Name',
+                role: 'ARTISAN',
+                isActive: true,
+                accounts: {
+                    create: {
+                        providerId: 'credential',
+                        accountId: customUserEmail,
+                        password: hashedPassword,
+                    },
+                },
+            },
+        })
+
+        const setup = await generateVaultSetup()
+        const rawMasterKey = setup.rawMasterKey
+        const kmsPublicKey = KMS.getPublicWrappingKey()
+        const asymmetricallyWrapped = await asymmetricWrapMasterKey(rawMasterKey, kmsPublicKey)
+        const wrappedKey = await KMS.wrapMasterKey(asymmetricallyWrapped)
+
+        await prisma.userWrappedVaultKeys.create({
+            data: {
+                userId: customUser.id,
+                wrapMode: 'SSE_KMS',
+                wrappedKey: wrappedKey,
+            }
+        })
+
+        const customCN = 'Custom Artisan CN Name'
+        // Generate C2PA credentials with custom CN
+        await C2PAService.generateAndStoreCredentials(customUser.id, rawMasterKey, customCN)
+
+        // Sign minimal PNG
+        const signedBuffer = await C2PAService.initializeManifest(customUser.id, minimalPngBuffer, 'image/png')
+
+        // Inspect manifest and check CN
+        const inspect = await C2PAService.inspectManifest(signedBuffer)
+        expect(inspect.hasManifest).toBe(true)
+        expect(inspect.authentic).toBe(true)
+        expect(inspect.artisanName).toBe(customCN)
+
+        // Cleanup
+        await prisma.userWrappedVaultKeys.deleteMany({ where: { userId: customUser.id } })
+        await prisma.userSecrets.deleteMany({ where: { userId: customUser.id } })
+        await prisma.user.delete({ where: { id: customUser.id } })
+    })
 })

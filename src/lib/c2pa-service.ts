@@ -110,14 +110,32 @@ export class C2PAService {
     /**
      * Generates a new key pair and signs the certificate, then stores them in the vault.
      */
-    static async generateAndStoreCredentials(userId: string, masterKey: Uint8Array): Promise<void> {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { name: true, email: true }
-        })
-        if (!user) throw new Error('User not found')
+    static async generateAndStoreCredentials(userId: string, masterKey: Uint8Array, commonName?: string): Promise<void> {
+        let artisanName = commonName;
+        if (!artisanName) {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { 
+                    name: true, 
+                    email: true,
+                    artisan: {
+                        select: {
+                            firstName: true,
+                            lastName: true
+                        }
+                    }
+                }
+            })
+            if (!user) throw new Error('User not found')
 
-        const artisanName = user.name || user.email.split('@')[0]
+            if (user.artisan?.firstName && user.artisan?.lastName) {
+                artisanName = `${user.artisan.firstName} ${user.artisan.lastName}`.trim();
+            } else if (user.name) {
+                artisanName = user.name;
+            } else {
+                artisanName = user.email.split('@')[0] || 'Unknown Artisan';
+            }
+        }
         
         // 1. Generate EC keys and sign cert
         const { privateKey, certificateChain, expiresAt } = await C2PAService.generateArtisanKeys(userId, artisanName)

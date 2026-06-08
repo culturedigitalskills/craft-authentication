@@ -27,7 +27,18 @@ export async function GET() {
         // Get user settings
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { c2paAutoRenew: true, c2paCertExpiresAt: true },
+            select: { 
+                c2paAutoRenew: true, 
+                c2paCertExpiresAt: true,
+                name: true,
+                email: true,
+                artisan: {
+                    select: {
+                        firstName: true,
+                        lastName: true
+                    }
+                }
+            },
         })
 
         const c2paAutoRenew = user?.c2paAutoRenew ?? false
@@ -39,12 +50,24 @@ export async function GET() {
             needsRenewal = daysRemaining <= 30
         }
 
+        let defaultCN = ''
+        if (user) {
+            if (user.artisan?.firstName && user.artisan?.lastName) {
+                defaultCN = `${user.artisan.firstName} ${user.artisan.lastName}`.trim()
+            } else if (user.name) {
+                defaultCN = user.name
+            } else {
+                defaultCN = user.email.split('@')[0] || 'Unknown Artisan'
+            }
+        }
+
         return NextResponse.json({
             vaultInitialized,
             c2paInitialized,
             c2paAutoRenew,
             c2paCertExpiresAt,
             needsRenewal,
+            defaultCN,
         })
     } catch (error: any) {
         console.error('Error in GET /api/c2pa/status:', error)

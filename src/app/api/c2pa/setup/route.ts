@@ -4,13 +4,23 @@ import { requireAuth } from '@/lib/auth-guard'
 import { KMS } from '@/lib/kms'
 import { C2PAService } from '@/lib/c2pa-service'
 
-export async function POST() {
+export async function POST(request: Request) {
     const { session, unauthorized } = await requireAuth()
     if (unauthorized) return unauthorized
 
     const userId = session!.user.id
 
     try {
+        let commonName: string | undefined = undefined
+        try {
+            const body = await request.json()
+            if (body && typeof body.commonName === 'string') {
+                commonName = body.commonName.trim() || undefined
+            }
+        } catch (e) {
+            // Ignore if body is not JSON or commonName is not provided
+        }
+
         // Retrieve the user's wrapped vault key
         const escrowRecord = await prisma.userWrappedVaultKeys.findFirst({
             where: { userId, wrapMode: 'SSE_KMS' },
@@ -28,7 +38,7 @@ export async function POST() {
 
         try {
             // Generate key pair, sign cert, and store encrypted in database
-            await C2PAService.generateAndStoreCredentials(userId, masterKey)
+            await C2PAService.generateAndStoreCredentials(userId, masterKey, commonName)
         } finally {
             // Guarantee memory cleanup
             masterKey.fill(0)
