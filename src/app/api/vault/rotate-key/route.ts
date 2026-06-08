@@ -64,7 +64,10 @@ export async function POST(request: Request) {
                 .update(Buffer.from(verification_token, 'base64'))
                 .digest('base64')
 
-            if (calculatedHash !== user.masterKeyHash) {
+            if (!crypto.timingSafeEqual(
+                Buffer.from(calculatedHash, 'base64'),
+                Buffer.from(user.masterKeyHash, 'base64')
+            )) {
                 const err = new Error('Invalid verification token') as any
                 err.statusCode = 401
                 throw err
