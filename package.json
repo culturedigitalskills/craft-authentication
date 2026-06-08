@@ -27,7 +27,9 @@
         "prod:docker:logs": "docker compose --env-file .env.production logs -f app",
         "prod:db:push": "dotenv -e .env.production -- prisma db push",
         "prod:db:studio": "dotenv -e .env.production -- prisma studio",
-        "test-deploy": "pnpm build-info && pnpm prod:docker:down && pnpm docker:build && pnpm prod:docker:up"
+        "test-deploy": "pnpm build-info && pnpm prod:docker:down && pnpm docker:build && pnpm prod:docker:up",
+        "test": "dotenv -e .env.local -- vitest run",
+        "test:watch": "dotenv -e .env.local -- vitest"
     },
     "dependencies": {
         "@atproto/api": "^0.18.21",
@@ -87,6 +89,7 @@
         "prisma": "^7.4.1",
         "tailwindcss": "^3.4.19",
         "tailwindcss-animate": "^1.0.7",
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "vitest": "^4.1.8"
     }
 }
