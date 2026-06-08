@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
-import { getC2PARootKeys } from '@/lib/c2pa-config'
 
 export async function GET() {
     const { session, unauthorized } = await requireAuth()

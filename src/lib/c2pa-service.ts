@@ -1,7 +1,7 @@
 import 'server-only'
 import crypto from 'crypto'
 import { execSync } from 'child_process'
-import fs, { writeFileSync, existsSync, unlinkSync } from 'fs'
+import { writeFileSync, existsSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import { prisma } from '@/lib/prisma'
 import { KMS } from '@/lib/kms'
@@ -297,7 +297,7 @@ export class C2PAService {
             const ext = detectExtension(mediaBuffer)
             const mimeType = ext === '.png' ? 'image/png' : (ext === '.webp' ? 'image/webp' : 'image/jpeg')
 
-            const rootCertPem = fs.readFileSync(join(process.cwd(), 'secrets', 'c2pa_root_cert.pem'), 'utf8')
+            const { certificate: rootCertPem } = getC2PARootKeys()
             const normalizedCert = rootCertPem.replace(/\r\n/g, '\n')
             const trustSettings = createTrustSettings({
                 verifyTrustList: false,
@@ -437,8 +437,10 @@ export class C2PAService {
         const confPath = join(tempDir, `${prefix}_openssl.cnf`)
 
         try {
-            const { privateKey: rootKey, certificate: rootCert } = getC2PARootKeys()
-            
+            const { certificate: rootCert } = getC2PARootKeys()
+            const rootCertPath = process.env.C2PA_ROOT_CERT_PATH!
+            const rootKeyPath = process.env.C2PA_ROOT_KEY_PATH!
+
             // Create config with SAN URI extension (W3C/DID standard) and required C2PA extensions
             const cnfContent = `
 [ req ]
@@ -468,8 +470,8 @@ subjectAltName = URI:urn:uuid:${userId}
 
             // 2. Sign the CSR with CA Root certificate (expires in 365 days)
             execSync(
-                `openssl x509 -req -in "${csrPath}" -CA "${join(secretsDir, 'c2pa_root_cert.pem')}" ` +
-                `-CAkey "${join(secretsDir, 'c2pa_root_key.pem')}" -CAcreateserial ` +
+                `openssl x509 -req -in "${csrPath}" -CA "${rootCertPath}" ` +
+                `-CAkey "${rootKeyPath}" -CAcreateserial ` +
                 `-out "${certPath}" -days 365 -sha256 -extfile "${confPath}" -extensions v3_req`,
                 { stdio: 'ignore' }
             )

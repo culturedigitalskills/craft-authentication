@@ -42,6 +42,12 @@ export async function POST(request: NextRequest) {
             try {
                 const manifestResult = await C2PAService.inspectManifest(uploadBuffer)
                 if (manifestResult.hasManifest) {
+                    if (!manifestResult.authentic) {
+                        return errorResponse(
+                            "This image contains invalid or tampered content credentials and cannot be accepted.",
+                            403
+                        )
+                    }
                     if (manifestResult.creatorUserId !== session!.user.id) {
                         return errorResponse(
                             "This image contains content credentials from a different creator. To respect authorship and prevent copying, we cannot accept uploads of other creators' works.",
