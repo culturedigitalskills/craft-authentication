@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { KMS } from '@/lib/kms'
+import { getVaultServerSecret } from '@/lib/vault-config'
 import crypto from 'crypto'
 
 export async function POST(request: Request) {
@@ -24,21 +25,27 @@ export async function POST(request: Request) {
         }
 
         if (!recovery_token_wrapped_key) {
-            return NextResponse.json(
-                { error: 'Missing recovery_token_wrapped_key' },
-                { status: 400 }
-            )
+            return NextResponse.json({ error: 'Missing recovery_token_wrapped_key' }, { status: 400 })
         }
 
         if (!verification_token) {
-            return NextResponse.json(
-                { error: 'Missing verification_token' },
-                { status: 400 }
-            )
+            return NextResponse.json({ error: 'Missing verification_token' }, { status: 400 })
         }
 
-        // Run setup inside a transaction for atomicity
         await prisma.$transaction(async (tx) => {
+            // Lock the user row to serialize concurrent initialization attempts
+            await tx.$executeRaw`SELECT 1 FROM "User" WHERE id = ${user_id} FOR UPDATE`
+
+            // Guard against re-initialization
+            const existingKeyCount = await tx.userWrappedVaultKeys.count({
+                where: { userId: user_id },
+            })
+            if (existingKeyCount > 0) {
+                const err = new Error('Vault already initialized for this user') as any
+                err.statusCode = 409
+                throw err
+            }
+
             // 1. Store Recovery Token row
             await tx.userWrappedVaultKeys.create({
                 data: {
@@ -55,16 +62,15 @@ export async function POST(request: Request) {
                     data: {
                         userId: user_id,
                         wrapMode: 'SSE_KMS',
-                        wrappedKey: wrappedKey,
+                        wrappedKey,
                     },
                 })
             }
 
             // 3. If Passkey (E2E_PRF) wrapper is provided
             if (prf_wrapped_key && credential_id) {
-                const serverSecret = process.env.VAULT_SERVER_SECRET || process.env.AUTH_SECRET || 'default_secret'
                 const credentialIdHash = crypto
-                    .createHmac('sha256', serverSecret)
+                    .createHmac('sha256', getVaultServerSecret())
                     .update(credential_id)
                     .digest('base64')
 
@@ -78,7 +84,7 @@ export async function POST(request: Request) {
                 })
             }
 
-            // 4. Update the user's masterKeyHash = SHA-256(verification_token)
+            // 4. Store masterKeyHash = SHA-256(verification_token) for downgrade protection
             const masterKeyHash = crypto
                 .createHash('sha256')
                 .update(Buffer.from(verification_token, 'base64'))
@@ -92,9 +98,10 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true })
     } catch (err: any) {
+        const status = err.statusCode ?? 500
         return NextResponse.json(
             { error: err.message || 'Initialization failed' },
-            { status: 500 }
+            { status }
         )
     }
 }

@@ -227,6 +227,43 @@ Subsequent starts will reuse the same keys.
 
 App runs on [http://localhost:3000](http://localhost:3000) by default (configure with `PORT`).
 
+## Vault & KMS Key Management
+
+The vault uses two independent secrets. They have different rotation procedures because they protect different things:
+
+| Secret | What it protects | Rotation impact |
+|---|---|---|
+| `kms_private_key.pem` / `kms_public_key.pem` | Nothing stored — RSA is used only *transiently* during vault init (client wraps with RSA; server RSA-decrypts and immediately re-wraps with `LOCAL_MASTER_KEY`). | None. Replace PEM files and restart. |
+| `LOCAL_MASTER_KEY` | All `SSE_KMS` rows in `UserWrappedVaultKeys` (AES-256-GCM). | All SSE_KMS records must be re-wrapped before the key changes. |
+
+### Rotating the RSA key pair
+
+```bash
+# Generate new key pair (refuses to overwrite — rename or delete existing files first)
+node scripts/generate-kms-keys.mjs
+
+# Restart the server — no database changes needed
+```
+
+### Rotating `LOCAL_MASTER_KEY`
+
+```bash
+# 1. Generate a new key
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# 2. Re-wrap all existing SSE_KMS records
+#    The server must still be running with the OLD key at this point
+pnpm dotenv -e .env.local -- node scripts/rotate-kms-master-key.mjs \
+    --old-key=<current-LOCAL_MASTER_KEY> \
+    --new-key=<newly-generated-key>
+
+# 3. Only after the script reports success: update LOCAL_MASTER_KEY in .env and restart
+```
+
+> **Do not restart the server between steps 2 and 3.** If the server reloads with the new
+> key before the script completes, any records still encrypted with the old key become
+> permanently unreadable.
+
 ## Available pnpm Scripts
 
 ### Development

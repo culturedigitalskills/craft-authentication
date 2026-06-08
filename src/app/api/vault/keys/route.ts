@@ -7,7 +7,7 @@ export async function GET() {
     if (unauthorized) return unauthorized
 
     try {
-        const wrappedKeys = await prisma.userWrappedVaultKeys.findMany({
+        const records = await prisma.userWrappedVaultKeys.findMany({
             where: { userId: session!.user.id },
             select: {
                 id: true,
@@ -17,6 +17,16 @@ export async function GET() {
                 createdAt: true,
             },
         })
+
+        // The SSE_KMS wrapped key is only ever unwrapped server-side (via KMS).
+        // Returning it to the client would expose attack material and serves no client purpose.
+        const wrappedKeys = records.map((r) => ({
+            id: r.id,
+            wrapMode: r.wrapMode,
+            wrappedKey: r.wrapMode === 'SSE_KMS' ? undefined : r.wrappedKey,
+            credentialId: r.credentialId,
+            createdAt: r.createdAt,
+        }))
 
         return NextResponse.json({ wrappedKeys })
     } catch (err: any) {
