@@ -8,6 +8,7 @@ import { KMS } from '@/lib/kms'
 import { getC2PARootKeys } from '@/lib/c2pa-config'
 import { UserSecretsService } from '@/lib/user-secrets-service'
 import { Reader, Builder, LocalSigner, createTrustSettings, createVerifySettings, mergeSettings, settingsToJson } from '@contentauth/c2pa-node'
+import type { C2PAState } from '@/types/c2pa'
 
 const secretsDir = join(process.cwd(), 'secrets')
 
@@ -533,7 +534,7 @@ subjectAltName = URI:urn:uuid:${userId}
     static async getC2PAState(
         mediaBuffer: Buffer,
         targetUserId?: string
-    ): Promise<'none' | 'invalid' | 'valid' | 'owned'> {
+    ): Promise<C2PAState> {
         try {
             const inspect = await C2PAService.inspectManifest(mediaBuffer)
             

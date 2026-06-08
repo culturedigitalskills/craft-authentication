@@ -1,9 +1,10 @@
 import { authClient } from './auth-client'
+import type { C2PAState } from '@/types/c2pa'
 
 export async function getClientC2PAState(
     file: File,
     targetUserId?: string
-): Promise<'none' | 'invalid' | 'valid' | 'owned'> {
+): Promise<C2PAState> {
     try {
         const formData = new FormData()
         formData.append('file', file)
