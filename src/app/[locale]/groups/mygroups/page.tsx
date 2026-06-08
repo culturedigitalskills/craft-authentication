@@ -39,22 +39,23 @@ export default async function MyGroupsPage() {
           })
         : []
 
-    const groups = memberships.map(m => ({ ...m.group, memberRole: m.role }))
+    const groups = memberships.map((m) => ({ ...m.group, memberRole: m.role }))
 
     // Fetch logos for all groups
-    const groupIds = groups.map(g => g.id)
-    const logoAttachments = groupIds.length > 0
-        ? await prisma.mediaAttachment.findMany({
-              where: {
-                  entityType: 'Group',
-                  entityId: { in: groupIds },
-                  attachmentType: 'HERO',
-                  isPrimary: true,
-              },
-              select: { entityId: true, mediaId: true },
-          })
-        : []
-    const logoMap = new Map(logoAttachments.map(a => [a.entityId, `/api/media/${a.mediaId}`]))
+    const groupIds = groups.map((g) => g.id)
+    const logoAttachments =
+        groupIds.length > 0
+            ? await prisma.mediaAttachment.findMany({
+                  where: {
+                      entityType: 'Group',
+                      entityId: { in: groupIds },
+                      attachmentType: 'HERO',
+                      isPrimary: true,
+                  },
+                  select: { entityId: true, mediaId: true },
+              })
+            : []
+    const logoMap = new Map(logoAttachments.map((a) => [a.entityId, `/api/media/${a.mediaId}`]))
 
     return (
         <div className="container mx-auto max-w-6xl px-4 py-10">
@@ -73,7 +74,7 @@ export default async function MyGroupsPage() {
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {groups.map(group => (
+                    {groups.map((group) => (
                         <Link
                             key={group.id}
                             href={`/groups/${group.slug}`}
@@ -88,6 +89,7 @@ export default async function MyGroupsPage() {
                                             fill
                                             sizes="40px"
                                             className="object-cover"
+                                            unoptimized
                                         />
                                     </div>
                                 ) : (
@@ -154,8 +156,11 @@ export default async function MyGroupsPage() {
                                         {t('trainingProgram')}
                                     </span>
                                 )}
-                                {group.certifications?.map(cert => (
-                                    <span key={cert} className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-800">
+                                {group.certifications?.map((cert) => (
+                                    <span
+                                        key={cert}
+                                        className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-800"
+                                    >
                                         <Award className="h-3 w-3" />
                                         {t(`cert_${cert}`)}
                                     </span>

@@ -2,7 +2,20 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Clock, GraduationCap, User, Users, Package, Instagram, Facebook, Twitter, Youtube, Globe, Hash } from 'lucide-react'
+import {
+    MapPin,
+    Clock,
+    GraduationCap,
+    User,
+    Users,
+    Package,
+    Instagram,
+    Facebook,
+    Twitter,
+    Youtube,
+    Globe,
+    Hash,
+} from 'lucide-react'
 import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
@@ -23,7 +36,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     if (!artisan) return { title: 'Artisan Not Found' }
 
     const title = `${artisan.firstName} ${artisan.lastName} — Artisan Profile`
-    const description = artisan.bio?.slice(0, 160) ?? `Discover the craft of ${artisan.firstName} ${artisan.lastName}.`
+    const description =
+        artisan.bio?.slice(0, 160) ??
+        `Discover the craft of ${artisan.firstName} ${artisan.lastName}.`
 
     // Use profile photo as OG image if available
     const photoAttachment = await prisma.mediaAttachment.findFirst({
@@ -111,11 +126,14 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
 
     // Fetch first media for each craft
     const crafts = await Promise.all(
-        craftRecords.map(async record => {
-            const mediaIds = ((record.data as Record<string, unknown>)['mediaIds'] as string[] | undefined)?.filter(Boolean) ?? []
+        craftRecords.map(async (record) => {
+            const mediaIds =
+                (
+                    (record.data as Record<string, unknown>)['mediaIds'] as string[] | undefined
+                )?.filter(Boolean) ?? []
             const imageUrl = mediaIds.length > 0 ? `/api/media/${mediaIds[0]}` : null
             return { id: record.id, name: record.name, imageUrl }
-        })
+        }),
     )
 
     const photoAttachment = await prisma.mediaAttachment.findFirst({
@@ -152,7 +170,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         orderBy: { displayOrder: 'asc' },
     })
 
-    const galleryImages = galleryAttachments.map(a => ({
+    const galleryImages = galleryAttachments.map((a) => ({
         id: a.id,
         mediaId: a.mediaId,
         url: `/api/media/${a.mediaId}`,
@@ -175,26 +193,25 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             include: { media: { select: { mimeType: true } } },
             orderBy: { displayOrder: 'asc' },
         })
-        workshopMedia = workshopAttachments.map(a => ({
+        workshopMedia = workshopAttachments.map((a) => ({
             mediaId: a.mediaId,
             isVideo: (a.media.mimeType ?? '').startsWith('video/'),
         }))
 
-        const answerMediaIds = ANSWER_MEDIA_FIELDS
-            .map(k => story[k])
-            .filter((v): v is string => Boolean(v))
+        const answerMediaIds = ANSWER_MEDIA_FIELDS.map((k) => story[k]).filter((v): v is string =>
+            Boolean(v),
+        )
         if (answerMediaIds.length > 0) {
             const files = await prisma.mediaFile.findMany({
                 where: { id: { in: answerMediaIds } },
                 select: { id: true, mimeType: true },
             })
-            answerMediaMimeTypes = Object.fromEntries(files.map(f => [f.id, f.mimeType]))
+            answerMediaMimeTypes = Object.fromEntries(files.map((f) => [f.id, f.mimeType]))
         }
     }
 
-    const locationText = artisan.region && artisan.country
-        ? `${artisan.region}, ${artisan.country}`
-        : null
+    const locationText =
+        artisan.region && artisan.country ? `${artisan.region}, ${artisan.country}` : null
 
     return (
         <div className="">
@@ -208,6 +225,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         sizes="100vw"
                         className="object-cover"
                         priority
+                        unoptimized
                     />
                 ) : (
                     <>
@@ -215,7 +233,12 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
                     </>
                 )}
-                {coverUrl && <div className="absolute inset-0" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }} />}
+                {coverUrl && (
+                    <div
+                        className="absolute inset-0"
+                        style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }}
+                    />
+                )}
 
                 <div className="relative mx-auto max-w-4xl px-4 text-center">
                     <div className="mx-auto mb-4 h-28 w-28 overflow-hidden rounded-full border-4 border-background shadow-xl sm:h-36 sm:w-36">
@@ -227,6 +250,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                 height={144}
                                 className="h-full w-full object-cover"
                                 priority
+                                unoptimized
                             />
                         ) : (
                             <div className="flex h-full w-full items-center justify-center bg-muted">
@@ -235,7 +259,9 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         )}
                     </div>
 
-                    <h1 className={`text-3xl font-bold tracking-tight sm:text-4xl ${coverUrl ? 'text-white' : ''}`}>
+                    <h1
+                        className={`text-3xl font-bold tracking-tight sm:text-4xl ${coverUrl ? 'text-white' : ''}`}
+                    >
                         {artisan.firstName} {artisan.lastName}
                     </h1>
                 </div>
@@ -249,8 +275,10 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             {artisan.yearsOfExperience !== null && (
                                 <span className="flex items-center gap-1.5">
                                     <Clock className="h-4 w-4 text-warm" />
-                                    <span className="font-medium text-foreground">{artisan.yearsOfExperience}</span>
-                                    {' '}{t('yearsExperience')}
+                                    <span className="font-medium text-foreground">
+                                        {artisan.yearsOfExperience}
+                                    </span>{' '}
+                                    {t('yearsExperience')}
                                 </span>
                             )}
                             {artisan.learningSource && (
@@ -296,7 +324,12 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             )}
 
             {/* ── Connect Section ── */}
-            {(artisan.socialInstagram || artisan.socialFacebook || artisan.socialTwitter || artisan.socialTiktok || artisan.socialYoutube || artisan.website) && (
+            {(artisan.socialInstagram ||
+                artisan.socialFacebook ||
+                artisan.socialTwitter ||
+                artisan.socialTiktok ||
+                artisan.socialYoutube ||
+                artisan.website) && (
                 <section className="border-b border-border/50 bg-background py-8">
                     <div className="mx-auto max-w-4xl px-4">
                         <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
@@ -304,39 +337,66 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         </h2>
                         <div className="flex flex-wrap gap-3">
                             {artisan.socialInstagram && (
-                                <a href={`https://instagram.com/${artisan.socialInstagram}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                <a
+                                    href={`https://instagram.com/${artisan.socialInstagram}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
                                     <Instagram className="h-4 w-4" />@{artisan.socialInstagram}
                                 </a>
                             )}
                             {artisan.socialFacebook && (
-                                <a href={`https://facebook.com/${artisan.socialFacebook}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Facebook className="h-4 w-4" />{artisan.socialFacebook}
+                                <a
+                                    href={`https://facebook.com/${artisan.socialFacebook}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
+                                    <Facebook className="h-4 w-4" />
+                                    {artisan.socialFacebook}
                                 </a>
                             )}
                             {artisan.socialTwitter && (
-                                <a href={`https://x.com/${artisan.socialTwitter}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                <a
+                                    href={`https://x.com/${artisan.socialTwitter}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
                                     <Twitter className="h-4 w-4" />@{artisan.socialTwitter}
                                 </a>
                             )}
                             {artisan.socialTiktok && (
-                                <a href={`https://tiktok.com/@${artisan.socialTiktok}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
+                                <a
+                                    href={`https://tiktok.com/@${artisan.socialTiktok}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
                                     <Hash className="h-4 w-4" />@{artisan.socialTiktok}
                                 </a>
                             )}
                             {artisan.socialYoutube && (
-                                <a href={`https://youtube.com/@${artisan.socialYoutube}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Youtube className="h-4 w-4" />{artisan.socialYoutube}
+                                <a
+                                    href={`https://youtube.com/@${artisan.socialYoutube}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
+                                    <Youtube className="h-4 w-4" />
+                                    {artisan.socialYoutube}
                                 </a>
                             )}
                             {artisan.website && (
-                                <a href={artisan.website} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Globe className="h-4 w-4" />{artisan.website.replace(/^https?:\/\//, '')}
+                                <a
+                                    href={artisan.website}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
+                                >
+                                    <Globe className="h-4 w-4" />
+                                    {artisan.website.replace(/^https?:\/\//, '')}
                                 </a>
                             )}
                         </div>
@@ -349,8 +409,11 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                 <section className="bg-muted/20 py-6">
                     <div className="mx-auto max-w-4xl px-4">
                         <div className="flex flex-wrap gap-2">
-                            {artisan.hashtags.map(tag => (
-                                <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                            {artisan.hashtags.map((tag) => (
+                                <span
+                                    key={tag}
+                                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
+                                >
                                     #{tag}
                                 </span>
                             ))}
@@ -368,7 +431,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             {t('groups')}
                         </h2>
                         <div className="flex flex-wrap gap-3">
-                            {artisan.memberships.map(m => (
+                            {artisan.memberships.map((m) => (
                                 <Link
                                     key={m.group.slug}
                                     href={`/groups/${m.group.slug}`}
@@ -397,8 +460,11 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             {t('crafts')}
                         </h2>
                         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                            {crafts.map(craft => (
-                                <Card key={craft.id} className="group overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+                            {crafts.map((craft) => (
+                                <Card
+                                    key={craft.id}
+                                    className="group overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                                >
                                     <Link href={`/crafts/${craft.id}`} className="block">
                                         <div className="relative aspect-square overflow-hidden bg-muted">
                                             {craft.imageUrl ? (

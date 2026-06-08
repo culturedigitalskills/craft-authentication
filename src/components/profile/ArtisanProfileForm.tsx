@@ -287,6 +287,7 @@ export function ArtisanProfileForm({
                                     width={128}
                                     height={128}
                                     className="h-full w-full object-cover"
+                                    unoptimized
                                 />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center bg-muted">

@@ -3,7 +3,7 @@ import { CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 
 export function TraditionSection() {
-    const t = useTranslations('');
+    const t = useTranslations('')
 
     return (
         <section className="py-16 px-4 bg-muted/30">
@@ -17,6 +17,7 @@ export function TraditionSection() {
                             fill
                             sizes="(max-width: 768px) 100vw, 50vw"
                             className="object-cover"
+                            unoptimized
                         />
                     </div>
 
@@ -51,7 +52,7 @@ export function TraditionSection() {
                             </li>
                         </ul>
                     </div>
-                </div> 
+                </div>
             </div>
         </section>
     )

@@ -99,6 +99,7 @@ export function CoverPhotoUpload({
                         fill
                         sizes="100vw"
                         className="object-cover"
+                        unoptimized
                     />
                 ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center gap-2">
@@ -112,7 +113,16 @@ export function CoverPhotoUpload({
                     </div>
                 )}
                 {previewUrl && !isUploading && (
-                    <div className="absolute inset-0 flex items-center justify-center transition-colors" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0)' }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0.3)')} onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0)')  }>
+                    <div
+                        className="absolute inset-0 flex items-center justify-center transition-colors"
+                        style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0)' }}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0.3)')
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0)')
+                        }
+                    >
                         <span className="rounded-md bg-background/80 px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100 hover:opacity-100">
                             {t('changeCover')}
                         </span>

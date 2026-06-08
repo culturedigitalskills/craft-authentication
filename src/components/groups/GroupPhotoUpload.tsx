@@ -103,6 +103,7 @@ export function GroupPhotoUpload({
                         fill
                         sizes={isCover ? '100vw' : '112px'}
                         className={isCover ? 'object-cover' : 'object-cover rounded-lg'}
+                        unoptimized
                     />
                 ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center gap-1.5">

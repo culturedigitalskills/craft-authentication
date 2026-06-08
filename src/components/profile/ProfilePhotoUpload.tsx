@@ -102,6 +102,7 @@ export function ProfilePhotoUpload({
                         fill
                         sizes="128px"
                         className="object-cover"
+                        unoptimized
                     />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center">
