@@ -78,7 +78,7 @@ export async function DELETE(request: Request) {
     } catch (err: any) {
         const status = err.statusCode ?? 500
         return NextResponse.json(
-            { error: err.message || 'Failed to delete KMS escrow' },
+            { error: status === 401 ? 'Unauthorized' : 'Request failed' },
             { status }
         )
     }

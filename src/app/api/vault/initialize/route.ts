@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     } catch (err: any) {
         const status = err.statusCode ?? 500
         return NextResponse.json(
-            { error: err.message || 'Initialization failed' },
+            { error: 'Request failed' },
             { status }
         )
     }
