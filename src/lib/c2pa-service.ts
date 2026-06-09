@@ -579,7 +579,7 @@ export class C2PAService {
 
                 const actionsAssertion = manifest.assertions?.find(
                     (a: any) => a.label === 'c2pa.actions' || a.label === 'c2pa.actions.v2',
-                )
+                ) as any
                 if (actionsAssertion?.data?.actions) {
                     for (const act of actionsAssertion.data.actions) {
                         // c2pa.opened is an internal ingredient reference — not user-facing
