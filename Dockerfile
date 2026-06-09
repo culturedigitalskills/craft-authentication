@@ -15,6 +15,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres"
 ENV DATABASE_URL=${DATABASE_URL_APP}
 ENV DATABASE_URL_APP=${DATABASE_URL_APP}
+
+RUN apt-get update && apt-get install -y openssl
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm prisma generate
