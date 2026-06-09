@@ -84,7 +84,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                         >
                             <Link href={`/groups/${group.slug}`} className="flex flex-col h-full">
                                 {/* Hero Image */}
-                                <div className="relative w-full h-48 overflow-hidden rounded-t-lg bg-muted flex-shrink-0">
+                                <div className="relative w-full h-48 overflow-hidden rounded-t-lg bg-muted shrink-0">
                                     {logoMap.get(group.id) ? (
                                         <Image
                                             src={logoMap.get(group.id)!}
@@ -102,7 +102,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                                 </div>
 
                                 {/* Content */}
-                                <CardHeader className="pb-2 bg-muted flex-shrink-0">
+                                <CardHeader className="pb-2 bg-muted shrink-0">
                                     <CardTitle className="line-clamp-1 transition-colors group-hover:text-primary">
                                         {group.name}
                                     </CardTitle>
@@ -113,7 +113,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
 
                                 <CardContent className="flex flex-col flex-1 pt-4 pb-4 bg-muted space-y-3 overflow-hidden">
                                     {/* Info Row */}
-                                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground flex-shrink-0">
+                                    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground shrink-0">
                                         <span className="inline-flex items-center gap-1">
                                             <Users className="h-3.5 w-3.5" />
                                             {group._count.memberships} {t('members')}
@@ -135,7 +135,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                                     </div>
 
                                     {/* Tags */}
-                                    <div className="flex flex-wrap gap-1.5 flex-shrink-0">
+                                    <div className="flex flex-wrap gap-1.5 shrink-0">
                                         {group.organizationType &&
                                             group.organizationType !== 'OTHER' && (
                                                 <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
