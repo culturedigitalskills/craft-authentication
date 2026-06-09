@@ -50,20 +50,25 @@ enum CraftStoryStatus {
 // Auth Models
 
 model User {
-    id            String      @id @default(uuid())
+    id            String                 @id @default(uuid())
     name          String?
-    email         String      @unique
-    emailVerified Boolean     @default(false)
+    email         String                 @unique
+    emailVerified Boolean                @default(false)
     password      String?
     image         String?
-    role          Role        @default(ARTISAN)
-    isActive      Boolean     @default(true)
-    createdAt     DateTime    @default(now())
-    updatedAt     DateTime    @updatedAt
+    role          Role                   @default(ARTISAN)
+    isActive      Boolean                @default(true)
+    masterKeyHash     String?                @map("master_key_hash")
+    c2paAutoRenew     Boolean                @default(false) @map("c2pa_auto_renew")
+    c2paCertExpiresAt DateTime?              @map("c2pa_cert_expires_at")
+    createdAt         DateTime               @default(now())
+    updatedAt     DateTime               @updatedAt
     accounts      Account[]
     sessions      Session[]
     artisan       Artisan?
     mediaFiles    MediaFile[]
+    secrets       UserSecrets[]
+    wrappedKeys   UserWrappedVaultKeys[]
 }
 
 model Account {
@@ -285,3 +290,39 @@ model MediaAttachment {
     @@index([entityType, entityId])
     @@index([mediaId])
 }
+
+// Vault Models
+
+enum VaultWrapMode {
+    E2E_PRF
+    SSE_KMS
+    RECOVERY_TOKEN
+}
+
+model UserSecrets {
+    id             String   @id @default(uuid())
+    userId         String   @map("user_id")
+    type           String
+    ciphertextData String   @map("ciphertext_data")
+    createdAt      DateTime @default(now()) @map("created_at")
+    updatedAt      DateTime @updatedAt @map("updated_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
+model UserWrappedVaultKeys {
+    id           String        @id @default(uuid())
+    userId       String        @map("user_id")
+    credentialId String?       @map("credential_id")
+    wrapMode     VaultWrapMode @map("wrap_mode")
+    wrappedKey   String        @map("wrapped_key")
+    createdAt    DateTime      @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([credentialId])
+}
+

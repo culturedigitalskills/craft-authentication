@@ -18,11 +18,7 @@ interface GalleryUploadProps {
     onGalleryUploaded?: (mediaFileIds: string[]) => void
 }
 
-export function GalleryUpload({
-    artisanId,
-    initialImages,
-    onGalleryUploaded,
-}: GalleryUploadProps) {
+export function GalleryUpload({ artisanId, initialImages, onGalleryUploaded }: GalleryUploadProps) {
     const t = useTranslations('profile')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
@@ -49,7 +45,10 @@ export function GalleryUpload({
                     body: formData,
                 })
 
-                if (!uploadRes.ok) throw new Error('Upload failed')
+                if (!uploadRes.ok) {
+                    const errorData = await uploadRes.json().catch(() => ({}))
+                    throw new Error(errorData.error || 'Upload failed')
+                }
 
                 const mediaFile = await uploadRes.json()
 
@@ -67,26 +66,35 @@ export function GalleryUpload({
                         }),
                     })
 
-                    if (!attachRes.ok) throw new Error('Attachment failed')
+                    if (!attachRes.ok) {
+                        const attachError = await attachRes.json().catch(() => ({}))
+                        throw new Error(attachError.error || 'Attachment failed')
+                    }
 
                     const attachment = await attachRes.json()
-                    setImages(prev => [...prev, {
-                        id: attachment.id,
-                        mediaId: mediaFile.id,
-                        url: `/api/media/${mediaFile.id}`,
-                    }])
+                    setImages((prev) => [
+                        ...prev,
+                        {
+                            id: attachment.id,
+                            mediaId: mediaFile.id,
+                            url: `/api/media/${mediaFile.id}`,
+                        },
+                    ])
                 } else {
-                    setPendingIds(prev => [...prev, mediaFile.id])
-                    setImages(prev => [...prev, {
-                        id: mediaFile.id,
-                        mediaId: mediaFile.id,
-                        url: `/api/media/${mediaFile.id}`,
-                    }])
+                    setPendingIds((prev) => [...prev, mediaFile.id])
+                    setImages((prev) => [
+                        ...prev,
+                        {
+                            id: mediaFile.id,
+                            mediaId: mediaFile.id,
+                            url: `/api/media/${mediaFile.id}`,
+                        },
+                    ])
                     onGalleryUploaded?.([...pendingIds, mediaFile.id])
                 }
             }
-        } catch {
-            setError(t('galleryUploadFailed'))
+        } catch (err: any) {
+            setError(err.message || t('galleryUploadFailed'))
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
@@ -104,7 +112,7 @@ export function GalleryUpload({
                 method: 'DELETE',
             })
             if (!res.ok) throw new Error('Delete failed')
-            setImages(prev => prev.filter(img => img.mediaId !== image.mediaId))
+            setImages((prev) => prev.filter((img) => img.mediaId !== image.mediaId))
         } catch {
             setError(t('galleryDeleteFailed'))
         }
@@ -125,6 +133,7 @@ export function GalleryUpload({
                             fill
                             sizes="(max-width: 768px) 50vw, 25vw"
                             className="object-cover transition-transform group-hover:scale-105"
+                            unoptimized
                         />
                         {artisanId && confirmDelete === image.mediaId ? (
                             <div
@@ -132,7 +141,9 @@ export function GalleryUpload({
                                 style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.7)' }}
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <p className="text-sm font-medium text-white">{t('galleryDeleteConfirm')}</p>
+                                <p className="text-sm font-medium text-white">
+                                    {t('galleryDeleteConfirm')}
+                                </p>
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
@@ -150,15 +161,20 @@ export function GalleryUpload({
                                     </button>
                                 </div>
                             </div>
-                        ) : artisanId && (
-                            <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); handleRemove(image) }}
-                                className="absolute right-1.5 top-1.5 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                                style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
+                        ) : (
+                            artisanId && (
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleRemove(image)
+                                    }}
+                                    className="absolute right-1.5 top-1.5 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                    style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            )
                         )}
                     </div>
                 ))}
@@ -174,7 +190,9 @@ export function GalleryUpload({
                     ) : (
                         <div className="flex flex-col items-center gap-1.5">
                             <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground">{t('uploadGallery')}</span>
+                            <span className="text-xs text-muted-foreground">
+                                {t('uploadGallery')}
+                            </span>
                         </div>
                     )}
                 </button>

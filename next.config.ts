@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     // Keep these as external packages so Next.js does not bundle them into the
     // server chunk. This ensures they are traced into the standalone node_modules
     // and remain resolvable by other scripts in the container (e.g. seed.mjs).
-    serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
+    serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg', '@contentauth/c2pa-node'],
     images: {
         remotePatterns: [
             {

@@ -1,13 +1,14 @@
 allowBuilds:
-    '@parcel/watcher': true
-    '@prisma/engines': true
-    '@swc/core': true
-    prisma: true
-    sharp: true
-    unrs-resolver: true
+  '@contentauth/c2pa-node': true
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  '@swc/core': true
+  prisma: true
+  sharp: true
+  unrs-resolver: true
 onlyBuiltDependencies:
-    - '@prisma/engines'
-    - prisma
+  - '@prisma/engines'
+  - prisma
 
 overrides:
-    kysely: "0.28.0"
+  kysely: "0.28.0"

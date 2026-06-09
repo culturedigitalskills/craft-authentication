@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/layout/Container'
 import Image from 'next/image'
 import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap } from 'lucide-react'
 import type { Metadata } from 'next'
@@ -24,26 +24,27 @@ export default async function GroupsPage({ searchParams }: PageProps) {
     const limit = 12
     const skip = (page - 1) * limit
 
-
     const t = await getTranslations('groups')
     const currentPageUrl = `${process.env.AUTH_URL}/groups`
 
     const [groups, totalCount] = await Promise.all([
-    // const groups = await 
-    prisma.group.findMany({
-        where: { isActive: true },
-        orderBy: { name: 'asc' },
-        include: {
-            _count: { select: { memberships: true } },
-        },
-    }), prisma.group.count({
-        where: {
-            isActive: true,
-        },
-    })])
+        // const groups = await
+        prisma.group.findMany({
+            where: { isActive: true },
+            orderBy: { name: 'asc' },
+            include: {
+                _count: { select: { memberships: true } },
+            },
+        }),
+        prisma.group.count({
+            where: {
+                isActive: true,
+            },
+        }),
+    ])
 
     // Fetch logos for all groups
-    const groupIds = groups.map(g => g.id)
+    const groupIds = groups.map((g) => g.id)
     const logoAttachments = await prisma.mediaAttachment.findMany({
         where: {
             entityType: 'Group',
@@ -53,7 +54,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
         },
         select: { entityId: true, mediaId: true },
     })
-    const logoMap = new Map(logoAttachments.map(a => [a.entityId, `/api/media/${a.mediaId}`]))
+    const logoMap = new Map(logoAttachments.map((a) => [a.entityId, `/api/media/${a.mediaId}`]))
     const totalPages = Math.max(1, Math.ceil(totalCount / limit))
     const pagination = {
         currentPage: page,
@@ -66,9 +67,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
         <Container>
             <div className="mx-auto mb-12 max-w-3xl text-center">
                 <h1 className="mb-8 text-4xl font-bold">{t('title')}</h1>
-                <p className="text-lg text-muted-foreground">
-                    {t('subtitle')}
-                </p>
+                <p className="text-lg text-muted-foreground">{t('subtitle')}</p>
             </div>
 
             {groups.length === 0 ? (
@@ -78,8 +77,11 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                 </div>
             ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {groups.map(group => (
-                        <Card key={group.id} className="group flex flex-col transition-shadow duration-200 hover:shadow-lg">
+                    {groups.map((group) => (
+                        <Card
+                            key={group.id}
+                            className="group flex flex-col transition-shadow duration-200 hover:shadow-lg"
+                        >
                             <Link href={`/groups/${group.slug}`} className="flex flex-col h-full">
                                 {/* Hero Image */}
                                 <div className="relative w-full h-48 overflow-hidden rounded-t-lg bg-muted flex-shrink-0">
@@ -88,6 +90,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                                             src={logoMap.get(group.id)!}
                                             alt={group.name}
                                             fill
+                                            unoptimized
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             className="object-cover transition-transform duration-200 group-hover:scale-105"
                                         />
@@ -133,11 +136,12 @@ export default async function GroupsPage({ searchParams }: PageProps) {
 
                                     {/* Tags */}
                                     <div className="flex flex-wrap gap-1.5 flex-shrink-0">
-                                        {group.organizationType && group.organizationType !== 'OTHER' && (
-                                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-                                                {t(`orgType_${group.organizationType}`)}
-                                            </span>
-                                        )}
+                                        {group.organizationType &&
+                                            group.organizationType !== 'OTHER' && (
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                                                    {t(`orgType_${group.organizationType}`)}
+                                                </span>
+                                            )}
                                         {group.isHeritageCraft && (
                                             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
                                                 <BookOpen className="h-3 w-3" />
@@ -156,8 +160,11 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                                                 {t('trainingProgram')}
                                             </span>
                                         )}
-                                        {group.certifications?.map(cert => (
-                                            <span key={cert} className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                                        {group.certifications?.map((cert) => (
+                                            <span
+                                                key={cert}
+                                                className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
+                                            >
                                                 <Award className="h-3 w-3" />
                                                 {t(`cert_${cert}`)}
                                             </span>
@@ -173,7 +180,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
                 currentPage={page}
                 pagination={pagination}
                 currentPageUrl={currentPageUrl}
-            />            
+            />
         </Container>
     )
 }

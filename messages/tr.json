@@ -17,7 +17,8 @@
     "logout": "Logout",
     "profile": "Profile",
     "myitems": "My Crafts",
-    "mygroups": "My Communities"
+    "mygroups": "My Communities",
+    "contentCredentials": "İçerik Bilgileri"
   },
   "auth": {
     "loginTitle": "Sign In",

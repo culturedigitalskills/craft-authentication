@@ -18,7 +18,8 @@
         "mygroups": "مجتمعاتي",
         "addcraft": "إضافة حرفة",
         "mystory": "قصتي",
-        "createGroup": "إنشاء مجتمع"
+        "createGroup": "إنشاء مجتمع",
+        "contentCredentials": "أوراق اعتماد المحتوى"
     },
     "auth": {
         "loginTitle": "تسجيل الدخول",

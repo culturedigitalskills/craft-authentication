@@ -7,6 +7,7 @@ import { createAuthMiddleware, APIError } from 'better-auth/api'
 import { hashPassword } from 'better-auth/crypto'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
+import { C2PAService } from '@/lib/c2pa-service'
 
 export const betterAuthInstance = betterAuth({
     database: prismaAdapter(prisma, {
@@ -144,6 +145,13 @@ export async function auth() {
         headers: headersList,
     })
     if (!sessionData) return null
+
+    // Background auto-renew check
+    // Run asynchronously in the background so it doesn't block the request path
+    C2PAService.checkAndAutoRenew(sessionData.user.id).catch((err) => {
+        console.error('Error in background C2PA auto-renew check:', err)
+    })
+
     return {
         user: {
             id: sessionData.user.id,
