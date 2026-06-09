@@ -25,6 +25,26 @@ export function decryptPayloadServer(ciphertextJson: string, masterKey: Uint8Arr
     return decrypted.toString('utf8')
 }
 
+/**
+ * Encrypts a plaintext string using the raw MasterVaultKey (AES-256-GCM) on the server.
+ * Returns a JSON string containing the ciphertext and iv.
+ */
+export function encryptPayloadServer(plaintext: string, masterKey: Uint8Array): string {
+    const iv = crypto.randomBytes(12)
+    const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(masterKey), iv)
+    const ciphertext = Buffer.concat([
+        cipher.update(plaintext, 'utf8'),
+        cipher.final()
+    ])
+    const tag = cipher.getAuthTag()
+    const combined = Buffer.concat([ciphertext, tag])
+
+    return JSON.stringify({
+        ciphertext: combined.toString('base64'),
+        iv: iv.toString('base64')
+    })
+}
+
 export class UserSecretsService {
     /**
      * Retrieves and decrypts a specific user secret on the server.

@@ -3,14 +3,14 @@ import { C2PAService } from '@/lib/c2pa-service'
 
 export async function POST(request: Request) {
     try {
-        const formData = await request.formData()
-        const file = formData.get('file') as File
-
-        if (!file) {
+        // Accept the image as a raw binary body (avoids multipart/form-data parsing
+        // which fails in the edge-runtime for large files).
+        const arrayBuffer = await request.arrayBuffer()
+        if (!arrayBuffer.byteLength) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer())
+        const buffer = Buffer.from(arrayBuffer)
         
         // Inspect the manifest cryptographically
         const manifestResult = await C2PAService.inspectManifest(buffer)
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
             assertions: manifestResult.assertions || []
         })
     } catch (error: any) {
-        console.error('Error in POST /api/c2pa/verify:', error)
-        return NextResponse.json({ error: error.message || 'Verification failed' }, { status: 500 })
+        console.error('Error in POST /api/c2pa/verify:', error?.message ?? error)
+        return NextResponse.json({ error: error?.message || String(error) || 'Verification failed' }, { status: 500 })
     }
 }

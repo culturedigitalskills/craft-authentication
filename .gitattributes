@@ -1,20 +1,17 @@
 # Default: normalize line endings to LF in the repo
 * text=auto eol=lf
-
 # Shell scripts must always be LF — CRLF breaks shebangs on Linux
 *.sh text eol=lf
-
 # Windows batch files need CRLF
 *.bat text eol=crlf
 *.cmd text eol=crlf
-
 # Binary files — no line ending conversion
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.ico binary
-*.svg binary
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.ico filter=lfs diff=lfs merge=lfs -text
+*.svg filter=lfs diff=lfs merge=lfs -text
 *.woff binary
 *.woff2 binary
 *.ttf binary
@@ -22,3 +19,6 @@
 *.eot binary
 *.pdf binary
 *.zip binary
+*.avif filter=lfs diff=lfs merge=lfs -text
+*.heic filter=lfs diff=lfs merge=lfs -text
+*.webp filter=lfs diff=lfs merge=lfs -text

@@ -18,7 +18,8 @@
     "profile": "Profile",
     "myitems": "My Crafts",
     "mygroups": "My Communities",
-    "contentCredentials": "İçerik Bilgileri"
+    "contentCredentials": "İçerik Bilgileri",
+    "generationWorkspace": "Resim Oluşturma"
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -381,6 +382,30 @@
       "wool" : "Wool",
       "cotton" : "Cotton",
       "mix" : "Mix"
+    },
+    "imageWorkspace": {
+        "title": "Resim Oluşturma",
+        "description": "OpenRouter AI kullanarak yüksek kaliteli resimler oluşturun. Bir açıklama belirtebilir ve otomatik olarak C2PA İçerik Kimlik Bilgilerinizle imzalanan elde edilen medyayı indirebilirsiniz.",
+        "apiKeyPlaceholder": "••••••••••••••••••••",
+        "apiKeyInfo": "OpenRouter.ai API Anahtarınızı yapıştırın. API'yi aramadan (ve maliyetten kaçınarak) oluşturmayı simüle etmek için anahtar olarak 'DEVELOP' yapıştırın.",
+        "store": "Kaydet",
+        "cancel": "İptal",
+        "promptLabel": "Resim İstemci",
+        "promptPlaceholder": "Oluşturmak istediğiniz resmi tanımlayın...",
+        "generate": "Resim Oluştur",
+        "statusPending": "Kuyruğa Alındı",
+        "statusSent": "Oluşturuluyor...",
+        "statusCanceled": "İptal Edildi",
+        "statusCompleted": "Tamamlandı",
+        "statusError": "Hata",
+        "tryAgain": "Tekrar dene",
+        "viewDetail": "Detayları Göster",
+        "noKeyWarning": "Yapılandırılmış OpenRouter API anahtarı yok. Lütfen anahtarınızı yukarıya ekleyin.",
+        "addKey": "API Anahtarı Ekle",
+        "editKey": "API Anahtarını Düzenle",
+        "delete": "Sil",
+        "deleteConfirm": "Oluşturulan resim galeriden silinsin mi?",
+        "taskQueue": "Oluşturma Geçmişi"
     }
 }
 

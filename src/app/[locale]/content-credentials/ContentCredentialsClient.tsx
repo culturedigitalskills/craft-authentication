@@ -61,6 +61,10 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
             description?: string | null
             softwareAgent: string
             timestamp?: string | null
+            parameters?: Record<string, string> | null
+            digitalSourceType?: string | null
+            signer?: string | null
+            issuer?: string | null
         }>
     } | null>(null)
 
@@ -162,12 +166,10 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
         setVerifyError(null)
 
         try {
-            const formData = new FormData()
-            formData.append('file', file)
-
             const res = await fetch('/api/c2pa/verify', {
                 method: 'POST',
-                body: formData,
+                body: file,
+                headers: { 'Content-Type': file.type || 'application/octet-stream' },
             })
 
             if (!res.ok) {
@@ -643,10 +645,34 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
                                                                     </span>
                                                                 )}
                                                             </div>
+                                                            {assertion.signer && (
+                                                                <p className="text-xs font-medium text-foreground/70">
+                                                                    {assertion.signer}
+                                                                    {assertion.issuer && (
+                                                                        <span className="font-normal text-muted-foreground">
+                                                                            {' '}· {assertion.issuer}
+                                                                        </span>
+                                                                    )}
+                                                                </p>
+                                                            )}
                                                             <p className="text-xs text-muted-foreground leading-relaxed">
                                                                 {assertion.description ||
                                                                     `Operation performed using ${assertion.softwareAgent}.`}
                                                             </p>
+                                                            {assertion.parameters?.model && (
+                                                                <div className="text-xs text-muted-foreground space-y-0.5 mt-1">
+                                                                    <p>
+                                                                        <span className="font-medium">Model:</span>{' '}
+                                                                        {assertion.parameters.model}
+                                                                    </p>
+                                                                    {assertion.parameters.size && (
+                                                                        <p>
+                                                                            <span className="font-medium">Size:</span>{' '}
+                                                                            {assertion.parameters.size}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ))}
