@@ -237,10 +237,10 @@ App runs on [http://localhost:3000](http://localhost:3000) by default (configure
 
 The vault uses two independent secrets. They have different rotation procedures because they protect different things:
 
-| Secret | What it protects | Rotation impact |
-|---|---|---|
-| `kms_private_key.pem` / `kms_public_key.pem` | Nothing stored — RSA is used only *transiently* during vault init (client wraps with RSA; server RSA-decrypts and immediately re-wraps with `LOCAL_MASTER_KEY`). | None. Replace PEM files and restart. |
-| `LOCAL_MASTER_KEY` | All `SSE_KMS` rows in `UserWrappedVaultKeys` (AES-256-GCM). | All SSE_KMS records must be re-wrapped before the key changes. |
+| Secret                                       | What it protects                                                                                                                                                 | Rotation impact                                                |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `kms_private_key.pem` / `kms_public_key.pem` | Nothing stored — RSA is used only _transiently_ during vault init (client wraps with RSA; server RSA-decrypts and immediately re-wraps with `LOCAL_MASTER_KEY`). | None. Replace PEM files and restart.                           |
+| `LOCAL_MASTER_KEY`                           | All `SSE_KMS` rows in `UserWrappedVaultKeys` (AES-256-GCM).                                                                                                      | All SSE_KMS records must be re-wrapped before the key changes. |
 
 ### Rotating the RSA key pair
 
@@ -295,6 +295,16 @@ C2PA_ROOT_CERT_PATH="./secrets/c2pa_root_cert.pem"
 
 > [!WARNING]
 > **Missing Certificate Error:** If the Root CA private key or certificate files are missing or unreadable, the application will throw a startup/execution error when checking status or executing C2PA operations.
+
+### C2PA Trust List
+
+Download the list of trusted C2PA signing authorities.
+
+```bash
+node scripts/download-c2pa-trust-list.mjs
+```
+
+I thsould create the file `secrets/c2pa-trust-list.pem`, which is used to validate other signing authorities besides us. The script downloads the trust list from https://raw.githubusercontent.com/c2pa-org/conformance-public/main/trust-list/.
 
 ### Certificate Renewal
 
