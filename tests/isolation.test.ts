@@ -7,7 +7,7 @@ describe('Server Actions Environment Isolation Tests', () => {
         
         try {
             // Simulate production mode
-            process.env.NODE_ENV = 'production'
+            (process.env as any).NODE_ENV = 'production'
 
             await expect(
                 verifyClientDecodedKeyAction('test-user-id', 'some-key')
@@ -18,7 +18,7 @@ describe('Server Actions Environment Isolation Tests', () => {
             ).rejects.toThrow('only available in development mode')
         } finally {
             // Restore environment to original state
-            process.env.NODE_ENV = originalNodeEnv
+            (process.env as any).NODE_ENV = originalNodeEnv
         }
     })
 })
