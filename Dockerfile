@@ -1,4 +1,4 @@
-FROM node:24-alpine AS base
+FROM node:24-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -26,7 +26,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install system dependencies (openssl for credentials generation, curl & jq for healthchecks) and prisma CLI
-RUN apk add --no-cache openssl curl jq && npm install -g prisma@7
+RUN apt-get update && apt-get install -y openssl curl jq && rm -rf /var/lib/apt/lists/* && npm install -g prisma@7
 
 # Application files
 COPY --from=builder /app/public ./public
