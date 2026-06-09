@@ -1,8 +1,10 @@
 import 'server-only'
 import { readFileSync, existsSync } from 'fs'
+import { join } from 'path'
 import crypto from 'crypto'
 
 let cachedRootKeys: { privateKey: string; certificate: string } | null = null
+let cachedTrustList: string | null | undefined = undefined // undefined = not yet attempted
 
 /**
  * Retrieves and validates the C2PA Root CA key and certificate.
@@ -52,4 +54,36 @@ export function getC2PARootKeys() {
     // Cache the loaded keys
     cachedRootKeys = { privateKey, certificate }
     return cachedRootKeys
+}
+
+/**
+ * Loads the C2PA content-signing trust list PEM from secrets/c2pa-trust-list.pem.
+ * Returns null and logs an error if the file is missing — callers should fall back
+ * to validating with only the local CA cert in that case.
+ *
+ * Run "node scripts/download-c2pa-trust-list.mjs" to populate the file.
+ */
+export function getC2PATrustList(): string | null {
+    if (cachedTrustList !== undefined) return cachedTrustList
+
+    const trustListPath = join(process.cwd(), 'secrets', 'c2pa-trust-list.pem')
+
+    if (!existsSync(trustListPath)) {
+        console.error(
+            '[C2PA] WARNING: C2PA trust list not found at ' + trustListPath + '. ' +
+            'Third-party C2PA signatures (e.g. Google, Adobe) will be marked as untrusted. ' +
+            'Run "node scripts/download-c2pa-trust-list.mjs" to fix this.'
+        )
+        cachedTrustList = null
+        return null
+    }
+
+    try {
+        cachedTrustList = readFileSync(trustListPath, 'utf8')
+        return cachedTrustList
+    } catch {
+        console.error('[C2PA] ERROR: Could not read C2PA trust list at ' + trustListPath)
+        cachedTrustList = null
+        return null
+    }
 }
