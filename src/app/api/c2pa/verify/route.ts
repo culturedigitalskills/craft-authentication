@@ -29,7 +29,7 @@ export async function POST(request: Request) {
             assertions: manifestResult.assertions || []
         })
     } catch (error: any) {
-        console.error('Error in POST /api/c2pa/verify:', error)
-        return NextResponse.json({ error: error.message || 'Verification failed' }, { status: 500 })
+        console.error('Error in POST /api/c2pa/verify:', error?.message ?? error)
+        return NextResponse.json({ error: error?.message || String(error) || 'Verification failed' }, { status: 500 })
     }
 }

@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     output: 'standalone',
     experimental: {
         serverActions: {
-            bodySizeLimit: '10mb',
+            bodySizeLimit: '50mb',
         },
     },
     // Keep these as external packages so Next.js does not bundle them into the
