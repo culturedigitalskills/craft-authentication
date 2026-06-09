@@ -18,6 +18,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
             hasManifest: manifestResult.hasManifest,
             verified: manifestResult.authentic,
+            untrusted: manifestResult.untrusted || false,
             error: manifestResult.authentic ? null : (manifestResult.validationStatus[0] || 'No C2PA manifest found or signature invalid'),
             artisanName: manifestResult.artisanName || null,
             creatorUserId: manifestResult.creatorUserId || null,

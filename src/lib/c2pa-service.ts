@@ -68,6 +68,7 @@ export interface C2PAManifestResult {
     artisanName?: string
     issuer?: string
     authentic: boolean
+    untrusted?: boolean
     validationStatus: string[]
     manifest?: any
     date?: string | null
@@ -360,6 +361,7 @@ export class C2PAService {
 
             const validationStatus: string[] = []
             let authentic = true
+            let untrusted = false
 
             if (json.validation_status && json.validation_status.length > 0) {
                 for (const status of json.validation_status) {
@@ -372,6 +374,9 @@ export class C2PAService {
                 const realFailures = failures.filter((f: any) => f.code !== 'signingCredential.untrusted')
                 if (realFailures.length > 0) {
                     authentic = false
+                }
+                if (failures.some((f: any) => f.code === 'signingCredential.untrusted')) {
+                    untrusted = true
                 }
                 for (const failure of failures) {
                     const statusStr = `${failure.code}: ${failure.explanation}`
@@ -424,6 +429,7 @@ export class C2PAService {
                 artisanName,
                 issuer,
                 authentic,
+                untrusted,
                 validationStatus,
                 manifest: json,
                 date,

@@ -50,6 +50,7 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
     const [verifyResult, setVerifyResult] = useState<{
         hasManifest: boolean
         authentic: boolean
+        untrusted?: boolean
         artisanName?: string
         creatorUserId?: string
         issuer?: string
@@ -180,6 +181,7 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
             setVerifyResult({
                 hasManifest: data.hasManifest,
                 authentic: data.verified,
+                untrusted: data.untrusted,
                 artisanName: data.artisanName,
                 creatorUserId: data.creatorUserId,
                 issuer: data.issuer,
@@ -495,24 +497,52 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
                                 {/* Status Alert */}
                                 {verifyResult.hasManifest ? (
                                     verifyResult.authentic ? (
-                                        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3">
-                                            <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
-                                            <div className="space-y-1">
-                                                {verifyResult.creatorUserId && userId && verifyResult.creatorUserId.trim().toLowerCase() === userId.trim().toLowerCase() && (
-                                                    <span className="inline-block px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase bg-emerald-600 text-white rounded mb-1">
-                                                        This is your creation
-                                                    </span>
-                                                )}
-                                                <h4 className="font-bold text-sm">
-                                                    Authentic Credentials Secured
-                                                </h4>
-                                                <p className="text-xs text-emerald-800 leading-relaxed">
-                                                    This image has a valid creator stamp that hasn't
-                                                    been altered. It was signed by a registered
-                                                    artisan.
-                                                </p>
+                                        verifyResult.untrusted ? (
+                                            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
+                                                <AlertTriangle className="h-6 w-6 text-amber-600 shrink-0 mt-0.5" />
+                                                <div className="space-y-1">
+                                                    {verifyResult.creatorUserId && userId && verifyResult.creatorUserId.trim().toLowerCase() === userId.trim().toLowerCase() && (
+                                                        <span className="inline-block px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase bg-amber-600 text-white rounded mb-1">
+                                                            This is your creation
+                                                        </span>
+                                                    )}
+                                                    <h4 className="font-bold text-sm">
+                                                        Credentials Secured (Untrusted Issuer)
+                                                    </h4>
+                                                    <p className="text-xs text-amber-800 leading-relaxed">
+                                                        This image has a valid creator stamp that hasn't
+                                                        been altered. However, the signing certificate is
+                                                        self-signed or not globally trusted.
+                                                    </p>
+                                                    <div className="mt-2 text-xs font-mono space-y-1 text-amber-700 border-t border-amber-200/50 pt-2">
+                                                        {verifyResult.validationStatus.map(
+                                                            (err, idx) => (
+                                                                <div key={idx}>• {err}</div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-3">
+                                                <CheckCircle2 className="h-6 w-6 text-emerald-600 shrink-0 mt-0.5" />
+                                                <div className="space-y-1">
+                                                    {verifyResult.creatorUserId && userId && verifyResult.creatorUserId.trim().toLowerCase() === userId.trim().toLowerCase() && (
+                                                        <span className="inline-block px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase bg-emerald-600 text-white rounded mb-1">
+                                                            This is your creation
+                                                        </span>
+                                                    )}
+                                                    <h4 className="font-bold text-sm">
+                                                        Authentic Credentials Secured
+                                                    </h4>
+                                                    <p className="text-xs text-emerald-800 leading-relaxed">
+                                                        This image has a valid creator stamp that hasn't
+                                                        been altered. It was signed by a registered
+                                                        artisan.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )
                                     ) : (
                                         <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/20 text-destructive flex items-start gap-3">
                                             <XCircle className="h-6 w-6 text-destructive shrink-0 mt-0.5" />

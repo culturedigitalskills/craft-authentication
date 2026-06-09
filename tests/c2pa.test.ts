@@ -129,6 +129,7 @@ describe('C2PA Content Credentials Integration Tests', () => {
         const inspect = await C2PAService.inspectManifest(buf)
         expect(inspect.hasManifest).toBe(true)
         expect(inspect.authentic).toBe(true)
+        expect(inspect.untrusted).toBe(false)
         expect(inspect.artisanName).toBe('Frank')
         expect(inspect.creatorUserId).toBe('ad6ed879-1596-4296-9329-1d79e24dda69')
         expect(inspect.issuer).toBe('Crafts C2PA Root CA')
