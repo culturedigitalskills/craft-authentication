@@ -361,11 +361,14 @@ export class C2PAService {
             // If the trust list file is absent (see scripts/download-c2pa-trust-list.mjs),
             // getC2PATrustList() logs an error and returns null — we fall back to our CA only.
             const trustListPem = getC2PATrustList()
-            const userAnchors = trustListPem ? trustListPem + '\n' + ourCert : ourCert
 
             const settingsString = settingsToJson(
                 mergeSettings(
-                    createTrustSettings({ verifyTrustList: true, userAnchors }),
+                    createTrustSettings({
+                        verifyTrustList: true,
+                        userAnchors: ourCert,
+                        trustAnchors: trustListPem ? trustListPem : undefined,
+                    }),
                     createVerifySettings({ verifyTrust: true }),
                 ),
             )

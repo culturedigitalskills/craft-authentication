@@ -17,17 +17,25 @@ export function getC2PARootKeys() {
     const certPath = process.env.C2PA_ROOT_CERT_PATH
 
     if (!keyPath) {
-        throw new Error('C2PA_ROOT_KEY_PATH is not set in environment. Please add it to your env file and run: node scripts/generate-c2pa-root.mjs')
+        throw new Error(
+            'C2PA_ROOT_KEY_PATH is not set in environment. Please add it to your env file and run: node scripts/generate-c2pa-root.mjs',
+        )
     }
     if (!certPath) {
-        throw new Error('C2PA_ROOT_CERT_PATH is not set in environment. Please add it to your env file and run: node scripts/generate-c2pa-root.mjs')
+        throw new Error(
+            'C2PA_ROOT_CERT_PATH is not set in environment. Please add it to your env file and run: node scripts/generate-c2pa-root.mjs',
+        )
     }
 
     if (!existsSync(keyPath)) {
-        throw new Error(`C2PA Root CA Private Key file not found at: ${keyPath}. Please run "node scripts/generate-c2pa-root.mjs" to generate it.`)
+        throw new Error(
+            `C2PA Root CA Private Key file not found at: ${keyPath}. Please run "node scripts/generate-c2pa-root.mjs" to generate it.`,
+        )
     }
     if (!existsSync(certPath)) {
-        throw new Error(`C2PA Root CA Certificate file not found at: ${certPath}. Please run "node scripts/generate-c2pa-root.mjs" to generate it.`)
+        throw new Error(
+            `C2PA Root CA Certificate file not found at: ${certPath}. Please run "node scripts/generate-c2pa-root.mjs" to generate it.`,
+        )
     }
 
     let privateKey: string
@@ -70,9 +78,11 @@ export function getC2PATrustList(): string | null {
 
     if (!existsSync(trustListPath)) {
         console.error(
-            '[C2PA] WARNING: C2PA trust list not found at ' + trustListPath + '. ' +
-            'Third-party C2PA signatures (e.g. Google, Adobe) will be marked as untrusted. ' +
-            'Run "node scripts/download-c2pa-trust-list.mjs" to fix this.'
+            '[C2PA] WARNING: C2PA trust list not found at ' +
+                trustListPath +
+                '. ' +
+                'Third-party C2PA signatures (e.g. Google, Adobe) will be marked as untrusted. ' +
+                'Run "node scripts/download-c2pa-trust-list.mjs" to fix this.',
         )
         cachedTrustList = null
         return null
