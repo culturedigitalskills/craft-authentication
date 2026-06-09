@@ -135,7 +135,7 @@ describe('C2PA Content Credentials Integration Tests', () => {
         expect(inspect.issuer).toBe('Crafts C2PA Root CA')
         expect(inspect.validationStatus).toEqual([])
         expect(inspect.assertions).toHaveLength(1)
-        expect(inspect.assertions[0].action).toBe('c2pa.created')
+        expect(inspect.assertions?.[0]?.action).toBe('c2pa.created')
     })
 
     it('should sign clean media with C2PA manifest (initializeManifest) and verify successfully', async () => {

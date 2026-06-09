@@ -74,7 +74,18 @@ export function getC2PARootKeys() {
 export function getC2PATrustList(): string | null {
     if (cachedTrustList !== undefined) return cachedTrustList
 
-    const trustListPath = join(process.cwd(), 'secrets', 'c2pa-trust-list.pem')
+    const trustListPath = process.env.C2PA_TRUST_LIST_PATH
+    if (!trustListPath) {
+        throw new Error(
+            'C2PA_TRUST_LIST_PATH is not set in environment. Please add it to your env file and run: node scripts/download-c2pa-trust-list.mjs',
+        )
+    }
+
+    if (!existsSync(trustListPath)) {
+        throw new Error(
+            `C2PA Trust List file not found at: ${trustListPath}. Please run "node scripts/download-c2pa-trust-list.mjs" to generate it.`,
+        )
+    }
 
     if (!existsSync(trustListPath)) {
         console.error(
