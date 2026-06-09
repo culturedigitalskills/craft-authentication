@@ -7,6 +7,10 @@
     node scripts/download-c2pa-trust-list.mjs
     ```
     I thsould create the file `secrets/c2pa-trust-list.pem`, which is used to validate other signing authorities besides us. The script downloads the trust list from https://raw.githubusercontent.com/c2pa-org/conformance-public/main/trust-list/.
+2. Add the environment variables to your `.env.local` (and `.env.production` for deployment):
+    ```env
+    C2PA_TRUST_LIST_PATH=./secrets/c2pa-trust-list.pem
+    ```
 
 # v0.11.0 -> v0.12.0
 
