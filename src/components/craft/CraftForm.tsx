@@ -16,7 +16,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft, Loader2, X, Play, Youtube } from 'lucide-react'
+import { ArrowLeft, Loader2, X, Play } from 'lucide-react'
+import { FaYoutube } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
 import { Prisma } from '@prisma/client'
 import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
@@ -426,7 +427,7 @@ export function CraftForm({ craft, user }: CraftFormProps) {
 
                     <div className="space-y-2">
                         <Label htmlFor="videoUrl" className="flex items-center gap-1.5">
-                            <Youtube className="h-4 w-4" />
+                            <FaYoutube className="h-4 w-4" />
                             {t('createCraft.videosLabel')}
                         </Label>
 

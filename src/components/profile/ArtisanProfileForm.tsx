@@ -26,14 +26,11 @@ import {
     Shield,
     LogOut,
     Loader2,
-    Instagram,
-    Facebook,
-    Twitter,
-    Youtube,
     Globe,
     Hash,
     X,
 } from 'lucide-react'
+import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
 
 interface Artisan {
     id: string
@@ -644,7 +641,7 @@ export function ArtisanProfileForm({
                                     {
                                         id: 'socialInstagram',
                                         label: t('socialInstagram'),
-                                        icon: Instagram,
+                                        icon: FaInstagram,
                                         value: socialInstagram,
                                         setter: setSocialInstagram,
                                         placeholder: 'yourhandle',
@@ -652,7 +649,7 @@ export function ArtisanProfileForm({
                                     {
                                         id: 'socialFacebook',
                                         label: t('socialFacebook'),
-                                        icon: Facebook,
+                                        icon: FaFacebook,
                                         value: socialFacebook,
                                         setter: setSocialFacebook,
                                         placeholder: 'yourhandle',
@@ -660,7 +657,7 @@ export function ArtisanProfileForm({
                                     {
                                         id: 'socialTwitter',
                                         label: t('socialTwitter'),
-                                        icon: Twitter,
+                                        icon: FaXTwitter,
                                         value: socialTwitter,
                                         setter: setSocialTwitter,
                                         placeholder: 'yourhandle',
@@ -668,7 +665,7 @@ export function ArtisanProfileForm({
                                     {
                                         id: 'socialTiktok',
                                         label: t('socialTiktok'),
-                                        icon: Hash,
+                                        icon: FaTiktok,
                                         value: socialTiktok,
                                         setter: setSocialTiktok,
                                         placeholder: 'yourhandle',
@@ -676,7 +673,7 @@ export function ArtisanProfileForm({
                                     {
                                         id: 'socialYoutube',
                                         label: t('socialYoutube'),
-                                        icon: Youtube,
+                                        icon: FaYoutube,
                                         value: socialYoutube,
                                         setter: setSocialYoutube,
                                         placeholder: 'yourchannel',
