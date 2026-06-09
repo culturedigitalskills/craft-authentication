@@ -191,7 +191,13 @@ export class C2PAService {
     static async initializeManifest(
         userId: string,
         mediaBuffer: Buffer,
-        mimeType: string
+        mimeType: string,
+        generationMetadata?: {
+            service: string
+            model: string
+            size: string
+            prompt: string
+        }
     ): Promise<Buffer> {
         const manifestInfo = await C2PAService.inspectManifest(mediaBuffer)
         if (manifestInfo.hasManifest && manifestInfo.creatorUserId !== userId) {
@@ -204,6 +210,28 @@ export class C2PAService {
         const leafKey = Buffer.from(privateKey, 'utf8')
         const signer = LocalSigner.newSigner(certChain, leafKey, 'es256', 'http://timestamp.digicert.com')
 
+        const assertions: any[] = [
+            {
+                label: 'c2pa.actions',
+                data: {
+                    actions: [
+                        {
+                            action: 'c2pa.created',
+                            softwareAgent: 'Crafts Registry v1',
+                            timestamp: new Date().toISOString()
+                        }
+                    ]
+                }
+            }
+        ]
+
+        if (generationMetadata) {
+            assertions.push({
+                label: 'org.sustainablecrafting.generation',
+                data: generationMetadata
+            })
+        }
+
         const manifestDefinition = {
             claim_generator: 'Crafts Registry',
             claim_generator_info: [
@@ -212,20 +240,7 @@ export class C2PAService {
                     version: '1.0.0'
                 }
             ],
-            assertions: [
-                {
-                    label: 'c2pa.actions',
-                    data: {
-                        actions: [
-                            {
-                                action: 'c2pa.created',
-                                softwareAgent: 'Crafts Registry v1',
-                                timestamp: new Date().toISOString()
-                            }
-                        ]
-                    }
-                }
-            ]
+            assertions
         }
 
         const builder = Builder.withJson(manifestDefinition)

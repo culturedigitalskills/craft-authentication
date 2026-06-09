@@ -19,7 +19,8 @@
         "addcraft": "Handwerk hinzufügen",
         "mystory": "Meine Geschichte",
         "createGroup": "Gemeinschaft erstellen",
-        "contentCredentials": "Inhaltsnachweise"
+        "contentCredentials": "Inhaltsnachweise",
+        "generationWorkspace": "Bildgenerierung"
     },
     "auth": {
         "loginTitle": "Anmelden",
@@ -404,5 +405,35 @@
         "addVideo": "Hinzufügen",
         "removeVideo": "Video entfernen",
         "invalidYoutubeUrl": "Konnte nicht als YouTube-Link erkannt werden."
+    },
+    "imageWorkspace": {
+        "title": "Bildgenerierung",
+        "description": "Erstellen Sie hochwertige Bilder mit OpenRouter AI. Sie können einen Prompt angeben und das resultierende Bild herunterladen, das automatisch mit Ihren C2PA-Inhaltsnachweisen signiert wird.",
+        "apiKeyPlaceholder": "••••••••••••••••••••",
+        "apiKeyInfo": "Fügen Sie Ihren OpenRouter.ai-API-Schlüssel ein. Um die Generierung ohne API-Aufrufe (und Kosten) zu simulieren, geben Sie 'DEVELOP' als Schlüssel ein.",
+        "store": "Speichern",
+        "cancel": "Abbrechen",
+        "promptLabel": "Bild-Prompt",
+        "promptPlaceholder": "Beschreiben Sie das Bild, das Sie generieren möchten...",
+        "generate": "Bild generieren",
+        "statusPending": "Warteschlange",
+        "statusSent": "Generierung...",
+        "statusCanceled": "Abgebrochen",
+        "statusCompleted": "Abgeschlossen",
+        "statusError": "Fehler",
+        "tryAgain": "Erneut versuchen",
+        "viewDetail": "Details anzeigen",
+        "noKeyWarning": "Kein OpenRouter-API-Schlüssel konfiguriert. Bitte fügen Sie Ihren Schlüssel oben hinzu.",
+        "addKey": "API-Schlüssel hinzufügen",
+        "editKey": "API-Schlüssel bearbeiten",
+        "delete": "Löschen",
+        "deleteConfirm": "Generiertes Bild aus Galerie löschen?",
+        "taskQueue": "Generierungsverlauf"
+    },
+    "materials": {
+        "selectOne": "Bitte auswählen:",
+        "wool": "Wolle",
+        "cotton": "Baumwolle",
+        "mix": "Mischung"
     }
 }
