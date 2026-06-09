@@ -3,7 +3,7 @@
 import { useSession, signOut } from '@/lib/auth-client'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
@@ -91,6 +91,14 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     >
                         <ShieldCheck className="h-4 w-4" />
                         {t('contentCredentials')}
+                    </Link>
+                    <Link
+                        href="/generation-workspace"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <Image className="h-4 w-4" />
+                        {t('generationWorkspace')}
                     </Link>
 
                     <div className="my-1 border-t border-border" />
@@ -211,6 +219,14 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         >
                             <ShieldCheck className="h-4 w-4 text-muted-foreground" />
                             {t('contentCredentials')}
+                        </Link>
+                        <Link
+                            href="/generation-workspace"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                            <Image className="h-4 w-4 text-muted-foreground" />
+                            {t('generationWorkspace')}
                         </Link>
                     </div>
 

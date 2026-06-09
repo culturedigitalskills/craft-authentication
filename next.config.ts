@@ -6,8 +6,9 @@ const nextConfig: NextConfig = {
     output: 'standalone',
     experimental: {
         serverActions: {
-            bodySizeLimit: '10mb',
+            bodySizeLimit: '50mb',
         },
+        proxyClientMaxBodySize: '30mb',
     },
     // Keep these as external packages so Next.js does not bundle them into the
     // server chunk. This ensures they are traced into the standalone node_modules

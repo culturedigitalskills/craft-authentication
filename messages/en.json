@@ -20,7 +20,8 @@
         "myitems": "My Crafts",
         "mygroups": "My Communities",
         "createGroup": "Create Community",
-        "contentCredentials": "Content Credentials"
+        "contentCredentials": "Content Credentials",
+        "generationWorkspace": "Image Generation"
     },
     "auth": {
         "loginTitle": "Sign In",
@@ -469,5 +470,29 @@
         "wool": "Wool",
         "cotton": "Cotton",
         "mix": "Mix"
+    },
+    "imageWorkspace": {
+        "title": "Image Generation",
+        "description": "Create high-quality images using OpenRouter AI. You can specify a prompt and download the resulting media, which is automatically signed with your C2PA Content Credentials.",
+        "apiKeyPlaceholder": "••••••••••••••••••••",
+        "apiKeyInfo": "Paste your OpenRouter.ai API Key. To simulate generation without calling the API (and avoiding costs), paste 'DEVELOP' as the key.",
+        "store": "Store",
+        "cancel": "Cancel",
+        "promptLabel": "Image Prompt",
+        "promptPlaceholder": "Describe the image you want to generate...",
+        "generate": "Generate Image",
+        "statusPending": "Queued",
+        "statusSent": "Generating...",
+        "statusCanceled": "Canceled",
+        "statusCompleted": "Completed",
+        "statusError": "Error",
+        "tryAgain": "Try again",
+        "viewDetail": "View Detail",
+        "noKeyWarning": "No OpenRouter API key configured. Please add your key above.",
+        "addKey": "Add API Key",
+        "editKey": "Edit API Key",
+        "delete": "Delete",
+        "deleteConfirm": "Delete generated image from gallery?",
+        "taskQueue": "Generation History"
     }
 }

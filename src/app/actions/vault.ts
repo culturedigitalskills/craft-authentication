@@ -121,3 +121,66 @@ export async function verifyDecryptedSecretAction(
         }
     }
 }
+
+import { auth } from '@/lib/auth'
+import { encryptPayloadServer } from '@/lib/user-secrets-service'
+
+export async function storeOpenRouterApiKeyAction(apiKey: string) {
+    const session = await auth()
+    if (!session?.user) {
+        throw new Error('Not authenticated')
+    }
+    const userId = session.user.id
+
+    const escrowRecord = await prisma.userWrappedVaultKeys.findFirst({
+        where: { userId, wrapMode: 'SSE_KMS' },
+    })
+
+    if (!escrowRecord) {
+        throw new Error('Vault is not initialized. Please set up your vault first.')
+    }
+
+    const masterKey = await KMS.unwrapMasterKey(escrowRecord.wrappedKey)
+
+    try {
+        const encryptedKey = encryptPayloadServer(apiKey, masterKey)
+
+        const existing = await prisma.userSecrets.findFirst({
+            where: { userId, type: 'OPENROUTER_API_KEY' },
+        })
+
+        if (existing) {
+            await prisma.userSecrets.update({
+                where: { id: existing.id },
+                data: { ciphertextData: encryptedKey },
+            })
+        } else {
+            await prisma.userSecrets.create({
+                data: {
+                    userId,
+                    type: 'OPENROUTER_API_KEY',
+                    ciphertextData: encryptedKey,
+                },
+            })
+        }
+    } finally {
+        masterKey.fill(0)
+    }
+
+    return { success: true }
+}
+
+export async function checkOpenRouterApiKeyAction() {
+    const session = await auth()
+    if (!session?.user) {
+        return { present: false }
+    }
+    const userId = session.user.id
+
+    const record = await prisma.userSecrets.findFirst({
+        where: { userId, type: 'OPENROUTER_API_KEY' },
+        select: { id: true },
+    })
+
+    return { present: record !== null }
+}

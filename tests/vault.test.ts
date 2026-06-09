@@ -64,13 +64,41 @@ describe('Cryptographic Vault Integration Tests', () => {
     beforeAll(async () => {
         // Mock fetch for OpenRouter API requests
         globalThis.fetch = vi.fn(async (url: any, options: any) => {
-            if (typeof url === 'string' && url.includes('openrouter.ai')) {
+            const urlStr = typeof url === 'string'
+                ? url
+                : (url && typeof url === 'object' && 'url' in url ? url.url : String(url))
+            if (urlStr.includes('openrouter.ai')) {
+                const choicesData = {
+                    id: 'chatcmpl-mock-12345',
+                    object: 'chat.completion',
+                    created: Math.floor(Date.now() / 1000),
+                    model: 'sourceful/riverflow-v2.5-pro:free',
+                    system_fingerprint: 'fp_mock_12345',
+                    choices: [
+                        {
+                            index: 0,
+                            finish_reason: 'stop',
+                            message: {
+                                role: 'assistant',
+                                images: [
+                                    {
+                                        image_url: {
+                                            url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
                 return {
                     ok: true,
                     status: 200,
-                    json: async () => ({
-                        data: [{ url: 'https://example.com/mock-image.png' }]
-                    })
+                    headers: {
+                        get: (name: string) => name.toLowerCase() === 'content-type' ? 'application/json' : null
+                    },
+                    json: async () => choicesData,
+                    text: async () => JSON.stringify(choicesData),
                 } as any
             }
             return originalFetch(url, options)
@@ -106,6 +134,8 @@ describe('Cryptographic Vault Integration Tests', () => {
         globalThis.fetch = originalFetch
         if (testUser) {
             // Clean up
+            await prisma.taskEvent.deleteMany({ where: { userId: testUser.id } })
+            await prisma.mediaFile.deleteMany({ where: { uploaderId: testUser.id } })
             await prisma.userWrappedVaultKeys.deleteMany({ where: { userId: testUser.id } })
             await prisma.userSecrets.deleteMany({ where: { userId: testUser.id } })
             await prisma.user.delete({ where: { id: testUser.id } })
@@ -251,10 +281,27 @@ describe('Cryptographic Vault Integration Tests', () => {
         expect(kmsBody.publicKey).toBeDefined()
         expect(kmsBody.publicKey).toContain('BEGIN PUBLIC KEY')
 
-        // Step 3: Test generateImageAction Server Action
-        const { generateImageAction } = await import('@/app/actions/generate-image')
-        const imageResult = await generateImageAction({ prompt: 'a cute cat' })
-        expect(imageResult.url).toBe('https://example.com/mock-image.png')
+        // Step 3: Test createTaskEventAction and generateImageAction
+        const { createTaskEventAction, generateImageAction } = await import('@/app/actions/generate-image')
+        const task = await createTaskEventAction('a cute cat', 'sourceful/riverflow-v2.5-pro:free')
+        const result = await generateImageAction(task.id)
+        expect(result.success).toBe(true)
+
+        // Poll task status until finished or timeout
+        let completedTask = null
+        for (let i = 0; i < 20; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 100))
+            completedTask = await prisma.taskEvent.findUnique({
+                where: { id: task.id },
+                include: { mediaFile: true }
+            })
+            if (completedTask?.receivedAt || completedTask?.errorAt) {
+                break
+            }
+        }
+
+        expect(completedTask?.receivedAt).toBeTruthy()
+        expect(completedTask?.mediaFileId).toBeTruthy()
     })
 
     it('should enforce security guards and handle edge cases', async () => {

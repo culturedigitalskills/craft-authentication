@@ -69,6 +69,7 @@ model User {
     mediaFiles    MediaFile[]
     secrets       UserSecrets[]
     wrappedKeys   UserWrappedVaultKeys[]
+    taskEvents    TaskEvent[]
 }
 
 model Account {
@@ -127,6 +128,7 @@ model MediaFile {
     updatedAt        DateTime          @default(now())
     mediaAttachments MediaAttachment[]
     uploader         User?             @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+    taskEvents       TaskEvent[]
 
     @@index([createdAt], name: "idx_media_files_created_at")
     @@index([uploaderId], name: "idx_media_files_uploader_id")
@@ -324,5 +326,27 @@ model UserWrappedVaultKeys {
 
     @@index([userId])
     @@index([credentialId])
+}
+
+model TaskEvent {
+    id           String    @id @default(uuid())
+    userId       String    @map("user_id")
+    type         String    @default("image-generation")
+    settings     Json
+    errorMessage String?   @map("error_message")
+    mediaFileId  String?   @map("media_file_id")
+
+    createdAt    DateTime  @default(now()) @map("created_at")
+    sentAt       DateTime? @map("sent_at")
+    canceledAt   DateTime? @map("canceled_at")
+    receivedAt   DateTime? @map("received_at")
+    errorAt      DateTime? @map("error_at")
+
+    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    mediaFile    MediaFile? @relation(fields: [mediaFileId], references: [id], onDelete: SetNull)
+
+    @@index([userId])
+    @@index([type])
+    @@index([createdAt])
 }
 

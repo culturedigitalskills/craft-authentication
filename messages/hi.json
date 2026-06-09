@@ -20,7 +20,8 @@
         "addcraft": "शिल्प जोड़ें",
         "mystory": "मेरी कहानी",
         "createGroup": "समुदाय बनाएं",
-        "contentCredentials": "सामग्री क्रेडेंशियल"
+        "contentCredentials": "सामग्री क्रेडेंशियल",
+        "generationWorkspace": "छवि निर्माण"
     },
     "auth": {
         "loginTitle": "साइन इन करें",
@@ -405,5 +406,35 @@
         "addVideo": "जोड़ें",
         "removeVideo": "वीडियो हटाएं",
         "invalidYoutubeUrl": "इसे YouTube लिंक के रूप में नहीं पहचाना जा सका।"
+    },
+    "materials": {
+        "selectOne": "एक चुनें:",
+        "wool": "ऊन",
+        "cotton": "कपास",
+        "mix": "मिश्रण"
+    },
+    "imageWorkspace": {
+        "title": "छवि निर्माण",
+        "description": "OpenRouter AI का उपयोग करके उच्च गुणवत्ता वाली छवियां बनाएं। आप एक संकेत निर्दिष्ट कर सकते हैं और परिणामी मीडिया डाउनलोड कर सकते हैं, जो आपके C2PA सामग्री क्रेडेंशियल के साथ स्वचालित रूप से हस्ताक्षरित है।",
+        "apiKeyPlaceholder": "••••••••••••••••••••",
+        "apiKeyInfo": "अपनी OpenRouter.ai API कुंजी पेस्ट करें। बिना API को कॉल किए (और लागत से बचने के लिए) जनरेशन का अनुकरण करने के लिए, कुंजी के रूप में 'DEVELOP' पेस्ट करें।",
+        "store": "सहेजें",
+        "cancel": "रद्द करें",
+        "promptLabel": "छवि संकेत (प्रॉम्प्ट)",
+        "promptPlaceholder": "जिस छवि को आप बनाना चाहते हैं उसका वर्णन करें...",
+        "generate": "छवि उत्पन्न करें",
+        "statusPending": "कतारबद्ध",
+        "statusSent": "उत्पन्न हो रहा है...",
+        "statusCanceled": "रद्द किया गया",
+        "statusCompleted": "पूरा हुआ",
+        "statusError": "त्रुटि",
+        "tryAgain": "फिर प्रयास करें",
+        "viewDetail": "विवरण देखें",
+        "noKeyWarning": "कोई OpenRouter API कुंजी कॉन्फ़िगर नहीं की गई है। कृपया ऊपर अपनी कुंजी जोड़ें।",
+        "addKey": "API कुंजी जोड़ें",
+        "editKey": "API कुंजी संपादित करें",
+        "delete": "हटाएं",
+        "deleteConfirm": "गैलरी से उत्पन्न छवि हटाएं?",
+        "taskQueue": "पीढ़ी इतिहास"
     }
 }
