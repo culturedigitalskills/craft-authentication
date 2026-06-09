@@ -18,7 +18,11 @@ interface StoryWorkshopUploadProps {
     maxUploadMb: number
 }
 
-export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: StoryWorkshopUploadProps) {
+export function StoryWorkshopUpload({
+    storyId,
+    initialItems,
+    maxUploadMb,
+}: StoryWorkshopUploadProps) {
     void maxUploadMb // reserved for future per-file client-side size check
     const t = useTranslations('craftStory.workshop')
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -37,8 +41,14 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
             for (const file of files) {
                 const formData = new FormData()
                 formData.append('file', file)
-                const uploadRes = await fetch('/api/media/upload', { method: 'POST', body: formData })
-                if (!uploadRes.ok) throw new Error('Upload failed')
+                const uploadRes = await fetch('/api/media/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
+                if (!uploadRes.ok) {
+                    const errorData = await uploadRes.json().catch(() => ({}))
+                    throw new Error(errorData.error || 'Upload failed')
+                }
                 const mediaFile = await uploadRes.json()
 
                 const attachRes = await fetch('/api/media/attachments', {
@@ -52,10 +62,13 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
                         displayOrder: items.length,
                     }),
                 })
-                if (!attachRes.ok) throw new Error('Attachment failed')
+                if (!attachRes.ok) {
+                    const attachError = await attachRes.json().catch(() => ({}))
+                    throw new Error(attachError.error || 'Attachment failed')
+                }
                 const attachment = await attachRes.json()
 
-                setItems(prev => [
+                setItems((prev) => [
                     ...prev,
                     {
                         attachmentId: attachment.id,
@@ -65,8 +78,8 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
                     },
                 ])
             }
-        } catch {
-            setError(t('uploadFailed'))
+        } catch (err: any) {
+            setError(err.message || t('uploadFailed'))
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
@@ -77,7 +90,7 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
         try {
             const res = await fetch(`/api/media/${item.mediaId}`, { method: 'DELETE' })
             if (!res.ok) throw new Error('Delete failed')
-            setItems(prev => prev.filter(i => i.mediaId !== item.mediaId))
+            setItems((prev) => prev.filter((i) => i.mediaId !== item.mediaId))
         } catch {
             setError(t('deleteFailed'))
         }
@@ -86,7 +99,7 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
     return (
         <div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {items.map(item => (
+                {items.map((item) => (
                     <div
                         key={item.mediaId}
                         className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted/30"
@@ -103,6 +116,7 @@ export function StoryWorkshopUpload({ storyId, initialItems, maxUploadMb }: Stor
                                 fill
                                 sizes="(max-width: 768px) 50vw, 25vw"
                                 className="object-cover"
+                                unoptimized
                             />
                         )}
                         <button

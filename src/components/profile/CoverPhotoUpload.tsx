@@ -47,7 +47,10 @@ export function CoverPhotoUpload({
                 body: formData,
             })
 
-            if (!uploadRes.ok) throw new Error('Upload failed')
+            if (!uploadRes.ok) {
+                const errorData = await uploadRes.json().catch(() => ({}))
+                throw new Error(errorData.error || 'Upload failed')
+            }
 
             const mediaFile = await uploadRes.json()
 
@@ -64,13 +67,16 @@ export function CoverPhotoUpload({
                     }),
                 })
 
-                if (!attachRes.ok) throw new Error('Attachment failed')
+                if (!attachRes.ok) {
+                    const attachError = await attachRes.json().catch(() => ({}))
+                    throw new Error(attachError.error || 'Attachment failed')
+                }
             }
 
             onCoverUploaded(mediaFile.id)
             setPreviewUrl(`/api/media/${mediaFile.id}`)
-        } catch {
-            setError(t('coverUploadFailed'))
+        } catch (err: any) {
+            setError(err.message || t('coverUploadFailed'))
             setPreviewUrl(currentCoverUrl)
         } finally {
             setIsUploading(false)
@@ -93,6 +99,7 @@ export function CoverPhotoUpload({
                         fill
                         sizes="100vw"
                         className="object-cover"
+                        unoptimized
                     />
                 ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center gap-2">
@@ -106,7 +113,16 @@ export function CoverPhotoUpload({
                     </div>
                 )}
                 {previewUrl && !isUploading && (
-                    <div className="absolute inset-0 flex items-center justify-center transition-colors" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0)' }} onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0.3)')} onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0)')  }>
+                    <div
+                        className="absolute inset-0 flex items-center justify-center transition-colors"
+                        style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0)' }}
+                        onMouseEnter={(e) =>
+                            (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0.3)')
+                        }
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0)')
+                        }
+                    >
                         <span className="rounded-md bg-background/80 px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100 hover:opacity-100">
                             {t('changeCover')}
                         </span>

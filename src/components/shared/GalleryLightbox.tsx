@@ -11,17 +11,25 @@ interface GalleryLightboxProps {
     onNavigate: (index: number) => void
 }
 
-export function GalleryLightbox({ images, currentIndex, onClose, onNavigate }: GalleryLightboxProps) {
+export function GalleryLightbox({
+    images,
+    currentIndex,
+    onClose,
+    onNavigate,
+}: GalleryLightboxProps) {
     const hasPrev = currentIndex > 0
     const hasNext = currentIndex < images.length - 1
     const dialogRef = useRef<HTMLDivElement>(null)
     const previousFocusRef = useRef<HTMLElement | null>(null)
 
-    const handleKeyDown = useCallback((e: KeyboardEvent) => {
-        if (e.key === 'Escape') onClose()
-        if (e.key === 'ArrowLeft' && hasPrev) onNavigate(currentIndex - 1)
-        if (e.key === 'ArrowRight' && hasNext) onNavigate(currentIndex + 1)
-    }, [onClose, onNavigate, currentIndex, hasPrev, hasNext])
+    const handleKeyDown = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose()
+            if (e.key === 'ArrowLeft' && hasPrev) onNavigate(currentIndex - 1)
+            if (e.key === 'ArrowRight' && hasNext) onNavigate(currentIndex + 1)
+        },
+        [onClose, onNavigate, currentIndex, hasPrev, hasNext],
+    )
 
     useEffect(() => {
         // Store the previously focused element to restore on close
@@ -64,7 +72,10 @@ export function GalleryLightbox({ images, currentIndex, onClose, onNavigate }: G
 
             <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); onNavigate(currentIndex - 1) }}
+                onClick={(e) => {
+                    e.stopPropagation()
+                    onNavigate(currentIndex - 1)
+                }}
                 disabled={!hasPrev}
                 aria-label="Previous image"
                 className={`absolute left-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 ${
@@ -83,13 +94,17 @@ export function GalleryLightbox({ images, currentIndex, onClose, onNavigate }: G
                     alt={`Gallery photo ${currentIndex + 1} of ${images.length}`}
                     width={1200}
                     height={900}
+                    unoptimized
                     className="max-h-[85vh] w-auto rounded-lg object-contain"
                 />
             </div>
 
             <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); onNavigate(currentIndex + 1) }}
+                onClick={(e) => {
+                    e.stopPropagation()
+                    onNavigate(currentIndex + 1)
+                }}
                 disabled={!hasNext}
                 aria-label="Next image"
                 className={`absolute right-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 ${
@@ -99,10 +114,7 @@ export function GalleryLightbox({ images, currentIndex, onClose, onNavigate }: G
                 <ChevronRight className="h-8 w-8" />
             </button>
 
-            <div
-                className="absolute bottom-4 text-sm text-white/60"
-                aria-live="polite"
-            >
+            <div className="absolute bottom-4 text-sm text-white/60" aria-live="polite">
                 {currentIndex + 1} / {images.length}
             </div>
         </div>

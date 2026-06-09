@@ -16,6 +16,8 @@ services:
             GARAGE_ADMIN_TOKEN: ${GARAGE_ADMIN_TOKEN:-}
             VC_PRIVATE_KEY_PATH: ${VC_PRIVATE_KEY_PATH:-/run/secrets/vc_private_key.pem}
             VC_PUBLIC_KEY_PATH: ${VC_PUBLIC_KEY_PATH:-/run/secrets/vc_public_key.pem}
+            KMS_PRIVATE_KEY_PATH: ${KMS_PRIVATE_KEY_PATH:-/run/secrets/kms_private_key.pem}
+            KMS_PUBLIC_KEY_PATH: ${KMS_PUBLIC_KEY_PATH:-/run/secrets/kms_public_key.pem}
         volumes:
             - ./secrets:/run/secrets:ro
         depends_on:

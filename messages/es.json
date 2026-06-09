@@ -18,7 +18,8 @@
         "mygroups": "Mis Comunidades",
         "addcraft": "Agregar Artesanía",
         "mystory": "Mi historia",
-        "createGroup": "Crear Comunidad"
+        "createGroup": "Crear Comunidad",
+        "contentCredentials": "Credenciales de Contenido"
     },
     "auth": {
         "loginTitle": "Iniciar sesión",

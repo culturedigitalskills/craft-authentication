@@ -1,6 +1,6 @@
 {
     "name": "craft-authentication",
-    "version": "0.10.0",
+    "version": "0.12.0",
     "private": true,
     "packageManager": "pnpm@11.5.2",
     "engines": {
@@ -27,12 +27,16 @@
         "prod:docker:logs": "docker compose --env-file .env.production logs -f app",
         "prod:db:push": "dotenv -e .env.production -- prisma db push",
         "prod:db:studio": "dotenv -e .env.production -- prisma studio",
-        "test-deploy": "pnpm build-info && pnpm prod:docker:down && pnpm docker:build && pnpm prod:docker:up"
+        "test-deploy": "pnpm build-info && pnpm prod:docker:down && pnpm docker:build && pnpm prod:docker:up",
+        "test": "dotenv -e .env.local -- vitest run",
+        "test:watch": "dotenv -e .env.local -- vitest"
     },
     "dependencies": {
         "@atproto/api": "^0.18.21",
         "@aws-sdk/client-s3": "^3.996.0",
         "@better-auth/prisma-adapter": "^1.6.14",
+        "@contentauth/c2pa-node": "^0.5.5",
+        "@contentauth/c2pa-web": "^0.9.0",
         "@hookform/resolvers": "^5.2.2",
         "@prisma/adapter-pg": "^7.4.1",
         "@prisma/client": "^7.4.1",
@@ -42,11 +46,13 @@
         "@radix-ui/react-menubar": "^1.1.16",
         "@radix-ui/react-select": "^2.2.6",
         "@radix-ui/react-slot": "^1.2.4",
+        "@scure/base": "^2.2.0",
         "bcryptjs": "^3.0.3",
         "better-auth": "^1.6.14",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "culori": "^4.0.2",
+        "hash-wasm": "^4.12.0",
         "lucide-react": "^0.557.0",
         "next": "16.1.6",
         "next-intl": "^4.8.3",
@@ -85,6 +91,7 @@
         "prisma": "^7.4.1",
         "tailwindcss": "^3.4.19",
         "tailwindcss-animate": "^1.0.7",
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "vitest": "^4.1.8"
     }
 }

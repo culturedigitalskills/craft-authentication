@@ -1,3 +1,82 @@
+# v0.11.0 -> v0.12.0
+
+### C2PA Content Credentials
+
+Added support for C2PA (Coalition for Content Provenance and Authenticity) signature manifest injection and verification. This enables artisans to secure their creations with cryptographically verifiable signatures.
+
+**Schema Changes**:
+- Added `c2paAutoRenew` boolean column to the `User` table (defaults to `false`).
+- Added `c2paCertExpiresAt` datetime column to the `User` table (nullable).
+
+**Configuration Changes** (add to `.env.local` and `.env.production`):
+- `C2PA_ROOT_KEY_PATH`: File path to `c2pa_root_key.pem`.
+- `C2PA_ROOT_CERT_PATH`: File path to `c2pa_root_cert.pem`.
+
+**Migration Steps**:
+
+1. Generate the C2PA Root CA key pair and certificate (run once):
+    ```bash
+    node scripts/generate-c2pa-root.mjs
+    ```
+    This script is interactive and prompts you for details. It generates `secrets/c2pa_root_key.pem` and `secrets/c2pa_root_cert.pem`.
+
+    > **Note on Renewal**: If this script is run again, it automatically renews the Root certificate using the existing private key, keeping previous Artisan cert signatures valid.
+
+2. Add the environment variables to your `.env.local` (and `.env.production` for deployment):
+    ```env
+    C2PA_ROOT_KEY_PATH="./secrets/c2pa_root_key.pem"
+    C2PA_ROOT_CERT_PATH="./secrets/c2pa_root_cert.pem"
+    ```
+
+    > [!WARNING]
+    > **Missing Certificate Error:** If the certificate files are missing or unreadable at startup or configuration evaluation time, the server will throw an error and refuse to initialize status or sign assets.
+
+3. Run database migrations to apply the schema updates:
+    ```bash
+    pnpm db:migrate
+    ```
+
+# v0.10.0 -> v0.11.0
+
+
+### Hybrid Encrypted User Secrets Vault
+
+Implemented a hybrid client-side encryption vault (using Web Crypto API) to secure user secrets (e.g., OpenAI, Flux2 API keys). The Master Vault Key can be simultaneously wrapped using Recovery Tokens, Server KMS (escrow), or E2E WebAuthn PRF.
+
+**Schema Changes**:
+- Added `VaultWrapMode` enum.
+- Added `UserSecrets` table for storing client-side encrypted payload data.
+- Added `UserWrappedVaultKeys` table for storing wrapped keys per authentication wrap mode.
+- Added `master_key_hash` column to the `User` table to enforce downgrade protection.
+
+**Configuration Changes** (add to `.env.local` and `.env.production`):
+- `KMS_PRIVATE_KEY_PATH` / `KMS_PUBLIC_KEY_PATH`: File paths to RSA-4096 PEM files used by `MockLocalKMS`. Only file paths are accepted — inline key values in env vars are not supported.
+- `LOCAL_MASTER_KEY`: 256-bit symmetric key (64-char hex) used by `MockLocalKMS` to store wrapped vault keys (AES-256-GCM). **Required** — the app fails at startup if unset.
+- `VAULT_SERVER_SECRET`: HMAC key for hashing WebAuthn credential IDs to prevent cross-service tracking. **Required** — startup fails if neither this nor `AUTH_SECRET` is set.
+
+**Migration Steps**:
+
+1. Generate the KMS key pair and all required secret values (run once):
+    ```bash
+    node scripts/generate-kms-keys.mjs
+    ```
+    This writes `secrets/kms_private_key.pem` and `secrets/kms_public_key.pem` and prints
+    `KMS_PRIVATE_KEY_PATH`, `KMS_PUBLIC_KEY_PATH`, `LOCAL_MASTER_KEY`, and
+    `VAULT_SERVER_SECRET` to add to `.env.local`.
+
+    > **Important**: `secrets/` is gitignored. Back the files up separately — losing
+    > `kms_private_key.pem` or changing `LOCAL_MASTER_KEY` permanently invalidates all
+    > existing SSE_KMS vault records.
+
+2. Copy the printed values into `.env.local` (and `.env.production` for deployment).
+
+3. Run database migrations to apply the vault schema:
+    ```bash
+    pnpm db:migrate
+    ```
+
+For ongoing KMS key rotation procedures, see **[Vault & KMS Key Management](./README.md#vault--kms-key-management)** in README.md.
+
 # v0.9.x -> v0.10.0
 
 ### Better Auth Migration
