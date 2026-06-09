@@ -15,6 +15,13 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres"
 ENV DATABASE_URL=${DATABASE_URL_APP}
 ENV DATABASE_URL_APP=${DATABASE_URL_APP}
+
+# Fallback environment variables for Better Auth during Next.js build-time route compilation, just to satisfy the validation (these won't be used at runtime, as the real values will be injected via Docker secrets and .env.production)
+ENV AUTH_SECRET=placeholder_secret_only_used_during_next_build_to_satisfy_better_auth_validation_67890
+ENV AUTH_URL=http://localhost:3000
+
+RUN apt-get update && apt-get install -y openssl
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm prisma generate
