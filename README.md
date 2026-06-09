@@ -306,6 +306,12 @@ node scripts/download-c2pa-trust-list.mjs
 
 I thsould create the file `secrets/c2pa-trust-list.pem`, which is used to validate other signing authorities besides us. The script downloads the trust list from https://raw.githubusercontent.com/c2pa-org/conformance-public/main/trust-list/.
 
+Add the following environment variables to your `.env.local` (and `.env.production` for deployment):
+
+```env
+C2PA_TRUST_LIST_PATH=./secrets/c2pa-trust-list.pem
+```
+
 ### Certificate Renewal
 
 If you execute `node scripts/generate-c2pa-root.mjs` while the Root CA key file already exists, it will automatically **renew the certificate** using the existing private key, keeping previous signatures valid.

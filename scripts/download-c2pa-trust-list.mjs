@@ -51,3 +51,10 @@ writeFileSync(destPath, pem, 'utf8')
 
 console.log(`Success! Saved ${certCount} certificates to:`)
 console.log(`  ${destPath}`)
+
+console.log('Add these lines to your .env:')
+console.log('')
+console.log('')
+console.log('# C2PA Trust List (for signature verification)')
+console.log(`C2PA_TRUST_LIST_PATH=./secrets/c2pa-trust-list.pem`)
+console.log('')
