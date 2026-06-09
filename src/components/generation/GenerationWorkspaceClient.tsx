@@ -18,6 +18,7 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select'
 import { useTranslations } from 'next-intl'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import {
     storeOpenRouterApiKeyAction,
     checkOpenRouterApiKeyAction
@@ -201,17 +202,17 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                 <div className="lg:col-span-5 space-y-6">
                     
                     {/* API Key Configuration Card */}
-                    <Card className={`border border-border/80 bg-card/40 backdrop-blur-md relative overflow-visible shadow-lg transition-all ${keyPopoverOpen ? 'z-20' : 'z-0'}`}>
-                        <CardHeader className="pb-4">
-                            <CardTitle className="text-lg font-bold flex items-center gap-2">
+                    <div className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6 space-y-6 shadow-sm relative overflow-visible">
+                        <div className="flex flex-col gap-1 border-b border-border/60 pb-4">
+                            <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
                                 <Key className="h-5 w-5 text-primary" />
                                 API Credentials
-                            </CardTitle>
-                            <CardDescription>
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
                                 Set up your OpenRouter.ai credentials
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
+                            </p>
+                        </div>
+                        <div className="space-y-4">
                             {hasKey === null ? (
                                 <div className="h-10 flex items-center justify-center">
                                     <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
@@ -220,7 +221,7 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                 <div className="flex items-center gap-3">
                                     <div className="flex-1 relative">
                                         <Input
-                                            type="password"
+                                            type="text"
                                             value="••••••••••••••••••••"
                                             disabled
                                             className="bg-muted/50 border-muted"
@@ -229,15 +230,83 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                             <CheckCircle className="w-3.5 h-3.5" /> Active
                                         </span>
                                     </div>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => setKeyPopoverOpen(true)}
-                                        className="h-10 w-10 shrink-0 border-primary/20 hover:border-primary/50 transition-colors"
-                                        title={t('editKey')}
-                                    >
-                                        <Edit2 className="w-4 h-4 text-primary" />
-                                    </Button>
+                                    <Popover open={keyPopoverOpen} onOpenChange={(open) => {
+                                        setKeyPopoverOpen(open)
+                                        if (!open) {
+                                            setApiKeyInput('')
+                                            setKeyError(null)
+                                        }
+                                    }}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-10 w-10 shrink-0 border-primary/20 hover:border-primary/50 transition-colors"
+                                                title={t('editKey')}
+                                            >
+                                                <Edit2 className="w-4 h-4 text-primary" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-72 p-4 space-y-4 shadow-xl border-border bg-background" align="end" side="bottom" sideOffset={8}>
+                                            <div className="space-y-2">
+                                                <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                                                    <Info className="w-4 h-4 text-primary" /> Setup Key
+                                                </h4>
+                                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                                    {t('apiKeyInfo')}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <Input
+                                                    type="text"
+                                                    placeholder="sk-or-..."
+                                                    value={apiKeyInput}
+                                                    onChange={(e) => setApiKeyInput(e.target.value)}
+                                                    className="w-full"
+                                                    autoComplete="off"
+                                                    name="openrouter-api-key"
+                                                    data-lpignore="true"
+                                                    data-1p-ignore
+                                                    data-bitwarden-ignore="true"
+                                                    autoFocus
+                                                />
+                                                {keyError && (
+                                                    <p className="text-xs text-destructive font-medium flex items-center gap-1">
+                                                        <AlertCircle className="w-3.5 h-3.5" /> {keyError}
+                                                    </p>
+                                                )}
+                                                <div className="flex items-center justify-end gap-2 pt-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setKeyPopoverOpen(false)
+                                                            setApiKeyInput('')
+                                                            setKeyError(null)
+                                                        }}
+                                                        disabled={isStoringKey}
+                                                    >
+                                                        {t('cancel')}
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={handleStoreKey}
+                                                        disabled={isStoringKey}
+                                                        className="bg-primary hover:bg-primary/90"
+                                                    >
+                                                        {isStoringKey ? (
+                                                            <>
+                                                                <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                                                                Saving...
+                                                            </>
+                                                        ) : (
+                                                            t('store')
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-4">
@@ -247,88 +316,98 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                             {t('noKeyWarning')}
                                         </div>
                                     </div>
-                                    <Button
-                                        onClick={() => setKeyPopoverOpen(true)}
-                                        className="w-full flex items-center gap-2 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/95 hover:to-violet-600/95"
-                                    >
-                                        <Key className="w-4 h-4" /> {t('addKey')}
-                                    </Button>
-                                </div>
-                            )}
-
-                            {/* Inline Popover overlay */}
-                            {keyPopoverOpen && (
-                                <div className="absolute inset-x-0 top-full mt-2 z-50 p-5 rounded-2xl border border-border bg-background shadow-2xl space-y-4 animate-in fade-in slide-in-from-top-3 duration-200">
-                                    <div className="space-y-2">
-                                        <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                                            <Info className="w-4 h-4 text-primary" /> Setup Key
-                                        </h4>
-                                        <p className="text-xs text-muted-foreground leading-relaxed">
-                                            {t('apiKeyInfo')}
-                                        </p>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <Input
-                                            type="password"
-                                            placeholder="sk-or-..."
-                                            value={apiKeyInput}
-                                            onChange={(e) => setApiKeyInput(e.target.value)}
-                                            className="w-full"
-                                            autoFocus
-                                        />
-                                        {keyError && (
-                                            <p className="text-xs text-destructive font-medium flex items-center gap-1">
-                                                <AlertCircle className="w-3.5 h-3.5" /> {keyError}
-                                            </p>
-                                        )}
-                                        <div className="flex items-center justify-end gap-2 pt-1">
+                                    <Popover open={keyPopoverOpen} onOpenChange={(open) => {
+                                        setKeyPopoverOpen(open)
+                                        if (!open) {
+                                            setApiKeyInput('')
+                                            setKeyError(null)
+                                        }
+                                    }}>
+                                        <PopoverTrigger asChild>
                                             <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => {
-                                                    setKeyPopoverOpen(false)
-                                                    setApiKeyInput('')
-                                                    setKeyError(null)
-                                                }}
-                                                disabled={isStoringKey}
+                                                className="w-full flex items-center gap-2 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/95 hover:to-violet-600/95"
                                             >
-                                                {t('cancel')}
+                                                <Key className="w-4 h-4" /> {t('addKey')}
                                             </Button>
-                                            <Button
-                                                size="sm"
-                                                onClick={handleStoreKey}
-                                                disabled={isStoringKey}
-                                                className="bg-primary hover:bg-primary/90"
-                                            >
-                                                {isStoringKey ? (
-                                                    <>
-                                                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                                                        Saving...
-                                                    </>
-                                                ) : (
-                                                    t('store')
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-72 p-4 space-y-4 shadow-xl border-border bg-background" align="center" side="bottom" sideOffset={8}>
+                                            <div className="space-y-2">
+                                                <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                                                    <Info className="w-4 h-4 text-primary" /> Setup Key
+                                                </h4>
+                                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                                    {t('apiKeyInfo')}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <Input
+                                                    type="text"
+                                                    placeholder="sk-or-..."
+                                                    value={apiKeyInput}
+                                                    onChange={(e) => setApiKeyInput(e.target.value)}
+                                                    className="w-full"
+                                                    autoComplete="off"
+                                                    name="openrouter-api-key"
+                                                    data-lpignore="true"
+                                                    data-1p-ignore
+                                                    data-bitwarden-ignore="true"
+                                                    autoFocus
+                                                />
+                                                {keyError && (
+                                                    <p className="text-xs text-destructive font-medium flex items-center gap-1">
+                                                        <AlertCircle className="w-3.5 h-3.5" /> {keyError}
+                                                    </p>
                                                 )}
-                                            </Button>
-                                        </div>
-                                    </div>
+                                                <div className="flex items-center justify-end gap-2 pt-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setKeyPopoverOpen(false)
+                                                            setApiKeyInput('')
+                                                            setKeyError(null)
+                                                        }}
+                                                        disabled={isStoringKey}
+                                                    >
+                                                        {t('cancel')}
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={handleStoreKey}
+                                                        disabled={isStoringKey}
+                                                        className="bg-primary hover:bg-primary/90"
+                                                    >
+                                                        {isStoringKey ? (
+                                                            <>
+                                                                <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                                                                Saving...
+                                                            </>
+                                                        ) : (
+                                                            t('store')
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                             )}
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
 
                     {/* Prompt Generator Card */}
-                    <Card className="border border-border/80 bg-card/40 backdrop-blur-md shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-bold flex items-center gap-2">
+                    <div className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6 space-y-6 shadow-sm">
+                        <div className="flex flex-col gap-1 border-b border-border/60 pb-4">
+                            <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
                                 <Sparkles className="h-5 w-5 text-primary" />
                                 Image Parameters
-                            </CardTitle>
-                            <CardDescription>
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
                                 Input details for generating your media
-                            </CardDescription>
-                        </CardHeader>
-                        <form onSubmit={handleGenerate}>
-                            <CardContent className="space-y-4">
+                            </p>
+                        </div>
+                        <form onSubmit={handleGenerate} className="space-y-6">
+                            <div className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-foreground flex items-center gap-1">
                                         Model Selection
@@ -367,8 +446,8 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                         disabled={!hasKey}
                                     />
                                 </div>
-                            </CardContent>
-                            <CardFooter>
+                            </div>
+                            <div className="pt-2">
                                 <Button
                                     type="submit"
                                     disabled={!hasKey || !prompt.trim() || isSubmitting}
@@ -386,24 +465,24 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                         </>
                                     )}
                                 </Button>
-                            </CardFooter>
+                            </div>
                         </form>
-                    </Card>
+                    </div>
 
                 </div>
 
                 {/* Right Column: Async Events History Queue (7 cols) */}
                 <div className="lg:col-span-7 space-y-6">
-                    <Card className="border border-border/80 bg-card/40 backdrop-blur-md shadow-lg min-h-[400px]">
-                        <CardHeader className="flex flex-row items-center justify-between border-b border-border/60 pb-4">
-                            <div>
-                                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                    <div className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6 space-y-6 shadow-sm min-h-[400px]">
+                        <div className="flex flex-row items-center justify-between border-b border-border/60 pb-4">
+                            <div className="flex flex-col gap-1">
+                                <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
                                     <Layers className="h-5 w-5 text-primary" />
                                     {t('taskQueue')}
-                                </CardTitle>
-                                <CardDescription>
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
                                     Monitor status of generative tasks
-                                </CardDescription>
+                                </p>
                             </div>
                             <Button
                                 variant="ghost"
@@ -414,8 +493,8 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                             >
                                 <RefreshCw className="h-4 w-4 text-muted-foreground" />
                             </Button>
-                        </CardHeader>
-                        <CardContent className="pt-6">
+                        </div>
+                        <div>
                             {loadingTasks && tasks.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-3">
                                     <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -432,8 +511,8 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                     onRetry={handleRetryTask}
                                 />
                             )}
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
 
             </div>

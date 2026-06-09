@@ -20,7 +20,10 @@ const GenerateImageArgsSchema = z.object({
 
 export type GenerateImageArgs = z.infer<typeof GenerateImageArgsSchema>
 
-export async function createTaskEventAction(prompt: string, model: string = 'sourceful/riverflow-v2.5-pro:free') {
+export async function createTaskEventAction(
+    prompt: string,
+    model: string = 'sourceful/riverflow-v2.5-pro:free',
+) {
     const session = await auth()
     if (!session?.user) throw new Error('Not authenticated')
 
@@ -45,7 +48,7 @@ export async function cancelTaskEventAction(eventId: string) {
     if (!session?.user) throw new Error('Not authenticated')
 
     const task = await prisma.taskEvent.findFirst({
-        where: { id: eventId, userId: session.user.id }
+        where: { id: eventId, userId: session.user.id },
     })
     if (!task) throw new Error('Task not found')
 
@@ -68,7 +71,7 @@ export async function getTaskEventsAction() {
     const events = await prisma.taskEvent.findMany({
         where: { userId: session.user.id, type: 'image-generation' },
         orderBy: { createdAt: 'desc' },
-        include: { mediaFile: true }
+        include: { mediaFile: true },
     })
 
     return events
@@ -80,7 +83,7 @@ export async function deleteTaskEventMediaAction(eventId: string) {
 
     const task = await prisma.taskEvent.findFirst({
         where: { id: eventId, userId: session.user.id },
-        include: { mediaFile: true }
+        include: { mediaFile: true },
     })
     if (!task) throw new Error('Task not found')
 
@@ -94,8 +97,8 @@ export async function deleteTaskEventMediaAction(eventId: string) {
                     data: {
                         mediaFileId: null,
                         errorAt: new Date(),
-                        errorMessage: 'Deleted By User'
-                    }
+                        errorMessage: 'Deleted By User',
+                    },
                 })
 
                 // Delete from database
@@ -114,8 +117,8 @@ export async function deleteTaskEventMediaAction(eventId: string) {
             where: { id: eventId },
             data: {
                 errorAt: new Date(),
-                errorMessage: 'Deleted By User'
-            }
+                errorMessage: 'Deleted By User',
+            },
         })
     }
 
@@ -128,7 +131,7 @@ export async function generateImageAction(eventId: string) {
     const userId = session.user.id
 
     const task = await prisma.taskEvent.findFirst({
-        where: { id: eventId, userId }
+        where: { id: eventId, userId },
     })
     if (!task) throw new Error('Task not found')
 
@@ -140,8 +143,8 @@ export async function generateImageAction(eventId: string) {
             errorAt: null,
             errorMessage: null,
             receivedAt: null,
-            canceledAt: null
-        }
+            canceledAt: null,
+        },
     })
 
     // Kick off the generation asynchronously in the background
@@ -165,7 +168,10 @@ async function runGenerationInBackground(eventId: string, userId: string) {
         const height = settings.height || 1024
 
         // 1. Get API Key
-        const apiKey = await UserSecretsService.getDecryptedSecret(userId, 'OPENROUTER_API_KEY').catch(() => null)
+        const apiKey = await UserSecretsService.getDecryptedSecret(
+            userId,
+            'OPENROUTER_API_KEY',
+        ).catch(() => null)
         if (!apiKey) {
             throw new Error('OpenRouter API key not configured in vault')
         }
@@ -183,10 +189,14 @@ async function runGenerationInBackground(eventId: string, userId: string) {
             if (currentTask?.canceledAt) return
 
             // Read mock image
-            const mockPath = path.join(process.cwd(), 'public', 'test', 'test_cr_no_manifest.png')
+            const mockPath = path.join(process.cwd(), 'public', 'test', 'generation_mock.png')
             if (!fs.existsSync(mockPath)) {
                 throw new Error(`Mock image not found at: ${mockPath}`)
             }
+
+            // add a brief delay to simulate file reading time
+            await new Promise((resolve) => setTimeout(resolve, 5000))
+
             imageBuffer = await fs.promises.readFile(mockPath)
         } else {
             // Real OpenRouter Call
@@ -198,14 +208,24 @@ async function runGenerationInBackground(eventId: string, userId: string) {
                 chatRequest: {
                     model,
                     messages: [{ role: 'user', content: prompt }],
-                    modalities: ['image']
-                }
+                    modalities: ['image'],
+                },
             })
 
             const choices = response.choices as any
             const message = choices?.[0]?.message
-            const imageObj = message?.images?.[0] || message?.imageUrl || message?.image_url || (message?.content && message.content.startsWith('data:image') ? { url: message.content } : null)
-            const imgUrl = imageObj?.imageUrl?.url || imageObj?.image_url?.url || imageObj?.url || message?.content
+            const imageObj =
+                message?.images?.[0] ||
+                message?.imageUrl ||
+                message?.image_url ||
+                (message?.content && message.content.startsWith('data:image')
+                    ? { url: message.content }
+                    : null)
+            const imgUrl =
+                imageObj?.imageUrl?.url ||
+                imageObj?.image_url?.url ||
+                imageObj?.url ||
+                message?.content
 
             if (!imgUrl || !imgUrl.startsWith('data:image')) {
                 throw new Error('Failed to retrieve generated image data from OpenRouter response')
@@ -235,22 +255,38 @@ async function runGenerationInBackground(eventId: string, userId: string) {
 
         // 3. Optional C2PA signing
         const hasC2PACreds = await prisma.userSecrets.count({
-            where: { userId, type: { in: ['C2PA_PRIV', 'C2PA_PUB'] } }
+            where: { userId, type: { in: ['C2PA_PRIV', 'C2PA_PUB'] } },
         })
 
         if (hasC2PACreds === 2) {
             try {
-                const signedBuffer = await C2PAService.initializeManifest(
-                    userId,
-                    imageBuffer,
-                    mimeType,
-                    {
-                        service: 'OpenRouter',
-                        model,
-                        size: `${width}x${height}`,
-                        prompt
-                    }
-                )
+                const manifestInfo = await C2PAService.inspectManifest(imageBuffer)
+                let signedBuffer: Buffer
+
+                const comissionDetails = {
+                    service: 'OpenRouter',
+                    model,
+                    size: `${width}x${height}`,
+                    prompt,
+                }
+                if (manifestInfo.hasManifest) {
+                    // Image already has a C2PA manifest (e.g. from the model generator itself).
+                    // Record that it was commissioned by our user by adding a new edit manifest.
+                    signedBuffer = await C2PAService.addCommissionManifest(
+                        userId,
+                        imageBuffer,
+                        mimeType,
+                        comissionDetails,
+                    )
+                } else {
+                    // Clean image, initialize a new manifest where the user is the creator.
+                    signedBuffer = await C2PAService.initializeManifest(
+                        userId,
+                        imageBuffer,
+                        mimeType,
+                        comissionDetails,
+                    )
+                }
                 uploadBuffer = signedBuffer
                 fileSize = signedBuffer.byteLength
             } catch (err) {
@@ -289,20 +325,21 @@ async function runGenerationInBackground(eventId: string, userId: string) {
             where: { id: eventId },
             data: {
                 receivedAt: new Date(),
-                mediaFileId: mediaFile.id
-            }
+                mediaFileId: mediaFile.id,
+            },
         })
-
     } catch (error: any) {
         console.error(`Generation failed for event ${eventId}:`, error)
-        await prisma.taskEvent.update({
-            where: { id: eventId },
-            data: {
-                errorAt: new Date(),
-                errorMessage: error.message || 'Unknown generation error'
-            }
-        }).catch((err) => {
-            console.error('Failed to update TaskEvent with error status:', err)
-        })
+        await prisma.taskEvent
+            .update({
+                where: { id: eventId },
+                data: {
+                    errorAt: new Date(),
+                    errorMessage: error.message || 'Unknown generation error',
+                },
+            })
+            .catch((err) => {
+                console.error('Failed to update TaskEvent with error status:', err)
+            })
     }
 }
