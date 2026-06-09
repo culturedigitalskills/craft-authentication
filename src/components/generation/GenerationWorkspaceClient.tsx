@@ -185,7 +185,7 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                 
                 {/* Left Column: Key configuration and prompt submission (5 cols) */}
                 <div className="lg:col-span-5 space-y-6">
-                    <ApiKeyConfig hasKey={hasKey} setHasKey={setHasKey} />
+                    <ApiKeyConfig userId={userId} hasKey={hasKey} setHasKey={setHasKey} />
                     <PromptForm
                         hasKey={hasKey}
                         prompt={prompt}
