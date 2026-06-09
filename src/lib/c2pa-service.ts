@@ -240,16 +240,17 @@ export class C2PAService {
         )
 
         const createdAction: any = {
-            action: 'c2pa.created',
+            action: generationMetadata ? 'c2pa.published' : 'c2pa.created',
             softwareAgent: 'Crafts Registry v1',
             timestamp: new Date().toISOString(),
+            description: 'Uploaded to Crafts Registry',
         }
 
         if (generationMetadata) {
             createdAction.digitalSourceType =
                 'http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia'
             createdAction.parameters = {
-                description: `AI generated via ${generationMetadata.service} using model ${generationMetadata.model}`,
+                description: `AI generated via ${generationMetadata.service} and uploaded to Crafts Registry`,
                 ...generationMetadata,
             }
         }
@@ -326,13 +327,13 @@ export class C2PAService {
                     data: {
                         actions: [
                             {
-                                action: 'c2pa.created',
+                                action: 'c2pa.published',
                                 digitalSourceType:
                                     'http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia',
                                 softwareAgent: 'Crafts Registry v1',
                                 timestamp: new Date().toISOString(),
                                 parameters: {
-                                    description: `AI generated via ${commissionDetails.service} using model ${commissionDetails.model}`,
+                                    description: `AI generated via ${commissionDetails.service} and uploaded to Crafts Registry`,
                                     ...commissionDetails,
                                 },
                             },
@@ -551,6 +552,42 @@ export class C2PAService {
 
             let date: string | null = activeManifest.signature_info?.time || null
 
+            const untrustedManifestIds = new Set<string>()
+            const failedManifestIds = new Set<string>()
+            if (json.validation_status && json.validation_status.length > 0) {
+                for (const status of json.validation_status) {
+                    if (status.url) {
+                        const match = status.url.match(/\/c2pa\/([^/]+)/)
+                        if (match) {
+                            if (status.code === 'signingCredential.untrusted') {
+                                untrustedManifestIds.add(match[1])
+                            } else {
+                                failedManifestIds.add(match[1])
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (json.validation_results) {
+                for (const key of Object.keys(json.validation_results)) {
+                    const group = (json.validation_results as any)[key]
+                    const failures = group?.failure || []
+                    for (const failure of failures) {
+                        if (failure.url) {
+                            const match = failure.url.match(/\/c2pa\/([^/]+)/)
+                            if (match) {
+                                if (failure.code === 'signingCredential.untrusted') {
+                                    untrustedManifestIds.add(match[1])
+                                } else {
+                                    failedManifestIds.add(match[1])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Walk the full ingredient chain (oldest ancestor first) to build a
             // complete provenance timeline across all manifests.
             const assertions: any[] = []
@@ -572,8 +609,7 @@ export class C2PAService {
                     }
                 }
 
-                const signerName =
-                    manifest.signature_info?.common_name || 'Unknown'
+                const signerName = manifest.signature_info?.common_name || 'Unknown'
                 const signerIssuer = manifest.signature_info?.issuer || 'Unknown'
                 const signerTime = manifest.signature_info?.time || null
 
@@ -586,14 +622,15 @@ export class C2PAService {
                         if (act.action === 'c2pa.opened') continue
                         assertions.push({
                             action: act.action,
-                            description:
-                                act.description || act.parameters?.description || null,
+                            description: act.description || act.parameters?.description || null,
                             softwareAgent: act.softwareAgent || signerName,
                             timestamp: act.timestamp || signerTime,
                             parameters: act.parameters || null,
                             digitalSourceType: act.digitalSourceType || null,
                             signer: signerName,
                             issuer: signerIssuer,
+                            untrusted: untrustedManifestIds.has(manifestId),
+                            invalid: failedManifestIds.has(manifestId),
                         })
                     }
                 }
