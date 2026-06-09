@@ -2,20 +2,8 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-    MapPin,
-    Clock,
-    GraduationCap,
-    User,
-    Users,
-    Package,
-    Instagram,
-    Facebook,
-    Twitter,
-    Youtube,
-    Globe,
-    Hash,
-} from 'lucide-react'
+import { MapPin, Clock, GraduationCap, User, Users, Package, Globe, Hash } from 'lucide-react'
+import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
 import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
@@ -344,7 +332,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
                                 >
-                                    <Instagram className="h-4 w-4" />@{artisan.socialInstagram}
+                                    <FaInstagram className="h-4 w-4" />@{artisan.socialInstagram}
                                 </a>
                             )}
                             {artisan.socialFacebook && (
@@ -354,7 +342,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
                                 >
-                                    <Facebook className="h-4 w-4" />
+                                    <FaFacebook className="h-4 w-4" />
                                     {artisan.socialFacebook}
                                 </a>
                             )}
@@ -365,7 +353,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
                                 >
-                                    <Twitter className="h-4 w-4" />@{artisan.socialTwitter}
+                                    <FaXTwitter className="h-4 w-4" />@{artisan.socialTwitter}
                                 </a>
                             )}
                             {artisan.socialTiktok && (
@@ -375,7 +363,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
                                 >
-                                    <Hash className="h-4 w-4" />@{artisan.socialTiktok}
+                                    <FaTiktok className="h-4 w-4" />@{artisan.socialTiktok}
                                 </a>
                             )}
                             {artisan.socialYoutube && (
@@ -385,7 +373,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
                                 >
-                                    <Youtube className="h-4 w-4" />
+                                    <FaYoutube className="h-4 w-4" />
                                     {artisan.socialYoutube}
                                 </a>
                             )}

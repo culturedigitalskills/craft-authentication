@@ -9,7 +9,7 @@ export default async function GenerationWorkspacePage() {
     }
 
     return (
-        <div className="container max-w-7xl mx-auto px-4 py-24">
+        <div className="container mx-auto max-w-6xl px-4 py-10">
             <GenerationWorkspaceClient userId={session.user.id} />
         </div>
     )

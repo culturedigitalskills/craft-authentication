@@ -90,7 +90,7 @@ function AlreadyInitializedStep({ onClose }: { onClose: () => void }) {
             </div>
 
             <div className="w-full rounded-xl bg-muted/60 px-4 py-3 flex items-center gap-3 text-left">
-                <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
                     <Lock className="w-4 h-4 text-primary" />
                 </div>
                 <p className="text-sm text-muted-foreground leading-snug">
@@ -142,7 +142,7 @@ function IntroStep({ onNext, loading }: { onNext: () => void; loading: boolean }
             <div className="w-full space-y-2.5 text-left">
                 {features.map(({ icon: Icon, title, body }) => (
                     <div key={title} className="flex gap-3 items-start rounded-xl bg-muted/60 px-4 py-3">
-                        <div className="mt-0.5 w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <div className="mt-0.5 w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
                             <Icon className="w-4 h-4 text-primary" />
                         </div>
                         <div>
@@ -189,7 +189,7 @@ function RecoveryKeyStep({
     return (
         <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
                     <Key className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
@@ -228,14 +228,14 @@ function RecoveryKeyStep({
             </div>
 
             <div className="flex gap-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 px-3.5 py-3">
-                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
                     <span className="font-semibold">Don't take a screenshot.</span> Screenshots back up to cloud services and can expose your key. Use a password manager instead.
                 </p>
             </div>
 
             <label className="flex items-center gap-3 cursor-pointer select-none group">
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                     <input
                         type="checkbox"
                         className="sr-only"
@@ -298,7 +298,7 @@ function VerifyStep({
     return (
         <div className="flex flex-col gap-5">
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-5 h-5 text-primary" />
                 </div>
                 <div>
@@ -327,7 +327,7 @@ function VerifyStep({
                 />
                 {error && (
                     <p className="flex items-center gap-1.5 text-xs text-destructive">
-                        <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+                        <AlertTriangle className="w-3 h-3 shrink-0" />
                         {error}
                     </p>
                 )}
@@ -382,7 +382,7 @@ function SuccessStep({ onDone }: { onDone: () => void }) {
             </div>
 
             <div className="w-full rounded-xl bg-muted/60 px-4 py-3 flex items-center gap-3 text-left">
-                <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
                     <Shield className="w-4 h-4 text-primary" />
                 </div>
                 <div>

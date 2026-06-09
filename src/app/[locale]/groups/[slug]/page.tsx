@@ -157,7 +157,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-4">
                             {logoUrl && (
-                                <div className="relative -mt-16 h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-4 border-card bg-card shadow-md sm:h-24 sm:w-24">
+                                <div className="relative -mt-16 h-20 w-20 shrink-0 overflow-hidden rounded-xl border-4 border-card bg-card shadow-md sm:h-24 sm:w-24">
                                     <Image
                                         src={logoUrl}
                                         alt={`${group.name} logo`}
@@ -317,7 +317,7 @@ function MemberCard({
             href={`/artisans/${artisan.slug}`}
             className="group flex items-start gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-md"
         >
-            <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-full bg-muted">
+            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted">
                 {photoUrl ? (
                     <Image
                         src={photoUrl}

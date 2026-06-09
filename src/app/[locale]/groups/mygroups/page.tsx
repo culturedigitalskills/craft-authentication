@@ -82,7 +82,7 @@ export default async function MyGroupsPage() {
                         >
                             <div className="flex items-center gap-3">
                                 {logoMap.get(group.id) ? (
-                                    <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg">
+                                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
                                         <Image
                                             src={logoMap.get(group.id)!}
                                             alt={group.name}
@@ -93,7 +93,7 @@ export default async function MyGroupsPage() {
                                         />
                                     </div>
                                 ) : (
-                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-muted">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                                         <Users className="h-5 w-5 text-muted-foreground" />
                                     </div>
                                 )}

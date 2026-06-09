@@ -1,24 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Key, Loader2, Edit2, Info, AlertCircle, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { useTranslations } from 'next-intl'
 import { storeOpenRouterApiKeyAction } from '@/app/actions/vault'
+import { VaultRequiredCard } from '@/components/content-credentials'
+import { VaultSetupModal } from '@/components/vault/VaultSetupModal'
 
 interface ApiKeyConfigProps {
+    userId: string
     hasKey: boolean | null
     setHasKey: (present: boolean) => void
 }
 
-export function ApiKeyConfig({ hasKey, setHasKey }: ApiKeyConfigProps) {
+export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
     const t = useTranslations('imageWorkspace')
     const [keyPopoverOpen, setKeyPopoverOpen] = useState(false)
     const [apiKeyInput, setApiKeyInput] = useState('')
     const [isStoringKey, setIsStoringKey] = useState(false)
     const [keyError, setKeyError] = useState<string | null>(null)
+    const [vaultInitialized, setVaultInitialized] = useState<boolean | null>(null)
+    const [setupModalOpen, setSetupModalOpen] = useState(false)
+
+    useEffect(() => {
+        fetch('/api/vault/status')
+            .then((res) => res.json())
+            .then((data) => setVaultInitialized(data.initialized ?? false))
+            .catch(() => setVaultInitialized(false))
+    }, [])
 
     // Handle storing the API key
     const handleStoreKey = async () => {
@@ -38,6 +50,31 @@ export function ApiKeyConfig({ hasKey, setHasKey }: ApiKeyConfigProps) {
         } finally {
             setIsStoringKey(false)
         }
+    }
+
+    if (vaultInitialized === null) {
+        return (
+            <div className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6 flex items-center justify-center h-24">
+                <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+            </div>
+        )
+    }
+
+    if (!vaultInitialized) {
+        return (
+            <>
+                <VaultRequiredCard onSetupVault={() => setSetupModalOpen(true)} />
+                <VaultSetupModal
+                    open={setupModalOpen}
+                    onOpenChange={setSetupModalOpen}
+                    userId={userId}
+                    onSuccess={() => {
+                        setSetupModalOpen(false)
+                        setVaultInitialized(true)
+                    }}
+                />
+            </>
+        )
     }
 
     return (
