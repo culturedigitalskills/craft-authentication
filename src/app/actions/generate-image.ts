@@ -125,6 +125,22 @@ export async function deleteTaskEventMediaAction(eventId: string) {
     return { success: true }
 }
 
+export async function deleteTaskEventAction(eventId: string) {
+    const session = await auth()
+    if (!session?.user) throw new Error('Not authenticated')
+
+    const task = await prisma.taskEvent.findFirst({
+        where: { id: eventId, userId: session.user.id },
+    })
+    if (!task) throw new Error('Task not found')
+
+    await prisma.taskEvent.delete({
+        where: { id: eventId },
+    })
+
+    return { success: true }
+}
+
 export async function generateImageAction(eventId: string) {
     const session = await auth()
     if (!session?.user) throw new Error('Not authenticated')
