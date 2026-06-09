@@ -65,6 +65,8 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
             digitalSourceType?: string | null
             signer?: string | null
             issuer?: string | null
+            untrusted?: boolean
+            invalid?: boolean
         }>
     } | null>(null)
 
@@ -513,8 +515,16 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
                                                     </h4>
                                                     <p className="text-xs text-amber-800 leading-relaxed">
                                                         This image has a valid creator stamp that hasn't
-                                                        been altered. However, the signing certificate is
-                                                        self-signed or not globally trusted.
+                                                        been altered. However,{' '}
+                                                        {verifyResult.artisanName && verifyResult.issuer && verifyResult.artisanName === verifyResult.issuer ? (
+                                                            <>
+                                                                the signing certificate for <span className="font-semibold">{verifyResult.artisanName}</span> is self-signed and not globally trusted.
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                the root signing certificate/issuer <span className="font-semibold">{verifyResult.issuer || 'unknown issuer'}</span> (which issued the certificate for <span className="font-semibold">{verifyResult.artisanName}</span>) is self-signed or not globally trusted.
+                                                            </>
+                                                        )}
                                                     </p>
                                                     <div className="mt-2 text-xs font-mono space-y-1 text-amber-700 border-t border-amber-200/50 pt-2">
                                                         {verifyResult.validationStatus.map(
@@ -646,14 +656,47 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
                                                                 )}
                                                             </div>
                                                             {assertion.signer && (
-                                                                <p className="text-xs font-medium text-foreground/70">
-                                                                    {assertion.signer}
+                                                                <div className="text-xs font-medium text-foreground/70 flex flex-col gap-1 mt-1">
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        {assertion.invalid ? (
+                                                                            <span title="Invalid Certificate" className="inline-flex items-center gap-1 text-destructive">
+                                                                                <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" />
+                                                                                <span className="font-semibold">{assertion.signer}</span> (Invalid Signer)
+                                                                            </span>
+                                                                        ) : assertion.untrusted && assertion.signer === assertion.issuer ? (
+                                                                            <span title="Self-Signed Untrusted Certificate" className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-500">
+                                                                                <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                                                                                <span className="font-semibold">{assertion.signer}</span> (Self-Signed / Untrusted)
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span title="Valid Certificate" className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-500">
+                                                                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                                                                <span className="font-semibold">{assertion.signer}</span>
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
                                                                     {assertion.issuer && (
-                                                                        <span className="font-normal text-muted-foreground">
-                                                                            {' '}· {assertion.issuer}
-                                                                        </span>
+                                                                        <div className="flex items-center gap-1.5 pl-5 text-muted-foreground text-[11px]">
+                                                                            <span>Issued by:</span>
+                                                                            {assertion.invalid ? (
+                                                                                <span title="Invalid Issuer" className="inline-flex items-center gap-1 text-destructive/80">
+                                                                                    <AlertTriangle className="h-3 w-3 text-destructive shrink-0" />
+                                                                                    {assertion.issuer}
+                                                                                </span>
+                                                                            ) : assertion.untrusted ? (
+                                                                                <span title="Untrusted Root Certificate / Issuer" className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-500">
+                                                                                    <AlertTriangle className="h-3 w-3 text-amber-500 shrink-0" />
+                                                                                    {assertion.issuer} (Untrusted Root CA)
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span title="Trusted Issuer" className="inline-flex items-center gap-1 text-emerald-600/80 dark:text-emerald-500/80">
+                                                                                    <CheckCircle2 className="h-3 w-3 text-emerald-500/80 shrink-0" />
+                                                                                    {assertion.issuer}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
                                                                     )}
-                                                                </p>
+                                                                </div>
                                                             )}
                                                             <p className="text-xs text-muted-foreground leading-relaxed">
                                                                 {assertion.description ||

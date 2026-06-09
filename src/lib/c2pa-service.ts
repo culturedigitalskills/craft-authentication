@@ -551,6 +551,42 @@ export class C2PAService {
 
             let date: string | null = activeManifest.signature_info?.time || null
 
+            const untrustedManifestIds = new Set<string>()
+            const failedManifestIds = new Set<string>()
+            if (json.validation_status && json.validation_status.length > 0) {
+                for (const status of json.validation_status) {
+                    if (status.url) {
+                        const match = status.url.match(/\/c2pa\/([^/]+)/)
+                        if (match) {
+                            if (status.code === 'signingCredential.untrusted') {
+                                untrustedManifestIds.add(match[1])
+                            } else {
+                                failedManifestIds.add(match[1])
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (json.validation_results) {
+                for (const key of Object.keys(json.validation_results)) {
+                    const group = (json.validation_results as any)[key]
+                    const failures = group?.failure || []
+                    for (const failure of failures) {
+                        if (failure.url) {
+                            const match = failure.url.match(/\/c2pa\/([^/]+)/)
+                            if (match) {
+                                if (failure.code === 'signingCredential.untrusted') {
+                                    untrustedManifestIds.add(match[1])
+                                } else {
+                                    failedManifestIds.add(match[1])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Walk the full ingredient chain (oldest ancestor first) to build a
             // complete provenance timeline across all manifests.
             const assertions: any[] = []
@@ -594,6 +630,8 @@ export class C2PAService {
                             digitalSourceType: act.digitalSourceType || null,
                             signer: signerName,
                             issuer: signerIssuer,
+                            untrusted: untrustedManifestIds.has(manifestId),
+                            invalid: failedManifestIds.has(manifestId),
                         })
                     }
                 }
