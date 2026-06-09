@@ -11,7 +11,8 @@ import {
     getTaskEventsAction,
     deleteTaskEventMediaAction,
     generateImageAction,
-    deleteTaskEventAction
+    deleteTaskEventAction,
+    addToGalleryAction
 } from '@/app/actions/generate-image'
 import { ApiKeyConfig } from './ApiKeyConfig'
 import { PromptForm } from './PromptForm'
@@ -35,6 +36,7 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
     const [selectedTask, setSelectedTask] = useState<any | null>(null)
     const [detailsOpen, setDetailsOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [isAddingToGallery, setIsAddingToGallery] = useState(false)
 
     // Load initial states
     const loadKeyState = useCallback(async () => {
@@ -143,6 +145,25 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
         }
     }
 
+    // Handle adding task media to gallery
+    const handleAddToGallery = async () => {
+        if (!selectedTask || !selectedTask.mediaFileId || isAddingToGallery) return
+        setIsAddingToGallery(true)
+        try {
+            await addToGalleryAction(selectedTask.mediaFileId)
+            const updated = await getTaskEventsAction()
+            setTasks(updated)
+            const newSelected = updated.find((t: any) => t.id === selectedTask.id)
+            if (newSelected) {
+                setSelectedTask(newSelected)
+            }
+        } catch (err: any) {
+            console.error('Failed to add to gallery:', err)
+        } finally {
+            setIsAddingToGallery(false)
+        }
+    }
+
     return (
         <div className="space-y-8">
             {/* Page Header */}
@@ -230,6 +251,8 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                 selectedTask={selectedTask}
                 isDeleting={isDeleting}
                 onDeleteMedia={handleDeleteMedia}
+                isAddingToGallery={isAddingToGallery}
+                onAddToGallery={handleAddToGallery}
             />
         </div>
     )

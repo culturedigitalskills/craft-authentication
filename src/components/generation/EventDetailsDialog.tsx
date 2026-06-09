@@ -1,6 +1,6 @@
 'use client'
 
-import { Sparkles, Loader2, Trash2 } from 'lucide-react'
+import { Sparkles, Loader2, Trash2, Check, ImagePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter
@@ -13,6 +13,8 @@ interface EventDetailsDialogProps {
     selectedTask: any | null
     isDeleting: boolean
     onDeleteMedia: () => void
+    isAddingToGallery: boolean
+    onAddToGallery: () => void
 }
 
 export function EventDetailsDialog({
@@ -20,9 +22,15 @@ export function EventDetailsDialog({
     onOpenChange,
     selectedTask,
     isDeleting,
-    onDeleteMedia
+    onDeleteMedia,
+    isAddingToGallery,
+    onAddToGallery
 }: EventDetailsDialogProps) {
     const t = useTranslations('imageWorkspace')
+
+    const isAlreadyInGallery = selectedTask?.mediaFile?.mediaAttachments?.some(
+        (att: any) => att.attachmentType === 'GALLERY'
+    )
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -84,24 +92,51 @@ export function EventDetailsDialog({
 
                     {/* Modal Footer */}
                     <DialogFooter className="flex items-center justify-between gap-4">
-                        <Button
-                            variant="destructive"
-                            onClick={onDeleteMedia}
-                            disabled={isDeleting}
-                            className="flex items-center gap-1.5"
-                        >
-                            {isDeleting ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    Deleting...
-                                </>
-                            ) : (
-                                <>
-                                    <Trash2 className="w-4 h-4" />
-                                    {t('delete')}
-                                </>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="destructive"
+                                onClick={onDeleteMedia}
+                                disabled={isDeleting}
+                                className="flex items-center gap-1.5"
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trash2 className="w-4 h-4" />
+                                        {t('delete')}
+                                    </>
+                                )}
+                            </Button>
+                            {selectedTask.mediaFileId && (
+                                <Button
+                                    variant="outline"
+                                    onClick={onAddToGallery}
+                                    disabled={isAddingToGallery || isAlreadyInGallery}
+                                    className="flex items-center gap-1.5 border-primary/30 text-primary hover:bg-primary/5 hover:text-primary"
+                                >
+                                    {isAddingToGallery ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            Adding...
+                                        </>
+                                    ) : isAlreadyInGallery ? (
+                                        <>
+                                            <Check className="w-4 h-4 text-green-500" />
+                                            Added to Gallery
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ImagePlus className="w-4 h-4" />
+                                            Add to Gallery
+                                        </>
+                                    )}
+                                </Button>
                             )}
-                        </Button>
+                        </div>
                         <Button
                             variant="outline"
                             onClick={() => onOpenChange(false)}

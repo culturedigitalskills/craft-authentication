@@ -71,7 +71,13 @@ export async function getTaskEventsAction() {
     const events = await prisma.taskEvent.findMany({
         where: { userId: session.user.id, type: 'image-generation' },
         orderBy: { createdAt: 'desc' },
-        include: { mediaFile: true },
+        include: {
+            mediaFile: {
+                include: {
+                    mediaAttachments: true,
+                },
+            },
+        },
     })
 
     return events
@@ -136,6 +142,61 @@ export async function deleteTaskEventAction(eventId: string) {
 
     await prisma.taskEvent.delete({
         where: { id: eventId },
+    })
+
+    return { success: true }
+}
+
+export async function addToGalleryAction(mediaFileId: string) {
+    const session = await auth()
+    if (!session?.user) throw new Error('Not authenticated')
+    const userId = session.user.id
+
+    const artisan = await prisma.artisan.findUnique({
+        where: { userId },
+    })
+    if (!artisan) {
+        throw new Error('Artisan profile not found. Please set up your profile first.')
+    }
+
+    const mediaFile = await prisma.mediaFile.findUnique({
+        where: { id: mediaFileId },
+    })
+    if (!mediaFile) throw new Error('Media file not found')
+    if (mediaFile.uploaderId !== userId) throw new Error('Unauthorized')
+
+    const existingAttachment = await prisma.mediaAttachment.findFirst({
+        where: {
+            mediaId: mediaFileId,
+            entityType: 'Artisan',
+            entityId: artisan.id,
+            attachmentType: 'GALLERY',
+        },
+    })
+
+    if (existingAttachment) {
+        return { success: true, message: 'Already in gallery' }
+    }
+
+    const lastAttachment = await prisma.mediaAttachment.findFirst({
+        where: {
+            entityType: 'Artisan',
+            entityId: artisan.id,
+            attachmentType: 'GALLERY',
+        },
+        orderBy: { displayOrder: 'desc' },
+    })
+    const nextDisplayOrder = lastAttachment ? lastAttachment.displayOrder + 1 : 0
+
+    await prisma.mediaAttachment.create({
+        data: {
+            mediaId: mediaFileId,
+            entityType: 'Artisan',
+            entityId: artisan.id,
+            attachmentType: 'GALLERY',
+            isPrimary: false,
+            displayOrder: nextDisplayOrder,
+        },
     })
 
     return { success: true }
@@ -344,6 +405,33 @@ async function runGenerationInBackground(eventId: string, userId: string) {
                 mediaFileId: mediaFile.id,
             },
         })
+
+        // Automatically add to user's gallery if they have an Artisan profile
+        const artisan = await prisma.artisan.findUnique({
+            where: { userId },
+        })
+        if (artisan) {
+            const lastAttachment = await prisma.mediaAttachment.findFirst({
+                where: {
+                    entityType: 'Artisan',
+                    entityId: artisan.id,
+                    attachmentType: 'GALLERY',
+                },
+                orderBy: { displayOrder: 'desc' },
+            })
+            const nextDisplayOrder = lastAttachment ? lastAttachment.displayOrder + 1 : 0
+
+            await prisma.mediaAttachment.create({
+                data: {
+                    mediaId: mediaFile.id,
+                    entityType: 'Artisan',
+                    entityId: artisan.id,
+                    attachmentType: 'GALLERY',
+                    isPrimary: false,
+                    displayOrder: nextDisplayOrder,
+                },
+            })
+        }
     } catch (error: any) {
         console.error(`Generation failed for event ${eventId}:`, error)
         await prisma.taskEvent
