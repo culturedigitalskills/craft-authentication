@@ -27,7 +27,9 @@ if (existsSync(privateKeyPath) || existsSync(publicKeyPath)) {
     console.error('ERROR: KMS key files already exist in ./secrets/')
     console.error('  kms_private_key.pem and/or kms_public_key.pem are present.')
     console.error('  Delete them manually if you intentionally want to rotate the KMS key pair.')
-    console.error('  WARNING: Rotating the KMS key pair invalidates all existing SSE_KMS vault records.')
+    console.error(
+        '  WARNING: Rotating the KMS key pair invalidates all existing SSE_KMS vault records.',
+    )
     process.exit(1)
 }
 
@@ -51,6 +53,8 @@ console.log(`  ${publicKeyPath}`)
 console.log('')
 console.log('Add these lines to your .env.local:')
 console.log('')
+console.log('')
+console.log('# Vault & KMS Settings')
 console.log(`KMS_PRIVATE_KEY_PATH=./secrets/kms_private_key.pem`)
 console.log(`KMS_PUBLIC_KEY_PATH=./secrets/kms_public_key.pem`)
 console.log(`LOCAL_MASTER_KEY=${localMasterKey}`)

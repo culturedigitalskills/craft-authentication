@@ -3,7 +3,7 @@
  * for signing Artisan C2PA credentials. The files are written to ./secrets/.
  *
  * If a private key already exists, it renews the certificate using the existing key.
- * 
+ *
  * This script is interactive and prompts the user for certificate details (Common Name,
  * Organization, Country) when creating/renewing.
  *
@@ -44,7 +44,9 @@ const hasCert = existsSync(rootCertPath)
 if (!hasKey && hasCert) {
     console.error('ERROR: C2PA Root CA certificate exists but the private key is missing.')
     console.error(`  Expected private key at: ${rootKeyPath}`)
-    console.error('  Cannot renew certificate without the private key. Please delete the certificate file and run again to create a new Root CA.')
+    console.error(
+        '  Cannot renew certificate without the private key. Please delete the certificate file and run again to create a new Root CA.',
+    )
     process.exit(1)
 }
 
@@ -53,11 +55,13 @@ function askQuestion(query) {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
-    });
-    return new Promise((resolve) => rl.question(query, (ans) => {
-        rl.close();
-        resolve(ans);
-    }));
+    })
+    return new Promise((resolve) =>
+        rl.question(query, (ans) => {
+            rl.close()
+            resolve(ans)
+        }),
+    )
 }
 
 async function main() {
@@ -68,13 +72,24 @@ async function main() {
     // Try to extract existing certificate details to use as defaults for renewal
     if (hasCert) {
         try {
-            const subjectStr = execSync(`openssl x509 -subject -noout -in "${rootCertPath}"`, { encoding: 'utf8' })
-            
+            const subjectStr = execSync(`openssl x509 -subject -noout -in "${rootCertPath}"`, {
+                encoding: 'utf8',
+            })
+
             // Format can be: subject=C = US, O = Sustainable Crafting Registry, CN = Crafts C2PA Root CA
             // or subject= /C=US/O=Sustainable Crafting Registry/CN=Crafts C2PA Root CA
-            const cMatch = subjectStr.match(/\/C=([^/]+)/) || subjectStr.match(/C\s*=\s*([^,]+)/) || subjectStr.match(/countryName\s*=\s*([^,]+)/)
-            const oMatch = subjectStr.match(/\/O=([^/]+)/) || subjectStr.match(/O\s*=\s*([^,]+)/) || subjectStr.match(/organizationName\s*=\s*([^,]+)/)
-            const cnMatch = subjectStr.match(/\/CN=([^/]+)/) || subjectStr.match(/CN\s*=\s*([^,\n]+)/) || subjectStr.match(/commonName\s*=\s*([^,\n]+)/)
+            const cMatch =
+                subjectStr.match(/\/C=([^/]+)/) ||
+                subjectStr.match(/C\s*=\s*([^,]+)/) ||
+                subjectStr.match(/countryName\s*=\s*([^,]+)/)
+            const oMatch =
+                subjectStr.match(/\/O=([^/]+)/) ||
+                subjectStr.match(/O\s*=\s*([^,]+)/) ||
+                subjectStr.match(/organizationName\s*=\s*([^,]+)/)
+            const cnMatch =
+                subjectStr.match(/\/CN=([^/]+)/) ||
+                subjectStr.match(/CN\s*=\s*([^,\n]+)/) ||
+                subjectStr.match(/commonName\s*=\s*([^,\n]+)/)
 
             if (cMatch) defaultCountry = cMatch[1].trim()
             if (oMatch) defaultOrg = oMatch[1].trim()
@@ -94,8 +109,10 @@ async function main() {
         console.log('--- Certificate Details Configuration ---')
         console.log('Press Enter to accept the default values in brackets.')
         console.log('')
-        
-        country = (await askQuestion(`Country Code (2 letters) [${defaultCountry}]: `)).trim() || defaultCountry
+
+        country =
+            (await askQuestion(`Country Code (2 letters) [${defaultCountry}]: `)).trim() ||
+            defaultCountry
         org = (await askQuestion(`Organization Name [${defaultOrg}]: `)).trim() || defaultOrg
         commonName = (await askQuestion(`Common Name (CN) [${defaultCN}]: `)).trim() || defaultCN
         console.log('')
@@ -132,27 +149,33 @@ keyUsage = critical, keyCertSign, cRLSign
         writeFileSync(tempConfigPath, configContent.trim(), 'utf8')
 
         if (hasKey) {
-            console.log('C2PA Root CA private key already exists. Renewing the certificate using the existing private key...')
-            
+            console.log(
+                'C2PA Root CA private key already exists. Renewing the certificate using the existing private key...',
+            )
+
             // Renew/generate cert using the existing private key (maintaining trust for already signed certificates)
             execSync(
                 `openssl req -x509 -new -nodes -key "${rootKeyPath}" ` +
-                `-out "${rootCertPath}" -days 825 -config "${tempConfigPath}"`,
-                { stdio: 'inherit' }
+                    `-out "${rootCertPath}" -days 825 -config "${tempConfigPath}"`,
+                { stdio: 'inherit' },
             )
-            
+
             console.log('')
-            console.log('Success! C2PA Root CA certificate renewed successfully (825 days validity):')
+            console.log(
+                'Success! C2PA Root CA certificate renewed successfully (825 days validity):',
+            )
             console.log(`  Private Key (kept): ${rootKeyPath}`)
             console.log(`  Certificate (renewed): ${rootCertPath}`)
         } else {
-            console.log('Generating new self-signed C2PA Root CA key and certificate (825 days validity)...')
-            
+            console.log(
+                'Generating new self-signed C2PA Root CA key and certificate (825 days validity)...',
+            )
+
             // Generate a new EC key pair and self-signed certificate
             execSync(
                 `openssl req -x509 -new -nodes -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 ` +
-                `-keyout "${rootKeyPath}" -out "${rootCertPath}" -days 825 -config "${tempConfigPath}"`,
-                { stdio: 'inherit' }
+                    `-keyout "${rootKeyPath}" -out "${rootCertPath}" -days 825 -config "${tempConfigPath}"`,
+                { stdio: 'inherit' },
             )
 
             console.log('')
@@ -163,11 +186,13 @@ keyUsage = critical, keyCertSign, cRLSign
 
         console.log('')
         console.log('Make sure to add these to your .env.local configuration:')
-        console.log(`  C2PA_ROOT_KEY_PATH=./secrets/c2pa_root_key.pem`)
-        console.log(`  C2PA_ROOT_CERT_PATH=./secrets/c2pa_root_cert.pem`)
+
+        console.log('')
+        console.log('# Content Credentials Root Key & Certificate (for C2PA support)')
+        console.log(`C2PA_ROOT_KEY_PATH=./secrets/c2pa_root_key.pem`)
+        console.log(`C2PA_ROOT_CERT_PATH=./secrets/c2pa_root_cert.pem`)
         console.log('')
         console.log('Please keep c2pa_root_key.pem safe and do not commit it to version control.')
-
     } catch (error) {
         console.error('An error occurred during certificate operation:', error)
     } finally {
