@@ -25,8 +25,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install prisma CLI for database migrations (adds ~50 MB)
-RUN npm install -g prisma@7
+# Install system dependencies (openssl for credentials generation, curl & jq for healthchecks) and prisma CLI
+RUN apk add --no-cache openssl curl jq && npm install -g prisma@7
 
 # Application files
 COPY --from=builder /app/public ./public
