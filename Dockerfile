@@ -3,6 +3,7 @@ ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN corepack prepare pnpm@11.5.2 --activate
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/* 
 
 FROM base AS deps
 WORKDIR /app
@@ -19,8 +20,6 @@ ENV DATABASE_URL_APP=${DATABASE_URL_APP}
 # Fallback environment variables for Better Auth during Next.js build-time route compilation, just to satisfy the validation (these won't be used at runtime, as the real values will be injected via Docker secrets and .env.production)
 ENV AUTH_SECRET=placeholder_secret_only_used_during_next_build_to_satisfy_better_auth_validation_67890
 ENV AUTH_URL=http://localhost:3000
-
-RUN apt-get update && apt-get install -y openssl
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
