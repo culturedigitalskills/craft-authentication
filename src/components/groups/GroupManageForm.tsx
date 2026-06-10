@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { Trash2, UserPlus, Shield, User, ArrowLeft, Loader2 } from 'lucide-react'
+import { Trash2, UserPlus, Shield, User, ArrowLeft, Loader2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -204,17 +204,25 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-5">
-                <Link
-                    href={`/groups/${group.slug}`}
-                    className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                </Link>
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">{group.name}</h1>
-                    <p className="text-sm text-primary-foreground/70">{t('editGroup')}</p>
+            <div className="flex items-center justify-between gap-4 rounded-xl bg-primary px-6 py-5">
+                <div className="flex items-center gap-4">
+                    <Link
+                        href={`/groups/${group.slug}`}
+                        className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                    </Link>
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">{group.name}</h1>
+                        <p className="text-sm text-primary-foreground/70">{t('editGroup')}</p>
+                    </div>
                 </div>
+                <Button variant="outline" asChild className="shrink-0">
+                    <Link href={`/groups/${group.slug}`}>
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        {t('viewPublicPage')}
+                    </Link>
+                </Button>
             </div>
 
             {/* Photos */}

@@ -241,9 +241,9 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
     // ── View mode — scroll sections layout ──
     if (!showForm && artisan) {
         return (
-            <div className="-mt-16">
+            <div>
                 {/* ── Hero Banner ── */}
-                <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-24">
+                <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-12">
                     {coverUrl ? (
                         <Image
                             src={coverUrl}
@@ -442,7 +442,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                 {/* ── Gallery Section ── */}
                 <section className="py-10">
                     <div className="mx-auto max-w-3xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
+                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
                             {t('gallery')}
                         </h2>
                         <GalleryUpload
@@ -460,17 +460,17 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
         <div className="container mx-auto max-w-4xl px-4 py-10">
             <div className="space-y-8">
                 {/* Header with back button */}
-                <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-5">
+                <div className="flex items-center gap-4 border-b border-border/40 pb-5">
                     {isEditing && (
                         <button
                             type="button"
                             onClick={handleCancelEdit}
-                            className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
+                            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
                             <ArrowLeft className="h-5 w-5" />
                         </button>
                     )}
-                    <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">
+                    <h1 className="text-2xl font-bold tracking-tight text-primary">
                         {isCreateMode ? t('createTitle') : t('editTitle')}
                     </h1>
                 </div>

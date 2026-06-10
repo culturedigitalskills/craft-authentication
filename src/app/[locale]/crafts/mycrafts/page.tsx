@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { CardTitle, CardContent, CardDescription, CardHeader, Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/dist/client/link'
@@ -9,17 +10,19 @@ import Image from 'next/image'
 import { Calendar, Eye, EyeOff, Pencil, Plus } from 'lucide-react'
 import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
+import { SearchInput } from '@/components/shared/SearchInput'
 import { cookies } from 'next/dist/server/request/cookies'
 import { prisma } from '@/lib/prisma'
 
 export default async function MyCraftsPage(
-    { searchParams }: { searchParams: { page?: string } }
+    { searchParams }: { searchParams: { page?: string; q?: string } }
 ) {
     const session = await auth()
     if (!session) redirect('/login')
 
     const params = await searchParams
     const page = params.page ? parseInt(params.page) : 1
+    const q = params.q?.trim() ?? ''
     const currentPageUrl = `${process.env.AUTH_URL}/crafts/mycrafts`
     const cookieStore = await cookies()
     const cookieHeader = cookieStore.toString()
@@ -38,9 +41,12 @@ export default async function MyCraftsPage(
         const allCrafts = data.data
         const pagination = data.pagination
 
+        const myCraftsRecords = allCrafts.filter((record: any) => record.data.artisan === session.user.email)
+        const hasCrafts = myCraftsRecords.length > 0
+
         const crafts = await Promise.all(
-            allCrafts
-                .filter((record: any) => record.data.artisan === session.user.email)
+            myCraftsRecords
+                .filter((record: any) => !q || (record.name ?? '').toLowerCase().includes(q.toLowerCase()))
                 .map(async (record: any) => {
                     const mediaIds = record.data['mediaIds']?.filter((id: any) => id !== null) ?? []
                     let imageUrl = null
@@ -69,44 +75,45 @@ export default async function MyCraftsPage(
         })
         const artisanName = artisan ? `${artisan.firstName} ${artisan.lastName}` : session.user.name ?? session.user.email
 
-        return <RenderMyCraftsPage crafts={crafts} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} artisanName={artisanName} />
+        return <RenderMyCraftsPage crafts={crafts} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} artisanName={artisanName} q={q} hasCrafts={hasCrafts} />
     } catch (error) {
         console.error('Error loading my crafts:', error)
     }
 }
 
-function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, artisanName }: {
+function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, artisanName, q, hasCrafts }: {
     crafts: any[]
     pagination: any
     currentPage: number
     currentPageUrl: string
     artisanName: any
+    q: string
+    hasCrafts: boolean
 }) {
     const t = useTranslations()
 
     return (
         <Container>
-            <div className="mb-10 flex items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('navbar.myitems')}</h1>
-                    <p className="mt-3 text-lg text-muted-foreground">{artisanName}</p>
-                </div>
-                {crafts.length > 0 && (
+            <PageHeader title={t('navbar.myitems')} description={artisanName} />
+
+            {hasCrafts && (
+                <div className="mb-6 flex items-center justify-between gap-4">
+                    <SearchInput placeholder={t('crafts.explore.searchPlaceholder')} />
                     <Button asChild className="shrink-0">
                         <Link href="/crafts/create">
                             <Plus className="mr-2 h-4 w-4" />
                             {t('navbar.addcraft')}
                         </Link>
                     </Button>
-                )}
-            </div>
+                </div>
+            )}
 
             {crafts.length > 0 ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {crafts.map((craft) => {
                         const editUrl = `/crafts/create?id=${craft.id}`
                         return (
-                            <Card key={craft.id} className="group relative transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+                            <Card key={craft.id} className="group relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
                                 <Link href={`/crafts/${craft.id}?from=mycrafts`} className="block">
                                     {/* Image */}
                                     <div className="relative aspect-square overflow-hidden rounded-t-lg">
@@ -167,6 +174,11 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
                             </Card>
                         )
                     })}
+                </div>
+            ) : q ? (
+                <div className="rounded-lg border border-dashed border-border p-12 text-center">
+                    <Plus className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+                    <p className="text-muted-foreground">{t('crafts.explore.noResults')}</p>
                 </div>
             ) : (
                 <div className="rounded-lg border border-dashed border-border p-12 text-center">

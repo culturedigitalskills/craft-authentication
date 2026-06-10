@@ -18,7 +18,8 @@
     "profile": "Profil",
     "myitems": "Zanaatlarım",
     "mygroups": "Topluluklarım",
-    "createGroup": "Topluluk Oluştur"
+    "createGroup": "Topluluk Oluştur",
+    "mystory": "Hikâyem"
   },
   "auth": {
     "loginTitle": "Giriş Yap",
@@ -142,6 +143,101 @@
     "step6Hint": "Hızlı bir bakış at. Daha sonra profil sayfanızdan her şeyi düzenleyebilirsiniz.",
     "reviewName": "Ad",
     "reviewPhotos": "Fotoğraflar"
+  },
+  "craftStory": {
+    "stepLabel": "Adım {current} / {total}",
+    "back": "Geri",
+    "next": "İleri",
+    "begin": "Başla",
+    "saveExit": "Kaydet ve çık",
+    "saving": "Kaydediliyor...",
+    "publish": "Hikâyemi yayınla",
+    "publishing": "Yayınlanıyor...",
+    "writeYourAnswer": "Cevabını yaz",
+    "answerPlaceholder": "Acele etme. Doğal konuş. Yanlış cevap yoktur.",
+    "questionLabel": "Soru {index}",
+    "publicHeading": "Kendi sözleriyle",
+    "publicTitle": "Bu zanaatın hikâyesi",
+    "errors": {
+      "saveFailed": "İlerlemeni kaydedemedik. Lütfen tekrar dene.",
+      "publishFailed": "Hikâyeni yayınlayamadık. Lütfen tekrar dene.",
+      "emptyStory": "Yayınlamadan önce en az bir yazılı cevap, kayıt veya atölye fotoğrafı ekle.",
+      "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle."
+    },
+    "banner": {
+      "startTitle": "Zanaat Hikâyeni Paylaş",
+      "startBody": "Zanaatını kendi sözlerinle; yazarak, konuşarak veya kaydederek anlat.",
+      "startCta": "Hikâyene başla",
+      "continueTitle": "Zanaat hikâyene devam et",
+      "continueBody": "{total} adımdan {current}. adımdasın. Kaldığın yerden devam et.",
+      "continueCta": "Devam et",
+      "publishedBadge": "Zanaat hikâyen yayınlandı",
+      "publishedBody": "Ziyaretçiler bunu herkese açık profilinde okuyabilir. İstediğin zaman düzenlemeye devam edebilirsin.",
+      "view": "Görüntüle",
+      "edit": "Düzenle"
+    },
+    "intro": {
+      "title": "Zanaat Hikâyeni Paylaşma Kılavuzu",
+      "lead": "Bu sayfa, zanaatının hikâyesini kendi sözlerinle anlatmana yardımcı olacak. Bu sorular yalnızca sana yol göstermek için burada. Lütfen doğal konuş ve önemli gördüğün her şeyi ekle.",
+      "formatsTitle": "Hikâyeni şu şekilde paylaşabilirsin:",
+      "formatText": "Yazılı metin",
+      "formatAudio": "Ses kaydı",
+      "formatVideo": "Video kaydı",
+      "encouragement": "Lütfen kendi sözlerinle, zanaatını anlamak isteyen birine hikâyeni anlatır gibi cevap ver."
+    },
+    "step1": {
+      "title": "Kendin Hakkında",
+      "prompt": "Kim olduğunu ve bu zanaatı ilk olarak nasıl öğrendiğini bize anlatabilir misin?"
+    },
+    "step2": {
+      "title": "Zanaatın Hakkında",
+      "prompt": "Zanaatını basit sözcüklerle; nereden geldiğini, nasıl yapıldığını ve ne için kullanıldığını da içerecek şekilde açıklayabilir misin?"
+    },
+    "step3": {
+      "title": "Duygular, Anlam ve Bağlar",
+      "prompt": "Bu zanaat senin için ne ifade ediyor? Onunla bağlantılı duygular, olaylar, gelenekler, semboller veya hikâyeler var mı?"
+    },
+    "step4": {
+      "title": "Faydalar ve Fırsatlar",
+      "prompt": "Bu zanaat sana, ailene veya topluluğuna neler kazandırdı?"
+    },
+    "step5": {
+      "title": "Bilginin Aktarımı ve Gelecek Nesiller",
+      "prompt": "Bu zanaat gençlere nasıl aktarılıyor ve gelecekte sürdürülebileceğini düşünüyor musun?"
+    },
+    "step6": {
+      "title": "Zorluklar ve Engeller",
+      "prompt": "Bu zanaatı icra ederken ne tür zorluklarla karşılaşıyorsun ve onu yaşatmak için ne tür bir destek faydalı olurdu?"
+    },
+    "step7": {
+      "title": "Atölye, Aletler ve Süreç",
+      "prompt": "Atölyeni, aletlerini, malzemelerini, zanaatını nasıl yaptığını ve çalıştığın yeri ayrı ayrı kaydet veya fotoğrafla.",
+      "saveFirst": "Önce bir önceki adımda bir cevap kaydet, ardından atölye medyası eklemek için geri dön."
+    },
+    "review": {
+      "title": "Hikâyeni gözden geçir",
+      "lead": "Paylaştıklarına hızlıca göz at. Yayınlamadan önce istediğin her şeyi düzenlemek için geri dönebilirsin.",
+      "notAnswered": "Henüz cevaplanmadı",
+      "hasRecording": "Kayıt eklendi",
+      "workshopCount": "{count, plural, =0 {Henüz dosya yok} one {1 dosya} other {# dosya}}"
+    },
+    "uploader": {
+      "label": "Ya da bunun yerine ses / video kaydet",
+      "chooseFile": "Ses veya video seç",
+      "replace": "Kaydı değiştir",
+      "remove": "Kaldır",
+      "uploading": "Yükleniyor...",
+      "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
+      "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB."
+    },
+    "workshop": {
+      "addFile": "Fotoğraf veya video ekle",
+      "removeItem": "Kaldır",
+      "videoLabel": "Video",
+      "itemAlt": "Atölye veya süreç görseli",
+      "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
+      "deleteFailed": "Bu dosya silinemedi. Lütfen tekrar dene."
+    }
   },
   "profile": {
     "title": "Zanaatkâr Profili",
@@ -364,6 +460,7 @@
     "fileTooLarge": "Görsel çok büyük. Maksimum boyut 8 MB.",
     "deleteFailed": "Topluluk silinemedi",
     "viewGroup": "Topluluğu Görüntüle",
+    "viewPublicPage": "Herkese Açık Sayfayı Görüntüle",
     "searchArtisan": "Zanaatkârı ada göre ara...",
     "cancel": "İptal",
     "searchPlaceholder": "Toplulukları ara...",
