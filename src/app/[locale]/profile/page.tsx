@@ -99,5 +99,29 @@ export default async function ProfilePage() {
         group: m.group,
     }))
 
-    return <ArtisanProfileForm artisan={artisan} photoUrl={photoUrl} coverUrl={coverUrl} galleryImages={galleryImages} myGroups={myGroups} />
+    const story = artisan
+        ? await prisma.craftStory.findUnique({
+              where: { artisanId: artisan.id },
+              select: { status: true, lastStepReached: true },
+          })
+        : null
+
+    const storyBanner: { state: 'none' | 'draft' | 'published'; progress: number; slug: string | null } = story
+        ? {
+              state: story.status === 'PUBLISHED' ? 'published' : 'draft',
+              progress: story.lastStepReached,
+              slug: artisan?.slug ?? null,
+          }
+        : { state: 'none', progress: 0, slug: artisan?.slug ?? null }
+
+    return (
+        <ArtisanProfileForm
+            artisan={artisan}
+            photoUrl={photoUrl}
+            coverUrl={coverUrl}
+            galleryImages={galleryImages}
+            myGroups={myGroups}
+            storyBanner={storyBanner}
+        />
+    )
 }

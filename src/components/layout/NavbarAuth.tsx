@@ -2,8 +2,9 @@
 
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
@@ -11,9 +12,16 @@ interface NavbarAuthProps {
     onAction?: () => void
     variant?: 'desktop' | 'mobile'
 }
+
+// Static warm underline shown under the label of the *selected* dropdown item,
+// mirroring the active-link indicator in the main navbar.
+const activeUnderline =
+    'relative after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-warm'
 export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
     const { data: session, status } = useSession()
     const t = useTranslations('navbar')
+    const pathname = usePathname()
+    const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -75,6 +83,14 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     >
                         <FolderUp className="h-4 w-4" />
                         {t('addcraft')}
+                    </Link>
+                    <Link
+                        href="/onboarding/story"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <BookOpen className="h-4 w-4" />
+                        {t('mystory')}
                     </Link>
 
                     <div className="my-1 border-t border-border" />
@@ -148,37 +164,39 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         )}
                     </div>
 
-                    {/* Links */}
+                    {/* Account links */}
                     <div className="py-1">
                         <Link
                             href="/profile"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/profile') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            <User className="h-4 w-4 text-muted-foreground" />
-                            {t('profile')}
+                            <User className="h-4 w-4" />
+                            <span className={isActive('/profile') ? activeUnderline : ''}>{t('profile')}</span>
                         </Link>
-                    </div>
-                    {/* My items */}
-                    <div className="py-1">
                         <Link
                             href="/crafts/mycrafts"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/crafts/mycrafts') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            <FolderOpen className="h-4 w-4 text-muted-foreground" />
-                            {t('myitems')}
+                            <FolderOpen className="h-4 w-4" />
+                            <span className={isActive('/crafts/mycrafts') ? activeUnderline : ''}>{t('myitems')}</span>
                         </Link>
-                    </div>
-                    {/* Add item */}
-                    <div className="py-1">
                         <Link
                             href="/crafts/create"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/crafts/create') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            <FolderUp className="h-4 w-4 text-muted-foreground" />
-                            {t('addcraft')}
+                            <FolderUp className="h-4 w-4" />
+                            <span className={isActive('/crafts/create') ? activeUnderline : ''}>{t('addcraft')}</span>
+                        </Link>
+                        <Link
+                            href="/onboarding/story"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/onboarding/story') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            <BookOpen className="h-4 w-4" />
+                            <span className={isActive('/onboarding/story') ? activeUnderline : ''}>{t('mystory')}</span>
                         </Link>
                     </div>
 
@@ -187,18 +205,18 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         <Link
                             href="/groups/mygroups"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/groups/mygroups') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            {t('mygroups')}
+                            <Users className="h-4 w-4" />
+                            <span className={isActive('/groups/mygroups') ? activeUnderline : ''}>{t('mygroups')}</span>
                         </Link>
                         <Link
                             href="/groups/create"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/groups/create') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            <UserPlus className="h-4 w-4 text-muted-foreground" />
-                            {t('createGroup')}
+                            <UserPlus className="h-4 w-4" />
+                            <span className={isActive('/groups/create') ? activeUnderline : ''}>{t('createGroup')}</span>
                         </Link>
                     </div>
 

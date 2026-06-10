@@ -7,6 +7,8 @@ import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { Card, CardContent } from '@/components/ui/card'
+import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
+import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -156,6 +158,40 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         url: `/api/media/${a.mediaId}`,
     }))
 
+    const publishedStory = await prisma.craftStory.findUnique({
+        where: { artisanId: artisan.id },
+    })
+    const story = publishedStory && publishedStory.status === 'PUBLISHED' ? publishedStory : null
+
+    let workshopMedia: WorkshopMediaItem[] = []
+    let answerMediaMimeTypes: Record<string, string> = {}
+    if (story) {
+        const workshopAttachments = await prisma.mediaAttachment.findMany({
+            where: {
+                entityType: 'CraftStory',
+                entityId: story.id,
+                attachmentType: 'PROCESS',
+            },
+            include: { media: { select: { mimeType: true } } },
+            orderBy: { displayOrder: 'asc' },
+        })
+        workshopMedia = workshopAttachments.map(a => ({
+            mediaId: a.mediaId,
+            isVideo: (a.media.mimeType ?? '').startsWith('video/'),
+        }))
+
+        const answerMediaIds = ANSWER_MEDIA_FIELDS
+            .map(k => story[k])
+            .filter((v): v is string => Boolean(v))
+        if (answerMediaIds.length > 0) {
+            const files = await prisma.mediaFile.findMany({
+                where: { id: { in: answerMediaIds } },
+                select: { id: true, mimeType: true },
+            })
+            answerMediaMimeTypes = Object.fromEntries(files.map(f => [f.id, f.mimeType]))
+        }
+    }
+
     const locationText = artisan.region && artisan.country
         ? `${artisan.region}, ${artisan.country}`
         : null
@@ -248,6 +284,15 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         </div>
                     </div>
                 </section>
+            )}
+
+            {/* ── Craft Story Section ── */}
+            {story && (
+                <CraftStoryDisplay
+                    story={story}
+                    workshop={workshopMedia}
+                    answerMediaMimeTypes={answerMediaMimeTypes}
+                />
             )}
 
             {/* ── Connect Section ── */}

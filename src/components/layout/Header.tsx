@@ -67,8 +67,13 @@ export function Header() {
         { href: '/groups', label: t('navbar.groups') },
     ]
 
+    // Sub-routes that have their own nav entry (My Crafts, Add Craft). The public
+    // "Crafts" link should not light up on these, so nothing is highlighted there.
+    const standaloneSubroutes = ['/crafts/mycrafts', '/crafts/create']
+
     function isActive(href: string) {
         if (href === '/') return pathname === '/' || pathname === ''
+        if (standaloneSubroutes.some(route => pathname.startsWith(route))) return false
         return pathname.startsWith(href)
     }
 

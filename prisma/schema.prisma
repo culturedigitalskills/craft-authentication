@@ -42,22 +42,28 @@ enum OrganizationType {
     OTHER
 }
 
+enum CraftStoryStatus {
+    DRAFT
+    PUBLISHED
+}
+
 // Auth Models
 
 model User {
-    id            String    @id @default(uuid())
+    id            String      @id @default(uuid())
     name          String?
-    email         String    @unique
+    email         String      @unique
     emailVerified DateTime?
     password      String?
     image         String?
-    role          Role      @default(ARTISAN)
-    isActive      Boolean   @default(true)
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+    role          Role        @default(ARTISAN)
+    isActive      Boolean     @default(true)
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
     accounts      Account[]
     sessions      Session[]
     artisan       Artisan?
+    mediaFiles    MediaFile[]
 }
 
 model Account {
@@ -105,11 +111,14 @@ model MediaFile {
     size             Int
     bucket           String
     objectKey        String
+    uploaderId       String?
     createdAt        DateTime          @default(now())
     updatedAt        DateTime          @default(now())
     mediaAttachments MediaAttachment[]
+    uploader         User?             @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
 
     @@index([createdAt], name: "idx_media_files_created_at")
+    @@index([uploaderId], name: "idx_media_files_uploader_id")
 }
 
 model DataRecord {
@@ -168,6 +177,30 @@ model Artisan {
     deletedAt         DateTime?
     user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
     memberships       ArtisanGroupMembership[]
+    craftStory        CraftStory?
+}
+
+model CraftStory {
+    id                      String           @id @default(uuid())
+    artisanId               String           @unique
+    status                  CraftStoryStatus @default(DRAFT)
+    lastStepReached         Int              @default(0)
+    answerSelfText          String?
+    answerSelfMediaId       String?
+    answerCraftText         String?
+    answerCraftMediaId      String?
+    answerMeaningText       String?
+    answerMeaningMediaId    String?
+    answerBenefitsText      String?
+    answerBenefitsMediaId   String?
+    answerFutureText        String?
+    answerFutureMediaId     String?
+    answerChallengesText    String?
+    answerChallengesMediaId String?
+    publishedAt             DateTime?
+    createdAt               DateTime         @default(now())
+    updatedAt               DateTime         @updatedAt
+    artisan                 Artisan          @relation(fields: [artisanId], references: [id], onDelete: Cascade)
 }
 
 model ArtisanGroupMembership {

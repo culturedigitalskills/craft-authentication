@@ -9,7 +9,7 @@ import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
 
 export async function POST(request: NextRequest) {
-    const { unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireAuth()
     if (unauthorized) return unauthorized
 
     try {
@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
                     size: file.size,
                     bucket: BUCKET_NAME,
                     objectKey,
+                    uploaderId: session!.user.id,
                 },
             })
 
