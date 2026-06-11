@@ -4,7 +4,6 @@ import { updateDataRecordSchema } from '@/lib/validations/data'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
-import { DOMAIN } from '@/lib/did/config'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -61,11 +60,7 @@ export async function DELETE(
 
     try {
         const { id } = await params
-        const record = await prisma.dataRecord.delete({ where: { id } })
-
-        // Clean up associated VC
-        const credentialId = `${DOMAIN}/credentials/crafts/${id}`
-        await prisma.verifiableCredential.deleteMany({ where: { credentialId } }).catch(() => {})
+        await prisma.dataRecord.delete({ where: { id } })
 
         return NextResponse.json({ message: 'Data record deleted successfully' })
     } catch (error: unknown) {

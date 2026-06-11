@@ -1,3 +1,36 @@
+# v0.13.0 -> v0.14.0
+
+### Craft Model (DataRecord → Craft)
+
+- Added `Craft` table: `artisanId` FK, `title`, `description`, `material`, `isPublic`, `isSharedLocation`,
+  `latitude`, `longitude`, `place`, `videos` (String array), timestamps, and a nullable `deletedAt` for
+  soft-deletes.
+- Added a `crafts` relation to the `Artisan` model.
+
+
+**Migration Steps**:
+
+To transfer already created crafts in prod
+
+1. Apply the schema migration. Locally run `pnpm db:migrate`; on staging/production the app container runs
+   `prisma migrate deploy` automatically on startup.
+
+2. Backfill existing crafts from `DataRecord` into `Craft` + `MediaAttachment`:
+
+    ```bash
+    pnpm db:backfill-crafts          # local (.env.local)
+    pnpm prod:db:backfill-crafts     # staging/production (.env.production)
+    ```
+
+    The script is idempotent and non-destructive: it preserves craft IDs (so existing QR codes and issued
+    VCs keep working), re-issues each VC with the artisan slug, and leaves `DataRecord` rows intact. Review
+    the summary for any **orphan** rows (a `DataRecord` craft whose `artisan` email has no matching
+    `Artisan`) — these are skipped and need manual attention.
+
+3. Verify on staging: public `/crafts`, `/crafts/mycrafts`, and a craft detail page with its credential.
+
+4. Only after verifying, optionally delete the now-unused craft `DataRecord` rows manually.
+
 # v0.12.0 -> v0.13.0
 
 **Migration Steps**:

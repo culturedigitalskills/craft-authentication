@@ -25,7 +25,20 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 - `POST /api/auth/signin` - Sign in (managed by NextAuth)
 - `GET/POST /api/auth/[...nextauth]` - NextAuth routes (signin, callback, signout, etc.)
 
+### Crafts
+
+- `GET /api/crafts` - List public crafts (with pagination and `search`)
+- `GET /api/crafts/:id` - Get a craft (private crafts: owner/admin only)
+- `POST /api/crafts` - Create a craft (authenticated; owner = caller's artisan profile)
+- `PUT /api/crafts/:id` - Update a craft (owner/admin only)
+- `DELETE /api/crafts/:id` - Delete a craft and its credential (owner/admin only)
+
+Craft images are linked via the Media Management endpoints (`entityType: 'Craft'`). On create/update,
+send the ordered `mediaIds` and the server reconciles the attachments.
+
 ### Example Data Management
+
+Generic starter CRUD over the `DataRecord` table (not used by the craft feature).
 
 - `GET /api/data` - List all data records (with pagination)
 - `GET /api/data/:id` - Get specific data record

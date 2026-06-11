@@ -2,27 +2,24 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Container } from '@/components/layout/Container';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl'
 import Link from 'next/link';
 import { ArrowLeft, User, Calendar, QrCode, Eye, EyeOff, MapPin } from 'lucide-react';
-import { formatDateTime } from '@/components/shared/formatDateTime';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { QRCode } from '@/components/shared/qrcode';
-import { cookies } from 'next/headers'
 import Gallery from '@/components/craft/Gallery'
 import { QRCopyButton } from '@/components/craft/QRCopyButton'
 import { verifyCraftVC, type CraftCredential } from '@/lib/did/vc'
-// CraftCredential used for proof type cast below
-import { DOMAIN } from '@/lib/did/config'
+import { craftCredentialId, getCraftMediaIds } from '@/lib/craft'
 import { VerifiableCredentialCard } from '@/components/verifiableCredentialCard/page'
+import { notFound } from 'next/navigation'
 
 interface PageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ from?: string }>
 }
 
-const formatDate = (timestamp: string) => 
+const formatDate = (timestamp: string | Date) =>
   new Date(timestamp).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
@@ -30,116 +27,55 @@ const formatDate = (timestamp: string) =>
     hour: '2-digit',
     minute: '2-digit'
   })
-const getCity = async (lat: number, lng: number): Promise<string> => {
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-  )
-  const data = await res.json()
-  
-  const city = data.address?.city 
-    ?? data.address?.town 
-    ?? data.address?.village 
-    ?? data.address?.county
-    ?? 'Unknown location'
-
-  return city
-}
 
 export default async function OneCraftPage({ params, searchParams }: PageProps) {
     const session = await auth()
     const { id } = await params
     const { from } = await searchParams
     const backHref = from === 'mycrafts' ? '/crafts/mycrafts' : '/crafts'
-    const cookieStore = await cookies()
-    const cookieHeader = cookieStore.toString()    
+    const currentPageUrl = `${process.env.AUTH_URL}/crafts/${id}`
 
-    const currentPageUrl = `${process.env.AUTH_URL}/crafts/${id}`;
-    try {
-            const urldata = `${process.env.AUTH_URL}/api/data/${id}`
-            const method = 'GET'
+    const craft = await prisma.craft.findFirst({
+        where: { id, deletedAt: null },
+        include: {
+            artisan: { select: { userId: true, firstName: true, lastName: true, slug: true } },
+        },
+    })
+    if (!craft) notFound()
 
-            const res = await fetch(urldata, {
-                method,
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Cookie': cookieHeader,
-                },
-            })
-            // console.log('I did it',res)
-            if (!res.ok) 
-                throw new Error('Request failed')            
+    const isOwner = session?.user?.id === craft.artisan.userId
+    const isAdmin = session?.user?.role === 'ADMIN'
 
+    // Private crafts are only visible to their owner or a site admin.
+    if (!craft.isPublic && !isOwner && !isAdmin) notFound()
 
-            
-            const data = await res.json()
-            // Look up artisan name and slug from email
-            const artisanEmail = data?.data['artisan'] as string | undefined
-            let artisanName: string | null = null
-            let artisanSlug: string | null = null
-            if (artisanEmail) {
-                const artisan = await prisma.artisan.findFirst({
-                    where: { user: { email: artisanEmail } },
-                    select: { firstName: true, lastName: true, slug: true },
-                })
-                if (artisan) {
-                    artisanName = `${artisan.firstName} ${artisan.lastName}`
-                    artisanSlug = artisan.slug
-                }
-            }
+    const mediaIds = await getCraftMediaIds(id)
 
-            // 2. extract media ids
-            const mediaIds: string[] = (data?.data['mediaIds'] as string[] ?? []).filter(Boolean)
+    // Fetch and verify the craft's Verifiable Credential.
+    const vcRecord = await prisma.verifiableCredential.findUnique({
+        where: { credentialId: craftCredentialId(id) },
+    })
+    let vcVerified: boolean | null = null
+    if (vcRecord) {
+        const proof = vcRecord.proof as CraftCredential['proof']
+        const result = await verifyCraftVC(
+            vcRecord.credentialSubject as object,
+            proof,
+            vcRecord.issuerDid,
+            proof.created,
+        )
+        vcVerified = result.verified
+    }
 
-            
-            let images = null
-
-            // 3. fetch images using the ids
-            if (mediaIds && mediaIds.length>0){
-                       
-
-              images = await Promise.all(mediaIds.map(async (mediaId) => {
-              const urlmedia =  `${process.env.AUTH_URL}/api/media/${mediaId}`          
-              
-              const imagesRes = await fetch(urlmedia, {
-                  method,
-                  credentials: 'include',
-                  headers: { 
-                      'Content-Type': 'application/json',
-                      'Cookie': cookieHeader
-                  },
-              })
-              if (!imagesRes.ok)
-                  throw new Error('Image request failed')
-              return imagesRes
-            }))       
-          }
-              
-            // 4. fetch and verify the craft's Verifiable Credential
-            const credentialId = `${DOMAIN}/credentials/crafts/${id}`
-            const vcRecord = await prisma.verifiableCredential.findUnique({
-                where: { credentialId },
-            })
-
-            let vcVerified: boolean | null = null
-            if (vcRecord) {
-                const proof = vcRecord.proof as CraftCredential['proof']
-                const result = await verifyCraftVC(
-                    vcRecord.credentialSubject as object,
-                    proof,
-                    vcRecord.issuerDid,
-                    proof.created,
-                )
-                vcVerified = result.verified
-            }
-
-            return <RenderOneCraftPage craft={data}
-            images={images}
+    return (
+        <RenderOneCraftPage
+            craft={craft}
+            mediaIds={mediaIds}
             currentPageUrl={currentPageUrl}
-            user={session?.user.email ?? null}
+            isOwner={isOwner || isAdmin}
             backHref={backHref}
-            artisanName={artisanName}
-            artisanSlug={artisanSlug}
+            artisanName={`${craft.artisan.firstName} ${craft.artisan.lastName}`}
+            artisanSlug={craft.artisan.slug}
             vcRecord={vcRecord ? {
                 credentialId: vcRecord.credentialId,
                 issuanceDate: vcRecord.issuanceDate,
@@ -147,19 +83,8 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
                 holderDid: vcRecord.holderDid,
             } : null}
             vcVerified={vcVerified}
-             />
-        } catch {
-          return (
-            <Container>
-              <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
-                <p className="text-muted-foreground">Could not load this craft. Please try again.</p>
-                <Button asChild variant="outline">
-                  <Link href="/crafts">Back to Crafts</Link>
-                </Button>
-              </div>
-            </Container>
-          )
-        }
+        />
+    )
 }
 
 interface VcData {
@@ -169,18 +94,16 @@ interface VcData {
     holderDid: string
 }
 
-function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, artisanName, artisanSlug, vcRecord, vcVerified}:
-  {craft: any, images: any, currentPageUrl: string, user: any, backHref: string, artisanName: string | null, artisanSlug: string | null, vcRecord: VcData | null, vcVerified: boolean | null}) {
+function RenderOneCraftPage({ craft, mediaIds, currentPageUrl, isOwner, backHref, artisanName, artisanSlug, vcRecord, vcVerified }:
+  { craft: any, mediaIds: string[], currentPageUrl: string, isOwner: boolean, backHref: string, artisanName: string | null, artisanSlug: string | null, vcRecord: VcData | null, vcVerified: boolean | null }) {
 
     const t = useTranslations();
     const craftEditUrl = `create?id=${craft.id}`;
-    const galleryImages = images?.map((image: any) => ({
-      url: image.url,
-      alt: image.name ?? craft?.data['name'],
-    })) ?? []
-    const galleryVideos: string[] = Array.isArray(craft?.data?.['videos'])
-      ? (craft.data['videos'] as string[]).filter(Boolean)
-      : []
+    const galleryImages = mediaIds.map((mediaId: string) => ({
+      url: `/api/media/${mediaId}`,
+      alt: craft.title,
+    }))
+    const galleryVideos: string[] = Array.isArray(craft.videos) ? craft.videos.filter(Boolean) : []
 
     return (
     <Container>
@@ -191,7 +114,7 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
             <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           </Link>
         </Button>
-        {user === craft?.data['artisan'] && (
+        {isOwner && (
           <Button asChild>
             <Link href={craftEditUrl}>{t('createCraft.editCraftTitle')}</Link>
           </Button>
@@ -201,16 +124,16 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
       {/* Full-width title header */}
       <div className="mb-8">
         <span className={`mb-3 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium
-          ${craft?.data['isPublic']
+          ${craft.isPublic
             ? 'bg-warm/10 text-warm'
             : 'bg-muted text-muted-foreground'
           }`}>
-          {craft?.data['isPublic']
+          {craft.isPublic
             ? <><Eye className="h-3 w-3" /> {t('crafts.details.visible')}</>
             : <><EyeOff className="h-3 w-3" /> {t('crafts.details.notvisible')}</>
           }
         </span>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{craft?.name}</h1>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{craft.title}</h1>
       </div>
 
       {/* Two-column content */}
@@ -236,13 +159,13 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
                   {artisanName}
                 </Link>
               ) : (
-                <p className="font-semibold">{artisanName ?? craft?.data['artisan']}</p>
+                <p className="font-semibold">{artisanName}</p>
               )}
             </div>
           </div>
 
           {/* Description */}
-          {craft?.description && (
+          {craft.description && (
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {t('crafts.details.description')}
@@ -252,12 +175,12 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
           )}
 
           {/* Materials */}
-          {craft?.data['material'] && (
+          {craft.material && (
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {t('crafts.details.materials')}
               </p>
-              <p className="text-base text-foreground/80">{craft?.data['material']}</p>
+              <p className="text-base text-foreground/80">{craft.material}</p>
             </div>
           )}
 
@@ -265,7 +188,7 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
 
           {/* Metadata */}
           <dl className="space-y-5">
-            {craft?.data['place'] && (
+            {craft.place && (
               <div>
                 <dt className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                   <MapPin className="h-3.5 w-3.5" />
@@ -273,12 +196,12 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
                 </dt>
                 <dd className="text-sm">
                   <a
-                    href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(craft?.data['place'])}`}
+                    href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(craft.place)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-warm hover:underline"
                   >
-                    {craft?.data['place']}
+                    {craft.place}
                   </a>
                 </dd>
               </div>
@@ -288,14 +211,14 @@ function RenderOneCraftPage({craft, images, currentPageUrl, user, backHref, arti
                 <Calendar className="h-3.5 w-3.5" />
                 {t('crafts.details.createdOn')}
               </dt>
-              <dd className="text-sm text-foreground/70">{formatDate(craft?.data['createdOn'])}</dd>
+              <dd className="text-sm text-foreground/70">{formatDate(craft.createdAt)}</dd>
             </div>
             <div>
               <dt className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 <Calendar className="h-3.5 w-3.5" />
                 {t('crafts.details.updatedOn')}
               </dt>
-              <dd className="text-sm text-foreground/70">{formatDate(craft?.data['updatedOn'])}</dd>
+              <dd className="text-sm text-foreground/70">{formatDate(craft.updatedAt)}</dd>
             </div>
           </dl>
 

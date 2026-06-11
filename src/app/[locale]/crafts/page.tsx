@@ -7,6 +7,7 @@ import { Calendar, User } from 'lucide-react'
 import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
 import { prisma } from '@/lib/prisma'
+import { getCraftPrimaryImageMap } from '@/lib/craft'
 import { SearchInput } from '@/components/shared/SearchInput'
 
 const LIMIT = 21
@@ -20,8 +21,9 @@ export default async function CraftsPage(
     const skip = (page - 1) * LIMIT
 
     const whereClause = {
-        data: { path: ['isPublic'], equals: true },
-        ...(q ? { name: { contains: q, mode: 'insensitive' as const } } : {}),
+        isPublic: true,
+        deletedAt: null,
+        ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : {}),
     }
 
     let craftsWithNames: any[] = []
@@ -29,46 +31,33 @@ export default async function CraftsPage(
 
     try {
         const [craftRecords, totalCount] = await Promise.all([
-            prisma.dataRecord.findMany({
+            prisma.craft.findMany({
                 where: whereClause,
-                select: { id: true, name: true, data: true },
+                select: {
+                    id: true,
+                    title: true,
+                    material: true,
+                    createdAt: true,
+                    artisan: { select: { firstName: true, lastName: true, slug: true } },
+                },
                 orderBy: { createdAt: 'desc' },
                 skip,
                 take: LIMIT,
             }),
-            prisma.dataRecord.count({ where: whereClause }),
+            prisma.craft.count({ where: whereClause }),
         ])
 
-        const crafts = craftRecords.map(record => {
-            const d = record.data as Record<string, any>
-            const mediaIds: string[] = (d['mediaIds'] as string[] ?? []).filter(Boolean)
-            return {
-                id: record.id,
-                title: record.name,
-                artisanEmail: d['artisan'] as string | null,
-                createdOn: d['createdOn'] as string,
-                material: (d['material'] as string | null) ?? null,
-                imageUrl: mediaIds.length > 0 ? `/api/media/${mediaIds[0]}` : null,
-            }
-        })
+        const imageMap = await getCraftPrimaryImageMap(craftRecords.map(c => c.id))
 
-        const emails = [...new Set(crafts.map(c => c.artisanEmail).filter(Boolean))] as string[]
-        const artisanProfiles = emails.length > 0
-            ? await prisma.artisan.findMany({
-                where: { user: { email: { in: emails } } },
-                select: { firstName: true, lastName: true, slug: true, user: { select: { email: true } } },
-            })
-            : []
-        const artisanByEmail = new Map(artisanProfiles.map(a => [a.user.email, a]))
-
-        craftsWithNames = crafts.map(c => {
-            const a = c.artisanEmail ? artisanByEmail.get(c.artisanEmail) : null
-            return {
-                ...c,
-                artisanName: a ? `${a.firstName} ${a.lastName}` : null,
-                artisanSlug: a?.slug ?? null,
-            }
-        })
+        craftsWithNames = craftRecords.map(record => ({
+            id: record.id,
+            title: record.title,
+            material: record.material,
+            createdOn: record.createdAt,
+            imageUrl: imageMap.has(record.id) ? `/api/media/${imageMap.get(record.id)}` : null,
+            artisanName: `${record.artisan.firstName} ${record.artisan.lastName}`,
+            artisanSlug: record.artisan.slug,
+        }))
 
         const totalPages = Math.max(1, Math.ceil(totalCount / LIMIT))
         pagination = { currentPage: page, totalPages, totalCount, hasNext: page < totalPages, hasPrev: page > 1 }
@@ -88,7 +77,6 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
     q: string
 }) {
     const t = useTranslations()
-    console.log('Rendering CraftsPage with crafts:', crafts)
     return (
         <Container>
             <div className="mb-8 text-center">

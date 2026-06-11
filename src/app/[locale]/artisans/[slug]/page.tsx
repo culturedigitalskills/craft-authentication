@@ -10,6 +10,7 @@ import type { Metadata } from 'next'
 import { Card, CardContent } from '@/components/ui/card'
 import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
+import { getCraftPrimaryImageMap } from '@/lib/craft'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -100,30 +101,19 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     if (!artisan) notFound()
 
     // Fetch the artisan's public crafts
-    const artisanEmail = artisan.user.email
-    const craftRecords = await prisma.dataRecord.findMany({
-        where: {
-            AND: [
-                { data: { path: ['artisan'], equals: artisanEmail } },
-                { data: { path: ['isPublic'], equals: true } },
-            ],
-        },
-        select: { id: true, name: true, data: true },
+    const craftRecords = await prisma.craft.findMany({
+        where: { artisanId: artisan.id, isPublic: true, deletedAt: null },
+        select: { id: true, title: true },
         orderBy: { createdAt: 'desc' },
         take: 6,
     })
 
-    // Fetch first media for each craft
-    const crafts = await Promise.all(
-        craftRecords.map(async (record) => {
-            const mediaIds =
-                (
-                    (record.data as Record<string, unknown>)['mediaIds'] as string[] | undefined
-                )?.filter(Boolean) ?? []
-            const imageUrl = mediaIds.length > 0 ? `/api/media/${mediaIds[0]}` : null
-            return { id: record.id, name: record.name, imageUrl }
-        }),
-    )
+    const craftImageMap = await getCraftPrimaryImageMap(craftRecords.map((c) => c.id))
+    const crafts = craftRecords.map((record) => ({
+        id: record.id,
+        name: record.title,
+        imageUrl: craftImageMap.has(record.id) ? `/api/media/${craftImageMap.get(record.id)}` : null,
+    }))
 
     const photoAttachment = await prisma.mediaAttachment.findFirst({
         where: {
