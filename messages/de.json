@@ -18,6 +18,8 @@
         "mygroups": "Meine Gemeinschaften",
         "addcraft": "Handwerk hinzufügen",
         "mystory": "Meine Geschichte",
+        "completeProfile": "Profil vervollständigen",
+        "mediaGallery": "Mediengalerie",
         "createGroup": "Gemeinschaft erstellen",
         "contentCredentials": "Inhaltsnachweise",
         "generationWorkspace": "Bildgenerierung",
@@ -498,5 +500,22 @@
         "wool": "Wolle",
         "cotton": "Baumwolle",
         "mix": "Mischung"
+    },
+    "mediaGallery": {
+        "title": "Mediengalerie",
+        "description": "Verwalte die Bilder, Videos und Audiodateien, die in deinem öffentlichen Profil angezeigt werden.",
+        "addMedia": "Medien hinzufügen",
+        "uploadHint": "Bilder, Video oder Audio",
+        "audio": "Audio",
+        "private": "Privat",
+        "makePublic": "Öffentlich machen",
+        "makePrivate": "Privat machen",
+        "remove": "Entfernen",
+        "deleteConfirm": "Dieses Element entfernen?",
+        "deleteYes": "Entfernen",
+        "deleteNo": "Abbrechen",
+        "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
+        "deleteFailed": "Dieses Element konnte nicht entfernt werden. Bitte versuche es erneut.",
+        "visibilityFailed": "Sichtbarkeit konnte nicht aktualisiert werden. Bitte versuche es erneut."
     }
 }

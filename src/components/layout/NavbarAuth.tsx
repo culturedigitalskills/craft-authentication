@@ -4,20 +4,22 @@ import { useSession, signOut } from '@/lib/auth-client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image, Images, Sparkles } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
 interface NavbarAuthProps {
     onAction?: () => void
     variant?: 'desktop' | 'mobile'
+    /** True when the signed-in user has not yet created an artisan profile. */
+    needsOnboarding?: boolean
 }
 
 // Static warm underline shown under the label of the *selected* dropdown item,
 // mirroring the active-link indicator in the main navbar.
 const activeUnderline =
     'relative after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-warm'
-export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
+export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = false }: NavbarAuthProps) {
     const { data: session, status } = useSession()
     const t = useTranslations('navbar')
     const pathname = usePathname()
@@ -60,6 +62,16 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                             )}
                         </div>
                     </div>
+                    {needsOnboarding && (
+                        <Link
+                            href="/onboarding"
+                            onClick={onAction}
+                            className="flex items-center gap-2 rounded-md bg-warm/10 px-2 py-2 text-sm font-medium text-warm transition-colors hover:bg-warm/15"
+                        >
+                            <Sparkles className="h-4 w-4" />
+                            {t('completeProfile')}
+                        </Link>
+                    )}
                     <Link
                         href="/profile"
                         onClick={onAction}
@@ -91,6 +103,14 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                     >
                         <BookOpen className="h-4 w-4" />
                         {t('mystory')}
+                    </Link>
+                    <Link
+                        href="/media-gallery"
+                        onClick={onAction}
+                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                        <Images className="h-4 w-4" />
+                        {t('mediaGallery')}
                     </Link>
                     <Link
                         href="/content-credentials"
@@ -180,6 +200,20 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         )}
                     </div>
 
+                    {/* Onboarding prompt — only until the user has an artisan profile */}
+                    {needsOnboarding && (
+                        <div className="border-b border-border py-1">
+                            <Link
+                                href="/onboarding"
+                                onClick={() => { setDropdownOpen(false); onAction?.() }}
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-warm transition-colors hover:bg-warm/5"
+                            >
+                                <Sparkles className="h-4 w-4" />
+                                {t('completeProfile')}
+                            </Link>
+                        </div>
+                    )}
+
                     {/* Account links */}
                     <div className="py-1">
                         <Link
@@ -213,6 +247,14 @@ export function NavbarAuth({ onAction, variant = 'desktop' }: NavbarAuthProps) {
                         >
                             <BookOpen className="h-4 w-4" />
                             <span className={isActive('/onboarding/story') ? activeUnderline : ''}>{t('mystory')}</span>
+                        </Link>
+                        <Link
+                            href="/media-gallery"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/media-gallery') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            <Images className="h-4 w-4" />
+                            <span className={isActive('/media-gallery') ? activeUnderline : ''}>{t('mediaGallery')}</span>
                         </Link>
                         <Link
                             href="/content-credentials"

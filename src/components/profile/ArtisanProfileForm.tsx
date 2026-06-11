@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
-import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
 import { CraftStoryBanner, type CraftStoryBannerProps } from './CraftStoryBanner'
 import {
@@ -51,12 +50,6 @@ interface Artisan {
     hashtags: string[]
 }
 
-interface GalleryImage {
-    id: string
-    mediaId: string
-    url: string
-}
-
 interface MyGroup {
     membershipId: string
     role: string
@@ -67,7 +60,6 @@ interface ArtisanProfileFormProps {
     artisan: Artisan | null
     photoUrl: string | null
     coverUrl: string | null
-    galleryImages: GalleryImage[]
     myGroups?: MyGroup[]
     storyBanner?: CraftStoryBannerProps
 }
@@ -76,7 +68,6 @@ export function ArtisanProfileForm({
     artisan,
     photoUrl,
     coverUrl,
-    galleryImages,
     myGroups = [],
     storyBanner,
 }: ArtisanProfileFormProps) {
@@ -468,15 +459,6 @@ export function ArtisanProfileForm({
                     </section>
                 )}
 
-                {/* ── Gallery Section ── */}
-                <section className="py-10">
-                    <div className="mx-auto max-w-3xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
-                            {t('gallery')}
-                        </h2>
-                        <GalleryUpload artisanId={artisan.id} initialImages={galleryImages} />
-                    </div>
-                </section>
             </div>
         )
     }
@@ -752,17 +734,6 @@ export function ArtisanProfileForm({
                             </div>
                         </div>
                     </div>
-
-                    {/* Gallery section (edit mode only) */}
-                    {!isCreateMode && (
-                        <div className="rounded-lg border border-border bg-card p-6">
-                            <h2 className="mb-4 text-lg font-semibold">{t('gallery')}</h2>
-                            <GalleryUpload
-                                artisanId={artisan?.id ?? null}
-                                initialImages={galleryImages}
-                            />
-                        </div>
-                    )}
 
                     {/* Action buttons */}
                     <div className="flex justify-end gap-3">

@@ -1,17 +1,17 @@
 -- DropForeignKey
-ALTER TABLE "CraftStory" DROP CONSTRAINT "CraftStory_answerBenefitsMediaId_fkey";
+ALTER TABLE "CraftStory" DROP CONSTRAINT IF EXISTS "CraftStory_answerBenefitsMediaId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "CraftStory" DROP CONSTRAINT "CraftStory_answerChallengesMediaId_fkey";
+ALTER TABLE "CraftStory" DROP CONSTRAINT IF EXISTS "CraftStory_answerChallengesMediaId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "CraftStory" DROP CONSTRAINT "CraftStory_answerCraftMediaId_fkey";
+ALTER TABLE "CraftStory" DROP CONSTRAINT IF EXISTS "CraftStory_answerCraftMediaId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "CraftStory" DROP CONSTRAINT "CraftStory_answerFutureMediaId_fkey";
+ALTER TABLE "CraftStory" DROP CONSTRAINT IF EXISTS "CraftStory_answerFutureMediaId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "CraftStory" DROP CONSTRAINT "CraftStory_answerMeaningMediaId_fkey";
+ALTER TABLE "CraftStory" DROP CONSTRAINT IF EXISTS "CraftStory_answerMeaningMediaId_fkey";
 
 -- DropForeignKey
-ALTER TABLE "CraftStory" DROP CONSTRAINT "CraftStory_answerSelfMediaId_fkey";
+ALTER TABLE "CraftStory" DROP CONSTRAINT IF EXISTS "CraftStory_answerSelfMediaId_fkey";

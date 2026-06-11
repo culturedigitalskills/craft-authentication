@@ -20,6 +20,8 @@
     "mygroups": "Topluluklarım",
     "createGroup": "Topluluk Oluştur",
     "mystory": "Hikâyem",
+    "completeProfile": "Profilini tamamla",
+    "mediaGallery": "Medya Galerisi",
     "contentCredentials": "İçerik Bilgileri",
     "generationWorkspace": "Resim Oluşturma"
   },
@@ -498,5 +500,22 @@
     "delete": "Sil",
     "deleteConfirm": "Oluşturulan resim galeriden silinsin mi?",
     "taskQueue": "Oluşturma Geçmişi"
+  },
+  "mediaGallery": {
+    "title": "Medya Galerisi",
+    "description": "Herkese açık profilinde gösterilen görselleri, videoları ve sesleri yönet.",
+    "addMedia": "Medya ekle",
+    "uploadHint": "Görsel, video veya ses",
+    "audio": "Ses",
+    "private": "Gizli",
+    "makePublic": "Herkese açık yap",
+    "makePrivate": "Gizli yap",
+    "remove": "Kaldır",
+    "deleteConfirm": "Bu öğe kaldırılsın mı?",
+    "deleteYes": "Kaldır",
+    "deleteNo": "İptal",
+    "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
+    "deleteFailed": "Bu öğe kaldırılamadı. Lütfen tekrar dene.",
+    "visibilityFailed": "Görünürlük güncellenemedi. Lütfen tekrar dene."
   }
 }

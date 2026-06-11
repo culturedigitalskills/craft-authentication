@@ -20,6 +20,8 @@
     "mygroups": "Mis Comunidades",
     "createGroup": "Crear Comunidad",
     "mystory": "Mi Historia",
+    "completeProfile": "Completa tu perfil",
+    "mediaGallery": "Galería multimedia",
     "contentCredentials": "Credenciales de Contenido",
     "generationWorkspace": "Generación de Imágenes"
   },
@@ -498,5 +500,22 @@
     "delete": "Eliminar",
     "deleteConfirm": "¿Eliminar la imagen generada de la galería?",
     "taskQueue": "Historial de generación"
+  },
+  "mediaGallery": {
+    "title": "Galería multimedia",
+    "description": "Gestiona las imágenes, los vídeos y el audio que se muestran en tu perfil público.",
+    "addMedia": "Añadir contenido",
+    "uploadHint": "Imágenes, vídeo o audio",
+    "audio": "Audio",
+    "private": "Privado",
+    "makePublic": "Hacer público",
+    "makePrivate": "Hacer privado",
+    "remove": "Quitar",
+    "deleteConfirm": "¿Quitar este elemento?",
+    "deleteYes": "Quitar",
+    "deleteNo": "Cancelar",
+    "uploadFailed": "Error al subir. Inténtalo de nuevo.",
+    "deleteFailed": "No se pudo quitar ese elemento. Inténtalo de nuevo.",
+    "visibilityFailed": "No se pudo actualizar la visibilidad. Inténtalo de nuevo."
   }
 }

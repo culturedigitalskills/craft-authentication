@@ -20,6 +20,8 @@
     "mygroups": "My Communities",
     "createGroup": "Create Community",
     "mystory": "My Story",
+    "completeProfile": "Complete your profile",
+    "mediaGallery": "Media Gallery",
     "contentCredentials": "Content Credentials",
     "generationWorkspace": "Image Generation"
   },
@@ -498,5 +500,22 @@
     "delete": "Delete",
     "deleteConfirm": "Delete generated image from gallery?",
     "taskQueue": "Generation History"
+  },
+  "mediaGallery": {
+    "title": "Media Gallery",
+    "description": "Manage the images, video, and audio shown on your public profile.",
+    "addMedia": "Add media",
+    "uploadHint": "Images, video or audio",
+    "audio": "Audio",
+    "private": "Private",
+    "makePublic": "Make public",
+    "makePrivate": "Make private",
+    "remove": "Remove",
+    "deleteConfirm": "Remove this item?",
+    "deleteYes": "Remove",
+    "deleteNo": "Cancel",
+    "uploadFailed": "Upload failed. Please try again.",
+    "deleteFailed": "Could not remove that item. Please try again.",
+    "visibilityFailed": "Could not update visibility. Please try again."
   }
 }

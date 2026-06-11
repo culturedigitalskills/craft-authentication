@@ -20,6 +20,8 @@
     "mygroups": "مجتمعاتي",
     "createGroup": "إنشاء مجتمع",
     "mystory": "قصتي",
+    "completeProfile": "أكمل ملفك الشخصي",
+    "mediaGallery": "معرض الوسائط",
     "contentCredentials": "أوراق اعتماد المحتوى",
     "generationWorkspace": "توليد الصور"
   },
@@ -498,5 +500,22 @@
     "delete": "حذف",
     "deleteConfirm": "هل تريد حذف الصورة المولدة من المعرض؟",
     "taskQueue": "سجل التوليد"
+  },
+  "mediaGallery": {
+    "title": "معرض الوسائط",
+    "description": "أدر الصور والفيديو والصوت المعروضة في ملفك العام.",
+    "addMedia": "إضافة وسائط",
+    "uploadHint": "صور أو فيديو أو صوت",
+    "audio": "صوت",
+    "private": "خاص",
+    "makePublic": "اجعله عامًا",
+    "makePrivate": "اجعله خاصًا",
+    "remove": "إزالة",
+    "deleteConfirm": "إزالة هذا العنصر؟",
+    "deleteYes": "إزالة",
+    "deleteNo": "إلغاء",
+    "uploadFailed": "فشل الرفع. يرجى المحاولة مرة أخرى.",
+    "deleteFailed": "تعذّرت إزالة هذا العنصر. يرجى المحاولة مرة أخرى.",
+    "visibilityFailed": "تعذّر تحديث الظهور. يرجى المحاولة مرة أخرى."
   }
 }

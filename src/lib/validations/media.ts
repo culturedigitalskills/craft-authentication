@@ -55,6 +55,7 @@ export const CreateMediaAttachmentSchema = z.object({
     entityId: z.uuid(),
     attachmentType: z.enum(['HERO', 'COVER', 'GALLERY', 'PROCESS']),
     isPrimary: z.boolean().default(false),
+    isPublic: z.boolean().default(true),
     displayOrder: z.number().int().min(0).default(0),
 })
 

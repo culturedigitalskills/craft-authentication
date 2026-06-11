@@ -154,8 +154,9 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             entityType: 'Artisan',
             entityId: artisan.id,
             attachmentType: 'GALLERY',
+            isPublic: true,
         },
-        select: { id: true, mediaId: true },
+        select: { id: true, mediaId: true, media: { select: { mimeType: true } } },
         orderBy: { displayOrder: 'asc' },
     })
 
@@ -163,6 +164,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         id: a.id,
         mediaId: a.mediaId,
         url: `/api/media/${a.mediaId}`,
+        mimeType: a.media.mimeType,
     }))
 
     const publishedStory = await prisma.craftStory.findUnique({

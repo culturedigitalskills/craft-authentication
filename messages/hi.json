@@ -20,6 +20,8 @@
     "mygroups": "मेरे समुदाय",
     "createGroup": "समुदाय बनाएं",
     "mystory": "मेरी कहानी",
+    "completeProfile": "अपनी प्रोफ़ाइल पूरी करें",
+    "mediaGallery": "मीडिया गैलरी",
     "contentCredentials": "सामग्री क्रेडेंशियल",
     "generationWorkspace": "छवि निर्माण"
   },
@@ -498,5 +500,22 @@
     "delete": "हटाएं",
     "deleteConfirm": "गैलरी से उत्पन्न छवि हटाएं?",
     "taskQueue": "पीढ़ी इतिहास"
+  },
+  "mediaGallery": {
+    "title": "मीडिया गैलरी",
+    "description": "अपनी सार्वजनिक प्रोफ़ाइल पर दिखाई गई छवियाँ, वीडियो और ऑडियो प्रबंधित करें।",
+    "addMedia": "मीडिया जोड़ें",
+    "uploadHint": "छवियाँ, वीडियो या ऑडियो",
+    "audio": "ऑडियो",
+    "private": "निजी",
+    "makePublic": "सार्वजनिक करें",
+    "makePrivate": "निजी करें",
+    "remove": "हटाएं",
+    "deleteConfirm": "इस आइटम को हटाएं?",
+    "deleteYes": "हटाएं",
+    "deleteNo": "रद्द करें",
+    "uploadFailed": "अपलोड विफल। कृपया पुनः प्रयास करें।",
+    "deleteFailed": "वह आइटम हटाया नहीं जा सका। कृपया पुनः प्रयास करें।",
+    "visibilityFailed": "दृश्यता अपडेट नहीं हो सकी। कृपया पुनः प्रयास करें।"
   }
 }

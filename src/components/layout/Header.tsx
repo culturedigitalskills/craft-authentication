@@ -9,7 +9,7 @@ import { NavbarAuth } from './NavbarAuth'
 import { LanguageSelect } from '@/components/shared/LanguageSelect'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 
-export function Header() {
+export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean }) {
     const t = useTranslations()
     const pathname = usePathname()
     const [menuOpen, setMenuOpen] = useState(false)
@@ -123,7 +123,7 @@ export function Header() {
                         <div className="mx-3 h-5 w-px bg-border" />
 
                         <div className="flex items-center gap-2">
-                            <NavbarAuth variant="desktop" />
+                            <NavbarAuth variant="desktop" needsOnboarding={needsOnboarding} />
                             <LanguageSelect isMobile={false} jsonlan={t('locale')} />
                             <ThemeToggle />
                         </div>
@@ -199,7 +199,7 @@ export function Header() {
 
                 {/* Drawer auth & language */}
                 <div className="mt-auto border-t border-border px-4 py-4">
-                    <NavbarAuth variant="mobile" onAction={() => setMenuOpen(false)} />
+                    <NavbarAuth variant="mobile" needsOnboarding={needsOnboarding} onAction={() => setMenuOpen(false)} />
                     <div className="mt-4 flex items-center gap-3">
                         <LanguageSelect isMobile={true} jsonlan={t('locale')} />
                         <ThemeToggle />

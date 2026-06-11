@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
                 entityId: validatedData.entityId,
                 attachmentType: validatedData.attachmentType,
                 isPrimary: validatedData.isPrimary,
+                isPublic: validatedData.isPublic,
                 displayOrder: validatedData.displayOrder,
             },
         })
