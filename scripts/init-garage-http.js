@@ -4,7 +4,7 @@
  * Garage initialization via Admin HTTP API (v2)
  *
  * Designed for Docker environments where `docker exec` is unavailable.
- * Uses Node 20's built-in fetch – no external dependencies required.
+ * Uses Node 24's built-in fetch – no external dependencies required.
  *
  * First run:  creates layout, access key, bucket, and permissions.
  *             Logs the generated S3_ACCESS_KEY and S3_SECRET_KEY for the

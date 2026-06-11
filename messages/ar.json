@@ -19,7 +19,9 @@
     "myitems": "حِرفي",
     "mygroups": "مجتمعاتي",
     "createGroup": "إنشاء مجتمع",
-    "mystory": "قصتي"
+    "mystory": "قصتي",
+    "contentCredentials": "أوراق اعتماد المحتوى",
+    "generationWorkspace": "توليد الصور"
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",
@@ -472,5 +474,29 @@
     "wool": "صوف",
     "cotton": "قطن",
     "mix": "مزيج"
+  },
+  "imageWorkspace": {
+    "title": "توليد الصور",
+    "description": "أنشئ صورًا عالية الجودة باستخدام OpenRouter AI. يمكنك تحديد وصف وتنزيل الوسائط الناتجة، والتي يتم توقيعها تلقائيًا باستخدام أوراق اعتماد محتوى C2PA الخاصة بك.",
+    "apiKeyPlaceholder": "••••••••••••••••••••",
+    "apiKeyInfo": "أدخل مفتاح واجهة برمجة التطبيقات (API Key) الخاص بـ OpenRouter.ai. لمحاكاة التوليد دون استدعاء واجهة برمجة التطبيقات (وتجنب التكاليف)، أدخل 'DEVELOP'.",
+    "store": "حفظ",
+    "cancel": "إلغاء",
+    "promptLabel": "وصف الصورة",
+    "promptPlaceholder": "صف الصورة التي تريد توليدها...",
+    "generate": "توليد الصورة",
+    "statusPending": "في الانتظار",
+    "statusSent": "جاري التوليد...",
+    "statusCanceled": "ملغي",
+    "statusCompleted": "مكتمل",
+    "statusError": "خطأ",
+    "tryAgain": "حاول مرة أخرى",
+    "viewDetail": "عرض التفاصيل",
+    "noKeyWarning": "مفتاح واجهة برمجة تطبيقات OpenRouter غير مهيأ. يرجى إضافة المفتاح أعلاه.",
+    "addKey": "إضافة مفتاح واجهة برمجة التطبيقات",
+    "editKey": "تعديل مفتاح واجهة برمجة التطبيقات",
+    "delete": "حذف",
+    "deleteConfirm": "هل تريد حذف الصورة المولدة من المعرض؟",
+    "taskQueue": "سجل التوليد"
   }
 }

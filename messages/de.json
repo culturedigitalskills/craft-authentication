@@ -17,49 +17,49 @@
         "myitems": "Meine Handwerke",
         "mygroups": "Meine Gemeinschaften",
         "addcraft": "Handwerk hinzufügen",
+        "mystory": "Meine Geschichte",
         "createGroup": "Gemeinschaft erstellen",
-        "seecrafts": "Galerie",
-        "mystory": "Meine Geschichte"
+        "contentCredentials": "Inhaltsnachweise",
+        "generationWorkspace": "Bildgenerierung",
+        "seecrafts": "Galerie"
     },
-    "orDivider": "oder",
-    "continueWithGoogle": "Weiter mit Google"
-  },
-  "about": {
-    "title": "Über SustainableCrafting",
-    "missionTitle": "Unsere Mission",
-    "missionDescription": "Bei SustainableCrafting bieten wir eine digitale Plattform, die Handwerkern weltweit ermöglicht, ihre handgefertigten Produkte zu dokumentieren, sich zu vernetzen und ihre sozioökonomischen Aktivitäten zu unterstützen. Wir glauben an die Bewahrung des Wissens, der Fähigkeiten und des kulturellen Erbes, das in jeder handwerklichen Tradition verwurzelt ist. Unsere Mission ist es, Authentizität zu fördern, die menschliche Geschichte hinter jedem handgefertigten Objekt zu feiern und Nachhaltigkeit in einem globalen Markt zu stärken, der allzu oft die geschickten Handwerkerhände vergisst, die sie erschaffen.",
-    "viewRepository": "Unser GitHub-Repository ansehen",
-    "keyFeatures": "Die Datenbank umfasst Prisma, das über umgebungsvariable URLs für Entwicklung und Docker mit Postgres verbunden ist. Die Benutzeroberfläche enthält shadcn/ui mit Tailwind v3, Radix-Primitives und wiederverwendbaren Hilfsfunktionen. Alles ist in einem Docker-Container für eine einfache Bereitstellung verpackt.",
-    "privacyPolicy": "Datenschutzerklärung",
-    "contact": "Kontakt"
-  },
-  "footer": {
-    "description": "Die Projektwebsite wurde von der University of Brighton erstellt und wird von ihr verwaltet. Dieses Projekt wird vom Arts and Humanities Research Council des Vereinigten Königreichs im Rahmen der Indien–UK-Forschung zu kreativen Industrien und kulturellem Erbe mit dem Titel „Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries“ finanziert. (Fördernummer OPP080)."
-  },
-  "socialmedia": {
-    "title": "Folge uns",
-    "instagram": "Instagram",
-    "twitter": "Twitter",
-    "facebook": "Facebook",
-    "email": "E-Mail"
-  },
-  "landing": {
-    "description": "Verbinde dich direkt mit erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes sorgfältig gestaltete Produkt erzählt eine authentische Geschichte über den Ort, seine Geschichte und die Menschen, die es herstellen. Überprüfe seine Echtheit durch unser innovatives QR-Code-System.",
-    "exploreCrafts": "Handwerke entdecken",
-    "learnMore": "Mehr erfahren"
-  },
-  "features": {
-    "authentic": {
-      "title": "Authentisch",
-      "description": "Zugang zu Informationen über kulturelle Produkte"
+    "auth": {
+        "loginTitle": "Anmelden",
+        "registerTitle": "Konto erstellen",
+        "email": "E-Mail",
+        "password": "Passwort",
+        "confirmPassword": "Passwort bestätigen",
+        "name": "Vollständiger Name",
+        "login": "Anmelden",
+        "register": "Konto erstellen",
+        "signingIn": "Anmeldung läuft...",
+        "registering": "Konto wird erstellt...",
+        "invalidCredentials": "Ungültige E-Mail oder Passwort",
+        "noAccount": "Noch kein Konto?",
+        "haveAccount": "Bereits ein Konto?",
+        "passwordMismatch": "Passwörter stimmen nicht überein",
+        "registrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+        "emailExists": "Ein Konto mit dieser E-Mail-Adresse existiert bereits.",
+        "validation": {
+            "nameRequired": "Name ist erforderlich",
+            "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+            "passwordMin": "Das Passwort muss mindestens 8 Zeichen lang sein",
+            "passwordMismatch": "Passwörter stimmen nicht überein"
+        },
+        "orDivider": "oder",
+        "continueWithGoogle": "Weiter mit Google"
     },
-    "traceable": {
-      "title": "Rückverfolgbar",
-      "description": "QR-Code-basierter Verifizierer"
+    "about": {
+        "title": "Über SustainableCrafting",
+        "missionTitle": "Unsere Mission",
+        "missionDescription": "Bei SustainableCrafting bieten wir eine digitale Plattform, die Handwerkern weltweit ermöglicht, ihre handgefertigten Produkte zu dokumentieren, sich zu vernetzen und ihre sozioökonomischen Aktivitäten zu unterstützen. Wir glauben an die Bewahrung des Wissens, der Fähigkeiten und des kulturellen Erbes, das in jeder handwerklichen Tradition verwurzelt ist. Unsere Mission ist es, Authentizität zu fördern, die menschliche Geschichte hinter jedem handgefertigten Objekt zu feiern und Nachhaltigkeit in einem globalen Markt zu stärken, der allzu oft die geschickten Handwerkerhände vergisst, die sie erschaffen.",
+        "viewRepository": "Unser GitHub-Repository ansehen",
+        "keyFeatures": "Die Datenbank umfasst Prisma, das über umgebungsvariable URLs für Entwicklung und Docker mit Postgres verbunden ist. Die Benutzeroberfläche enthält shadcn/ui mit Tailwind v3, Radix-Primitives und wiederverwendbaren Hilfsfunktionen. Alles ist in einem Docker-Container für eine einfache Bereitstellung verpackt.",
+        "privacyPolicy": "Datenschutzerklärung",
+        "contact": "Kontakt"
     },
-    "connected": {
-      "title": "Vernetzt",
-      "description": "Direkte Verbindung zu Kunsthandwerkern und Herstellern"
+    "footer": {
+        "description": "Die Projektwebsite wurde von der University of Brighton erstellt und wird von ihr verwaltet. Dieses Projekt wird vom Arts and Humanities Research Council des Vereinigten Königreichs im Rahmen der Indien–UK-Forschung zu kreativen Industrien und kulturellem Erbe mit dem Titel „Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries“ finanziert. (Fördernummer OPP080)."
     },
     "socialmedia": {
         "title": "Folge uns",
@@ -150,11 +150,11 @@
         "stepLabel": "Schritt {current} von {total}",
         "back": "Zurück",
         "next": "Weiter",
-        "begin": "Beginnen",
+        "begin": "Loslegen",
         "saveExit": "Speichern & beenden",
         "saving": "Speichern...",
         "publish": "Meine Geschichte veröffentlichen",
-        "publishing": "Wird veröffentlicht...",
+        "publishing": "Veröffentlichen...",
         "writeYourAnswer": "Schreibe deine Antwort",
         "answerPlaceholder": "Lass dir Zeit. Sprich natürlich. Es gibt keine falsche Antwort.",
         "questionLabel": "Frage {index}",
@@ -163,33 +163,33 @@
         "errors": {
             "saveFailed": "Wir konnten deinen Fortschritt nicht speichern. Bitte versuche es erneut.",
             "publishFailed": "Wir konnten deine Geschichte nicht veröffentlichen. Bitte versuche es erneut.",
-            "emptyStory": "Füge vor dem Veröffentlichen mindestens eine schriftliche Antwort, eine Aufnahme oder ein Werkstattfoto hinzu.",
+            "emptyStory": "Füge mindestens eine schriftliche Antwort, eine Aufnahme oder ein Werkstattfoto hinzu, bevor du veröffentlichst.",
             "conflict": "Deine Geschichte wurde in einem anderen Fenster aktualisiert. Lade diese Seite neu, um die neueste Version zu sehen."
         },
         "banner": {
             "startTitle": "Teile die Geschichte deines Handwerks",
-            "startBody": "Erzähle uns mit deinen eigenen Worten von deinem Handwerk – schriftlich, gesprochen oder als Aufnahme.",
-            "startCta": "Geschichte beginnen",
-            "continueTitle": "Setze deine Handwerksgeschichte fort",
+            "startBody": "Erzähle uns von deinem Handwerk mit deinen eigenen Worten, durch Schreiben, Sprechen oder Aufnehmen.",
+            "startCta": "Meine Geschichte beginnen",
+            "continueTitle": "Setze deine Geschichte fort",
             "continueBody": "Du bist bei Schritt {current} von {total}. Mach dort weiter, wo du aufgehört hast.",
-            "continueCta": "Fortsetzen",
-            "publishedBadge": "Deine Handwerksgeschichte ist veröffentlicht",
-            "publishedBody": "Besucher können sie auf deinem öffentlichen Profil lesen. Du kannst sie jederzeit weiter bearbeiten.",
+            "continueCta": "Weiter",
+            "publishedBadge": "Deine Geschichte ist veröffentlicht",
+            "publishedBody": "Besucher können sie in deinem öffentlichen Profil lesen. Du kannst sie jederzeit weiter bearbeiten.",
             "view": "Ansehen",
             "edit": "Bearbeiten"
         },
         "intro": {
             "title": "Leitfaden zum Teilen deiner Handwerksgeschichte",
-            "lead": "Diese Seite hilft dir, die Geschichte deines Handwerks mit deinen eigenen Worten zu erzählen. Diese Fragen dienen nur als Orientierung. Sprich natürlich und füge alles hinzu, was dir wichtig erscheint.",
+            "lead": "Diese Seite hilft dir, die Geschichte deines Handwerks mit deinen eigenen Worten zu erzählen. Diese Fragen dienen nur als Orientierung. Bitte sprich natürlich und ergänze alles, was dir wichtig erscheint.",
             "formatsTitle": "Du kannst deine Geschichte teilen als:",
             "formatText": "Geschriebener Text",
             "formatAudio": "Audioaufnahme",
             "formatVideo": "Videoaufnahme",
-            "encouragement": "Bitte antworte mit deinen eigenen Worten, als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte."
+            "encouragement": "Bitte antworte in deinen eigenen Worten, so als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte."
         },
         "step1": {
             "title": "Über dich",
-            "prompt": "Kannst du uns erzählen, wer du bist und wie du dieses Handwerk zuerst gelernt hast?"
+            "prompt": "Kannst du uns erzählen, wer du bist und wie du dieses Handwerk zum ersten Mal gelernt hast?"
         },
         "step2": {
             "title": "Über dein Handwerk",
@@ -201,34 +201,34 @@
         },
         "step4": {
             "title": "Vorteile und Möglichkeiten",
-            "prompt": "Was hat dieses Handwerk dir, deiner Familie oder deiner Gemeinschaft gebracht?"
+            "prompt": "Was hat dir dieses Handwerk, deiner Familie oder deiner Gemeinschaft gebracht?"
         },
         "step5": {
-            "title": "Wissensweitergabe und künftige Generationen",
-            "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben, und glaubst du, dass es in Zukunft fortbestehen kann?"
+            "title": "Wissensweitergabe und zukünftige Generationen",
+            "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben? Glaubst du, dass es in Zukunft weiterleben kann?"
         },
         "step6": {
-            "title": "Herausforderungen und Hindernisse",
-            "prompt": "Welche Schwierigkeiten hast du bei der Ausübung dieses Handwerks, und welche Art von Unterstützung würde helfen, es am Leben zu erhalten?"
+            "title": "Herausforderungen und Hürden",
+            "prompt": "Welche Schwierigkeiten begegnen dir beim Ausüben dieses Handwerks? Welche Art von Unterstützung würde helfen, es am Leben zu halten?"
         },
         "step7": {
             "title": "Werkstatt, Werkzeuge & Prozess",
-            "prompt": "Nimm deine Werkstatt, deine Werkzeuge, deine Materialien, wie du dein Handwerk ausübst, und den Ort, an dem du arbeitest, separat auf oder fotografiere sie.",
-            "saveFirst": "Speichere zuerst eine Antwort in einem vorherigen Schritt und komm dann zurück, um Werkstattmedien hinzuzufügen."
+            "prompt": "Nimm separat deine Werkstatt, deine Werkzeuge, deine Materialien, wie du dein Handwerk machst, und den Ort, an dem du arbeitest, auf oder fotografiere sie.",
+            "saveFirst": "Speichere zuerst eine Antwort in einem früheren Schritt, dann komme zurück, um Werkstattmedien hinzuzufügen."
         },
         "review": {
             "title": "Überprüfe deine Geschichte",
-            "lead": "Wirf einen kurzen Blick auf das, was du geteilt hast. Du kannst vor dem Veröffentlichen jederzeit zurückgehen und etwas bearbeiten.",
+            "lead": "Wirf einen kurzen Blick auf das, was du geteilt hast. Du kannst alles bearbeiten, bevor du veröffentlichst.",
             "notAnswered": "Noch nicht beantwortet",
             "hasRecording": "Aufnahme angehängt",
             "workshopCount": "{count, plural, =0 {Noch keine Dateien} one {1 Datei} other {# Dateien}}"
         },
         "uploader": {
-            "label": "Oder nimm stattdessen Audio / Video auf",
-            "chooseFile": "Audio oder Video auswählen",
+            "label": "Oder nimm Audio / Video auf",
+            "chooseFile": "Audio oder Video wählen",
             "replace": "Aufnahme ersetzen",
             "remove": "Entfernen",
-            "uploading": "Wird hochgeladen...",
+            "uploading": "Hochladen...",
             "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
             "hint": "MP3, WAV, MP4 oder WebM. Bis zu {max} MB."
         },
@@ -418,10 +418,10 @@
         "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist 8 MB.",
         "deleteFailed": "Gruppe konnte nicht gelöscht werden",
         "viewGroup": "Gruppe ansehen",
-        "viewPublicPage": "Öffentliche Seite ansehen",
         "searchArtisan": "Handwerker nach Namen suchen...",
         "cancel": "Abbrechen",
         "browseGroups": "Alle Gemeinschaften durchsuchen",
+        "viewPublicPage": "Öffentliche Seite ansehen",
         "searchPlaceholder": "Gemeinschaften suchen...",
         "groupsCount": "Gemeinschaften",
         "noResults": "Keine Gemeinschaften entsprechen deiner Suche."
@@ -469,8 +469,32 @@
         "craftCreateSuccess": "Handwerk erfolgreich erstellt!",
         "craftUpdateSuccess": "Handwerk erfolgreich aktualisiert!"
     },
+    "imageWorkspace": {
+        "title": "Bildgenerierung",
+        "description": "Erstellen Sie hochwertige Bilder mit OpenRouter AI. Sie können einen Prompt angeben und das resultierende Bild herunterladen, das automatisch mit Ihren C2PA-Inhaltsnachweisen signiert wird.",
+        "apiKeyPlaceholder": "••••••••••••••••••••",
+        "apiKeyInfo": "Fügen Sie Ihren OpenRouter.ai-API-Schlüssel ein. Um die Generierung ohne API-Aufrufe (und Kosten) zu simulieren, geben Sie 'DEVELOP' als Schlüssel ein.",
+        "store": "Speichern",
+        "cancel": "Abbrechen",
+        "promptLabel": "Bild-Prompt",
+        "promptPlaceholder": "Beschreiben Sie das Bild, das Sie generieren möchten...",
+        "generate": "Bild generieren",
+        "statusPending": "Warteschlange",
+        "statusSent": "Generierung...",
+        "statusCanceled": "Abgebrochen",
+        "statusCompleted": "Abgeschlossen",
+        "statusError": "Fehler",
+        "tryAgain": "Erneut versuchen",
+        "viewDetail": "Details anzeigen",
+        "noKeyWarning": "Kein OpenRouter-API-Schlüssel konfiguriert. Bitte fügen Sie Ihren Schlüssel oben hinzu.",
+        "addKey": "API-Schlüssel hinzufügen",
+        "editKey": "API-Schlüssel bearbeiten",
+        "delete": "Löschen",
+        "deleteConfirm": "Generiertes Bild aus Galerie löschen?",
+        "taskQueue": "Generierungsverlauf"
+    },
     "materials": {
-        "selectOne": "Wähle eines:",
+        "selectOne": "Bitte auswählen:",
         "wool": "Wolle",
         "cotton": "Baumwolle",
         "mix": "Mischung"

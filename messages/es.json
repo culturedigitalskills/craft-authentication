@@ -19,7 +19,9 @@
     "myitems": "Mis Artesanías",
     "mygroups": "Mis Comunidades",
     "createGroup": "Crear Comunidad",
-    "mystory": "Mi Historia"
+    "mystory": "Mi Historia",
+    "contentCredentials": "Credenciales de Contenido",
+    "generationWorkspace": "Generación de Imágenes"
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
@@ -472,5 +474,29 @@
     "wool": "Lana",
     "cotton": "Algodón",
     "mix": "Mezcla"
+  },
+  "imageWorkspace": {
+    "title": "Generación de Imágenes",
+    "description": "Crea imágenes de alta calidad usando OpenRouter AI. Puedes especificar una descripción y descargar el archivo resultante, el cual se firmará automáticamente con tus Credenciales de Contenido C2PA.",
+    "apiKeyPlaceholder": "••••••••••••••••••••",
+    "apiKeyInfo": "Pega tu clave API de OpenRouter.ai. Para simular la generación sin llamar a la API (y evitar costes), pega 'DEVELOP' como clave.",
+    "store": "Guardar",
+    "cancel": "Cancelar",
+    "promptLabel": "Descripción de la imagen",
+    "promptPlaceholder": "Describe la imagen que deseas generar...",
+    "generate": "Generar imagen",
+    "statusPending": "En cola",
+    "statusSent": "Generando...",
+    "statusCanceled": "Cancelado",
+    "statusCompleted": "Completado",
+    "statusError": "Error",
+    "tryAgain": "Intentar de nuevo",
+    "viewDetail": "Ver detalles",
+    "noKeyWarning": "No hay ninguna clave API de OpenRouter configurada. Por favor, añade tu clave arriba.",
+    "addKey": "Añadir clave API",
+    "editKey": "Editar clave API",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar la imagen generada de la galería?",
+    "taskQueue": "Historial de generación"
   }
 }

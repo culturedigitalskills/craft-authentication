@@ -3,7 +3,7 @@ import { CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 
 export function TraditionSection() {
-    const t = useTranslations('');
+    const t = useTranslations('')
 
     return (
         <section className="py-16 px-4 bg-muted/30">
@@ -17,6 +17,7 @@ export function TraditionSection() {
                             fill
                             sizes="(max-width: 768px) 100vw, 50vw"
                             className="object-cover"
+                            unoptimized
                         />
                     </div>
 
@@ -32,26 +33,26 @@ export function TraditionSection() {
                         {/* Benefits List */}
                         <ul className="space-y-3">
                             <li className="flex items-start gap-3">
-                                <CheckCircle className="h-5 w-5 text-warm flex-shrink-0 mt-0.5" />
+                                <CheckCircle className="h-5 w-5 text-warm shrink-0 mt-0.5" />
                                 <span className="text-muted-foreground">
                                     {t('benefits.certificates')}
                                 </span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <CheckCircle className="h-5 w-5 text-warm flex-shrink-0 mt-0.5" />
+                                <CheckCircle className="h-5 w-5 text-warm shrink-0 mt-0.5" />
                                 <span className="text-muted-foreground">
                                     {t('benefits.connection')}
                                 </span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <CheckCircle className="h-5 w-5 text-warm flex-shrink-0 mt-0.5" />
+                                <CheckCircle className="h-5 w-5 text-warm shrink-0 mt-0.5" />
                                 <span className="text-muted-foreground">
                                     {t('benefits.supply')}
                                 </span>
                             </li>
                         </ul>
                     </div>
-                </div> 
+                </div>
             </div>
         </section>
     )

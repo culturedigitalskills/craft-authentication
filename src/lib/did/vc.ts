@@ -169,3 +169,51 @@ export async function verifyCraftVC(
         }
     }
 }
+
+export async function testVcSigning(): Promise<{
+    signed: boolean
+    verified: boolean
+    did: string
+    algorithm: 'RSA-SHA256'
+    timestamp: string
+    error?: string
+}> {
+    const timestamp = new Date().toISOString()
+
+    try {
+        const privateKey = getPrivateKey()
+        const publicKey = getPublicKey()
+
+        const payload = {
+            type: 'vc-signing-self-test',
+            did: DID_WEB,
+            timestamp,
+        }
+
+        const normalized = canonicalize(payload)
+        const signature = signData(normalized, privateKey)
+
+        const verify = crypto.createVerify('RSA-SHA256')
+        verify.update(normalized)
+        verify.end()
+
+        const verified = verify.verify(publicKey, signature, 'base64')
+
+        return {
+            signed: signature.length > 0,
+            verified,
+            did: DID_WEB,
+            algorithm: 'RSA-SHA256',
+            timestamp,
+        }
+    } catch (error) {
+        return {
+            signed: false,
+            verified: false,
+            did: DID_WEB,
+            algorithm: 'RSA-SHA256',
+            timestamp,
+            error: error instanceof Error ? error.message : 'Signing test error',
+        }
+    }
+}

@@ -1,11 +1,13 @@
-FROM node:20-alpine AS base
+FROM node:24-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+RUN corepack prepare pnpm@11.5.2 --activate
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/* 
 
 FROM base AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
@@ -14,6 +16,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres"
 ENV DATABASE_URL=${DATABASE_URL_APP}
 ENV DATABASE_URL_APP=${DATABASE_URL_APP}
+
+# Fallback environment variables for Better Auth during Next.js build-time route compilation, just to satisfy the validation (these won't be used at runtime, as the real values will be injected via Docker secrets and .env.production)
+ENV AUTH_SECRET=placeholder_secret_only_used_during_next_build_to_satisfy_better_auth_validation_67890
+ENV AUTH_URL=http://localhost:3000
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm prisma generate
@@ -24,8 +31,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install prisma CLI for database migrations (adds ~50 MB)
-RUN npm install -g prisma@7
+# Install system dependencies (openssl for credentials generation, curl & jq for healthchecks) and prisma CLI
+RUN apt-get update && apt-get install -y openssl curl jq && rm -rf /var/lib/apt/lists/* && npm install -g prisma@7
 
 # Application files
 COPY --from=builder /app/public ./public

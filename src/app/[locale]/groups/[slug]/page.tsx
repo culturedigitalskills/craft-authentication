@@ -115,6 +115,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                         src={coverUrl}
                         alt={`${group.name} cover`}
                         fill
+                        unoptimized
                         sizes="100vw"
                         className="object-cover"
                         priority
@@ -149,6 +150,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                                 alt={`${group.name} logo`}
                                 width={112}
                                 height={112}
+                                unoptimized
                                 className="h-full w-full object-cover"
                             />
                         ) : (
@@ -337,6 +339,7 @@ function MemberCard({
                         alt={`${artisan.firstName} ${artisan.lastName}`}
                         width={56}
                         height={56}
+                        unoptimized
                         className="h-full w-full object-cover"
                     />
                 ) : (

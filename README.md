@@ -5,6 +5,7 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 ## Stack
 
 - **Framework**: Next.js 16 (App Router, TypeScript)
+- **Runtime**: Node.js 24 LTS
 - **Database**: PostgreSQL 16 + Prisma 7
 - **Storage**: Garage (S3-compatible, AGPL v3)
 - **UI**: shadcn/ui + Tailwind CSS v3 + Radix primitives
@@ -51,6 +52,12 @@ Next.js 16 + Prisma 7 + PostgreSQL + Garage starter with shadcn/ui, Tailwind CSS
 - `POST /api/media/attachments` - Link media to an entity (authenticated)
 - `DELETE /api/media/:id` - Delete media file
 
+### Verifiable Credentials
+
+- `GET /api/vc/:craftId` - Download signed credential JSON for a craft
+- `POST /api/vc/verify` - Verify a credential JSON
+- `GET /api/vc/signing-test` - Signing self-test endpoint (dev by default; production requires `VC_TEST_TOKEN` + `x-vc-test-token` header)
+
 ## Usage Examples
 
 ### Create Data Record
@@ -74,6 +81,19 @@ curl -X POST \
 
 ```bash
 curl http://localhost:3000/api/media
+```
+
+### Test VC signing health
+
+```bash
+curl http://localhost:3000/api/vc/signing-test
+```
+
+Production example (with token):
+
+```bash
+curl -H "x-vc-test-token: YOUR_VC_TEST_TOKEN" \
+  http://localhost:3000/api/vc/signing-test
 ```
 
 ## Data Persistence
@@ -132,6 +152,12 @@ cp garage.toml.example garage.toml
 
 # Install packages
 pnpm i
+
+# Generate C2PA Root CA key pair & certificate
+node scripts/generate-c2pa-root.mjs
+
+# Generate KMS wrapping keys & configurations
+node scripts/generate-kms-keys.mjs
 
 # Start Postgres + Garage containers
 pnpm docker:up
@@ -206,6 +232,89 @@ pnpm prod:docker:up
 Subsequent starts will reuse the same keys.
 
 App runs on [http://localhost:3000](http://localhost:3000) by default (configure with `PORT`).
+
+## Vault & KMS Key Management
+
+The vault uses two independent secrets. They have different rotation procedures because they protect different things:
+
+| Secret                                       | What it protects                                                                                                                                                 | Rotation impact                                                |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `kms_private_key.pem` / `kms_public_key.pem` | Nothing stored — RSA is used only _transiently_ during vault init (client wraps with RSA; server RSA-decrypts and immediately re-wraps with `LOCAL_MASTER_KEY`). | None. Replace PEM files and restart.                           |
+| `LOCAL_MASTER_KEY`                           | All `SSE_KMS` rows in `UserWrappedVaultKeys` (AES-256-GCM).                                                                                                      | All SSE_KMS records must be re-wrapped before the key changes. |
+
+### Rotating the RSA key pair
+
+```bash
+# Generate new key pair (refuses to overwrite — rename or delete existing files first)
+node scripts/generate-kms-keys.mjs
+
+# Restart the server — no database changes needed
+```
+
+### Rotating `LOCAL_MASTER_KEY`
+
+```bash
+# 1. Generate a new key
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# 2. Re-wrap all existing SSE_KMS records
+#    The server must still be running with the OLD key at this point
+pnpm dotenv -e .env.local -- node scripts/rotate-kms-master-key.mjs \
+    --old-key=<current-LOCAL_MASTER_KEY> \
+    --new-key=<newly-generated-key>
+
+# 3. Only after the script reports success: update LOCAL_MASTER_KEY in .env and restart
+```
+
+> **Do not restart the server between steps 2 and 3.** If the server reloads with the new
+> key before the script completes, any records still encrypted with the old key become
+> permanently unreadable.
+
+## C2PA Content Credentials
+
+The application uses C2PA to sign media files with authentic content credentials. Signing requires a self-signed Root CA certificate to sign Artisan credentials.
+
+### Setting Up Root CA Certificates
+
+Before starting the server (on new installations), you must generate the Root CA private key and certificate:
+
+```bash
+# Generate the Root CA key pair and certificate (run once)
+# This script is interactive and will prompt you for Country, Organization, and Common Name.
+node scripts/generate-c2pa-root.mjs
+```
+
+This generates `secrets/c2pa_root_key.pem` and `secrets/c2pa_root_cert.pem`.
+
+Add the following environment variables to your `.env.local` (and `.env.production` for deployment):
+
+```env
+C2PA_ROOT_KEY_PATH="./secrets/c2pa_root_key.pem"
+C2PA_ROOT_CERT_PATH="./secrets/c2pa_root_cert.pem"
+```
+
+> [!WARNING]
+> **Missing Certificate Error:** If the Root CA private key or certificate files are missing or unreadable, the application will throw a startup/execution error when checking status or executing C2PA operations.
+
+### C2PA Trust List
+
+Download the list of trusted C2PA signing authorities.
+
+```bash
+node scripts/download-c2pa-trust-list.mjs
+```
+
+I thsould create the file `secrets/c2pa-trust-list.pem`, which is used to validate other signing authorities besides us. The script downloads the trust list from https://raw.githubusercontent.com/c2pa-org/conformance-public/main/trust-list/.
+
+Add the following environment variables to your `.env.local` (and `.env.production` for deployment):
+
+```env
+C2PA_TRUST_LIST_PATH=./secrets/c2pa-trust-list.pem
+```
+
+### Certificate Renewal
+
+If you execute `node scripts/generate-c2pa-root.mjs` while the Root CA key file already exists, it will automatically **renew the certificate** using the existing private key, keeping previous signatures valid.
 
 ## Available pnpm Scripts
 

@@ -73,7 +73,7 @@ export default function Gallery({ images, videos = [] }: GalleryProps) {
             <div
               key={index}
               onClick={() => setSelected(index)}
-              className={`relative w-20 h-20 rounded-md cursor-pointer flex-shrink-0 overflow-hidden transition-opacity
+              className={`relative w-20 h-20 rounded-md cursor-pointer shrink-0 overflow-hidden transition-opacity
                 ${selected === index
                   ? 'ring-2 ring-blue-500 opacity-100'
                   : 'opacity-60 hover:opacity-100'
