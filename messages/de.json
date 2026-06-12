@@ -18,9 +18,12 @@
         "mygroups": "Meine Gemeinschaften",
         "addcraft": "Handwerk hinzufügen",
         "mystory": "Meine Geschichte",
+        "completeProfile": "Profil vervollständigen",
+        "mediaGallery": "Mediengalerie",
         "createGroup": "Gemeinschaft erstellen",
         "contentCredentials": "Inhaltsnachweise",
-        "generationWorkspace": "Bildgenerierung"
+        "generationWorkspace": "Bildgenerierung",
+        "seecrafts": "Galerie"
     },
     "auth": {
         "loginTitle": "Anmelden",
@@ -186,13 +189,35 @@
             "formatVideo": "Videoaufnahme",
             "encouragement": "Bitte antworte in deinen eigenen Worten, so als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte."
         },
-        "step1": { "title": "Über dich", "prompt": "Kannst du uns erzählen, wer du bist und wie du dieses Handwerk zum ersten Mal gelernt hast?" },
-        "step2": { "title": "Über dein Handwerk", "prompt": "Kannst du dein Handwerk mit einfachen Worten erklären, einschließlich woher es kommt, wie es hergestellt wird und wofür es verwendet wird?" },
-        "step3": { "title": "Gefühle, Bedeutung und Verbindungen", "prompt": "Was bedeutet dieses Handwerk für dich? Gibt es Gefühle, Ereignisse, Traditionen, Symbole oder Geschichten, die damit verbunden sind?" },
-        "step4": { "title": "Vorteile und Möglichkeiten", "prompt": "Was hat dir dieses Handwerk, deiner Familie oder deiner Gemeinschaft gebracht?" },
-        "step5": { "title": "Wissensweitergabe und zukünftige Generationen", "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben? Glaubst du, dass es in Zukunft weiterleben kann?" },
-        "step6": { "title": "Herausforderungen und Hürden", "prompt": "Welche Schwierigkeiten begegnen dir beim Ausüben dieses Handwerks? Welche Art von Unterstützung würde helfen, es am Leben zu halten?" },
-        "step7": { "title": "Werkstatt, Werkzeuge & Prozess", "prompt": "Nimm separat deine Werkstatt, deine Werkzeuge, deine Materialien, wie du dein Handwerk machst, und den Ort, an dem du arbeitest, auf oder fotografiere sie.", "saveFirst": "Speichere zuerst eine Antwort in einem früheren Schritt, dann komme zurück, um Werkstattmedien hinzuzufügen." },
+        "step1": {
+            "title": "Über dich",
+            "prompt": "Kannst du uns erzählen, wer du bist und wie du dieses Handwerk zum ersten Mal gelernt hast?"
+        },
+        "step2": {
+            "title": "Über dein Handwerk",
+            "prompt": "Kannst du dein Handwerk mit einfachen Worten erklären, einschließlich woher es kommt, wie es hergestellt wird und wofür es verwendet wird?"
+        },
+        "step3": {
+            "title": "Gefühle, Bedeutung und Verbindungen",
+            "prompt": "Was bedeutet dieses Handwerk für dich? Gibt es Gefühle, Ereignisse, Traditionen, Symbole oder Geschichten, die damit verbunden sind?"
+        },
+        "step4": {
+            "title": "Vorteile und Möglichkeiten",
+            "prompt": "Was hat dir dieses Handwerk, deiner Familie oder deiner Gemeinschaft gebracht?"
+        },
+        "step5": {
+            "title": "Wissensweitergabe und zukünftige Generationen",
+            "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben? Glaubst du, dass es in Zukunft weiterleben kann?"
+        },
+        "step6": {
+            "title": "Herausforderungen und Hürden",
+            "prompt": "Welche Schwierigkeiten begegnen dir beim Ausüben dieses Handwerks? Welche Art von Unterstützung würde helfen, es am Leben zu halten?"
+        },
+        "step7": {
+            "title": "Werkstatt, Werkzeuge & Prozess",
+            "prompt": "Nimm separat deine Werkstatt, deine Werkzeuge, deine Materialien, wie du dein Handwerk machst, und den Ort, an dem du arbeitest, auf oder fotografiere sie.",
+            "saveFirst": "Speichere zuerst eine Antwort in einem früheren Schritt, dann komme zurück, um Werkstattmedien hinzuzufügen."
+        },
         "review": {
             "title": "Überprüfe deine Geschichte",
             "lead": "Wirf einen kurzen Blick auf das, was du geteilt hast. Du kannst alles bearbeiten, bevor du veröffentlichst.",
@@ -315,7 +340,11 @@
             "searchPlaceholder": "Handwerke suchen...",
             "craftsCount": "Handwerke",
             "noImageAvailable": "Kein Bild verfügbar",
-            "by": "von"
+            "by": "von",
+            "craftDetails": "Handwerksdetails",
+            "artisan": "Kunsthandwerker",
+            "materials": "Materialien",
+            "techniques": "Techniken"
         },
         "details": {
             "qrCodeTitle": "Echtheitszertifikat",
@@ -323,11 +352,21 @@
             "copyLink": "Link kopieren",
             "linkCopied": "Kopiert!",
             "visible": "Öffentlich",
-            "notvisible": "Privat"
+            "notvisible": "Privat",
+            "description": "Beschreibung",
+            "materials": "Materialien",
+            "createdBy": "Erstellt von",
+            "createdWhere": "Erstellt in",
+            "createdOn": "Erstellt am",
+            "updatedOn": "Aktualisiert am",
+            "backToCrafts": "Zurück zu den Handwerken",
+            "noDescription": "Keine Beschreibung verfügbar",
+            "qrCodeDescription": "Teile dieses Handwerk."
         },
         "mycrafts": {
             "noCraftsYet": "Sie haben noch keine Handwerke hinzugefügt."
-        }
+        },
+        "welcomeTitleCraft": "Handwerksdetails"
     },
     "groups": {
         "title": "Handwerkergruppen",
@@ -382,7 +421,12 @@
         "deleteFailed": "Gruppe konnte nicht gelöscht werden",
         "viewGroup": "Gruppe ansehen",
         "searchArtisan": "Handwerker nach Namen suchen...",
-        "cancel": "Abbrechen"
+        "cancel": "Abbrechen",
+        "browseGroups": "Alle Gemeinschaften durchsuchen",
+        "viewPublicPage": "Öffentliche Seite ansehen",
+        "searchPlaceholder": "Gemeinschaften suchen...",
+        "groupsCount": "Gemeinschaften",
+        "noResults": "Keine Gemeinschaften entsprechen deiner Suche."
     },
     "createCraft": {
         "createCraftName": "Titel des Handwerks",
@@ -404,7 +448,28 @@
         "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
         "addVideo": "Hinzufügen",
         "removeVideo": "Video entfernen",
-        "invalidYoutubeUrl": "Konnte nicht als YouTube-Link erkannt werden."
+        "invalidYoutubeUrl": "Konnte nicht als YouTube-Link erkannt werden.",
+        "craftInfo": "Handwerksinformationen",
+        "craftTitle": "Handwerkstitel",
+        "craftDescription": "Handwerksbeschreibung",
+        "createCraftTitle": "Neues Handwerk erstellen",
+        "editCraftTitle": "Handwerk bearbeiten",
+        "saveCraft": "Handwerk speichern",
+        "updateCraft": "Aktualisieren",
+        "cancelEdit": "Abbrechen",
+        "deleteCraft": "Löschen",
+        "createCraftPublic": "Dieses Handwerk öffentlich machen",
+        "uploadImages": "Lade Bilder deines Handwerks hoch",
+        "browse": "Dateien durchsuchen",
+        "imagesSelected": "Bild(er) ausgewählt",
+        "saving": "Speichern...",
+        "updating": "Wird aktualisiert...",
+        "createFailed": "Handwerk konnte nicht gespeichert werden. Bitte versuche es erneut.",
+        "updateFailed": "Handwerk konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+        "savingCraft": "Handwerk wird gespeichert...",
+        "updatingCraft": "Handwerk wird aktualisiert...",
+        "craftCreateSuccess": "Handwerk erfolgreich erstellt!",
+        "craftUpdateSuccess": "Handwerk erfolgreich aktualisiert!"
     },
     "imageWorkspace": {
         "title": "Bildgenerierung",
@@ -435,5 +500,22 @@
         "wool": "Wolle",
         "cotton": "Baumwolle",
         "mix": "Mischung"
+    },
+    "mediaGallery": {
+        "title": "Mediengalerie",
+        "description": "Verwalte die Bilder, Videos und Audiodateien, die in deinem öffentlichen Profil angezeigt werden.",
+        "addMedia": "Medien hinzufügen",
+        "uploadHint": "Bilder, Video oder Audio",
+        "audio": "Audio",
+        "private": "Privat",
+        "makePublic": "Öffentlich machen",
+        "makePrivate": "Privat machen",
+        "remove": "Entfernen",
+        "deleteConfirm": "Dieses Element entfernen?",
+        "deleteYes": "Entfernen",
+        "deleteNo": "Abbrechen",
+        "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
+        "deleteFailed": "Dieses Element konnte nicht entfernt werden. Bitte versuche es erneut.",
+        "visibilityFailed": "Sichtbarkeit konnte nicht aktualisiert werden. Bitte versuche es erneut."
     }
 }

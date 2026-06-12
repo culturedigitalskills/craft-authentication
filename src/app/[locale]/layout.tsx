@@ -5,6 +5,8 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { auth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 import { SessionProvider } from '@/components/auth/SessionProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import {routing} from '@/i8n/routing'
@@ -36,6 +38,18 @@ export default async function LocaleLayout({ children, params }: Props) {
     if (!hasLocale(routing.locales, locale)) {
     notFound();
     }
+
+    // A signed-in user with no artisan profile still needs onboarding — surface a
+    // "Complete your profile" entry point in the nav so it's reachable after skipping.
+    const session = await auth()
+    let needsOnboarding = false
+    if (session?.user) {
+        const artisan = await prisma.artisan.findUnique({
+            where: { userId: session.user.id },
+            select: { id: true },
+        })
+        needsOnboarding = !artisan
+    }
     return (
         <html lang={`/${locale}`} suppressHydrationWarning>
             <head>
@@ -54,7 +68,7 @@ export default async function LocaleLayout({ children, params }: Props) {
                     <SessionProvider>
                         <NextIntlClientProvider messages={messages}>
                             <div className="flex min-h-screen flex-col">
-                                <Header />
+                                <Header needsOnboarding={needsOnboarding} />
                                 <main className="flex-1">
                                     {children}
                                 </main>

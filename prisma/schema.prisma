@@ -307,6 +307,7 @@ model MediaAttachment {
     entityId       String
     attachmentType AttachmentType @default(GALLERY)
     isPrimary      Boolean        @default(false)
+    isPublic       Boolean        @default(true)
     displayOrder   Int            @default(0)
     createdAt      DateTime       @default(now())
     media          MediaFile      @relation(fields: [mediaId], references: [id], onDelete: Cascade)
