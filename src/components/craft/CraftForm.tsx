@@ -19,19 +19,24 @@ import {
 import { ArrowLeft, Loader2, X, Play } from 'lucide-react'
 import { FaYoutube } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
-import { Prisma } from '@prisma/client'
 import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
 
 interface Craft {
     id: string
-    name: string
+    title: string
     description: string | null
-    data: Prisma.JsonValue | null
+    material: string | null
+    isPublic: boolean
+    isSharedLocation: boolean
+    latitude: number | null
+    longitude: number | null
+    place: string | null
+    videos: string[]
+    mediaIds: string[]
 }
 
 interface CraftFormProps {
     craft: Craft | null
-    user: string | null
 }
 
 async function submitImages(images: File[]): Promise<string[]> {
@@ -47,7 +52,7 @@ async function submitImages(images: File[]): Promise<string[]> {
     )
 }
 
-export function CraftForm({ craft, user }: CraftFormProps) {
+export function CraftForm({ craft }: CraftFormProps) {
     const t = useTranslations('')
     const router = useRouter()
 
@@ -56,45 +61,17 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
-    const [name, setName] = useState(craft?.name ?? '')
+    const [name, setName] = useState(craft?.title ?? '')
     const [description, setDescription] = useState(craft?.description ?? '')
-
-    const [data, setData] = useState<Record<string, unknown> | null>(
-        (craft?.data as Record<string, unknown>) ?? null
-    )
-    const [material, setMaterial] = useState<string>(data?.['material'] as string ?? '')
-    const [artisan, setArtisan] = useState<string>(data?.['artisan'] as string ?? '')
-    const [isPublic, setIsPublic] = useState<boolean>(data?.['isPublic'] as boolean ?? false)
-    const [isSharedLocation, setIsSharedLocation] = useState<boolean>(
-        data?.['isSharedLocation'] === undefined ? true : Boolean(data?.['isSharedLocation'])
-    )
-    const [createdOn, setCreatedOn] = useState(data?.['createdOn'] as string ?? '')
-    const [updatedOn, setUpdatedOn] = useState(data?.['updatedOn'] as string ?? '')
+    const [material, setMaterial] = useState<string>(craft?.material ?? '')
+    const [isPublic, setIsPublic] = useState<boolean>(craft?.isPublic ?? false)
+    const [isSharedLocation, setIsSharedLocation] = useState<boolean>(craft?.isSharedLocation ?? true)
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
-    const [existingMediaIds, setExistingMediaIds] = useState<string[]>(
-        Array.isArray(data?.['mediaIds']) ? (data['mediaIds'] as string[]).filter(Boolean) : []
-    )
+    const [existingMediaIds, setExistingMediaIds] = useState<string[]>(craft?.mediaIds ?? [])
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
     const [images, setImages] = useState<File[]>([])
-    const [videos, setVideos] = useState<string[]>(
-        Array.isArray(data?.['videos']) ? (data['videos'] as string[]).filter(Boolean) : []
-    )
+    const [videos, setVideos] = useState<string[]>(craft?.videos ?? [])
     const [videoInput, setVideoInput] = useState('')
-
-    useEffect(() => {
-        setMaterial(data?.['material'] as string ?? '')
-        setArtisan(data?.['artisan'] as string ?? '')
-        setIsPublic(data?.['isPublic'] as boolean ?? false)
-        setIsSharedLocation(data?.['isSharedLocation'] as boolean ?? true)
-        setCreatedOn(data?.['CreatedOn'] as string ?? '')
-        setUpdatedOn(data?.['updatedOn'] as string ?? '')
-        setExistingMediaIds(
-            Array.isArray(data?.['mediaIds']) ? (data['mediaIds'] as string[]).filter(Boolean) : []
-        )
-        setVideos(
-            Array.isArray(data?.['videos']) ? (data['videos'] as string[]).filter(Boolean) : []
-        )
-    }, [data])
 
     function handleAddVideo() {
         const id = extractYouTubeId(videoInput)
@@ -115,19 +92,15 @@ export function CraftForm({ craft, user }: CraftFormProps) {
         setVideos(prev => prev.filter(v => v !== id))
     }
 
-    async function handleRemoveExisting(mediaId: string) {
+    // Remove from local state only; the underlying file is garbage-collected
+    // server-side on save when the new mediaIds list is reconciled.
+    function handleRemoveExisting(mediaId: string) {
         if (confirmDelete !== mediaId) {
             setConfirmDelete(mediaId)
             return
         }
         setConfirmDelete(null)
-        try {
-            const res = await fetch(`/api/media/${mediaId}`, { method: 'DELETE' })
-            if (!res.ok) throw new Error('Delete failed')
-            setExistingMediaIds(prev => prev.filter(id => id !== mediaId))
-        } catch {
-            setMessage({ text: t('createCraft.deleteImageFailed'), type: 'error' })
-        }
+        setExistingMediaIds(prev => prev.filter(id => id !== mediaId))
     }
 
     useEffect(() => {
@@ -150,44 +123,53 @@ export function CraftForm({ craft, user }: CraftFormProps) {
         setIsSubmitting(true)
         setMessage(null)
 
-        const timestamp = new Date().toISOString()
-        if (isCreateMode) setCreatedOn(timestamp)
+        // Resolve location: only when the artisan opts to share it.
+        let latitude: number | null = craft?.latitude ?? null
+        let longitude: number | null = craft?.longitude ?? null
+        let place: string | null = craft?.place ?? null
 
-        let city = null
-        if (isSharedLocation && location?.lat && location?.lng) {
-            const geoRes = await fetch(`/api/geocode?lat=${location.lat}&lng=${location.lng}`)
-            const geoData = await geoRes.json()
-            city = geoData.city
+        if (isSharedLocation) {
+            if (location?.lat && location?.lng) {
+                latitude = location.lat
+                longitude = location.lng
+                try {
+                    const geoRes = await fetch(`/api/geocode?lat=${location.lat}&lng=${location.lng}`)
+                    const geoData = await geoRes.json()
+                    place = geoData.city ?? place
+                } catch {
+                    // Non-fatal — keep any existing place value.
+                }
+            }
+        } else {
+            latitude = null
+            longitude = null
+            place = null
         }
 
-        const ids = await submitImages(images)
+        const newIds = await submitImages(images)
+        const mediaIds = [...existingMediaIds, ...newIds].filter(Boolean)
 
-        const craftdata = {
-            name,
+        const payload = {
+            title: name,
             description,
-            data: {
-                ...data,
-                material,
-                isPublic,
-                isSharedLocation,
-                artisan: data?.artisan ?? user ?? '',
-                createdOn: data?.createdOn ?? timestamp,
-                updatedOn: timestamp,
-                mediaIds: [...existingMediaIds, ...ids],
-                videos,
-                location: data?.location ? data.location : location ? { lat: location.lat, lng: location.lng } : null,
-                place: data?.city ?? city,
-            },
+            material: material || undefined,
+            isPublic,
+            isSharedLocation,
+            latitude,
+            longitude,
+            place,
+            videos,
+            mediaIds,
         }
 
         try {
-            const url = isCreateMode ? '/api/data' : `/api/data/${craft?.id}`
+            const url = isCreateMode ? '/api/crafts' : `/api/crafts/${craft?.id}`
             const method = isCreateMode ? 'POST' : 'PUT'
 
             const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(craftdata),
+                body: JSON.stringify(payload),
             })
 
             if (!res.ok) throw new Error('Request failed')
@@ -216,15 +198,9 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     async function handleDelete() {
         if (!confirm(t('createCraft.deleteCraftConfirm'))) return
 
-        if (existingMediaIds.length > 0) {
-            await Promise.all(
-                existingMediaIds.map(async (mediaId: string) => {
-                    await fetch(`/api/media/${mediaId}`, { method: 'DELETE' })
-                })
-            )
-        }
-
-        const res = await fetch(`/api/data/${craft?.id}`, { method: 'DELETE' })
+        // The craft DELETE endpoint cascades attachments and garbage-collects
+        // the underlying media files server-side.
+        const res = await fetch(`/api/crafts/${craft?.id}`, { method: 'DELETE' })
         if (res.ok) router.push('/crafts')
     }
 

@@ -16,6 +16,8 @@
         "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
         "db:rollback": "dotenv -e .env.local -- prisma migrate deploy",
         "db:push": "dotenv -e .env.local -- prisma db push",
+        "db:backfill-crafts": "dotenv -e .env.local -- node scripts/backfill-crafts.js",
+        "prod:db:backfill-crafts": "dotenv -e .env.production -- node scripts/backfill-crafts.js",
         "build": "dotenv -e .env.production -- next build",
         "start": "dotenv -e .env.production -- next start",
         "lint": "eslint .",

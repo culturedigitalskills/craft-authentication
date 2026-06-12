@@ -2,7 +2,6 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { CardTitle, CardContent, CardDescription, CardHeader, Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/dist/client/link'
@@ -10,110 +9,96 @@ import Image from 'next/image'
 import { Calendar, Eye, EyeOff, Pencil, Plus } from 'lucide-react'
 import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
-import { SearchInput } from '@/components/shared/SearchInput'
-import { cookies } from 'next/dist/server/request/cookies'
 import { prisma } from '@/lib/prisma'
+import { getCraftPrimaryImageMap } from '@/lib/craft'
+
+const LIMIT = 21
 
 export default async function MyCraftsPage(
-    { searchParams }: { searchParams: { page?: string; q?: string } }
+    { searchParams }: { searchParams: Promise<{ page?: string }> }
 ) {
     const session = await auth()
-    if (!session) redirect('/login')
+    if (!session?.user) redirect('/login')
 
     const params = await searchParams
-    const page = params.page ? parseInt(params.page) : 1
-    const q = params.q?.trim() ?? ''
+    const page = params.page ? Math.max(1, parseInt(params.page)) : 1
+    const skip = (page - 1) * LIMIT
     const currentPageUrl = `${process.env.AUTH_URL}/crafts/mycrafts`
-    const cookieStore = await cookies()
-    const cookieHeader = cookieStore.toString()
 
-    try {
-        const res = await fetch(`${process.env.AUTH_URL}/api/data/?page=${page}&limit=21`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': cookieHeader,
-            },
-        })
-        if (!res.ok) throw new Error('Request failed')
-        const data = await res.json()
+    // Resolve the signed-in user's artisan profile — crafts are owned by it.
+    const artisan = await prisma.artisan.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true, firstName: true, lastName: true },
+    })
+    const artisanName = artisan
+        ? `${artisan.firstName} ${artisan.lastName}`
+        : session.user.name ?? session.user.email
 
-        const allCrafts = data.data
-        const pagination = data.pagination
+    let crafts: any[] = []
+    let pagination = { currentPage: page, totalPages: 1, totalCount: 0, hasNext: false, hasPrev: false }
 
-        const myCraftsRecords = allCrafts.filter((record: any) => record.data.artisan === session.user.email)
-        const hasCrafts = myCraftsRecords.length > 0
+    if (artisan) {
+        const where = { artisanId: artisan.id, deletedAt: null }
+        const [records, totalCount] = await Promise.all([
+            prisma.craft.findMany({
+                where,
+                select: { id: true, title: true, description: true, isPublic: true, createdAt: true },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: LIMIT,
+            }),
+            prisma.craft.count({ where }),
+        ])
 
-        const crafts = await Promise.all(
-            myCraftsRecords
-                .filter((record: any) => !q || (record.name ?? '').toLowerCase().includes(q.toLowerCase()))
-                .map(async (record: any) => {
-                    const mediaIds = record.data['mediaIds']?.filter((id: any) => id !== null) ?? []
-                    let imageUrl = null
-                    if (mediaIds.length > 0) {
-                        const imageRes = await fetch(`${process.env.AUTH_URL}/api/media/${mediaIds[0]}`, {
-                            method: 'GET',
-                            headers: { 'Cookie': cookieHeader },
-                        })
-                        imageUrl = imageRes.url
-                    }
-                    return {
-                        id: record.id,
-                        title: record.name,
-                        createdOn: record.data.createdOn,
-                        isPublic: record.data.isPublic,
-                        mediaIds,
-                        imageUrl,
-                    }
-                })
-        )
+        const imageMap = await getCraftPrimaryImageMap(records.map(r => r.id))
+        crafts = records.map(r => ({
+            id: r.id,
+            title: r.title,
+            description: r.description,
+            isPublic: r.isPublic,
+            createdOn: r.createdAt,
+            imageUrl: imageMap.has(r.id) ? `/api/media/${imageMap.get(r.id)}` : null,
+        }))
 
-        // Look up own artisan name
-        const artisan = await prisma.artisan.findFirst({
-            where: { user: { email: session.user.email! } },
-            select: { firstName: true, lastName: true },
-        })
-        const artisanName = artisan ? `${artisan.firstName} ${artisan.lastName}` : session.user.name ?? session.user.email
-
-        return <RenderMyCraftsPage crafts={crafts} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} artisanName={artisanName} q={q} hasCrafts={hasCrafts} />
-    } catch (error) {
-        console.error('Error loading my crafts:', error)
+        const totalPages = Math.max(1, Math.ceil(totalCount / LIMIT))
+        pagination = { currentPage: page, totalPages, totalCount, hasNext: page < totalPages, hasPrev: page > 1 }
     }
+
+    return <RenderMyCraftsPage crafts={crafts} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} artisanName={artisanName} />
 }
 
-function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, artisanName, q, hasCrafts }: {
+function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, artisanName }: {
     crafts: any[]
     pagination: any
     currentPage: number
     currentPageUrl: string
     artisanName: any
-    q: string
-    hasCrafts: boolean
 }) {
     const t = useTranslations()
 
     return (
         <Container>
-            <PageHeader title={t('navbar.myitems')} description={artisanName} />
-
-            {hasCrafts && (
-                <div className="mb-6 flex items-center justify-between gap-4">
-                    <SearchInput placeholder={t('crafts.explore.searchPlaceholder')} />
+            <div className="mb-10 flex items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{t('navbar.myitems')}</h1>
+                    <p className="mt-3 text-lg text-muted-foreground">{artisanName}</p>
+                </div>
+                {crafts.length > 0 && (
                     <Button asChild className="shrink-0">
                         <Link href="/crafts/create">
                             <Plus className="mr-2 h-4 w-4" />
                             {t('navbar.addcraft')}
                         </Link>
                     </Button>
-                </div>
-            )}
+                )}
+            </div>
 
             {crafts.length > 0 ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {crafts.map((craft) => {
                         const editUrl = `/crafts/create?id=${craft.id}`
                         return (
-                            <Card key={craft.id} className="group relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+                            <Card key={craft.id} className="group relative transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
                                 <Link href={`/crafts/${craft.id}?from=mycrafts`} className="block">
                                     {/* Image */}
                                     <div className="relative aspect-square overflow-hidden rounded-t-lg">
@@ -174,11 +159,6 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
                             </Card>
                         )
                     })}
-                </div>
-            ) : q ? (
-                <div className="rounded-lg border border-dashed border-border p-12 text-center">
-                    <Plus className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
-                    <p className="text-muted-foreground">{t('crafts.explore.noResults')}</p>
                 </div>
             ) : (
                 <div className="rounded-lg border border-dashed border-border p-12 text-center">

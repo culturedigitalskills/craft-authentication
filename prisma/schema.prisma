@@ -191,6 +191,28 @@ model Artisan {
     user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
     memberships       ArtisanGroupMembership[]
     craftStory        CraftStory?
+    crafts            Craft[]
+}
+
+model Craft {
+    id               String    @id @default(uuid())
+    artisanId        String
+    title            String
+    description      String?
+    material         String?
+    isPublic         Boolean   @default(false)
+    isSharedLocation Boolean   @default(true)
+    latitude         Float?
+    longitude        Float?
+    place            String?
+    videos           String[]  @default([]) // YouTube IDs
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
+    deletedAt        DateTime?
+    artisan          Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+
+    @@index([artisanId])
+    @@index([isPublic])
 }
 
 model CraftStory {
