@@ -182,7 +182,7 @@ pnpm garage:init
 Check that S3_ACCESS_KEY and S3_SECRET_KEY were updated by the above step
 
 # Generate Prisma client
-pnpm prisma:generate
+pnpm db:generate
 
 # Run initial migration (optional)
 pnpm db:migrate

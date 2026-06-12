@@ -10,17 +10,6 @@ const ALLOWED_MIME_TYPES = [
 ]
 const MAX_FILE_SIZE = (parseInt(process.env.MAX_MEDIA_SIZE ?? '100') || 100) * 1024 * 1024 // 100MB
 
-export const mediaQuerySchema = z.object({
-    page: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().positive()).catch(1),
-    limit: z
-        .string()
-        .regex(/^\d+$/)
-        .transform(Number)
-        .pipe(z.number().int().positive().max(100))
-        .catch(10),
-    type: z.enum(['image', 'video']).optional(),
-})
-
 export const fileUploadSchema = z.object({
     file: z
         .instanceof(File)
@@ -59,6 +48,5 @@ export const CreateMediaAttachmentSchema = z.object({
     displayOrder: z.number().int().min(0).default(0),
 })
 
-export type MediaQuery = z.infer<typeof mediaQuerySchema>
 export type FileUpload = z.infer<typeof fileUploadSchema>
 export type CreateMediaAttachment = z.infer<typeof CreateMediaAttachmentSchema>

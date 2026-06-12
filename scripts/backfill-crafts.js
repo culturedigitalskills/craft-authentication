@@ -18,8 +18,13 @@
 
 const crypto = require('crypto')
 const { PrismaClient } = require('@prisma/client')
+const { PrismaPg } = require('@prisma/adapter-pg')
+const { Pool } = require('pg')
 
-const prisma = new PrismaClient()
+// Prisma 7 uses a driver adapter (see src/lib/prisma.ts). CLI scripts prefer
+// DATABASE_URL (localhost), falling back to the app's DATABASE_URL_APP.
+const pool = new Pool({ connectionString: process.env.DATABASE_URL || process.env.DATABASE_URL_APP })
+const prisma = new PrismaClient({ adapter: new PrismaPg(pool) })
 
 const colors = { red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', reset: '\x1b[0m' }
 const log = (msg, color = 'reset') => console.log(`${colors[color]}${msg}${colors.reset}`)
@@ -261,4 +266,5 @@ main()
     })
     .finally(async () => {
         await prisma.$disconnect()
+        await pool.end()
     })
