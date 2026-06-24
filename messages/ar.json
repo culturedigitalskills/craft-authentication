@@ -12,13 +12,13 @@
     "artisans": "الحرفيون",
     "groups": "المجتمعات",
     "seecrafts": "المعرض",
-    "addcraft": "إضافة حرفة",
+    "addcraft": "إضافة حرفة جديدة",
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
     "profile": "الملف الشخصي",
     "myitems": "حِرفي",
     "mygroups": "مجتمعاتي",
-    "createGroup": "إنشاء مجتمع",
+    "createGroup": "إضافة مجتمع جديد",
     "mystory": "قصتي",
     "completeProfile": "أكمل ملفك الشخصي",
     "mediaGallery": "معرض الوسائط",
@@ -154,6 +154,7 @@
     "next": "التالي",
     "begin": "ابدأ",
     "saveExit": "حفظ وخروج",
+    "backToReview": "حفظ والعودة إلى المراجعة",
     "saving": "جارٍ الحفظ...",
     "publish": "نشر قصتي",
     "publishing": "جارٍ النشر...",
@@ -221,6 +222,8 @@
     "review": {
       "title": "راجع قصتك",
       "lead": "ألقِ نظرة سريعة على ما شاركته. يمكنك العودة لتعديل أي شيء قبل النشر.",
+      "editStep": "تعديل {section}",
+      "editHint": "انقر على أي قسم لتعديله.",
       "notAnswered": "لم تتم الإجابة بعد",
       "hasRecording": "تسجيل مرفق",
       "workshopCount": "{count, plural, =0 {لا توجد ملفات بعد} one {ملف واحد} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}}"
@@ -247,6 +250,8 @@
     "title": "ملف الحرفي",
     "createTitle": "أنشئ ملف الحرفي الخاص بك",
     "editTitle": "عدّل ملف الحرفي الخاص بك",
+    "createHelper": "أخبر العالم عنك وعن حرفتك.",
+    "editHelper": "حدّث بياناتك وكيف يراك الآخرون.",
     "firstName": "الاسم الأول",
     "lastName": "اسم العائلة",
     "bio": "نبذة",
@@ -349,6 +354,22 @@
     "details": {
       "description": "الوصف",
       "materials": "المواد",
+      "technique": "التقنية",
+      "timeToMake": "مدة الصنع",
+      "dimensions": "الأبعاد",
+      "weight": "الوزن",
+      "inspiration": "الإلهام",
+      "careInstructions": "تعليمات العناية",
+      "meetMaker": "تعرّف على الصانع",
+      "viewProfile": "عرض الملف الشخصي",
+      "yearsExperience": "سنوات خبرة",
+      "theMaking": "كيفية صنعها",
+      "added": "أُضيفت",
+      "viewLargerMap": "عرض خريطة أكبر",
+      "authenticity": "الأصالة",
+      "qrTitle": "امسح للتحقق",
+      "certificateTitle": "شهادة أصالة",
+      "certificateDescription": "شهادة رقمية مقاومة للتلاعب لهذه الحرفة.",
       "createdBy": "أنشأها",
       "createdWhere": "مكان الإنشاء",
       "createdOn": "تاريخ الإنشاء",
@@ -382,7 +403,23 @@
     "deleteCraft": "حذف",
     "createCraftName": "عنوان الحرفة",
     "createCraftDescription": "الوصف",
-    "createCraftMaterial": "المادة",
+    "createCraftMaterial": "المواد",
+    "createCraftMaterialsPlaceholder": "اذكر المواد المستخدمة — مثل صوف مغزول يدويًا، أصباغ نباتية، خشب البلوط.",
+    "createCraftTechnique": "التقنية",
+    "createCraftTechniquePlaceholder": "صف التقنيات والأساليب المستخدمة في صنعه.",
+    "createCraftTimeToMake": "مدة الصنع",
+    "createCraftTimeToMakePlaceholder": "مثل حوالي 3 أسابيع، 40 ساعة",
+    "createCraftDimensions": "الأبعاد",
+    "dimensionWidth": "العرض",
+    "dimensionHeight": "الارتفاع",
+    "dimensionDepth": "العمق",
+    "dimensionUnit": "الوحدة",
+    "createCraftWeight": "الوزن",
+    "weightUnit": "وحدة الوزن",
+    "createCraftInspiration": "الإلهام",
+    "createCraftInspirationPlaceholder": "ما الذي ألهم هذه القطعة؟ فكرة أو شخص أو مكان أو تقليد…",
+    "createCraftCareInstructions": "تعليمات العناية",
+    "createCraftCareInstructionsPlaceholder": "كيف ينبغي العناية بهذه القطعة وتخزينها؟",
     "createCraftPublic": "اجعل هذه الحرفة عامة",
     "createCraftMakeLocationPublic": "مشاركة موقعي التقريبي مع الزوار",
     "uploadImages": "ارفع صور حرفتك",
@@ -517,5 +554,57 @@
     "uploadFailed": "فشل الرفع. يرجى المحاولة مرة أخرى.",
     "deleteFailed": "تعذّرت إزالة هذا العنصر. يرجى المحاولة مرة أخرى.",
     "visibilityFailed": "تعذّر تحديث الظهور. يرجى المحاولة مرة أخرى."
+  },
+  "home": {
+    "hero": {
+      "headlineLead": "كل حرفة تحمل الأيدي التي",
+      "headlineEmphasis": "صنعتها",
+      "subcopy": "خلف كل قطعة إنسان حقيقي ومكان حقيقي وتقليد توارثته الأجيال. تعرّف على الحرفيين والقصص المنسوجة في أعمالهم.",
+      "ctaMakers": "تعرّف على الحرفيين",
+      "ctaCrafts": "تصفّح الحرف",
+      "chipKicker": "حرفي مميّز"
+    },
+    "trust": {
+      "rooted": {
+        "title": "متجذّرة في مكانها",
+        "description": "كل حرفة مرتبطة بالمنطقة والتقاليد التي تنحدر منها."
+      },
+      "named": {
+        "title": "صنعها حرفي معروف الاسم",
+        "description": "لا مصانع مجهولة — تعرّف على الشخص الذي شكّلتها يداه."
+      },
+      "verified": {
+        "title": "مصدر موثّق",
+        "description": "شهادة موقّعة على بُعد مسح ضوئي واحد كلما أردت دليلاً."
+      }
+    },
+    "artisans": {
+      "eyebrow": "الناس",
+      "title": "تعرّف على الحرفيين",
+      "viewAll": "كل الحرفيين",
+      "story": "يصنع بعناية."
+    },
+    "communities": {
+      "eyebrow": "معًا",
+      "title": "الحرف تعيش داخل المجتمعات",
+      "body": "النقابات والتعاونيات والتجمّعات تُبقي التقاليد حيّة — تتشارك المهارات والأدوات ومكانًا للانتماء.",
+      "viewAll": "كل المجتمعات",
+      "makers": "حرفي"
+    },
+    "crafts": {
+      "eyebrow": "العمل",
+      "title": "حرف مميّزة",
+      "viewAll": "المجموعة",
+      "by": "بقلم"
+    },
+    "provenance": {
+      "eyebrow": "أصالة موثّقة رقميًا",
+      "title": "المصدر، متّصل بالحرفي",
+      "body": "القصة أولًا. وعندما تحتاج إلى دليل، تحمل كل حرفة شهادة قابلة للتحقق ورمز QR يؤكّد من صنعها وأين ومتى.",
+      "point1": "موقّعة تشفيريًا من الحرفي",
+      "point2": "امسح رمز QR للتحقق في ثوانٍ",
+      "point3": "مدعومة باعتماد مقاوم للعبث",
+      "cta": "شاهد كيف يعمل"
+    }
   }
 }

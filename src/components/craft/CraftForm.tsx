@@ -25,7 +25,17 @@ interface Craft {
     id: string
     title: string
     description: string | null
-    material: string | null
+    materials: string | null
+    technique: string | null
+    timeToMake: string | null
+    width: number | null
+    height: number | null
+    depth: number | null
+    dimensionUnit: string | null
+    weight: number | null
+    weightUnit: string | null
+    inspiration: string | null
+    careInstructions: string | null
     isPublic: boolean
     isSharedLocation: boolean
     latitude: number | null
@@ -63,7 +73,17 @@ export function CraftForm({ craft }: CraftFormProps) {
 
     const [name, setName] = useState(craft?.title ?? '')
     const [description, setDescription] = useState(craft?.description ?? '')
-    const [material, setMaterial] = useState<string>(craft?.material ?? '')
+    const [materials, setMaterials] = useState<string>(craft?.materials ?? '')
+    const [technique, setTechnique] = useState<string>(craft?.technique ?? '')
+    const [timeToMake, setTimeToMake] = useState<string>(craft?.timeToMake ?? '')
+    const [width, setWidth] = useState<string>(craft?.width?.toString() ?? '')
+    const [height, setHeight] = useState<string>(craft?.height?.toString() ?? '')
+    const [depth, setDepth] = useState<string>(craft?.depth?.toString() ?? '')
+    const [dimensionUnit, setDimensionUnit] = useState<string>(craft?.dimensionUnit ?? 'cm')
+    const [weight, setWeight] = useState<string>(craft?.weight?.toString() ?? '')
+    const [weightUnit, setWeightUnit] = useState<string>(craft?.weightUnit ?? 'kg')
+    const [inspiration, setInspiration] = useState<string>(craft?.inspiration ?? '')
+    const [careInstructions, setCareInstructions] = useState<string>(craft?.careInstructions ?? '')
     const [isPublic, setIsPublic] = useState<boolean>(craft?.isPublic ?? false)
     const [isSharedLocation, setIsSharedLocation] = useState<boolean>(craft?.isSharedLocation ?? true)
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -152,7 +172,17 @@ export function CraftForm({ craft }: CraftFormProps) {
         const payload = {
             title: name,
             description,
-            material: material || undefined,
+            materials: materials || undefined,
+            technique: technique || undefined,
+            timeToMake: timeToMake || undefined,
+            width: width ? parseFloat(width) : undefined,
+            height: height ? parseFloat(height) : undefined,
+            depth: depth ? parseFloat(depth) : undefined,
+            dimensionUnit,
+            weight: weight ? parseFloat(weight) : undefined,
+            weightUnit,
+            inspiration: inspiration || undefined,
+            careInstructions: careInstructions || undefined,
             isPublic,
             isSharedLocation,
             latitude,
@@ -269,19 +299,135 @@ export function CraftForm({ craft }: CraftFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="material">
+                        <Label htmlFor="materials">
                             {t('createCraft.createCraftMaterial')}
                         </Label>
-                        <Select value={material} onValueChange={setMaterial}>
-                            <SelectTrigger id="material">
-                                <SelectValue placeholder={t('createCraft.selectMaterial')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Cotton">{t('materials.cotton')}</SelectItem>
-                                <SelectItem value="Wool">{t('materials.wool')}</SelectItem>
-                                <SelectItem value="Mix">{t('materials.mix')}</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Textarea
+                            id="materials"
+                            value={materials}
+                            onChange={(e) => setMaterials(e.target.value)}
+                            placeholder={t('createCraft.createCraftMaterialsPlaceholder')}
+                            rows={3}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="technique">
+                            {t('createCraft.createCraftTechnique')}
+                        </Label>
+                        <Textarea
+                            id="technique"
+                            value={technique}
+                            onChange={(e) => setTechnique(e.target.value)}
+                            placeholder={t('createCraft.createCraftTechniquePlaceholder')}
+                            rows={3}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="timeToMake">
+                            {t('createCraft.createCraftTimeToMake')}
+                        </Label>
+                        <Input
+                            id="timeToMake"
+                            value={timeToMake}
+                            onChange={(e) => setTimeToMake(e.target.value)}
+                            placeholder={t('createCraft.createCraftTimeToMakePlaceholder')}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>{t('createCraft.createCraftDimensions')}</Label>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={width}
+                                onChange={(e) => setWidth(e.target.value)}
+                                placeholder={t('createCraft.dimensionWidth')}
+                                aria-label={t('createCraft.dimensionWidth')}
+                            />
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={height}
+                                onChange={(e) => setHeight(e.target.value)}
+                                placeholder={t('createCraft.dimensionHeight')}
+                                aria-label={t('createCraft.dimensionHeight')}
+                            />
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={depth}
+                                onChange={(e) => setDepth(e.target.value)}
+                                placeholder={t('createCraft.dimensionDepth')}
+                                aria-label={t('createCraft.dimensionDepth')}
+                            />
+                            <Select value={dimensionUnit} onValueChange={setDimensionUnit}>
+                                <SelectTrigger aria-label={t('createCraft.dimensionUnit')}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="cm">cm</SelectItem>
+                                    <SelectItem value="in">in</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>{t('createCraft.createCraftWeight')}</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={weight}
+                                onChange={(e) => setWeight(e.target.value)}
+                                placeholder={t('createCraft.createCraftWeight')}
+                                aria-label={t('createCraft.createCraftWeight')}
+                            />
+                            <Select value={weightUnit} onValueChange={setWeightUnit}>
+                                <SelectTrigger aria-label={t('createCraft.weightUnit')}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="g">g</SelectItem>
+                                    <SelectItem value="kg">kg</SelectItem>
+                                    <SelectItem value="oz">oz</SelectItem>
+                                    <SelectItem value="lb">lb</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="inspiration">
+                            {t('createCraft.createCraftInspiration')}
+                        </Label>
+                        <Textarea
+                            id="inspiration"
+                            value={inspiration}
+                            onChange={(e) => setInspiration(e.target.value)}
+                            placeholder={t('createCraft.createCraftInspirationPlaceholder')}
+                            rows={3}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="careInstructions">
+                            {t('createCraft.createCraftCareInstructions')}
+                        </Label>
+                        <Textarea
+                            id="careInstructions"
+                            value={careInstructions}
+                            onChange={(e) => setCareInstructions(e.target.value)}
+                            placeholder={t('createCraft.createCraftCareInstructionsPlaceholder')}
+                            rows={3}
+                        />
                     </div>
 
                     <div className="flex flex-col gap-3">

@@ -18,9 +18,9 @@ export function PageHeader({
 }) {
     return (
         <div className={`mb-8 text-center ${className ?? ''}`}>
-            <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">{title}</h1>
+            <h1 className="sc-h1">{title}</h1>
             {description && (
-                <p className="mx-auto mt-3 max-w-3xl text-lg text-muted-foreground">{description}</p>
+                <p className="sc-body mx-auto mt-3 max-w-3xl">{description}</p>
             )}
         </div>
     )

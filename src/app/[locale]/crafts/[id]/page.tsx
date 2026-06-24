@@ -1,11 +1,8 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { Container } from '@/components/layout/Container';
-import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl'
 import Link from 'next/link';
-import { ArrowLeft, User, Calendar, QrCode, Eye, EyeOff, MapPin } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, ArrowRight, Calendar, QrCode, Eye, EyeOff, MapPin, Pencil, Clock, Ruler, Scale, Heart, ShieldCheck } from 'lucide-react';
 import { QRCode } from '@/components/shared/qrcode';
 import Gallery from '@/components/craft/Gallery'
 import { QRCopyButton } from '@/components/craft/QRCopyButton'
@@ -13,20 +10,17 @@ import { verifyCraftVC, type CraftCredential } from '@/lib/did/vc'
 import { craftCredentialId, getCraftMediaIds } from '@/lib/craft'
 import { VerifiableCredentialCard } from '@/components/verifiableCredentialCard/page'
 import { notFound } from 'next/navigation'
+import { ScMedia } from '@/components/sc/ScMedia'
+import { PortraitFallback } from '@/components/sc/fallbacks'
+import { SectionHeader } from '@/components/sc/SectionHeader'
 
 interface PageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ from?: string }>
 }
 
-const formatDate = (timestamp: string | Date) =>
-  new Date(timestamp).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+const formatMonthYear = (timestamp: string | Date) =>
+  new Date(timestamp).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
 
 export default async function OneCraftPage({ params, searchParams }: PageProps) {
     const session = await auth()
@@ -38,7 +32,17 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
     const craft = await prisma.craft.findFirst({
         where: { id, deletedAt: null },
         include: {
-            artisan: { select: { userId: true, firstName: true, lastName: true, slug: true } },
+            artisan: {
+                select: {
+                    userId: true,
+                    firstName: true,
+                    lastName: true,
+                    slug: true,
+                    bio: true,
+                    yearsOfExperience: true,
+                    learningSource: true,
+                },
+            },
         },
     })
     if (!craft) notFound()
@@ -50,6 +54,13 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
     if (!craft.isPublic && !isOwner && !isAdmin) notFound()
 
     const mediaIds = await getCraftMediaIds(id)
+
+    // The maker's profile photo, shown in the "Meet the maker" feature.
+    const artisanPhoto = await prisma.mediaAttachment.findFirst({
+        where: { entityType: 'Artisan', entityId: craft.artisanId, attachmentType: 'HERO', isPrimary: true },
+        select: { mediaId: true },
+    })
+    const artisanPhotoUrl = artisanPhoto ? `/api/media/${artisanPhoto.mediaId}` : null
 
     // Fetch and verify the craft's Verifiable Credential.
     const vcRecord = await prisma.verifiableCredential.findUnique({
@@ -76,6 +87,10 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
             backHref={backHref}
             artisanName={`${craft.artisan.firstName} ${craft.artisan.lastName}`}
             artisanSlug={craft.artisan.slug}
+            artisanPhotoUrl={artisanPhotoUrl}
+            artisanBio={craft.artisan.bio}
+            artisanYears={craft.artisan.yearsOfExperience}
+            artisanLearningSource={craft.artisan.learningSource}
             vcRecord={vcRecord ? {
                 credentialId: vcRecord.credentialId,
                 issuanceDate: vcRecord.issuanceDate,
@@ -94,8 +109,8 @@ interface VcData {
     holderDid: string
 }
 
-function RenderOneCraftPage({ craft, mediaIds, currentPageUrl, isOwner, backHref, artisanName, artisanSlug, vcRecord, vcVerified }:
-  { craft: any, mediaIds: string[], currentPageUrl: string, isOwner: boolean, backHref: string, artisanName: string | null, artisanSlug: string | null, vcRecord: VcData | null, vcVerified: boolean | null }) {
+function RenderOneCraftPage({ craft, mediaIds, currentPageUrl, isOwner, backHref, artisanName, artisanSlug, artisanPhotoUrl, artisanBio, artisanYears, artisanLearningSource, vcRecord, vcVerified }:
+  { craft: any, mediaIds: string[], currentPageUrl: string, isOwner: boolean, backHref: string, artisanName: string | null, artisanSlug: string | null, artisanPhotoUrl: string | null, artisanBio: string | null, artisanYears: number | null, artisanLearningSource: string | null, vcRecord: VcData | null, vcVerified: boolean | null }) {
 
     const t = useTranslations();
     const craftEditUrl = `create?id=${craft.id}`;
@@ -105,153 +120,276 @@ function RenderOneCraftPage({ craft, mediaIds, currentPageUrl, isOwner, backHref
     }))
     const galleryVideos: string[] = Array.isArray(craft.videos) ? craft.videos.filter(Boolean) : []
 
+    // Compose human-readable size / weight strings from whichever values exist.
+    const dims = [craft.width, craft.height, craft.depth].filter((v: number | null) => v != null)
+    const dimensionsText = dims.length ? `${dims.join(' × ')} ${craft.dimensionUnit ?? ''}`.trim() : null
+    const weightText = craft.weight != null ? `${craft.weight} ${craft.weightUnit ?? ''}`.trim() : null
+
+    // Embedded OpenStreetMap for the (approximate) place of making.
+    const lat = craft.latitude
+    const lon = craft.longitude
+    const hasMap = craft.isSharedLocation && lat != null && lon != null
+    const mapDelta = 0.02
+    const mapSrc = hasMap
+        ? `https://www.openstreetmap.org/export/embed.html?bbox=${lon - mapDelta},${lat - mapDelta},${lon + mapDelta},${lat + mapDelta}&layer=mapnik&marker=${lat},${lon}`
+        : null
+    const mapLink = hasMap
+        ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`
+        : null
+
+    // Key stats — time to make leads, then size and weight (only those present).
+    const stats = [
+        craft.timeToMake ? { Icon: Clock, value: craft.timeToMake, label: t('crafts.details.timeToMake') } : null,
+        dimensionsText ? { Icon: Ruler, value: dimensionsText, label: t('crafts.details.dimensions') } : null,
+        weightText ? { Icon: Scale, value: weightText, label: t('crafts.details.weight') } : null,
+    ].filter(Boolean) as { Icon: typeof Clock; value: string; label: string }[]
+
     return (
-    <Container>
-      {/* Top bar: back link + edit button */}
-      <div className="mb-8 flex items-center justify-between">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href={backHref} aria-label={t('crafts.details.backToCrafts')}>
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+      <>
+        {/* ── Split hero: media left, sticky info rail right ── */}
+        <div className="sc-container py-8">
+          <Link href={backHref} className="sc-btn sc-btn--ghost mb-6">
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            {t('crafts.details.backToCrafts')}
           </Link>
-        </Button>
-        {isOwner && (
-          <Button asChild>
-            <Link href={craftEditUrl}>{t('createCraft.editCraftTitle')}</Link>
-          </Button>
-        )}
-      </div>
 
-      {/* Full-width title header */}
-      <div className="mb-8">
-        <span className={`mb-3 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium
-          ${craft.isPublic
-            ? 'bg-warm/10 text-warm'
-            : 'bg-muted text-muted-foreground'
-          }`}>
-          {craft.isPublic
-            ? <><Eye className="h-3 w-3" /> {t('crafts.details.visible')}</>
-            : <><EyeOff className="h-3 w-3" /> {t('crafts.details.notvisible')}</>
-          }
-        </span>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{craft.title}</h1>
-      </div>
+          <div className="sc-split">
+            {/* Media */}
+            <div
+              className="overflow-hidden bg-[var(--sc-surface)] p-3 sm:p-4"
+              style={{ borderRadius: 'var(--sc-r-hero)', boxShadow: 'var(--sc-shadow-hero)', border: '1px solid var(--sc-border)' }}
+            >
+              <Gallery images={galleryImages} videos={galleryVideos} />
+            </div>
 
-      {/* Two-column content */}
-      <div className="grid gap-10 lg:grid-cols-2">
+            {/* Info rail */}
+            <aside className="sc-sticky flex flex-col gap-6">
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="sc-eyebrow">{t('navbar.crafts')}</p>
+                  {isOwner && (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-[var(--sc-r-chip)] px-2.5 py-1 text-xs font-semibold"
+                      style={craft.isPublic
+                        ? { background: 'var(--sc-accent)', color: '#fff8ee' }
+                        : { background: 'var(--sc-paper-lo)', color: 'var(--sc-text-muted)' }}
+                    >
+                      {craft.isPublic
+                        ? <><Eye className="h-3 w-3" /> {t('crafts.details.visible')}</>
+                        : <><EyeOff className="h-3 w-3" /> {t('crafts.details.notvisible')}</>}
+                    </span>
+                  )}
+                </div>
+                <h1 className="sc-h1 mt-2" style={{ fontSize: '40px' }}>{craft.title}</h1>
+                {artisanName && (
+                  <p className="sc-body mt-2">
+                    {t('crafts.explore.by')}{' '}
+                    {artisanSlug ? (
+                      <Link href={`/artisans/${artisanSlug}`} className="font-medium hover:text-[color:var(--sc-accent)]" style={{ color: 'var(--sc-text)' }}>
+                        {artisanName}
+                      </Link>
+                    ) : <span style={{ color: 'var(--sc-text)' }}>{artisanName}</span>}
+                  </p>
+                )}
+              </div>
 
-        {/* Left: gallery only */}
-        <div>
-          <Gallery images={galleryImages} videos={galleryVideos} />
+              {/* Stat strip — time · dimensions · weight */}
+              {stats.length > 0 && (
+                <div className="flex overflow-hidden rounded-[var(--sc-r-card)]" style={{ border: '1px solid var(--sc-border)' }}>
+                  {stats.map((s, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 p-4"
+                      style={i > 0 ? { borderLeft: '1px solid var(--sc-border)' } : undefined}
+                    >
+                      <s.Icon className="h-4 w-4" style={{ color: 'var(--sc-accent)' }} />
+                      <p className="mt-2 leading-tight" style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '17px', color: 'var(--sc-ink)' }}>{s.value}</p>
+                      <p className="sc-meta mt-0.5">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Maker mini-card */}
+              <div className="sc-card flex items-center gap-3 p-4">
+                <div
+                  className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full"
+                  style={{ border: '2px solid var(--sc-surface)', boxShadow: 'var(--sc-shadow-card)' }}
+                >
+                  <ScMedia
+                    src={artisanPhotoUrl}
+                    alt={artisanName ?? ''}
+                    fallback={<PortraitFallback name={artisanName} />}
+                    sizes="56px"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="sc-meta">{t('crafts.details.createdBy')}</p>
+                  <p className="truncate" style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '17px', color: 'var(--sc-ink)' }}>
+                    {artisanSlug ? (
+                      <Link href={`/artisans/${artisanSlug}`} className="hover:text-[color:var(--sc-accent)]">{artisanName}</Link>
+                    ) : artisanName}
+                  </p>
+                  {artisanYears != null && (
+                    <p className="mt-0.5 flex items-center gap-1 text-xs" style={{ color: 'var(--sc-text-muted)' }}>
+                      <Clock className="h-3 w-3" />{artisanYears} {t('crafts.details.yearsExperience')}
+                    </p>
+                  )}
+                </div>
+                {artisanSlug && (
+                  <Link href={`/artisans/${artisanSlug}`} className="shrink-0" aria-label={t('crafts.details.viewProfile')} style={{ color: 'var(--sc-accent)' }}>
+                    <ArrowRight className="h-5 w-5" />
+                  </Link>
+                )}
+              </div>
+
+              {isOwner && (
+                <Link href={craftEditUrl} className="sc-btn sc-btn--primary justify-center">
+                  <Pencil className="h-4 w-4" />
+                  {t('createCraft.editCraftTitle')}
+                </Link>
+              )}
+            </aside>
+          </div>
         </div>
 
-        {/* Right: details */}
-        <div className="space-y-10">
-
-          {/* Artisan */}
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
-              <User className="h-5 w-5 text-muted-foreground" />
+        {/* ── Inspiration band (tinted) ── */}
+        {craft.inspiration && (
+          <section
+            className="my-4 border-y py-16"
+            style={{ background: 'color-mix(in srgb, var(--sc-accent) 6%, var(--sc-paper))', borderColor: 'color-mix(in srgb, var(--sc-accent) 18%, transparent)' }}
+          >
+            <div className="sc-container">
+              <p className="sc-eyebrow mb-4">{t('crafts.details.inspiration')}</p>
+              <blockquote className="sc-quote max-w-3xl whitespace-pre-line" style={{ fontSize: '34px' }}>
+                {craft.inspiration}
+              </blockquote>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground">{t('crafts.details.createdBy')}</p>
-              {artisanSlug ? (
-                <Link href={`/artisans/${artisanSlug}`} className="font-semibold hover:text-warm transition-colors">
-                  {artisanName}
-                </Link>
-              ) : (
-                <p className="font-semibold">{artisanName}</p>
+          </section>
+        )}
+
+        {/* ── Editorial body: narrative + details rail ── */}
+        <div className="sc-container py-12">
+          <div className="sc-split">
+            <div className="flex flex-col gap-8">
+              {craft.description && (
+                <p className="sc-lead whitespace-pre-line">{craft.description}</p>
+              )}
+
+              {(craft.materials || craft.technique) && (
+                <div>
+                  <SectionHeader title={t('crafts.details.theMaking')} className="mb-5" />
+                  <div className="flex flex-col gap-6">
+                    {craft.materials && (
+                      <div>
+                        <p className="sc-meta mb-2">{t('crafts.details.materials')}</p>
+                        <p className="sc-body whitespace-pre-line">{craft.materials}</p>
+                      </div>
+                    )}
+                    {craft.technique && (
+                      <div>
+                        <p className="sc-meta mb-2">{t('crafts.details.technique')}</p>
+                        <p className="sc-body whitespace-pre-line">{craft.technique}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
+
+            {/* Details rail */}
+            <aside className="flex flex-col gap-6">
+              <div className="sc-card flex flex-col gap-6 p-6">
+                {(hasMap || craft.place) && (
+                  <div>
+                    <p className="sc-meta mb-2 flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {t('crafts.details.createdWhere')}
+                    </p>
+                    {craft.place && <p className="mb-2 text-sm font-medium" style={{ color: 'var(--sc-text)' }}>{craft.place}</p>}
+                    {hasMap && mapSrc && (
+                      <>
+                        <iframe
+                          title={t('crafts.details.createdWhere')}
+                          src={mapSrc}
+                          className="h-56 w-full rounded-[var(--sc-r-btn)]"
+                          style={{ border: '1px solid var(--sc-border)' }}
+                          loading="lazy"
+                        />
+                        <a href={mapLink!} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs hover:underline" style={{ color: 'var(--sc-accent)' }}>
+                          {t('crafts.details.viewLargerMap')}
+                        </a>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <div>
+                  <p className="sc-meta mb-1 flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {t('crafts.details.added')}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--sc-text-soft)' }}>{formatMonthYear(craft.createdAt)}</p>
+                </div>
+              </div>
+
+              {craft.careInstructions && (
+                <div
+                  className="rounded-[var(--sc-r-card)] p-5"
+                  style={{ background: 'color-mix(in srgb, var(--sc-accent) 5%, var(--sc-surface))', border: '1px solid color-mix(in srgb, var(--sc-accent) 20%, transparent)' }}
+                >
+                  <p className="sc-eyebrow mb-2 flex items-center gap-1.5">
+                    <Heart className="h-3.5 w-3.5" />
+                    {t('crafts.details.careInstructions')}
+                  </p>
+                  <p className="sc-body whitespace-pre-line" style={{ fontSize: '14px' }}>{craft.careInstructions}</p>
+                </div>
+              )}
+            </aside>
           </div>
-
-          {/* Description */}
-          {craft.description && (
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                {t('crafts.details.description')}
-              </p>
-              <p className="text-base leading-relaxed text-foreground/80">{craft.description}</p>
-            </div>
-          )}
-
-          {/* Materials */}
-          {craft.material && (
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                {t('crafts.details.materials')}
-              </p>
-              <p className="text-base text-foreground/80">{craft.material}</p>
-            </div>
-          )}
-
-          <div className="border-t border-border" />
-
-          {/* Metadata */}
-          <dl className="space-y-5">
-            {craft.place && (
-              <div>
-                <dt className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {t('crafts.details.createdWhere')}
-                </dt>
-                <dd className="text-sm">
-                  <a
-                    href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(craft.place)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-warm hover:underline"
-                  >
-                    {craft.place}
-                  </a>
-                </dd>
-              </div>
-            )}
-            <div>
-              <dt className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                <Calendar className="h-3.5 w-3.5" />
-                {t('crafts.details.createdOn')}
-              </dt>
-              <dd className="text-sm text-foreground/70">{formatDate(craft.createdAt)}</dd>
-            </div>
-            <div>
-              <dt className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                <Calendar className="h-3.5 w-3.5" />
-                {t('crafts.details.updatedOn')}
-              </dt>
-              <dd className="text-sm text-foreground/70">{formatDate(craft.updatedAt)}</dd>
-            </div>
-          </dl>
-
-          {/* QR Code card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <QrCode className="h-4 w-4" />
-                {t('crafts.details.qrCodeTitle')}
-              </CardTitle>
-              <CardDescription>{t('crafts.details.qrScanGuidance')}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center gap-4">
-              <div className="rounded-lg border bg-background p-3">
-                <QRCode data={currentPageUrl} foreground={'oklch(0.2 0.1406 223.41)'} background={'oklch(1.00 0.000 70)'} margin={2} />
-              </div>
-              <p className="max-w-xs break-all text-center text-xs text-muted-foreground">
-                {currentPageUrl}
-              </p>
-              <QRCopyButton url={currentPageUrl} label={t('crafts.details.copyLink')} copiedLabel={t('crafts.details.linkCopied')} />
-              <VerifiableCredentialCard
-                credentialId={vcRecord?.credentialId ?? null}
-                issuanceDate={vcRecord?.issuanceDate ?? null}
-                issuerName="Sustainable Crafting Registry"
-                holderDid={vcRecord?.holderDid ?? null}
-                verified={vcVerified}
-                craftId={craft.id ?? null}
-              />
-            </CardContent>
-          </Card>
-
         </div>
-      </div>
-    </Container>
+
+        {/* ── Authenticity / provenance (dark closing band) ── */}
+        <section className="sc-dark py-16">
+          <div className="sc-container">
+            <p className="sc-eyebrow mb-2">{t('crafts.details.authenticity')}</p>
+            <h2 className="sc-h2 mb-8" style={{ color: 'var(--sc-text-on-dark)' }}>{t('crafts.details.certificateTitle')}</h2>
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* QR */}
+              <div className="sc-dark-panel p-6">
+                <h3 className="mb-1 flex items-center gap-2" style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '18px', color: 'var(--sc-text-on-dark)' }}>
+                  <QrCode className="h-4 w-4" style={{ color: 'var(--sc-accent-warm)' }} />
+                  {t('crafts.details.qrTitle')}
+                </h3>
+                <p className="mb-4 text-sm" style={{ color: 'var(--sc-text-on-dark-muted)' }}>{t('crafts.details.qrScanGuidance')}</p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="rounded-[var(--sc-r-btn)] bg-[var(--sc-surface)] p-3">
+                    <QRCode data={currentPageUrl} foreground={'#20303f'} background={'#fdfcfa'} margin={2} />
+                  </div>
+                  <p className="max-w-xs break-all text-center text-xs" style={{ color: 'var(--sc-text-on-dark-muted)' }}>{currentPageUrl}</p>
+                  <QRCopyButton url={currentPageUrl} label={t('crafts.details.copyLink')} copiedLabel={t('crafts.details.linkCopied')} />
+                </div>
+              </div>
+
+              {/* Certificate of Authenticity */}
+              <div className="sc-dark-panel p-6">
+                <h3 className="mb-1 flex items-center gap-2" style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '18px', color: 'var(--sc-text-on-dark)' }}>
+                  <ShieldCheck className="h-4 w-4" style={{ color: 'var(--sc-accent-warm)' }} />
+                  {t('crafts.details.certificateTitle')}
+                </h3>
+                <p className="mb-4 text-sm" style={{ color: 'var(--sc-text-on-dark-muted)' }}>{t('crafts.details.certificateDescription')}</p>
+                <VerifiableCredentialCard
+                  credentialId={vcRecord?.credentialId ?? null}
+                  issuanceDate={vcRecord?.issuanceDate ?? null}
+                  issuerName="Sustainable Crafting Registry"
+                  holderDid={vcRecord?.holderDid ?? null}
+                  verified={vcVerified}
+                  craftId={craft.id ?? null}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
     )
   }

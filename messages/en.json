@@ -12,13 +12,13 @@
     "artisans": "Artisans",
     "groups": "Communities",
     "seecrafts": "Gallery",
-    "addcraft": "Add Craft",
+    "addcraft": "Add New Craft",
     "login": "Login",
     "logout": "Logout",
     "profile": "Profile",
     "myitems": "My Crafts",
     "mygroups": "My Communities",
-    "createGroup": "Create Community",
+    "createGroup": "Add New Community",
     "mystory": "My Story",
     "completeProfile": "Complete your profile",
     "mediaGallery": "Media Gallery",
@@ -149,11 +149,14 @@
     "reviewPhotos": "Photos"
   },
   "craftStory": {
+    "wizardTitle": "My Story",
+    "wizardHelper": "Share the story of your craft in your own words.",
     "stepLabel": "Step {current} of {total}",
     "back": "Back",
     "next": "Next",
     "begin": "Begin",
     "saveExit": "Save & exit",
+    "backToReview": "Save & back to review",
     "saving": "Saving...",
     "publish": "Publish my story",
     "publishing": "Publishing...",
@@ -221,6 +224,8 @@
     "review": {
       "title": "Review your story",
       "lead": "Take a quick look at what you've shared. You can go back to edit anything before publishing.",
+      "editStep": "Edit {section}",
+      "editHint": "Tap any section to edit it.",
       "notAnswered": "Not answered yet",
       "hasRecording": "Recording attached",
       "workshopCount": "{count, plural, =0 {No files yet} one {1 file} other {# files}}"
@@ -247,6 +252,8 @@
     "title": "Artisan Profile",
     "createTitle": "Create Your Artisan Profile",
     "editTitle": "Edit Your Artisan Profile",
+    "createHelper": "Tell the world about you and your craft.",
+    "editHelper": "Update your details and how others see you.",
     "firstName": "First Name",
     "lastName": "Last Name",
     "bio": "Bio",
@@ -349,6 +356,22 @@
     "details": {
       "description": "Description",
       "materials": "Materials",
+      "technique": "Technique",
+      "timeToMake": "Time to make",
+      "dimensions": "Dimensions",
+      "weight": "Weight",
+      "inspiration": "Inspiration",
+      "careInstructions": "Care instructions",
+      "meetMaker": "Meet the maker",
+      "viewProfile": "View profile",
+      "yearsExperience": "years of experience",
+      "theMaking": "The making",
+      "added": "Added",
+      "viewLargerMap": "View larger map",
+      "authenticity": "Authenticity",
+      "qrTitle": "Scan to verify",
+      "certificateTitle": "Certificate of Authenticity",
+      "certificateDescription": "A tamper-evident digital certificate for this craft.",
       "createdBy": "Created by",
       "createdWhere": "Created at",
       "createdOn": "Created on",
@@ -382,7 +405,23 @@
     "deleteCraft": "Delete",
     "createCraftName": "Craft title",
     "createCraftDescription": "Description",
-    "createCraftMaterial": "Material",
+    "createCraftMaterial": "Materials",
+    "createCraftMaterialsPlaceholder": "List the materials used — e.g. hand-spun wool, plant dyes, oak.",
+    "createCraftTechnique": "Technique",
+    "createCraftTechniquePlaceholder": "Describe the techniques and methods used to make it.",
+    "createCraftTimeToMake": "Time to make",
+    "createCraftTimeToMakePlaceholder": "e.g. about 3 weeks, 40 hours",
+    "createCraftDimensions": "Dimensions",
+    "dimensionWidth": "Width",
+    "dimensionHeight": "Height",
+    "dimensionDepth": "Depth",
+    "dimensionUnit": "Unit",
+    "createCraftWeight": "Weight",
+    "weightUnit": "Weight unit",
+    "createCraftInspiration": "Inspiration",
+    "createCraftInspirationPlaceholder": "What prompted this piece? An idea, a person, a place, a tradition…",
+    "createCraftCareInstructions": "Care instructions",
+    "createCraftCareInstructionsPlaceholder": "How should this piece be looked after and stored?",
     "createCraftPublic": "Make this craft public",
     "createCraftMakeLocationPublic": "Share my approximate location with visitors",
     "uploadImages": "Upload images of your craft",
@@ -517,5 +556,57 @@
     "uploadFailed": "Upload failed. Please try again.",
     "deleteFailed": "Could not remove that item. Please try again.",
     "visibilityFailed": "Could not update visibility. Please try again."
+  },
+  "home": {
+    "hero": {
+      "headlineLead": "Every craft carries the hands that",
+      "headlineEmphasis": "made it",
+      "subcopy": "Behind every piece is a real person, a real place, and a tradition passed down through generations. Meet the makers and the stories woven into their work.",
+      "ctaMakers": "Meet the makers",
+      "ctaCrafts": "Browse the crafts",
+      "chipKicker": "Featured maker"
+    },
+    "trust": {
+      "rooted": {
+        "title": "Rooted in place",
+        "description": "Every craft is tied to the region and traditions it comes from."
+      },
+      "named": {
+        "title": "Made by a named maker",
+        "description": "No anonymous factories — meet the person whose hands shaped it."
+      },
+      "verified": {
+        "title": "Verified provenance",
+        "description": "A signed certificate is only a scan away, whenever you want proof."
+      }
+    },
+    "artisans": {
+      "eyebrow": "The people",
+      "title": "Meet the artisans",
+      "viewAll": "All artisans",
+      "story": "Crafting with care."
+    },
+    "communities": {
+      "eyebrow": "Together",
+      "title": "Crafts live inside communities",
+      "body": "Guilds, cooperatives and collectives keep traditions alive — sharing skills, tools and a place to belong.",
+      "viewAll": "All communities",
+      "makers": "makers"
+    },
+    "crafts": {
+      "eyebrow": "The work",
+      "title": "Featured crafts",
+      "viewAll": "The collection",
+      "by": "by"
+    },
+    "provenance": {
+      "eyebrow": "Authenticity, digitally verified",
+      "title": "Provenance, connected to the maker",
+      "body": "The story comes first. When you need proof, every craft carries a verifiable certificate and a QR code confirming who made it, where, and when.",
+      "point1": "Cryptographically signed by the maker",
+      "point2": "Scan the QR to verify in seconds",
+      "point3": "Backed by a tamper-evident credential",
+      "cta": "See how it works"
+    }
   }
 }

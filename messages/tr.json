@@ -12,13 +12,13 @@
     "artisans": "Ustalar",
     "groups": "Topluluklar",
     "seecrafts": "Galeri",
-    "addcraft": "Zanaat Ekle",
+    "addcraft": "Yeni Zanaat Ekle",
     "login": "Giriş Yap",
     "logout": "Çıkış Yap",
     "profile": "Profil",
     "myitems": "Zanaatlarım",
     "mygroups": "Topluluklarım",
-    "createGroup": "Topluluk Oluştur",
+    "createGroup": "Yeni Topluluk Ekle",
     "mystory": "Hikâyem",
     "completeProfile": "Profilini tamamla",
     "mediaGallery": "Medya Galerisi",
@@ -154,6 +154,7 @@
     "next": "İleri",
     "begin": "Başla",
     "saveExit": "Kaydet ve çık",
+    "backToReview": "Kaydet ve gözden geçirmeye dön",
     "saving": "Kaydediliyor...",
     "publish": "Hikâyemi yayınla",
     "publishing": "Yayınlanıyor...",
@@ -221,6 +222,8 @@
     "review": {
       "title": "Hikâyeni gözden geçir",
       "lead": "Paylaştıklarına hızlıca göz at. Yayınlamadan önce istediğin her şeyi düzenlemek için geri dönebilirsin.",
+      "editStep": "{section} düzenle",
+      "editHint": "Düzenlemek için herhangi bir bölüme dokun.",
       "notAnswered": "Henüz cevaplanmadı",
       "hasRecording": "Kayıt eklendi",
       "workshopCount": "{count, plural, =0 {Henüz dosya yok} one {1 dosya} other {# dosya}}"
@@ -247,6 +250,8 @@
     "title": "Zanaatkâr Profili",
     "createTitle": "Zanaatkâr Profilinizi Oluşturun",
     "editTitle": "Zanaatkâr Profilinizi Düzenleyin",
+    "createHelper": "Kendinizi ve zanaatınızı dünyaya tanıtın.",
+    "editHelper": "Bilgilerinizi ve başkalarının sizi nasıl gördüğünü güncelleyin.",
     "firstName": "Ad",
     "lastName": "Soyad",
     "bio": "Biyografi",
@@ -349,6 +354,22 @@
     "details": {
       "description": "Açıklama",
       "materials": "Malzemeler",
+      "technique": "Teknik",
+      "timeToMake": "Yapım süresi",
+      "dimensions": "Boyutlar",
+      "weight": "Ağırlık",
+      "inspiration": "İlham",
+      "careInstructions": "Bakım talimatları",
+      "meetMaker": "Ustayı tanıyın",
+      "viewProfile": "Profili görüntüle",
+      "yearsExperience": "yıl deneyim",
+      "theMaking": "Yapımı",
+      "added": "Eklendi",
+      "viewLargerMap": "Daha büyük haritayı gör",
+      "authenticity": "Özgünlük",
+      "qrTitle": "Doğrulamak için tarayın",
+      "certificateTitle": "Özgünlük Sertifikası",
+      "certificateDescription": "Bu zanaat için kurcalamaya karşı korumalı dijital sertifika.",
       "createdBy": "Oluşturan",
       "createdWhere": "Oluşturulduğu yer",
       "createdOn": "Oluşturulma tarihi",
@@ -382,7 +403,23 @@
     "deleteCraft": "Sil",
     "createCraftName": "Title:",
     "createCraftDescription": "Describe your craft in a few words:",
-    "createCraftMaterial": "Material used:",
+    "createCraftMaterial": "Malzemeler",
+    "createCraftMaterialsPlaceholder": "Kullanılan malzemeleri yazın – örn. el eğirmesi yün, bitkisel boyalar, meşe.",
+    "createCraftTechnique": "Teknik",
+    "createCraftTechniquePlaceholder": "Yapımında kullanılan teknik ve yöntemleri anlatın.",
+    "createCraftTimeToMake": "Yapım süresi",
+    "createCraftTimeToMakePlaceholder": "örn. yaklaşık 3 hafta, 40 saat",
+    "createCraftDimensions": "Boyutlar",
+    "dimensionWidth": "Genişlik",
+    "dimensionHeight": "Yükseklik",
+    "dimensionDepth": "Derinlik",
+    "dimensionUnit": "Birim",
+    "createCraftWeight": "Ağırlık",
+    "weightUnit": "Ağırlık birimi",
+    "createCraftInspiration": "İlham",
+    "createCraftInspirationPlaceholder": "Bu parçaya ne ilham verdi? Bir fikir, bir kişi, bir yer, bir gelenek…",
+    "createCraftCareInstructions": "Bakım talimatları",
+    "createCraftCareInstructionsPlaceholder": "Bu parça nasıl korunmalı ve saklanmalı?",
     "createCraftPublic": "Bu zanaatı herkese açık yap",
     "createCraftMakeLocationPublic": "Share my location",
     "uploadImages": "Zanaatınızın görsellerini yükleyin",
@@ -517,5 +554,57 @@
     "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
     "deleteFailed": "Bu öğe kaldırılamadı. Lütfen tekrar dene.",
     "visibilityFailed": "Görünürlük güncellenemedi. Lütfen tekrar dene."
+  },
+  "home": {
+    "hero": {
+      "headlineLead": "Her el sanatı, onu yapan",
+      "headlineEmphasis": "elleri taşır",
+      "subcopy": "Her parçanın ardında gerçek bir insan, gerçek bir yer ve nesilden nesile aktarılan bir gelenek vardır. Üreticilerle ve işlerine işlenen hikâyelerle tanışın.",
+      "ctaMakers": "Üreticilerle tanışın",
+      "ctaCrafts": "El sanatlarına göz atın",
+      "chipKicker": "Öne çıkan üretici"
+    },
+    "trust": {
+      "rooted": {
+        "title": "Yerine bağlı",
+        "description": "Her el sanatı, geldiği bölgeye ve geleneklere bağlıdır."
+      },
+      "named": {
+        "title": "Adı bilinen bir usta tarafından",
+        "description": "Anonim fabrika yok — ona şekil veren kişiyle tanışın."
+      },
+      "verified": {
+        "title": "Doğrulanmış köken",
+        "description": "İmzalı bir sertifika, kanıt istediğinizde bir tarama uzağınızda."
+      }
+    },
+    "artisans": {
+      "eyebrow": "İnsanlar",
+      "title": "Ustalarla tanışın",
+      "viewAll": "Tüm ustalar",
+      "story": "Özenle üretiyor."
+    },
+    "communities": {
+      "eyebrow": "Birlikte",
+      "title": "El sanatları topluluklar içinde yaşar",
+      "body": "Loncalar, kooperatifler ve kolektifler gelenekleri yaşatır — beceri, alet ve aidiyet paylaşır.",
+      "viewAll": "Tüm topluluklar",
+      "makers": "usta"
+    },
+    "crafts": {
+      "eyebrow": "İşler",
+      "title": "Öne çıkan el sanatları",
+      "viewAll": "Koleksiyon",
+      "by": "üretici:"
+    },
+    "provenance": {
+      "eyebrow": "Özgünlük, dijital olarak doğrulanmış",
+      "title": "Köken, üreticiye bağlı",
+      "body": "Önce hikâye gelir. Kanıt gerektiğinde her el sanatı; onu kimin, nerede ve ne zaman yaptığını doğrulayan bir sertifika ve QR kod taşır.",
+      "point1": "Usta tarafından kriptografik olarak imzalandı",
+      "point2": "Saniyeler içinde doğrulamak için QR kodu tarayın",
+      "point3": "Kurcalamaya karşı korumalı bir kimlik bilgisiyle desteklenir",
+      "cta": "Nasıl çalıştığını görün"
+    }
   }
 }

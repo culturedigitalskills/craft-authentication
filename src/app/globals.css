@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Sustainable Crafting — warm-artisanal design system (tokens + .sc-* components). */
+@import "../../styles/sustainable-crafting.css";
 
 @custom-variant dark (&:is(.dark *));
 

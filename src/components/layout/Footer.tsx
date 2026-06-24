@@ -30,45 +30,38 @@ export function Footer() {
     const t = useTranslations('')
 
     return (
-        <footer className="bg-primary text-primary-foreground">
-            <div className="container mx-auto max-w-6xl px-4 py-6">
+        <footer className="sc-dark" style={{ background: 'var(--sc-ink-deep)' }}>
+            <div className="sc-container py-8">
                 {/* Stack on mobile, row on desktop */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     {/* Copyright & description */}
                     <div className="min-w-0 space-y-1">
-                        <span className="text-sm font-bold">{t('copyright')}</span>
-                        <p className="text-xs leading-relaxed text-primary-foreground/80">
+                        <span
+                            className="text-base font-semibold"
+                            style={{ fontFamily: 'var(--sc-font-display)', color: 'var(--sc-text-on-dark)' }}
+                        >
+                            {t('copyright')}
+                        </span>
+                        <p className="text-xs leading-relaxed" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
                             {t('footer.description')}
                         </p>
                     </div>
 
                     {/* Social icons */}
                     <div className="flex shrink-0 items-center gap-4">
-                        <Link
-                            href="#"
-                            className="text-primary-foreground/60 transition-colors hover:text-primary-foreground"
-                        >
+                        <Link href="#" className="transition-opacity hover:opacity-100" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
                             <InstagramIcon className="h-5 w-5 fill-current" />
                             <span className="sr-only">{t('socialmedia.instagram')}</span>
                         </Link>
-                        <Link
-                            href="#"
-                            className="text-primary-foreground/60 transition-colors hover:text-primary-foreground"
-                        >
+                        <Link href="#" className="transition-opacity hover:opacity-100" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
                             <XIcon className="h-5 w-5 fill-current" />
                             <span className="sr-only">{t('socialmedia.twitter')}</span>
                         </Link>
-                        <Link
-                            href="#"
-                            className="text-primary-foreground/60 transition-colors hover:text-primary-foreground"
-                        >
+                        <Link href="#" className="transition-opacity hover:opacity-100" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
                             <FacebookIcon className="h-5 w-5 fill-current" />
                             <span className="sr-only">{t('socialmedia.facebook')}</span>
                         </Link>
-                        <Link
-                            href="#"
-                            className="text-primary-foreground/60 transition-colors hover:text-primary-foreground"
-                        >
+                        <Link href="#" className="transition-opacity hover:opacity-100" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
                             <Mail className="h-5 w-5" />
                             <span className="sr-only">{t('socialmedia.email')}</span>
                         </Link>

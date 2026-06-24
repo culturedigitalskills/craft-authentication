@@ -1,0 +1,412 @@
+/* ============================================================
+   Sustainable Crafting — unified design system
+   Warm-artisanal: paper grounds, navy ink, terracotta accent.
+   Drop this in once (global), then build with the tokens +
+   the component classes below. Everything is a CSS variable so
+   themes can be retuned in one place.
+   ============================================================ */
+
+/* ---- Fonts (load in <head>) -------------------------------
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Hanken+Grotesque:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+------------------------------------------------------------ */
+
+:root {
+  /* — Brand palette — */
+  --sc-paper:        #f1e9da;   /* base page cream */
+  --sc-paper-hi:     #f7f0e2;   /* lighter cream (gradient top) */
+  --sc-paper-lo:     #ece2cf;   /* deeper cream (gradient bottom) */
+  --sc-surface:      #f1e9da;   /* card surface (solid) */
+  --sc-surface-trans: rgba(251, 246, 235, 0.85); /* card on paper */
+
+  --sc-ink:          #20303f;   /* primary navy-teal ink */
+  --sc-ink-deep:     #1a2730;   /* footer / deepest */
+  --sc-ink-soft:     #324654;   /* raised surfaces on dark */
+
+  --sc-accent:       #bb5a2c;   /* terracotta — primary accent */
+  --sc-accent-deep:  #a8521f;   /* terracotta hover/pressed */
+  --sc-accent-warm:  #e6a06a;   /* ochre — accent ON dark bg */
+
+  /* — Secondary craft hues (use sparingly, for variety) — */
+  --sc-teal:         #1f7d86;
+  --sc-teal-deep:    #1d6b75;
+  --sc-ochre:        #cf8a2a;
+  --sc-ochre-hi:     #e0a64a;
+  --sc-olive:        #7c8460;
+  --sc-plum:         #b06a8a;
+
+  /* — Text — */
+  --sc-text:         #2a231d;   /* default body on paper */
+  --sc-text-soft:    #5f5648;   /* secondary body */
+  --sc-text-muted:   #9a8d79;   /* captions, meta, labels */
+  --sc-text-on-dark: #f4ede0;   /* body on ink */
+  --sc-text-on-dark-muted: #9fb0bd;
+
+  /* — Lines & borders — */
+  --sc-border:       rgba(42, 35, 29, 0.10);
+  --sc-border-strong: rgba(42, 35, 29, 0.18);
+  --sc-border-on-dark: rgba(255, 248, 238, 0.16);
+
+  /* — Type families — */
+  --sc-font-display: "Spectral", Georgia, serif;        /* headings, numbers */
+  --sc-font-body:    "Hanken Grotesque", system-ui, sans-serif;
+  --sc-font-hand:    "Caveat", cursive;                  /* quotes, captions, accents */
+
+  /* — Type scale — */
+  --sc-text-eyebrow: 12px;   /* 700, letter-spacing 2px, UPPERCASE, accent */
+  --sc-text-meta:    11.5px; /* 700, letter-spacing 0.6px, UPPERCASE, muted */
+  --sc-text-sm:      13.5px;
+  --sc-text-base:    17px;   /* body — line-height 1.6–1.75 */
+  --sc-text-lead:    27px;   /* Spectral lead paragraph */
+  --sc-text-h2:      30px;
+  --sc-text-h1:      52px;   /* page titles; detail heroes go 44–56 */
+
+  /* — Layout — */
+  --sc-maxw:         1240px;
+  --sc-gutter:       32px;   /* page horizontal padding */
+  --sc-rail:         340px;  /* sticky side-rail width */
+  --sc-rail-gap:     56px;   /* main↔rail gap */
+  --sc-grid-gap:     22px;   /* card grid gap */
+  --sc-section-y:    48px;   /* vertical rhythm between sections */
+
+  /* — Radii — */
+  --sc-r-chip:       22px;   /* filter chips / pills */
+  --sc-r-btn:        12px;   /* buttons, inputs */
+  --sc-r-card:       18px;   /* standard cards */
+  --sc-r-card-lg:    20px;
+  --sc-r-hero:       24px;   /* hero panels */
+  --sc-r-tile:       18px;   /* group logo tiles */
+
+  /* — Elevation — */
+  --sc-shadow-card:  0 12px 30px -24px rgba(32, 48, 63, 0.50);
+  --sc-shadow-raise: 0 16px 38px -28px rgba(32, 48, 63, 0.60);
+  --sc-shadow-hero:  0 24px 60px -30px rgba(32, 48, 63, 0.60);
+
+  /* — Motion — */
+  --sc-ease:         cubic-bezier(0.22, 0.61, 0.36, 1);
+  --sc-dur:          220ms;
+}
+
+/* ---- Page foundation -------------------------------------- */
+body {
+  margin: 0;
+  background: var(--sc-paper);
+  color: var(--sc-text);
+  font-family: var(--sc-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--sc-accent);
+  color: #fff8ee;
+}
+
+/* The signature paper ground — apply to the top-level page wrapper. */
+.sc-page {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: radial-gradient(120% 80% at 80% -10%,
+              var(--sc-paper-hi) 0%, var(--sc-paper) 45%, var(--sc-paper-lo) 100%);
+}
+
+/* Subtle paper grain — one fixed overlay per page, pointer-events:none. */
+.sc-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Centered content column. */
+.sc-container {
+  max-width: var(--sc-maxw);
+  margin: 0 auto;
+  padding-left: var(--sc-gutter);
+  padding-right: var(--sc-gutter);
+}
+
+/* ---- Typography helpers ----------------------------------- */
+.sc-eyebrow {
+  font-size: var(--sc-text-eyebrow);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--sc-accent);
+}
+
+.sc-display {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  color: var(--sc-ink);
+  letter-spacing: -0.5px;
+  line-height: 1.02;
+}
+
+.sc-h1 {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-text-h1);
+  line-height: 1;
+  letter-spacing: -0.6px;
+  color: var(--sc-ink);
+  margin: 0;
+}
+
+.sc-h2 {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-text-h2);
+  color: var(--sc-ink);
+  margin: 0;
+}
+
+.sc-lead {
+  font-family: var(--sc-font-display);
+  font-weight: 400;
+  font-size: var(--sc-text-lead);
+  line-height: 1.45;
+  letter-spacing: -0.2px;
+  color: var(--sc-ink);
+}
+
+.sc-body {
+  font-size: var(--sc-text-base);
+  line-height: 1.7;
+  color: var(--sc-text-soft);
+}
+
+.sc-meta {
+  font-size: var(--sc-text-meta);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--sc-text-muted);
+}
+
+.sc-quote {
+  font-family: var(--sc-font-hand);
+  font-size: 38px;
+  line-height: 1.15;
+  color: var(--sc-ink);
+  border-left: 4px solid var(--sc-accent);
+  padding-left: 28px;
+  margin: 0;
+}
+
+/* ---- Buttons ---------------------------------------------- */
+.sc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: var(--sc-r-btn);
+  font-family: var(--sc-font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--sc-dur) var(--sc-ease), box-shadow var(--sc-dur) var(--sc-ease);
+}
+
+.sc-btn--primary {
+  background: var(--sc-accent);
+  color: #fff8ee;
+  box-shadow: 0 8px 20px -8px var(--sc-accent);
+}
+
+.sc-btn--primary:hover {
+  background: var(--sc-accent-deep);
+  transform: translateY(-1px);
+}
+
+.sc-btn--ghost {
+  background: transparent;
+  color: var(--sc-text);
+  border: 1px solid var(--sc-border-strong);
+}
+
+.sc-btn--ghost:hover {
+  border-color: var(--sc-accent);
+  color: var(--sc-accent);
+}
+
+/* ---- Chips / filter pills --------------------------------- */
+.sc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--sc-r-chip);
+  font-size: var(--sc-text-sm);
+  font-weight: 600;
+  color: var(--sc-text-soft);
+  border: 1px solid var(--sc-border-strong);
+  cursor: pointer;
+  transition: all var(--sc-dur) var(--sc-ease);
+}
+
+.sc-chip:hover {
+  border-color: var(--sc-accent);
+  color: var(--sc-accent);
+}
+
+.sc-chip--active {
+  background: var(--sc-ink);
+  color: var(--sc-text-on-dark);
+  border-color: var(--sc-ink);
+}
+
+/* Credential badge (tinted) — set --t to a hue var. */
+.sc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t, var(--sc-accent));
+  background: color-mix(in srgb, var(--t, var(--sc-accent)) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--t, var(--sc-accent)) 24%, transparent);
+}
+
+/* ---- Cards ------------------------------------------------ */
+.sc-card {
+  background: var(--sc-surface-trans);
+  border: 1px solid var(--sc-border);
+  border-radius: var(--sc-r-card);
+  box-shadow: var(--sc-shadow-card);
+  overflow: hidden;
+  transition: transform var(--sc-dur) var(--sc-ease), box-shadow var(--sc-dur) var(--sc-ease);
+}
+
+.sc-card--raised {
+  box-shadow: var(--sc-shadow-raise);
+}
+
+a.sc-card:hover,
+.sc-card--hover:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sc-shadow-raise);
+}
+
+/* ---- Surfaces on dark ------------------------------------- */
+.sc-dark {
+  background: var(--sc-ink);
+  color: var(--sc-text-on-dark);
+}
+
+.sc-dark .sc-eyebrow {
+  color: var(--sc-accent-warm);
+}
+
+.sc-dark-panel {
+  background: rgba(255, 253, 248, 0.06);
+  border: 1px solid var(--sc-border-on-dark);
+  border-radius: var(--sc-r-card-lg);
+}
+
+/* ---- Avatars & stacks ------------------------------------- */
+.sc-avatar {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  color: #fff8ee;
+}
+
+.sc-stack {
+  display: flex;
+  align-items: center;
+}
+
+.sc-stack > * {
+  margin-left: -10px;
+  border: 2.5px solid var(--sc-ink);
+}
+
+.sc-stack > *:first-child {
+  margin-left: 0;
+}
+
+/* ---- Section divider rule (title … line … action) --------- */
+.sc-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--sc-border);
+}
+
+/* ---- Sticky rail layout ----------------------------------- */
+.sc-split {
+  display: grid;
+  grid-template-columns: 1fr var(--sc-rail);
+  gap: var(--sc-rail-gap);
+  align-items: start;
+}
+
+.sc-sticky {
+  position: sticky;
+  top: 96px;
+}
+
+/* ---- Nav -------------------------------------------------- */
+.sc-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(10px);
+  background: rgba(244, 237, 224, 0.82);
+  border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-nav__link {
+  color: var(--sc-text-soft);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.sc-nav__link--active {
+  color: var(--sc-text);
+  font-weight: 600;
+  position: relative;
+}
+
+.sc-nav__link--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -19px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--sc-accent);
+}
+
+/* ---- Responsive ------------------------------------------- */
+@media (max-width: 900px) {
+  :root {
+    --sc-text-h1: 38px;
+    --sc-text-lead: 22px;
+    --sc-rail-gap: 32px;
+  }
+
+  .sc-split {
+    grid-template-columns: 1fr;
+  }
+
+  .sc-sticky {
+    position: static;
+  }
+}

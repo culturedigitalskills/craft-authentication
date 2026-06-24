@@ -6,10 +6,24 @@ import { z } from 'zod'
 const mediaIdsField = z.array(z.uuid()).max(50).optional()
 const videosField = z.array(z.string().min(1).max(50)).max(50).optional()
 
+const dimensionField = z.number().positive().max(1_000_000).nullish()
+const dimensionUnitField = z.enum(['cm', 'in']).nullish()
+const weightUnitField = z.enum(['g', 'kg', 'oz', 'lb']).nullish()
+
 export const CreateCraftSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255),
     description: z.string().max(1000).optional(),
-    material: z.string().max(100).optional(),
+    materials: z.string().max(2000).optional(),
+    technique: z.string().max(2000).optional(),
+    timeToMake: z.string().max(100).optional(),
+    width: dimensionField,
+    height: dimensionField,
+    depth: dimensionField,
+    dimensionUnit: dimensionUnitField,
+    weight: dimensionField,
+    weightUnit: weightUnitField,
+    inspiration: z.string().max(2000).optional(),
+    careInstructions: z.string().max(2000).optional(),
     isPublic: z.boolean().default(false),
     isSharedLocation: z.boolean().default(true),
     latitude: z.number().min(-90).max(90).nullish(),
@@ -22,7 +36,17 @@ export const CreateCraftSchema = z.object({
 export const UpdateCraftSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255).optional(),
     description: z.string().max(1000).nullish(),
-    material: z.string().max(100).nullish(),
+    materials: z.string().max(2000).nullish(),
+    technique: z.string().max(2000).nullish(),
+    timeToMake: z.string().max(100).nullish(),
+    width: dimensionField,
+    height: dimensionField,
+    depth: dimensionField,
+    dimensionUnit: dimensionUnitField,
+    weight: dimensionField,
+    weightUnit: weightUnitField,
+    inspiration: z.string().max(2000).nullish(),
+    careInstructions: z.string().max(2000).nullish(),
     isPublic: z.boolean().optional(),
     isSharedLocation: z.boolean().optional(),
     latitude: z.number().min(-90).max(90).nullish(),

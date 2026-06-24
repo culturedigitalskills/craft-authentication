@@ -55,19 +55,35 @@ export default async function LocaleLayout({ children, params }: Props) {
             <head>
                 <link href="/favicon.ico" rel="icon" sizes="32x32" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+                {/* Sustainable Crafting type — Spectral (display), Hanken Grotesque (body), Caveat (accent) */}
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Hanken+Grotesque:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap"
+                    rel="stylesheet"
+                />
             </head>
 
             <body
                 className={cn(
-                    'min-h-screen overflow-x-hidden bg-background font-sans antialiased',
+                    'min-h-screen overflow-x-hidden antialiased',
                     geistSans.variable,
                     geistMono.variable,
                 )}
             >
-                <ThemeProvider attribute="class" defaultTheme="light">
-                    <SessionProvider>
+
+
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="light"
+                            forcedTheme="light"
+                            enableSystem={false}
+                            disableTransitionOnChange
+                        >                    
+                        <SessionProvider>
                         <NextIntlClientProvider messages={messages}>
-                            <div className="flex min-h-screen flex-col">
+                            <div className="sc-page flex min-h-screen flex-col">
+                                <div className="sc-grain" />
                                 <Header needsOnboarding={needsOnboarding} />
                                 <main className="flex-1">
                                     {children}

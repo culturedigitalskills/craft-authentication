@@ -12,13 +12,13 @@
     "artisans": "Artesanos",
     "groups": "Comunidades",
     "seecrafts": "Galería",
-    "addcraft": "Agregar Artesanía",
+    "addcraft": "Agregar Nueva Artesanía",
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
     "profile": "Perfil",
     "myitems": "Mis Artesanías",
     "mygroups": "Mis Comunidades",
-    "createGroup": "Crear Comunidad",
+    "createGroup": "Agregar Nueva Comunidad",
     "mystory": "Mi Historia",
     "completeProfile": "Completa tu perfil",
     "mediaGallery": "Galería multimedia",
@@ -154,6 +154,7 @@
     "next": "Siguiente",
     "begin": "Comenzar",
     "saveExit": "Guardar y salir",
+    "backToReview": "Guardar y volver a la revisión",
     "saving": "Guardando...",
     "publish": "Publicar mi historia",
     "publishing": "Publicando...",
@@ -221,6 +222,8 @@
     "review": {
       "title": "Revisa tu historia",
       "lead": "Echa un vistazo rápido a lo que has compartido. Puedes volver atrás para editar cualquier cosa antes de publicar.",
+      "editStep": "Editar {section}",
+      "editHint": "Toca cualquier sección para editarla.",
       "notAnswered": "Sin responder todavía",
       "hasRecording": "Grabación adjunta",
       "workshopCount": "{count, plural, =0 {Aún no hay archivos} one {1 archivo} other {# archivos}}"
@@ -247,6 +250,8 @@
     "title": "Perfil de Artesano",
     "createTitle": "Crea tu Perfil de Artesano",
     "editTitle": "Edita tu Perfil de Artesano",
+    "createHelper": "Cuéntale al mundo sobre ti y tu artesanía.",
+    "editHelper": "Actualiza tus datos y cómo te ven los demás.",
     "firstName": "Nombre",
     "lastName": "Apellido",
     "bio": "Biografía",
@@ -349,6 +354,22 @@
     "details": {
       "description": "Descripción",
       "materials": "Materiales",
+      "technique": "Técnica",
+      "timeToMake": "Tiempo de elaboración",
+      "dimensions": "Dimensiones",
+      "weight": "Peso",
+      "inspiration": "Inspiración",
+      "careInstructions": "Instrucciones de cuidado",
+      "meetMaker": "Conoce al creador",
+      "viewProfile": "Ver perfil",
+      "yearsExperience": "años de experiencia",
+      "theMaking": "La elaboración",
+      "added": "Añadido",
+      "viewLargerMap": "Ver mapa más grande",
+      "authenticity": "Autenticidad",
+      "qrTitle": "Escanea para verificar",
+      "certificateTitle": "Certificado de Autenticidad",
+      "certificateDescription": "Un certificado digital a prueba de manipulaciones para esta pieza.",
       "createdBy": "Creado por",
       "createdWhere": "Creado en",
       "createdOn": "Creado el",
@@ -382,7 +403,23 @@
     "deleteCraft": "Eliminar",
     "createCraftName": "Título del artesanía",
     "createCraftDescription": "Descripción",
-    "createCraftMaterial": "Material",
+    "createCraftMaterial": "Materiales",
+    "createCraftMaterialsPlaceholder": "Enumera los materiales usados — p. ej. lana hilada a mano, tintes vegetales, roble.",
+    "createCraftTechnique": "Técnica",
+    "createCraftTechniquePlaceholder": "Describe las técnicas y métodos usados para crearla.",
+    "createCraftTimeToMake": "Tiempo de elaboración",
+    "createCraftTimeToMakePlaceholder": "p. ej. unas 3 semanas, 40 horas",
+    "createCraftDimensions": "Dimensiones",
+    "dimensionWidth": "Ancho",
+    "dimensionHeight": "Alto",
+    "dimensionDepth": "Profundidad",
+    "dimensionUnit": "Unidad",
+    "createCraftWeight": "Peso",
+    "weightUnit": "Unidad de peso",
+    "createCraftInspiration": "Inspiración",
+    "createCraftInspirationPlaceholder": "¿Qué inspiró esta pieza? Una idea, una persona, un lugar, una tradición…",
+    "createCraftCareInstructions": "Instrucciones de cuidado",
+    "createCraftCareInstructionsPlaceholder": "¿Cómo se debe cuidar y guardar esta pieza?",
     "createCraftPublic": "Hacer pública esta artesanía",
     "createCraftMakeLocationPublic": "Compartir mi ubicación aproximada con los visitantes",
     "uploadImages": "Sube imágenes de tu artesanía",
@@ -517,5 +554,57 @@
     "uploadFailed": "Error al subir. Inténtalo de nuevo.",
     "deleteFailed": "No se pudo quitar ese elemento. Inténtalo de nuevo.",
     "visibilityFailed": "No se pudo actualizar la visibilidad. Inténtalo de nuevo."
+  },
+  "home": {
+    "hero": {
+      "headlineLead": "Cada artesanía lleva las manos que",
+      "headlineEmphasis": "la crearon",
+      "subcopy": "Detrás de cada pieza hay una persona real, un lugar real y una tradición transmitida por generaciones. Conoce a quienes crean y las historias tejidas en su trabajo.",
+      "ctaMakers": "Conoce a los artesanos",
+      "ctaCrafts": "Explora las artesanías",
+      "chipKicker": "Artesano destacado"
+    },
+    "trust": {
+      "rooted": {
+        "title": "Arraigada en su lugar",
+        "description": "Cada artesanía está ligada a la región y las tradiciones de las que proviene."
+      },
+      "named": {
+        "title": "Hecha por un artesano con nombre",
+        "description": "Sin fábricas anónimas: conoce a la persona cuyas manos la dieron forma."
+      },
+      "verified": {
+        "title": "Procedencia verificada",
+        "description": "Un certificado firmado está a un escaneo de distancia cuando quieras comprobarlo."
+      }
+    },
+    "artisans": {
+      "eyebrow": "Las personas",
+      "title": "Conoce a los artesanos",
+      "viewAll": "Todos los artesanos",
+      "story": "Creando con dedicación."
+    },
+    "communities": {
+      "eyebrow": "Juntos",
+      "title": "Las artesanías viven en comunidades",
+      "body": "Gremios, cooperativas y colectivos mantienen vivas las tradiciones: comparten saberes, herramientas y un lugar de pertenencia.",
+      "viewAll": "Todas las comunidades",
+      "makers": "artesanos"
+    },
+    "crafts": {
+      "eyebrow": "El trabajo",
+      "title": "Artesanías destacadas",
+      "viewAll": "La colección",
+      "by": "por"
+    },
+    "provenance": {
+      "eyebrow": "Autenticidad, verificada digitalmente",
+      "title": "Procedencia, conectada con el artesano",
+      "body": "La historia va primero. Cuando necesitas pruebas, cada artesanía lleva un certificado verificable y un código QR que confirma quién la hizo, dónde y cuándo.",
+      "point1": "Firmada criptográficamente por el artesano",
+      "point2": "Escanea el QR para verificar en segundos",
+      "point3": "Respaldada por una credencial a prueba de manipulaciones",
+      "cta": "Descubre cómo funciona"
+    }
   }
 }

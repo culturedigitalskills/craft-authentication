@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
 import { LocationSelect } from './LocationSelect'
@@ -466,22 +467,31 @@ export function ArtisanProfileForm({
     // ── Create / Edit mode ──
     return (
         <div className="container mx-auto max-w-4xl px-4 py-10">
-            <div className="space-y-8">
-                {/* Header with back button */}
-                <div className="flex items-center gap-4 border-b border-border/40 pb-5">
-                    {isEditing && (
-                        <button
-                            type="button"
-                            onClick={handleCancelEdit}
-                            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                        >
-                            <ArrowLeft className="h-5 w-5" />
-                        </button>
-                    )}
-                    <h1 className="text-2xl font-bold tracking-tight text-primary">
-                        {isCreateMode ? t('createTitle') : t('editTitle')}
-                    </h1>
+            <Card className="overflow-hidden rounded-2xl shadow-lg">
+                {/* Colour banner header */}
+                <div className="bg-primary px-6 py-6">
+                    <div className="flex items-center gap-3">
+                        {isEditing && (
+                            <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                        )}
+                        <div>
+                            <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                                {isCreateMode ? t('createTitle') : t('editTitle')}
+                            </h1>
+                            <p className="text-left text-sm text-primary-foreground/70">
+                                {isCreateMode ? t('createHelper') : t('editHelper')}
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
+                <CardContent className="space-y-8 p-6">
 
                 {message && (
                     <div
@@ -754,7 +764,8 @@ export function ArtisanProfileForm({
                         </Button>
                     </div>
                 </form>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }

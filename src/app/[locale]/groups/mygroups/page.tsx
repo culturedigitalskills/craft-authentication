@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap } from 'lucide-react'
+import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Metadata } from 'next'
 
@@ -75,11 +75,11 @@ export default async function MyGroupsPage() {
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {groups.map((group) => (
-                        <Link
+                        <div
                             key={group.id}
-                            href={`/groups/${group.slug}`}
-                            className="group rounded-lg border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
+                            className="group relative rounded-lg border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
                         >
+                            <Link href={`/groups/${group.slug}`} className="block p-6">
                             <div className="flex items-center gap-3">
                                 {logoMap.get(group.id) ? (
                                     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
@@ -166,7 +166,20 @@ export default async function MyGroupsPage() {
                                     </span>
                                 ))}
                             </div>
-                        </Link>
+                            </Link>
+
+                            {/* Edit button — outside the Link to avoid nesting */}
+                            {group.memberRole === 'ADMIN' && (
+                                <div className="absolute right-2 top-2">
+                                    <Button size="sm" variant="secondary" asChild>
+                                        <Link href={`/groups/${group.slug}/manage`}>
+                                            <Pencil className="mr-1 h-3 w-3" />
+                                            {t('editGroup')}
+                                        </Link>
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
             )}

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
 import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image, Images, Sparkles } from 'lucide-react'
-import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 
 interface NavbarAuthProps {
@@ -15,10 +14,16 @@ interface NavbarAuthProps {
     needsOnboarding?: boolean
 }
 
-// Static warm underline shown under the label of the *selected* dropdown item,
+// Shared row styling for dropdown / drawer entries, tuned to the --sc-* palette.
+const rowBase = 'flex items-center gap-2 rounded-[10px] px-4 py-2 text-sm transition-colors duration-200'
+const rowIdle = 'text-[var(--sc-text-soft)] hover:text-[var(--sc-accent)]'
+const rowActive = 'text-[var(--sc-accent)]'
+
+// Static terracotta underline shown under the label of the *selected* entry,
 // mirroring the active-link indicator in the main navbar.
 const activeUnderline =
-    'relative after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-warm'
+    'relative after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-[var(--sc-accent)]'
+
 export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = false }: NavbarAuthProps) {
     const { data: session, status } = useSession()
     const t = useTranslations('navbar')
@@ -41,7 +46,7 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
     }, [dropdownOpen])
 
     if (status === 'loading') {
-        return <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
+        return <div className="h-9 w-9 animate-pulse rounded-full" style={{ background: 'var(--sc-border-strong)' }} />
     }
 
     // ── Mobile layout: stacked links ──
@@ -50,15 +55,18 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
             return (
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                        <div
+                            className="sc-avatar flex h-9 w-9 shrink-0 text-xs"
+                            style={{ background: 'var(--sc-ink)' }}
+                        >
                             {getInitials(session.user.name, session.user.email)}
                         </div>
                         <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-foreground">
+                            <p className="truncate text-sm font-medium" style={{ color: 'var(--sc-text)' }}>
                                 {session.user.name || session.user.email}
                             </p>
                             {session.user.name && session.user.email && (
-                                <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+                                <p className="truncate text-xs" style={{ color: 'var(--sc-text-muted)' }}>{session.user.email}</p>
                             )}
                         </div>
                     </div>
@@ -66,91 +74,73 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                         <Link
                             href="/onboarding"
                             onClick={onAction}
-                            className="flex items-center gap-2 rounded-md bg-warm/10 px-2 py-2 text-sm font-medium text-warm transition-colors hover:bg-warm/15"
+                            className="flex items-center gap-2 rounded-[10px] px-2 py-2 text-sm font-medium text-[var(--sc-accent)]"
+                            style={{ background: 'color-mix(in srgb, var(--sc-accent) 10%, transparent)' }}
                         >
                             <Sparkles className="h-4 w-4" />
                             {t('completeProfile')}
                         </Link>
                     )}
-                    <Link
-                        href="/profile"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
+
+                    <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
+
+                    {/* Account Profile and Story */}
+                    <Link href="/profile" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
                         <User className="h-4 w-4" />
                         {t('profile')}
                     </Link>
-                    <Link
-                        href="/crafts/mycrafts"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
-                        <FolderOpen className="h-4 w-4" />
-                        {t('myitems')}
-                    </Link>      
-                    <Link
-                        href="/crafts/create"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
-                        <FolderUp className="h-4 w-4" />
-                        {t('addcraft')}
-                    </Link>
-                    <Link
-                        href="/onboarding/story"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
+                    <Link href="/onboarding/story" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
                         <BookOpen className="h-4 w-4" />
                         {t('mystory')}
                     </Link>
-                    <Link
-                        href="/media-gallery"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
+                    <Link href="/media-gallery" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
                         <Images className="h-4 w-4" />
                         {t('mediaGallery')}
                     </Link>
-                    <Link
-                        href="/content-credentials"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
+                    <Link href="/content-credentials" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
                         <ShieldCheck className="h-4 w-4" />
                         {t('contentCredentials')}
                     </Link>
-                    <Link
-                        href="/generation-workspace"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
+
+                    <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
+
+                    {/* Crafts */}
+                    <Link href="/crafts/mycrafts" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
+                        <FolderOpen className="h-4 w-4" />
+                        {t('myitems')}
+                    </Link>
+                    <Link href="/crafts/create" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
+                        <FolderUp className="h-4 w-4" />
+                        {t('addcraft')}
+                    </Link>
+
+                    <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
+
+                    {/* Groups */}
+                    <Link href="/groups/mygroups" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
+                        <Users className="h-4 w-4" />
+                        {t('mygroups')}
+                    </Link>
+                    <Link href="/groups/create" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
+                        <UserPlus className="h-4 w-4" />
+                        {t('createGroup')}
+                    </Link>
+
+                    <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
+
+                    {/* Image tools */}
+                    <Link href="/generation-workspace" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
                         <Image className="h-4 w-4" />
                         {t('generationWorkspace')}
                     </Link>
 
-                    <div className="my-1 border-t border-border" />
+                    <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
 
-                    <Link
-                        href="/groups/mygroups"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
-                        <Users className="h-4 w-4" />
-                        {t('mygroups')}
-                    </Link>
-                    <Link
-                        href="/groups/create"
-                        onClick={onAction}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
-                        <UserPlus className="h-4 w-4" />
-                        {t('createGroup')}
-                    </Link>
+                    {/* Logout */}
                     <button
                         type="button"
                         onClick={() => { signOut({ callbackUrl: '/' }); onAction?.() }}
-                        className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
+                        className={`${rowBase} text-[var(--sc-accent-deep)] hover:opacity-80`}
                     >
                         <LogOut className="h-4 w-4" />
                         {t('logout')}
@@ -160,11 +150,7 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
         }
 
         return (
-            <Link
-                href="/login"
-                onClick={onAction}
-                className="inline-flex items-center justify-center rounded-md bg-warm px-4 py-2.5 text-sm font-medium text-warm-foreground transition-colors hover:bg-warm/90"
-            >
+            <Link href="/login" onClick={onAction} className="sc-btn sc-btn--primary w-full justify-center">
                 {t('login')}
             </Link>
         )
@@ -177,36 +163,38 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                 <button
                     type="button"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white ring-2 ring-transparent transition-all hover:ring-primary/30"
+                    className="sc-avatar flex h-9 w-9 text-xs ring-2 ring-transparent transition-all hover:ring-[color:var(--sc-accent)]/30"
+                    style={{ background: 'var(--sc-ink)' }}
                 >
                     {getInitials(session.user.name, session.user.email)}
                 </button>
 
                 {/* Dropdown */}
                 <div
-                    className={`absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-lg border border-border bg-background shadow-lg transition-all ${
+                    className={`absolute right-0 top-full mt-3 w-60 overflow-hidden rounded-[var(--sc-r-card)] border shadow-[var(--sc-shadow-raise)] transition-all ${
                         dropdownOpen
                             ? 'visible translate-y-0 opacity-100'
                             : 'invisible -translate-y-1 opacity-0'
                     }`}
+                    style={{ background: 'var(--sc-surface)', borderColor: 'var(--sc-border)' }}
                 >
                     {/* User info */}
-                    <div className="border-b border-border px-4 py-3">
-                        <p className="truncate text-sm font-medium text-foreground">
+                    <div className="border-b px-4 py-3" style={{ borderColor: 'var(--sc-border)' }}>
+                        <p className="truncate text-sm font-medium" style={{ color: 'var(--sc-text)' }}>
                             {session.user.name || session.user.email}
                         </p>
                         {session.user.name && session.user.email && (
-                            <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+                            <p className="truncate text-xs" style={{ color: 'var(--sc-text-muted)' }}>{session.user.email}</p>
                         )}
                     </div>
 
                     {/* Onboarding prompt — only until the user has an artisan profile */}
                     {needsOnboarding && (
-                        <div className="border-b border-border py-1">
+                        <div className="border-b py-1" style={{ borderColor: 'var(--sc-border)' }}>
                             <Link
                                 href="/onboarding"
                                 onClick={() => { setDropdownOpen(false); onAction?.() }}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-warm transition-colors hover:bg-warm/5"
+                                className={`${rowBase} font-medium ${rowActive}`}
                             >
                                 <Sparkles className="h-4 w-4" />
                                 {t('completeProfile')}
@@ -214,36 +202,20 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                         </div>
                     )}
 
-                    {/* Account links */}
+                    {/* Account Profile and Story */}
                     <div className="py-1">
                         <Link
                             href="/profile"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/profile') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`${rowBase} ${isActive('/profile') ? rowActive : rowIdle}`}
                         >
                             <User className="h-4 w-4" />
                             <span className={isActive('/profile') ? activeUnderline : ''}>{t('profile')}</span>
                         </Link>
                         <Link
-                            href="/crafts/mycrafts"
-                            onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/crafts/mycrafts') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            <FolderOpen className="h-4 w-4" />
-                            <span className={isActive('/crafts/mycrafts') ? activeUnderline : ''}>{t('myitems')}</span>
-                        </Link>
-                        <Link
-                            href="/crafts/create"
-                            onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/crafts/create') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            <FolderUp className="h-4 w-4" />
-                            <span className={isActive('/crafts/create') ? activeUnderline : ''}>{t('addcraft')}</span>
-                        </Link>
-                        <Link
                             href="/onboarding/story"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/onboarding/story') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`${rowBase} ${isActive('/onboarding/story') ? rowActive : rowIdle}`}
                         >
                             <BookOpen className="h-4 w-4" />
                             <span className={isActive('/onboarding/story') ? activeUnderline : ''}>{t('mystory')}</span>
@@ -251,7 +223,7 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                         <Link
                             href="/media-gallery"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/media-gallery') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`${rowBase} ${isActive('/media-gallery') ? rowActive : rowIdle}`}
                         >
                             <Images className="h-4 w-4" />
                             <span className={isActive('/media-gallery') ? activeUnderline : ''}>{t('mediaGallery')}</span>
@@ -259,27 +231,39 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                         <Link
                             href="/content-credentials"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                            className={`${rowBase} ${isActive('/content-credentials') ? rowActive : rowIdle}`}
                         >
-                            <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                            {t('contentCredentials')}
+                            <ShieldCheck className="h-4 w-4" />
+                            <span className={isActive('/content-credentials') ? activeUnderline : ''}>{t('contentCredentials')}</span>
+                        </Link>
+                    </div>
+
+                    {/* Crafts */}
+                    <div className="border-t py-1" style={{ borderColor: 'var(--sc-border)' }}>
+                        <Link
+                            href="/crafts/mycrafts"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className={`${rowBase} ${isActive('/crafts/mycrafts') ? rowActive : rowIdle}`}
+                        >
+                            <FolderOpen className="h-4 w-4" />
+                            <span className={isActive('/crafts/mycrafts') ? activeUnderline : ''}>{t('myitems')}</span>
                         </Link>
                         <Link
-                            href="/generation-workspace"
+                            href="/crafts/create"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                            className={`${rowBase} ${isActive('/crafts/create') ? rowActive : rowIdle}`}
                         >
-                            <Image className="h-4 w-4 text-muted-foreground" />
-                            {t('generationWorkspace')}
+                            <FolderUp className="h-4 w-4" />
+                            <span className={isActive('/crafts/create') ? activeUnderline : ''}>{t('addcraft')}</span>
                         </Link>
                     </div>
 
                     {/* Groups */}
-                    <div className="border-t border-border py-1">
+                    <div className="border-t py-1" style={{ borderColor: 'var(--sc-border)' }}>
                         <Link
                             href="/groups/mygroups"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/groups/mygroups') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`${rowBase} ${isActive('/groups/mygroups') ? rowActive : rowIdle}`}
                         >
                             <Users className="h-4 w-4" />
                             <span className={isActive('/groups/mygroups') ? activeUnderline : ''}>{t('mygroups')}</span>
@@ -287,19 +271,31 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                         <Link
                             href="/groups/create"
                             onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 ${isActive('/groups/create') ? 'text-warm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`${rowBase} ${isActive('/groups/create') ? rowActive : rowIdle}`}
                         >
                             <UserPlus className="h-4 w-4" />
                             <span className={isActive('/groups/create') ? activeUnderline : ''}>{t('createGroup')}</span>
                         </Link>
                     </div>
 
+                    {/* Image tools */}
+                    <div className="border-t py-1" style={{ borderColor: 'var(--sc-border)' }}>
+                        <Link
+                            href="/generation-workspace"
+                            onClick={() => { setDropdownOpen(false); onAction?.() }}
+                            className={`${rowBase} ${isActive('/generation-workspace') ? rowActive : rowIdle}`}
+                        >
+                            <Image className="h-4 w-4" />
+                            <span className={isActive('/generation-workspace') ? activeUnderline : ''}>{t('generationWorkspace')}</span>
+                        </Link>
+                    </div>
+
                     {/* Logout */}
-                    <div className="border-t border-border py-1">
+                    <div className="border-t py-1" style={{ borderColor: 'var(--sc-border)' }}>
                         <button
                             type="button"
                             onClick={() => { signOut({ callbackUrl: '/' }); setDropdownOpen(false); onAction?.() }}
-                            className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
+                            className={`${rowBase} w-full text-[var(--sc-accent-deep)] hover:opacity-80`}
                         >
                             <LogOut className="h-4 w-4" />
                             {t('logout')}
@@ -312,11 +308,9 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
 
     // Not logged in
     return (
-        <Button asChild size="sm">
-            <Link href="/login" onClick={onAction}>
-                {t('login')}
-            </Link>
-        </Button>
+        <Link href="/login" onClick={onAction} className="sc-btn sc-btn--primary">
+            {t('login')}
+        </Link>
     )
 }
 
