@@ -19,11 +19,17 @@ export const betterAuthInstance = betterAuth({
         enabled: true,
         // Using Better Auth's default highly secure scrypt hashing
     },
+    // Only register Google when credentials are configured — otherwise Better Auth
+    // warns about the missing clientId/clientSecret on every startup.
     socialProviders: {
-        google: {
-            clientId: process.env.GOOGLE_CLIENT_ID || '',
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-        },
+        ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+            ? {
+                  google: {
+                      clientId: process.env.GOOGLE_CLIENT_ID,
+                      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                  },
+              }
+            : {}),
     },
     user: {
         additionalFields: {

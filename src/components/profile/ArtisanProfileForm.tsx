@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
-import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
 import { CraftStoryBanner, type CraftStoryBannerProps } from './CraftStoryBanner'
 import {
@@ -51,12 +51,6 @@ interface Artisan {
     hashtags: string[]
 }
 
-interface GalleryImage {
-    id: string
-    mediaId: string
-    url: string
-}
-
 interface MyGroup {
     membershipId: string
     role: string
@@ -67,7 +61,6 @@ interface ArtisanProfileFormProps {
     artisan: Artisan | null
     photoUrl: string | null
     coverUrl: string | null
-    galleryImages: GalleryImage[]
     myGroups?: MyGroup[]
     storyBanner?: CraftStoryBannerProps
 }
@@ -76,7 +69,6 @@ export function ArtisanProfileForm({
     artisan,
     photoUrl,
     coverUrl,
-    galleryImages,
     myGroups = [],
     storyBanner,
 }: ArtisanProfileFormProps) {
@@ -249,9 +241,9 @@ export function ArtisanProfileForm({
     // ── View mode — scroll sections layout ──
     if (!showForm && artisan) {
         return (
-            <div className="-mt-16">
+            <div>
                 {/* ── Hero Banner ── */}
-                <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-24">
+                <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-12">
                     {coverUrl ? (
                         <Image
                             src={coverUrl}
@@ -468,15 +460,6 @@ export function ArtisanProfileForm({
                     </section>
                 )}
 
-                {/* ── Gallery Section ── */}
-                <section className="py-10">
-                    <div className="mx-auto max-w-3xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
-                            {t('gallery')}
-                        </h2>
-                        <GalleryUpload artisanId={artisan.id} initialImages={galleryImages} />
-                    </div>
-                </section>
             </div>
         )
     }
@@ -484,22 +467,31 @@ export function ArtisanProfileForm({
     // ── Create / Edit mode ──
     return (
         <div className="container mx-auto max-w-4xl px-4 py-10">
-            <div className="space-y-8">
-                {/* Header with back button */}
-                <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-5">
-                    {isEditing && (
-                        <button
-                            type="button"
-                            onClick={handleCancelEdit}
-                            className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
-                        >
-                            <ArrowLeft className="h-5 w-5" />
-                        </button>
-                    )}
-                    <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">
-                        {isCreateMode ? t('createTitle') : t('editTitle')}
-                    </h1>
+            <Card className="overflow-hidden rounded-2xl shadow-lg">
+                {/* Colour banner header */}
+                <div className="bg-primary px-6 py-6">
+                    <div className="flex items-center gap-3">
+                        {isEditing && (
+                            <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                        )}
+                        <div>
+                            <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                                {isCreateMode ? t('createTitle') : t('editTitle')}
+                            </h1>
+                            <p className="text-left text-sm text-primary-foreground/70">
+                                {isCreateMode ? t('createHelper') : t('editHelper')}
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
+                <CardContent className="space-y-8 p-6">
 
                 {message && (
                     <div
@@ -753,17 +745,6 @@ export function ArtisanProfileForm({
                         </div>
                     </div>
 
-                    {/* Gallery section (edit mode only) */}
-                    {!isCreateMode && (
-                        <div className="rounded-lg border border-border bg-card p-6">
-                            <h2 className="mb-4 text-lg font-semibold">{t('gallery')}</h2>
-                            <GalleryUpload
-                                artisanId={artisan?.id ?? null}
-                                initialImages={galleryImages}
-                            />
-                        </div>
-                    )}
-
                     {/* Action buttons */}
                     <div className="flex justify-end gap-3">
                         {isEditing && (
@@ -783,7 +764,8 @@ export function ArtisanProfileForm({
                         </Button>
                     </div>
                 </form>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }

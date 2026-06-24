@@ -40,85 +40,89 @@ export function CraftStoryDisplay({ story, workshop, answerMediaMimeTypes }: Cra
     if (!hasAny) return null
 
     return (
-        <section id="craft-story" className="border-t border-border/50 bg-background py-12 scroll-mt-24">
-            <div className="mx-auto max-w-3xl px-4">
-                <h2 className="mb-1 text-xs font-semibold uppercase tracking-widest text-warm">
-                    {t('publicHeading')}
-                </h2>
-                <p className="mb-8 text-2xl font-bold tracking-tight sm:text-3xl">
-                    {t('publicTitle')}
-                </p>
+        <section id="craft-story" className="scroll-mt-24">
+            <p className="sc-eyebrow mb-2">{t('publicHeading')}</p>
+            <h2 className="sc-h2 mb-8">{t('publicTitle')}</h2>
 
-                <div className="space-y-10">
-                    {ANSWER_KEYS.map((key, i) => {
-                        const text = story[`answer${key}Text` as const]
-                        const mediaId = story[`answer${key}MediaId` as const]
-                        if (!text?.trim() && !mediaId) return null
-                        const isVideo = mediaId
-                            ? (answerMediaMimeTypes[mediaId] ?? '').startsWith('video/')
-                            : false
-                        return (
-                            <article key={key}>
-                                <h3 className="mb-3 text-lg font-semibold tracking-tight">
-                                    {t(`step${i + 1}.title`)}
-                                </h3>
-                                {text?.trim() && (
-                                    <p className="mb-4 whitespace-pre-wrap text-base leading-relaxed text-foreground/85">
-                                        {text}
-                                    </p>
-                                )}
-                                {mediaId && (
-                                    <div className="rounded-lg border border-border bg-muted/30 p-2">
-                                        {isVideo ? (
-                                            <video
-                                                src={`/api/media/${mediaId}`}
-                                                controls
-                                                className="w-full rounded-md"
-                                            />
-                                        ) : (
-                                            <audio
-                                                src={`/api/media/${mediaId}`}
-                                                controls
-                                                className="w-full"
-                                            />
-                                        )}
-                                    </div>
-                                )}
-                            </article>
-                        )
-                    })}
-
-                    {workshop.length > 0 && (
-                        <article>
-                            <h3 className="mb-3 text-lg font-semibold tracking-tight">
-                                {t('step7.title')}
+            <div className="flex flex-col gap-10">
+                {ANSWER_KEYS.map((key, i) => {
+                    const text = story[`answer${key}Text` as const]
+                    const mediaId = story[`answer${key}MediaId` as const]
+                    if (!text?.trim() && !mediaId) return null
+                    const isVideo = mediaId
+                        ? (answerMediaMimeTypes[mediaId] ?? '').startsWith('video/')
+                        : false
+                    return (
+                        <article key={key}>
+                            <h3
+                                className="mb-3"
+                                style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '21px', color: 'var(--sc-ink)' }}
+                            >
+                                {t(`step${i + 1}.title`)}
                             </h3>
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                                {workshop.map(item => (
-                                    <div
-                                        key={item.mediaId}
-                                        className="overflow-hidden rounded-lg border border-border bg-muted/30"
-                                    >
-                                        {item.isVideo ? (
-                                            <video
-                                                src={`/api/media/${item.mediaId}`}
-                                                controls
-                                                className="aspect-square w-full object-cover"
-                                            />
-                                        ) : (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img
-                                                src={`/api/media/${item.mediaId}`}
-                                                alt=""
-                                                className="aspect-square w-full object-cover"
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
+                            {text?.trim() && (
+                                <p className="sc-body mb-4 whitespace-pre-wrap">
+                                    {text}
+                                </p>
+                            )}
+                            {mediaId && (
+                                <div
+                                    className="rounded-[var(--sc-r-card)] p-2"
+                                    style={{ border: '1px solid var(--sc-border)', background: 'var(--sc-surface-trans)' }}
+                                >
+                                    {isVideo ? (
+                                        <video
+                                            src={`/api/media/${mediaId}`}
+                                            controls
+                                            className="w-full rounded-[var(--sc-r-btn)]"
+                                        />
+                                    ) : (
+                                        <audio
+                                            src={`/api/media/${mediaId}`}
+                                            controls
+                                            className="w-full"
+                                        />
+                                    )}
+                                </div>
+                            )}
                         </article>
-                    )}
-                </div>
+                    )
+                })}
+
+                {workshop.length > 0 && (
+                    <article>
+                        <h3
+                            className="mb-3"
+                            style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '21px', color: 'var(--sc-ink)' }}
+                        >
+                            {t('step7.title')}
+                        </h3>
+                        <div className="grid grid-cols-2 gap-[var(--sc-grid-gap)] sm:grid-cols-3">
+                            {workshop.map(item => (
+                                <div
+                                    key={item.mediaId}
+                                    className="overflow-hidden rounded-[var(--sc-r-card)]"
+                                    style={{ border: '1px solid var(--sc-border)', background: 'var(--sc-surface-trans)', boxShadow: 'var(--sc-shadow-card)' }}
+                                >
+                                    {item.isVideo ? (
+                                        <video
+                                            src={`/api/media/${item.mediaId}`}
+                                            controls
+                                            className="aspect-square w-full object-cover"
+                                        />
+                                    ) : (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            src={`/api/media/${item.mediaId}`}
+                                            alt=""
+                                            className="aspect-square w-full object-cover"
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </article>
+                )}
             </div>
         </section>
     )

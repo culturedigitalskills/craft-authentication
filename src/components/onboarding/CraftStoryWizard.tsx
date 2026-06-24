@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Container } from '@/components/layout/Container'
+import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, ArrowRight, Check, Loader2, Save } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save } from 'lucide-react'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
@@ -51,6 +52,9 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
     const [saving, setSaving] = useState(false)
     const [publishing, setPublishing] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    // True while editing a single step reached by clicking a section on the
+    // review screen — lets us offer a direct "back to review" action.
+    const [returnToReview, setReturnToReview] = useState(false)
 
     function setAnswerText(key: AnswerKey, value: string) {
         setStory(s => ({ ...s, [`answer${key}Text`]: value }))
@@ -111,6 +115,15 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
         setStep(s => Math.max(0, s - 1))
     }
 
+    // Save the current step's edits and return straight to the review screen.
+    async function handleReturnToReview() {
+        const ok = await save(step)
+        if (ok) {
+            setReturnToReview(false)
+            setStep(TOTAL_STEPS - 1)
+        }
+    }
+
     async function handleSaveExit() {
         await save(step)
         router.push('/profile')
@@ -149,28 +162,47 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
     const currentKey = isQuestion ? ANSWER_KEYS[step - 1] : null
 
     return (
-        <Container>
-            <div className="mx-auto max-w-2xl py-10 sm:py-14">
-                {/* Progress dots */}
-                <div className="mb-2 flex justify-center gap-2">
-                    {Array.from({ length: TOTAL_STEPS }, (_, i) => i).map(n => (
-                        <span
-                            key={n}
-                            className={`h-2 w-2 rounded-full transition-all ${
-                                n === step
-                                    ? 'w-8 bg-primary'
-                                    : n < step
-                                      ? 'bg-primary/40'
-                                      : 'bg-muted'
-                            }`}
-                        />
-                    ))}
+        <div className="container mx-auto px-4 py-10">
+            <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
+                <div className="bg-primary px-6 py-6">
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href="/profile"
+                            className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                                {t('wizardTitle')}
+                            </h1>
+                            <p className="text-left text-sm text-primary-foreground/70">
+                                {t('wizardHelper')}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <p className="mb-8 text-center text-xs text-muted-foreground">
-                    {t('stepLabel', { current: step + 1, total: TOTAL_STEPS })}
-                </p>
 
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+                <CardContent className="p-6">
+                    {/* Progress dots */}
+                    <div className="mb-2 flex justify-center gap-2">
+                        {Array.from({ length: TOTAL_STEPS }, (_, i) => i).map(n => (
+                            <span
+                                key={n}
+                                className={`h-2 w-2 rounded-full transition-all ${
+                                    n === step
+                                        ? 'w-8 bg-primary'
+                                        : n < step
+                                          ? 'bg-primary/40'
+                                          : 'bg-muted'
+                                }`}
+                            />
+                        ))}
+                    </div>
+                    <p className="mb-8 text-center text-xs text-muted-foreground">
+                        {t('stepLabel', { current: step + 1, total: TOTAL_STEPS })}
+                    </p>
+
                     <div key={step} className="animate-in fade-in-50 slide-in-from-right-4 duration-300">
                         {step === 0 && <IntroStep />}
 
@@ -191,7 +223,11 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
                         )}
 
                         {step === 8 && (
-                            <ReviewStep story={story} workshopCount={initialWorkshopMedia.length} />
+                            <ReviewStep
+                                story={story}
+                                workshopCount={initialWorkshopMedia.length}
+                                onEditStep={target => { setError(null); setReturnToReview(true); setStep(target) }}
+                            />
                         )}
 
                         {error && (
@@ -200,65 +236,81 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
                             </div>
                         )}
                     </div>
-                </div>
 
-                {/* Footer */}
-                <div className="mt-6 flex items-center justify-between gap-3">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleBack}
-                        disabled={step === 0 || saving || publishing}
-                    >
-                        <ArrowLeft className="mr-1.5 h-4 w-4" />
-                        {t('back')}
-                    </Button>
+                    {/* Footer */}
+                    <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleBack}
+                            disabled={step === 0 || saving || publishing}
+                            className="w-full sm:w-auto"
+                        >
+                            <ArrowLeft className="mr-1.5 h-4 w-4" />
+                            {t('back')}
+                        </Button>
 
-                    <div className="flex items-center gap-2">
-                        {step > 0 && step < TOTAL_STEPS - 1 && (
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={handleSaveExit}
-                                disabled={saving || publishing}
-                            >
-                                <Save className="mr-1.5 h-4 w-4" />
-                                {t('saveExit')}
-                            </Button>
-                        )}
-                        {step < TOTAL_STEPS - 1 ? (
-                            <Button type="button" onClick={handleNext} disabled={saving || publishing}>
-                                {saving ? (
-                                    <>
-                                        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                                        {t('saving')}
-                                    </>
-                                ) : (
-                                    <>
-                                        {step === 0 ? t('begin') : t('next')}
-                                        <ArrowRight className="ml-1.5 h-4 w-4" />
-                                    </>
-                                )}
-                            </Button>
-                        ) : (
-                            <Button type="button" onClick={handlePublish} disabled={saving || publishing}>
-                                {publishing ? (
-                                    <>
-                                        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                                        {t('publishing')}
-                                    </>
-                                ) : (
-                                    <>
-                                        <Check className="mr-1.5 h-4 w-4" />
-                                        {t('publish')}
-                                    </>
-                                )}
-                            </Button>
-                        )}
+                        <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row sm:items-center">
+                            {step > 0 && step < TOTAL_STEPS - 1 && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={handleSaveExit}
+                                    disabled={saving || publishing}
+                                    className="w-full sm:w-auto"
+                                >
+                                    <Save className="mr-1.5 h-4 w-4" />
+                                    {t('saveExit')}
+                                </Button>
+                            )}
+                            {returnToReview && step > 0 && step < TOTAL_STEPS - 1 ? (
+                                <Button type="button" onClick={handleReturnToReview} disabled={saving || publishing} className="w-full sm:w-auto">
+                                    {saving ? (
+                                        <>
+                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                            {t('saving')}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Check className="mr-1.5 h-4 w-4" />
+                                            {t('backToReview')}
+                                        </>
+                                    )}
+                                </Button>
+                            ) : step < TOTAL_STEPS - 1 ? (
+                                <Button type="button" onClick={handleNext} disabled={saving || publishing} className="w-full sm:w-auto">
+                                    {saving ? (
+                                        <>
+                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                            {t('saving')}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {step === 0 ? t('begin') : t('next')}
+                                            <ArrowRight className="ml-1.5 h-4 w-4" />
+                                        </>
+                                    )}
+                                </Button>
+                            ) : (
+                                <Button type="button" onClick={handlePublish} disabled={saving || publishing} className="w-full sm:w-auto">
+                                    {publishing ? (
+                                        <>
+                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                            {t('publishing')}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Check className="mr-1.5 h-4 w-4" />
+                                            {t('publish')}
+                                        </>
+                                    )}
+                                </Button>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </div>
-        </Container>
+                </CardContent>
+            </Card>
+        </div>
     )
 }
 
@@ -343,7 +395,15 @@ function WorkshopStep({ storyId, initial, maxUploadMb }: { storyId: string | nul
     )
 }
 
-function ReviewStep({ story, workshopCount }: { story: Partial<CraftStoryDraft>; workshopCount: number }) {
+function ReviewStep({
+    story,
+    workshopCount,
+    onEditStep,
+}: {
+    story: Partial<CraftStoryDraft>
+    workshopCount: number
+    onEditStep: (step: number) => void
+}) {
     const t = useTranslations('craftStory')
     const rows = ANSWER_KEYS.map((key, i) => {
         const text = story[`answer${key}Text` as const] as string | null | undefined
@@ -353,33 +413,45 @@ function ReviewStep({ story, workshopCount }: { story: Partial<CraftStoryDraft>;
             media ? t('review.hasRecording') : null,
         ].filter(Boolean).join(' · ')
         return {
+            // Questions occupy steps 1-6, in the same order as ANSWER_KEYS.
+            step: i + 1,
             label: t(`step${i + 1}.title`),
             value: summary || null,
         }
     })
 
+    // Workshop media is its own step (7); add it as a final editable row.
+    const allRows = [
+        ...rows,
+        { step: 7, label: t('step7.title'), value: t('review.workshopCount', { count: workshopCount }) },
+    ]
+
     return (
         <div>
             <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('review.title')}</h1>
             <p className="mb-6 text-base text-muted-foreground">{t('review.lead')}</p>
-            <div className="divide-y divide-border rounded-lg border border-border">
-                {rows.map(({ label, value }) => (
-                    <div key={label} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
-                        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-1/3">{label}</span>
-                        <span className={`text-sm sm:w-2/3 ${value ? 'font-medium' : 'italic text-muted-foreground'}`}>
-                            {value ?? t('review.notAnswered')}
+            <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+                {allRows.map(({ step, label, value }) => (
+                    <button
+                        key={label}
+                        type="button"
+                        onClick={() => onEditStep(step)}
+                        aria-label={t('review.editStep', { section: label })}
+                        className="group flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none sm:flex-row sm:items-start sm:justify-between"
+                    >
+                        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-1/3">
+                            {label}
                         </span>
-                    </div>
+                        <span className="flex items-start gap-2 sm:w-2/3">
+                            <span className={`text-sm ${value ? 'font-medium' : 'italic text-muted-foreground'}`}>
+                                {value ?? t('review.notAnswered')}
+                            </span>
+                            <Pencil className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
+                        </span>
+                    </button>
                 ))}
-                <div className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
-                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-1/3">
-                        {t('step7.title')}
-                    </span>
-                    <span className="text-sm sm:w-2/3">
-                        {t('review.workshopCount', { count: workshopCount })}
-                    </span>
-                </div>
             </div>
+            <p className="mt-3 text-center text-xs text-muted-foreground">{t('review.editHint')}</p>
         </div>
     )
 }

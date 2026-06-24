@@ -4,6 +4,37 @@ import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { errorResponse } from '@/lib/validations/types'
 import { requireAuth } from '@/lib/auth-guard'
+import { CRAFT_ENTITY_TYPE } from '@/lib/craft'
+
+/**
+ * Resolve the owning user of an attachment's entity. Returns null when
+ * ownership cannot be established (e.g. Group attachments, unknown types) —
+ * those are only deletable by site admins.
+ */
+async function resolveEntityOwner(entityType: string, entityId: string): Promise<string | null> {
+    if (entityType === 'Artisan') {
+        const artisan = await prisma.artisan.findUnique({
+            where: { id: entityId },
+            select: { userId: true },
+        })
+        return artisan?.userId ?? null
+    }
+    if (entityType === CRAFT_ENTITY_TYPE) {
+        const craft = await prisma.craft.findUnique({
+            where: { id: entityId },
+            select: { artisan: { select: { userId: true } } },
+        })
+        return craft?.artisan.userId ?? null
+    }
+    if (entityType === 'CraftStory') {
+        const story = await prisma.craftStory.findUnique({
+            where: { id: entityId },
+            select: { artisan: { select: { userId: true } } },
+        })
+        return story?.artisan.userId ?? null
+    }
+    return null
+}
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -51,18 +82,25 @@ export async function DELETE(
             return errorResponse('File not found', 404)
         }
 
-        // Verify the user owns this media via attachment → artisan → user
-        const attachment = await prisma.mediaAttachment.findFirst({
-            where: { mediaId: id },
-        })
-        if (attachment) {
-            const artisan = await prisma.artisan.findUnique({
-                where: { id: attachment.entityId },
-                select: { userId: true },
+        // The uploader owns the file. Legacy rows predate uploaderId, so for
+        // those we fall back to resolving the owner through the attachment's
+        // entity. Site admins may always delete.
+        const isAdmin = session!.user.role === 'ADMIN'
+        let isOwner = fileData.uploaderId !== null && fileData.uploaderId === session!.user.id
+        if (!isOwner && fileData.uploaderId === null) {
+            const attachment = await prisma.mediaAttachment.findFirst({
+                where: { mediaId: id },
             })
-            if (!artisan || artisan.userId !== session!.user.id) {
-                return errorResponse('Forbidden', 403)
+            if (attachment) {
+                const ownerUserId = await resolveEntityOwner(
+                    attachment.entityType,
+                    attachment.entityId,
+                )
+                isOwner = ownerUserId !== null && ownerUserId === session!.user.id
             }
+        }
+        if (!isOwner && !isAdmin) {
+            return errorResponse('Forbidden', 403)
         }
 
         // We have two data items for a media file, a database

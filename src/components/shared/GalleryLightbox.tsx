@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { mediaKind } from '@/lib/media-kind'
 
 interface GalleryLightboxProps {
-    images: { mediaId: string; url: string }[]
+    images: { mediaId: string; url: string; mimeType?: string | null }[]
     currentIndex: number
     onClose: () => void
     onNavigate: (index: number) => void
@@ -86,17 +87,41 @@ export function GalleryLightbox({
             </button>
 
             <div
-                className="relative max-h-[85vh] max-w-[90vw]"
+                className="relative flex max-h-[85vh] max-w-[90vw] items-center justify-center"
                 onClick={(e) => e.stopPropagation()}
             >
-                <Image
-                    src={images[currentIndex].url}
-                    alt={`Gallery photo ${currentIndex + 1} of ${images.length}`}
-                    width={1200}
-                    height={900}
-                    unoptimized
-                    className="max-h-[85vh] w-auto rounded-lg object-contain"
-                />
+                {(() => {
+                    const item = images[currentIndex]
+                    const kind = mediaKind(item.mimeType)
+                    if (kind === 'video') {
+                        return (
+                            <video
+                                key={item.mediaId}
+                                src={item.url}
+                                controls
+                                autoPlay
+                                className="max-h-[85vh] max-w-[90vw] rounded-lg"
+                            />
+                        )
+                    }
+                    if (kind === 'audio') {
+                        return (
+                            <div className="w-[80vw] max-w-md rounded-2xl bg-white/5 p-8">
+                                <audio key={item.mediaId} src={item.url} controls autoPlay className="w-full" />
+                            </div>
+                        )
+                    }
+                    return (
+                        <Image
+                            src={item.url}
+                            alt={`Gallery item ${currentIndex + 1} of ${images.length}`}
+                            width={1200}
+                            height={900}
+                            unoptimized
+                            className="max-h-[85vh] w-auto rounded-lg object-contain"
+                        />
+                    )
+                })()}
             </div>
 
             <button

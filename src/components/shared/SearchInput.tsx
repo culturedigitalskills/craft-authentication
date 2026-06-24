@@ -28,19 +28,23 @@ export function SearchInput({ placeholder }: SearchInputProps) {
     }
 
     return (
-        <div className="relative max-w-sm">
+        <div className="relative w-full max-w-sm">
             <Search
                 aria-hidden="true"
-                className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${
-                    isPending ? 'text-warm' : 'text-muted-foreground'
-                }`}
+                className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors"
+                style={{ color: isPending ? 'var(--sc-accent)' : 'var(--sc-text-muted)' }}
             />
             <input
                 type="text"
                 defaultValue={value}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full rounded-md border border-input bg-background py-2 pl-9 pr-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warm/30 focus-visible:ring-offset-2"
+                className="w-full rounded-[var(--sc-r-chip)] border py-2.5 pl-10 pr-4 text-sm focus-visible:outline-none focus-visible:ring-2"
+                style={{
+                    background: 'var(--sc-surface)',
+                    borderColor: 'var(--sc-border-strong)',
+                    color: 'var(--sc-text)',
+                }}
             />
         </div>
     )
