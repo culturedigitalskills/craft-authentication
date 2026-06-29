@@ -4,6 +4,7 @@ import { UpdateGroupSchema } from '@/lib/validations/group'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireGroupAdmin } from '@/lib/auth-guard'
+import { generateUniqueSlug, rollSlugHistory } from '@/lib/slug'
 
 export async function GET(
     request: NextRequest,
@@ -75,27 +76,14 @@ export async function PUT(
             updateData.website = null
         }
 
-        // Regenerate slug if name changes
+        // Regenerate slug if name changes, retiring the old slug into history
+        // so existing links/QR codes keep resolving via a redirect.
         if (validatedData.name) {
-            const baseSlug = validatedData.name
-                .toLowerCase()
-                .replace(/[^a-z0-9-]/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-|-$/g, '')
-
-            let slug = baseSlug
-            let slugExists = await prisma.group.findFirst({
-                where: { slug, id: { not: id } },
-            })
-            let counter = 1
-            while (slugExists) {
-                slug = `${baseSlug}-${counter}`
-                slugExists = await prisma.group.findFirst({
-                    where: { slug, id: { not: id } },
-                })
-                counter++
+            const slug = await generateUniqueSlug('group', validatedData.name, id)
+            if (slug !== group.slug) {
+                updateData.slug = slug
+                updateData.previousSlugs = rollSlugHistory(group.slug, slug, group.previousSlugs)
             }
-            updateData.slug = slug
         }
 
         const updated = await prisma.group.update({

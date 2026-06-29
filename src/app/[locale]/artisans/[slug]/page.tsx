@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Clock, GraduationCap, Users, Globe } from 'lucide-react'
 import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
@@ -19,8 +19,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params
-    const artisan = await prisma.artisan.findUnique({
-        where: { slug, deletedAt: null },
+    const artisan = await prisma.artisan.findFirst({
+        where: { OR: [{ slug }, { previousSlugs: { has: slug } }], deletedAt: null },
         select: { id: true, firstName: true, lastName: true, bio: true },
     })
     if (!artisan) return { title: 'Artisan Not Found' }
@@ -64,11 +64,12 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     const { slug } = await params
     const t = await getTranslations('artisanProfile')
 
-    const artisan = await prisma.artisan.findUnique({
-        where: { slug, deletedAt: null },
+    const artisan = await prisma.artisan.findFirst({
+        where: { OR: [{ slug }, { previousSlugs: { has: slug } }], deletedAt: null },
         select: {
             id: true,
             userId: true,
+            slug: true,
             firstName: true,
             lastName: true,
             bio: true,
@@ -100,6 +101,9 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     })
 
     if (!artisan) notFound()
+
+    // Requested via a retired slug — send to the current canonical URL.
+    if (artisan.slug !== slug) redirect(`/artisans/${artisan.slug}`)
 
     // Fetch the artisan's public crafts
     const craftRecords = await prisma.craft.findMany({
@@ -219,7 +223,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                 </div>
 
                 <div className="sc-container">
-                    <div className="-mt-16 flex flex-col items-start gap-4 sm:-mt-20 sm:flex-row sm:items-end">
+                    <div className="-mt-16 flex flex-col items-start gap-4 sm:-mt-20 sm:flex-row sm:items-start">
                         <div
                             className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full sm:h-40 sm:w-40"
                             style={{ border: '4px solid var(--sc-surface)', boxShadow: 'var(--sc-shadow-hero)' }}
@@ -232,7 +236,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                 priority
                             />
                         </div>
-                        <div className="pb-2">
+                        <div className="sm:pt-24">
                             <p className="sc-eyebrow">{t('about')}</p>
                             <h1 className="sc-h1 mt-1" style={{ fontSize: '44px' }}>
                                 {artisan.firstName} {artisan.lastName}

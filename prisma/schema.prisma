@@ -151,6 +151,7 @@ model Group {
     id                 String              @id @default(uuid())
     name               String
     slug               String              @unique
+    previousSlugs      String[]            @default([])
     description        String?
     website            String?
     location           String?
@@ -163,6 +164,8 @@ model Group {
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
     memberships        ArtisanGroupMembership[]
+
+    @@index([previousSlugs], type: Gin)
 }
 
 model Artisan {
@@ -173,6 +176,7 @@ model Artisan {
     firstName         String
     lastName          String
     slug              String                       @unique
+    previousSlugs     String[]                     @default([])
     bio               String?
     yearsOfExperience Int?
     learningSource    String?
@@ -192,6 +196,8 @@ model Artisan {
     memberships       ArtisanGroupMembership[]
     craftStory        CraftStory?
     crafts            Craft[]
+
+    @@index([previousSlugs], type: Gin)
 }
 
 model Craft {

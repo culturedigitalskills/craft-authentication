@@ -9,6 +9,7 @@ import {
     setCraftMedia,
     findUnownedMedia,
     getCraftPrimaryImageMap,
+    getCraftMediaItems,
 } from '@/lib/craft'
 
 export async function GET(request: NextRequest) {
@@ -118,13 +119,15 @@ export async function POST(request: NextRequest) {
 
         // Issue the provenance credential (non-fatal — craft still succeeds).
         try {
+            const media = await getCraftMediaItems(craft.id)
+            const firstImageId = media.find(m => m.mimeType?.startsWith('image/'))?.mediaId ?? null
             await issueCraftVC({
                 id: craft.id,
                 title: craft.title,
                 description: craft.description,
                 artisanSlug: artisan.slug,
                 createdAt: craft.createdAt,
-                firstMediaId: mediaIds[0] ?? null,
+                firstMediaId: firstImageId,
             })
         } catch (vcError) {
             console.error('VC issuance failed for craft', craft.id, vcError)

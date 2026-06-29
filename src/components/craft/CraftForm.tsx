@@ -16,7 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft, Loader2, X, Play } from 'lucide-react'
+import { ArrowLeft, Loader2, X, Play, Check, Upload, Images } from 'lucide-react'
 import { FaYoutube } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
 import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
@@ -42,24 +42,51 @@ interface Craft {
     longitude: number | null
     place: string | null
     videos: string[]
-    mediaIds: string[]
+    media: MediaItem[]
+}
+
+type MediaKind = 'image' | 'video'
+
+interface MediaItem {
+    mediaId: string
+    mimeType: string | null
 }
 
 interface CraftFormProps {
     craft: Craft | null
 }
 
-async function submitImages(images: File[]): Promise<string[]> {
-    if (images.length === 0) return []
-    return Promise.all(
-        images.map(async (image) => {
-            const formData = new FormData()
-            formData.append('file', image)
-            const res = await fetch('/api/media/upload', { method: 'POST', body: formData })
-            const media = await res.json()
-            return media?.id
-        })
-    )
+const kindFromMime = (mime: string | null | undefined): MediaKind =>
+    mime?.startsWith('video/') ? 'video' : 'image'
+
+// Upload a single file via XHR so we can report upload progress. Resolves to
+// the new media id, or undefined if the upload failed (the caller filters those
+// out, mirroring the previous fetch behaviour).
+function uploadFileWithProgress(file: File, onProgress: (pct: number) => void): Promise<string | undefined> {
+    return new Promise((resolve) => {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', '/api/media/upload')
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
+        }
+        xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                onProgress(100)
+                try {
+                    resolve(JSON.parse(xhr.responseText)?.id)
+                } catch {
+                    resolve(undefined)
+                }
+            } else {
+                resolve(undefined)
+            }
+        }
+        xhr.onerror = () => resolve(undefined)
+        xhr.send(formData)
+    })
 }
 
 export function CraftForm({ craft }: CraftFormProps) {
@@ -87,11 +114,47 @@ export function CraftForm({ craft }: CraftFormProps) {
     const [isPublic, setIsPublic] = useState<boolean>(craft?.isPublic ?? false)
     const [isSharedLocation, setIsSharedLocation] = useState<boolean>(craft?.isSharedLocation ?? true)
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
-    const [existingMediaIds, setExistingMediaIds] = useState<string[]>(craft?.mediaIds ?? [])
+    const [existingMedia, setExistingMedia] = useState<MediaItem[]>(craft?.media ?? [])
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
-    const [images, setImages] = useState<File[]>([])
+    const [files, setFiles] = useState<File[]>([])
+    const [uploads, setUploads] = useState<{ name: string; progress: number; failed: boolean }[]>([])
     const [videos, setVideos] = useState<string[]>(craft?.videos ?? [])
     const [videoInput, setVideoInput] = useState('')
+
+    // Media source: upload fresh files, or reuse media from the gallery.
+    const [mediaSource, setMediaSource] = useState<'upload' | 'gallery'>('upload')
+    const [gallery, setGallery] = useState<{ mediaId: string; url: string; mimeType: string | null }[] | null>(null)
+    const [galleryLoading, setGalleryLoading] = useState(false)
+    const [galleryError, setGalleryError] = useState(false)
+
+    async function loadGallery() {
+        if (gallery || galleryLoading) return
+        setGalleryLoading(true)
+        setGalleryError(false)
+        try {
+            const res = await fetch('/api/media/gallery')
+            if (!res.ok) throw new Error()
+            setGallery(await res.json())
+        } catch {
+            setGalleryError(true)
+        } finally {
+            setGalleryLoading(false)
+        }
+    }
+
+    function handleSelectGallery(source: 'upload' | 'gallery') {
+        setMediaSource(source)
+        if (source === 'gallery') void loadGallery()
+    }
+
+    // Toggle a gallery item into/out of the craft's attached media.
+    function toggleGalleryItem(item: { mediaId: string; mimeType: string | null }) {
+        setExistingMedia(prev =>
+            prev.some(m => m.mediaId === item.mediaId)
+                ? prev.filter(m => m.mediaId !== item.mediaId)
+                : [...prev, { mediaId: item.mediaId, mimeType: item.mimeType }],
+        )
+    }
 
     function handleAddVideo() {
         const id = extractYouTubeId(videoInput)
@@ -120,7 +183,7 @@ export function CraftForm({ craft }: CraftFormProps) {
             return
         }
         setConfirmDelete(null)
-        setExistingMediaIds(prev => prev.filter(id => id !== mediaId))
+        setExistingMedia(prev => prev.filter(m => m.mediaId !== mediaId))
     }
 
     useEffect(() => {
@@ -166,8 +229,26 @@ export function CraftForm({ craft }: CraftFormProps) {
             place = null
         }
 
-        const newIds = await submitImages(images)
-        const mediaIds = [...existingMediaIds, ...newIds].filter(Boolean)
+        let newIds: (string | undefined)[] = []
+        if (files.length > 0) {
+            setUploads(files.map(f => ({ name: f.name, progress: 0, failed: false })))
+            newIds = await Promise.all(
+                files.map((file, i) =>
+                    uploadFileWithProgress(file, (pct) =>
+                        setUploads(prev => prev.map((u, j) => (j === i ? { ...u, progress: pct } : u))),
+                    ).then((id) => {
+                        if (!id) setUploads(prev => prev.map((u, j) => (j === i ? { ...u, failed: true } : u)))
+                        return id
+                    }),
+                ),
+            )
+        }
+        if (newIds.some(id => !id)) {
+            setMessage({ text: t('createCraft.uploadFailed'), type: 'error' })
+            setIsSubmitting(false)
+            return
+        }
+        const mediaIds = [...existingMedia.map(m => m.mediaId), ...newIds].filter(Boolean) as string[]
 
         const payload = {
             title: name,
@@ -458,21 +539,38 @@ export function CraftForm({ craft }: CraftFormProps) {
                             {t('createCraft.uploadImages')}
                         </Label>
 
-                        {existingMediaIds.length > 0 && (
+                        {existingMedia.length > 0 && (
                             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                                {existingMediaIds.map((mediaId) => (
+                                {existingMedia.map(({ mediaId, mimeType }) => (
                                     <div
                                         key={mediaId}
-                                        className="group relative aspect-square overflow-hidden rounded-lg border border-border"
+                                        className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
                                     >
-                                        <Image
-                                            src={`/api/media/${mediaId}`}
-                                            alt="Craft photo"
-                                            fill
-                                            sizes="(max-width: 768px) 33vw, 25vw"
-                                            unoptimized
-                                            className="object-cover"
-                                        />
+                                        {kindFromMime(mimeType) === 'video' ? (
+                                            <>
+                                                <video
+                                                    src={`/api/media/${mediaId}`}
+                                                    muted
+                                                    playsInline
+                                                    preload="metadata"
+                                                    className="h-full w-full object-cover"
+                                                />
+                                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                                    <div className="rounded-full bg-black/55 p-2">
+                                                        <Play className="h-4 w-4 fill-white text-white" />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <Image
+                                                src={`/api/media/${mediaId}`}
+                                                alt="Craft media"
+                                                fill
+                                                sizes="(max-width: 768px) 33vw, 25vw"
+                                                unoptimized
+                                                className="object-cover"
+                                            />
+                                        )}
                                         {confirmDelete === mediaId ? (
                                             <div
                                                 className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-1.5 text-center"
@@ -514,37 +612,156 @@ export function CraftForm({ craft }: CraftFormProps) {
                             </div>
                         )}
 
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="outline"
+                        {/* Source toggle: upload fresh files or reuse the gallery */}
+                        <div className="inline-flex rounded-lg border border-border p-0.5">
+                            <button
                                 type="button"
-                                onClick={() => document.getElementById('images')?.click()}
+                                onClick={() => handleSelectGallery('upload')}
+                                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    mediaSource === 'upload'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
                             >
-                                {t('createCraft.browse')}
-                            </Button>
-                            {images.length > 0 && (
-                                <span className="text-sm text-muted-foreground">
-                                    {images.length} {t('createCraft.imagesSelected')}
-                                </span>
-                            )}
+                                <Upload className="h-4 w-4" />
+                                {t('createCraft.uploadTab')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleSelectGallery('gallery')}
+                                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    mediaSource === 'gallery'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                <Images className="h-4 w-4" />
+                                {t('createCraft.galleryTab')}
+                            </button>
                         </div>
-                        <input
-                            type="file"
-                            id="images"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={(e) => {
-                                const files = Array.from(e.target.files || [])
-                                const oversized = files.find(f => f.size > 8 * 1024 * 1024)
-                                if (oversized) {
-                                    setMessage({ text: t('createCraft.fileTooLarge'), type: 'error' })
-                                    e.target.value = ''
-                                    return
-                                }
-                                setImages(files)
-                            }}
-                        />
+
+                        {mediaSource === 'upload' ? (
+                            <>
+                                <div className="flex items-center gap-3">
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        onClick={() => document.getElementById('images')?.click()}
+                                    >
+                                        {t('createCraft.browse')}
+                                    </Button>
+                                    {files.length > 0 && (
+                                        <span className="text-sm text-muted-foreground">
+                                            {files.length} {t('createCraft.filesSelected')}
+                                        </span>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    id="images"
+                                    accept="image/*,video/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const selected = Array.from(e.target.files || [])
+                                        const oversized = selected.find(f => f.size > 100 * 1024 * 1024)
+                                        if (oversized) {
+                                            setMessage({ text: t('createCraft.mediaTooLarge'), type: 'error' })
+                                            e.target.value = ''
+                                            return
+                                        }
+                                        setUploads([])
+                                        setFiles(selected)
+                                    }}
+                                />
+                            </>
+                        ) : (
+                            <div>
+                                <p className="mb-2 text-sm text-muted-foreground">{t('createCraft.galleryHint')}</p>
+                                {galleryLoading && (
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        {t('createCraft.galleryLoading')}
+                                    </div>
+                                )}
+                                {galleryError && (
+                                    <p className="text-sm text-red-600">{t('createCraft.galleryLoadFailed')}</p>
+                                )}
+                                {!galleryLoading && !galleryError && gallery?.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">{t('createCraft.galleryEmpty')}</p>
+                                )}
+                                {!galleryLoading && gallery && gallery.length > 0 && (
+                                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                                        {gallery.map((item) => {
+                                            const selected = existingMedia.some(m => m.mediaId === item.mediaId)
+                                            return (
+                                                <button
+                                                    key={item.mediaId}
+                                                    type="button"
+                                                    onClick={() => toggleGalleryItem(item)}
+                                                    aria-pressed={selected}
+                                                    className={`group relative aspect-square overflow-hidden rounded-lg border bg-muted transition-colors ${
+                                                        selected ? 'border-primary ring-2 ring-primary' : 'border-border'
+                                                    }`}
+                                                >
+                                                    {kindFromMime(item.mimeType) === 'video' ? (
+                                                        <>
+                                                            <video
+                                                                src={item.url}
+                                                                muted
+                                                                playsInline
+                                                                preload="metadata"
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                                                <div className="rounded-full bg-black/55 p-2">
+                                                                    <Play className="h-4 w-4 fill-white text-white" />
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <Image
+                                                            src={item.url}
+                                                            alt="Gallery media"
+                                                            fill
+                                                            sizes="(max-width: 768px) 33vw, 25vw"
+                                                            unoptimized
+                                                            className="object-cover"
+                                                        />
+                                                    )}
+                                                    {selected && (
+                                                        <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                                            <Check className="h-3.5 w-3.5" />
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {uploads.length > 0 && (
+                            <div className="space-y-2 pt-1">
+                                {uploads.map((u, i) => (
+                                    <div key={i} className="text-sm">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="truncate text-muted-foreground">{u.name}</span>
+                                            <span className={`shrink-0 tabular-nums ${u.failed ? 'text-red-600' : 'text-muted-foreground'}`}>
+                                                {u.failed ? t('createCraft.failed') : `${u.progress}%`}
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                            <div
+                                                className={`h-full rounded-full transition-all ${u.failed ? 'bg-red-500' : 'bg-primary'}`}
+                                                style={{ width: `${u.failed ? 100 : u.progress}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="space-y-2">

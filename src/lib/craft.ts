@@ -80,13 +80,22 @@ export async function setCraftMedia(craftId: string, mediaIds: string[]): Promis
     })
 
     if (nextIds.length > 0) {
+        // The hero/primary must be an image — it's reused as the thumbnail in
+        // list views (rendered as <img>), so a video must never be primary.
+        const files = await prisma.mediaFile.findMany({
+            where: { id: { in: nextIds } },
+            select: { id: true, mimeType: true },
+        })
+        const mimeById = new Map(files.map(f => [f.id, f.mimeType]))
+        const heroId = nextIds.find(id => mimeById.get(id)?.startsWith('image/')) ?? nextIds[0]
+
         await prisma.mediaAttachment.createMany({
             data: nextIds.map((mediaId, i) => ({
                 mediaId,
                 entityType: CRAFT_ENTITY_TYPE,
                 entityId: craftId,
-                attachmentType: i === 0 ? ('HERO' as const) : ('GALLERY' as const),
-                isPrimary: i === 0,
+                attachmentType: mediaId === heroId ? ('HERO' as const) : ('GALLERY' as const),
+                isPrimary: mediaId === heroId,
                 displayOrder: i,
             })),
         })
@@ -95,7 +104,7 @@ export async function setCraftMedia(craftId: string, mediaIds: string[]): Promis
     return existingIds.filter(id => !nextIds.includes(id))
 }
 
-/** Ordered list of a craft's media ids (HERO first). */
+/** Ordered list of a craft's media ids (display order). */
 export async function getCraftMediaIds(craftId: string): Promise<string[]> {
     const atts = await prisma.mediaAttachment.findMany({
         where: { entityType: CRAFT_ENTITY_TYPE, entityId: craftId },
@@ -105,7 +114,17 @@ export async function getCraftMediaIds(craftId: string): Promise<string[]> {
     return atts.map(a => a.mediaId)
 }
 
-/** Map of craftId -> primary mediaId, for list views. */
+/** Ordered list of a craft's media with mime type, for distinguishing image vs video. */
+export async function getCraftMediaItems(craftId: string): Promise<{ mediaId: string; mimeType: string | null }[]> {
+    const atts = await prisma.mediaAttachment.findMany({
+        where: { entityType: CRAFT_ENTITY_TYPE, entityId: craftId },
+        orderBy: { displayOrder: 'asc' },
+        select: { mediaId: true, media: { select: { mimeType: true } } },
+    })
+    return atts.map(a => ({ mediaId: a.mediaId, mimeType: a.media.mimeType }))
+}
+
+/** Map of craftId -> primary image mediaId, for list-view thumbnails. */
 export async function getCraftPrimaryImageMap(craftIds: string[]): Promise<Map<string, string>> {
     if (craftIds.length === 0) return new Map()
     const atts = await prisma.mediaAttachment.findMany({
@@ -113,6 +132,9 @@ export async function getCraftPrimaryImageMap(craftIds: string[]): Promise<Map<s
             entityType: CRAFT_ENTITY_TYPE,
             entityId: { in: craftIds },
             isPrimary: true,
+            // Only images make valid thumbnails; a video-only craft falls back
+            // to the list view's placeholder instead of a broken <img>.
+            media: { mimeType: { startsWith: 'image/' } },
         },
         select: { entityId: true, mediaId: true },
     })

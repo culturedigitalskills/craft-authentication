@@ -30,7 +30,7 @@ function generateCsp(nonce: string) {
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
-        "frame-src 'self' https://www.youtube.com",
+        "frame-src 'self' https://www.youtube.com https://www.openstreetmap.org",
         "frame-ancestors 'none'",
         isDev ? '' : 'upgrade-insecure-requests',
     ].filter(Boolean).join('; ')

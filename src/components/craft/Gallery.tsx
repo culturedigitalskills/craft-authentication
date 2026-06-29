@@ -11,15 +11,18 @@ type GalleryImage = {
 type GalleryItem =
   | { kind: 'image'; url: string; alt?: string }
   | { kind: 'video'; youtubeId: string; alt?: string }
+  | { kind: 'videofile'; url: string; alt?: string }
 
 type GalleryProps = {
   images: GalleryImage[]
   videos?: string[]
+  videoFiles?: GalleryImage[]
 }
 
-export default function Gallery({ images, videos = [] }: GalleryProps) {
+export default function Gallery({ images, videos = [], videoFiles = [] }: GalleryProps) {
   const items: GalleryItem[] = [
     ...images.map<GalleryItem>(img => ({ kind: 'image', url: img.url, alt: img.alt })),
+    ...videoFiles.map<GalleryItem>(v => ({ kind: 'videofile', url: v.url, alt: v.alt })),
     ...videos.map<GalleryItem>(id => ({ kind: 'video', youtubeId: id })),
   ]
 
@@ -38,6 +41,24 @@ export default function Gallery({ images, videos = [] }: GalleryProps) {
             src={youtubeThumbnailUrl(item.youtubeId)}
             alt={item.alt ?? 'video thumbnail'}
             className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="rounded-full bg-black/60 p-3">
+              <Play className="h-6 w-6 fill-white text-white" />
+            </div>
+          </div>
+        </>
+      )
+    }
+    if (item.kind === 'videofile') {
+      return (
+        <>
+          <video
+            src={item.url}
+            muted
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-contain"
           />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="rounded-full bg-black/60 p-3">
@@ -87,6 +108,21 @@ export default function Gallery({ images, videos = [] }: GalleryProps) {
                     <img
                       src={youtubeThumbnailUrl(item.youtubeId)}
                       alt={`thumbnail ${index}`}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <div className="rounded-full bg-black/60 p-1">
+                        <Play className="h-3 w-3 fill-white text-white" />
+                      </div>
+                    </div>
+                  </>
+                ) : item.kind === 'videofile' ? (
+                  <>
+                    <video
+                      src={item.url}
+                      muted
+                      playsInline
+                      preload="metadata"
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -148,6 +184,15 @@ export default function Gallery({ images, videos = [] }: GalleryProps) {
                 allowFullScreen
               />
             </div>
+          ) : current.kind === 'videofile' ? (
+            <video
+              src={current.url}
+              controls
+              autoPlay
+              playsInline
+              className="max-h-[90vh] max-w-[90vw] rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
           ) : (
             <img
               src={current.url}

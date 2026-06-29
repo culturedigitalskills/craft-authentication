@@ -4,6 +4,7 @@ import { UpdateArtisanSchema } from '@/lib/validations/artisan'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
+import { generateUniqueSlug, rollSlugHistory } from '@/lib/slug'
 
 export async function PUT(
     request: NextRequest,
@@ -30,25 +31,12 @@ export async function PUT(
         if (validatedData.firstName || validatedData.lastName) {
             const newFirst = validatedData.firstName ?? artisan.firstName
             const newLast = validatedData.lastName ?? artisan.lastName
-            const baseSlug = `${newFirst}-${newLast}`
-                .toLowerCase()
-                .replace(/[^a-z0-9-]/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-|-$/g, '')
-
-            let slug = baseSlug
-            let slugExists = await prisma.artisan.findFirst({
-                where: { slug, id: { not: id } },
-            })
-            let counter = 1
-            while (slugExists) {
-                slug = `${baseSlug}-${counter}`
-                slugExists = await prisma.artisan.findFirst({
-                    where: { slug, id: { not: id } },
-                })
-                counter++
+            const slug = await generateUniqueSlug('artisan', `${newFirst}-${newLast}`, id)
+            if (slug !== artisan.slug) {
+                updateData.slug = slug
+                // Keep the old slug alive so existing links/QR codes redirect.
+                updateData.previousSlugs = rollSlugHistory(artisan.slug, slug, artisan.previousSlugs)
             }
-            updateData.slug = slug
         }
 
         const updated = await prisma.artisan.update({

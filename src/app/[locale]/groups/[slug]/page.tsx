@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, ExternalLink, Pencil, ArrowLeft } from 'lucide-react'
@@ -15,8 +15,8 @@ interface PageProps {
 }
 
 async function getGroup(slug: string) {
-    return prisma.group.findUnique({
-        where: { slug },
+    return prisma.group.findFirst({
+        where: { OR: [{ slug }, { previousSlugs: { has: slug } }] },
         include: {
             memberships: {
                 where: { leftDate: null },
@@ -63,6 +63,9 @@ export default async function GroupDetailPage({ params }: PageProps) {
     const group = await getGroup(slug)
 
     if (!group || !group.isActive) notFound()
+
+    // Requested via a retired slug — send to the current canonical URL.
+    if (group.slug !== slug) redirect(`/groups/${group.slug}`)
 
     // Check if current user can manage this group
     const session = await auth()
@@ -147,7 +150,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                 </div>
 
                 <div className="sc-container">
-                    <div className="-mt-14 flex flex-col gap-5 sm:-mt-16 sm:flex-row sm:items-end">
+                    <div className="-mt-14 flex flex-col gap-5 sm:-mt-16 sm:flex-row sm:items-start">
                         {/* Logo tile */}
                         <div
                             className="relative h-28 w-28 shrink-0 overflow-hidden rounded-[var(--sc-r-tile)] sm:h-32 sm:w-32"
@@ -156,7 +159,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                             <ScMedia src={logoUrl} alt={`${group.name} logo`} fallback={<KraftMonogram name={group.name} />} sizes="128px" />
                         </div>
 
-                        <div className="min-w-0 flex-1 pb-1">
+                        <div className="min-w-0 flex-1 sm:pt-20">
                             <h1 className="sc-h1" style={{ fontSize: '40px' }}>{group.name}</h1>
                             {group.location && (
                                 <p className="mt-1 flex items-center gap-1.5 text-sm" style={{ color: 'var(--sc-text-soft)' }}>
@@ -180,7 +183,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex shrink-0 flex-wrap gap-3 pb-1">
+                        <div className="flex shrink-0 flex-wrap gap-3 sm:self-end sm:pb-1">
                             {canManage && (
                                 <Link href={`/groups/${group.slug}/manage`} className="sc-btn sc-btn--primary">
                                     <Pencil className="h-4 w-4" />

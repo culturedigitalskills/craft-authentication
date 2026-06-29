@@ -7,7 +7,7 @@ import { QRCode } from '@/components/shared/qrcode';
 import Gallery from '@/components/craft/Gallery'
 import { QRCopyButton } from '@/components/craft/QRCopyButton'
 import { verifyCraftVC, type CraftCredential } from '@/lib/did/vc'
-import { craftCredentialId, getCraftMediaIds } from '@/lib/craft'
+import { craftCredentialId, getCraftMediaItems } from '@/lib/craft'
 import { VerifiableCredentialCard } from '@/components/verifiableCredentialCard/page'
 import { notFound } from 'next/navigation'
 import { ScMedia } from '@/components/sc/ScMedia'
@@ -26,7 +26,8 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
     const session = await auth()
     const { id } = await params
     const { from } = await searchParams
-    const backHref = from === 'mycrafts' ? '/crafts/mycrafts' : '/crafts'
+    const fromMyCrafts = from === 'mycrafts'
+    const backHref = fromMyCrafts ? '/crafts/mycrafts' : '/crafts'
     const currentPageUrl = `${process.env.AUTH_URL}/crafts/${id}`
 
     const craft = await prisma.craft.findFirst({
@@ -53,7 +54,9 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
     // Private crafts are only visible to their owner or a site admin.
     if (!craft.isPublic && !isOwner && !isAdmin) notFound()
 
-    const mediaIds = await getCraftMediaIds(id)
+    const mediaItems = await getCraftMediaItems(id)
+    const imageIds = mediaItems.filter(m => !m.mimeType?.startsWith('video/')).map(m => m.mediaId)
+    const videoFileIds = mediaItems.filter(m => m.mimeType?.startsWith('video/')).map(m => m.mediaId)
 
     // The maker's profile photo, shown in the "Meet the maker" feature.
     const artisanPhoto = await prisma.mediaAttachment.findFirst({
@@ -81,9 +84,11 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
     return (
         <RenderOneCraftPage
             craft={craft}
-            mediaIds={mediaIds}
+            imageIds={imageIds}
+            videoFileIds={videoFileIds}
             currentPageUrl={currentPageUrl}
             isOwner={isOwner || isAdmin}
+            showQr={fromMyCrafts}
             backHref={backHref}
             artisanName={`${craft.artisan.firstName} ${craft.artisan.lastName}`}
             artisanSlug={craft.artisan.slug}
@@ -109,12 +114,16 @@ interface VcData {
     holderDid: string
 }
 
-function RenderOneCraftPage({ craft, mediaIds, currentPageUrl, isOwner, backHref, artisanName, artisanSlug, artisanPhotoUrl, artisanBio, artisanYears, artisanLearningSource, vcRecord, vcVerified }:
-  { craft: any, mediaIds: string[], currentPageUrl: string, isOwner: boolean, backHref: string, artisanName: string | null, artisanSlug: string | null, artisanPhotoUrl: string | null, artisanBio: string | null, artisanYears: number | null, artisanLearningSource: string | null, vcRecord: VcData | null, vcVerified: boolean | null }) {
+function RenderOneCraftPage({ craft, imageIds, videoFileIds, currentPageUrl, isOwner, showQr, backHref, artisanName, artisanSlug, artisanPhotoUrl, artisanBio, artisanYears, artisanLearningSource, vcRecord, vcVerified }:
+  { craft: any, imageIds: string[], videoFileIds: string[], currentPageUrl: string, isOwner: boolean, showQr: boolean, backHref: string, artisanName: string | null, artisanSlug: string | null, artisanPhotoUrl: string | null, artisanBio: string | null, artisanYears: number | null, artisanLearningSource: string | null, vcRecord: VcData | null, vcVerified: boolean | null }) {
 
     const t = useTranslations();
     const craftEditUrl = `create?id=${craft.id}`;
-    const galleryImages = mediaIds.map((mediaId: string) => ({
+    const galleryImages = imageIds.map((mediaId: string) => ({
+      url: `/api/media/${mediaId}`,
+      alt: craft.title,
+    }))
+    const galleryVideoFiles = videoFileIds.map((mediaId: string) => ({
       url: `/api/media/${mediaId}`,
       alt: craft.title,
     }))
@@ -159,7 +168,7 @@ function RenderOneCraftPage({ craft, mediaIds, currentPageUrl, isOwner, backHref
               className="overflow-hidden bg-[var(--sc-surface)] p-3 sm:p-4"
               style={{ borderRadius: 'var(--sc-r-hero)', boxShadow: 'var(--sc-shadow-hero)', border: '1px solid var(--sc-border)' }}
             >
-              <Gallery images={galleryImages} videos={galleryVideos} />
+              <Gallery images={galleryImages} videoFiles={galleryVideoFiles} videos={galleryVideos} />
             </div>
 
             {/* Info rail */}
@@ -354,22 +363,22 @@ function RenderOneCraftPage({ craft, mediaIds, currentPageUrl, isOwner, backHref
           <div className="sc-container">
             <p className="sc-eyebrow mb-2">{t('crafts.details.authenticity')}</p>
             <h2 className="sc-h2 mb-8" style={{ color: 'var(--sc-text-on-dark)' }}>{t('crafts.details.certificateTitle')}</h2>
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* QR */}
-              <div className="sc-dark-panel p-6">
-                <h3 className="mb-1 flex items-center gap-2" style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '18px', color: 'var(--sc-text-on-dark)' }}>
-                  <QrCode className="h-4 w-4" style={{ color: 'var(--sc-accent-warm)' }} />
-                  {t('crafts.details.qrTitle')}
-                </h3>
-                <p className="mb-4 text-sm" style={{ color: 'var(--sc-text-on-dark-muted)' }}>{t('crafts.details.qrScanGuidance')}</p>
-                <div className="flex flex-col items-center gap-4">
-                  <div className="rounded-[var(--sc-r-btn)] bg-[var(--sc-surface)] p-3">
+            <div className={`grid gap-6 ${showQr ? 'md:grid-cols-2' : ''}`}>
+              {/* QR — only shown to the crafter (accessed via ?from=mycrafts) */}
+              {showQr && (
+                <div className="sc-dark-panel p-6">
+                  <h3 className="mb-1 flex items-center gap-2" style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '18px', color: 'var(--sc-text-on-dark)' }}>
+                    <QrCode className="h-4 w-4" style={{ color: 'var(--sc-accent-warm)' }} />
+                    {t('crafts.details.qrTitle')}
+                  </h3>
+                  <p className="mb-4 text-sm" style={{ color: 'var(--sc-text-on-dark-muted)' }}>{t('crafts.details.qrScanGuidance')}</p>
+                  <div className="flex flex-col items-center gap-4">
                     <QRCode data={currentPageUrl} foreground={'#20303f'} background={'#fdfcfa'} margin={2} />
+                    {/* <p className="max-w-xs break-all text-center text-xs" style={{ color: 'var(--sc-text-on-dark-muted)' }}>{currentPageUrl}</p> */}
+                    {/* <QRCopyButton url={currentPageUrl} label={t('crafts.details.copyLink')} copiedLabel={t('crafts.details.linkCopied')} /> */}
                   </div>
-                  <p className="max-w-xs break-all text-center text-xs" style={{ color: 'var(--sc-text-on-dark-muted)' }}>{currentPageUrl}</p>
-                  <QRCopyButton url={currentPageUrl} label={t('crafts.details.copyLink')} copiedLabel={t('crafts.details.linkCopied')} />
                 </div>
-              </div>
+              )}
 
               {/* Certificate of Authenticity */}
               <div className="sc-dark-panel p-6">

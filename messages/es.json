@@ -337,6 +337,11 @@
     "connectWith": "Conectar"
   },
   "crafts": {
+    "notFound": {
+      "title": "Esta artesanía no está disponible",
+      "body": "Es posible que su creador la haya eliminado. Explora otras artesanías.",
+      "browse": "Explorar artesanías"
+    },
     "welcomeTitle": "Explorar artesanías",
     "description": "Descubre artesanías hechas a mano auténticas de artesanos expertos de todo el mundo. Cada pieza está verificada y cuenta una historia única de tradición y artesanía.",
     "explore": {
@@ -378,7 +383,7 @@
       "noDescription": "No hay descripción disponible",
       "qrCodeTitle": "Certificado de Autenticidad",
       "qrCodeDescription": "Comparte esta artesanía.",
-      "qrScanGuidance": "Escanea con la cámara de tu teléfono para verificar la autenticidad",
+      "qrScanGuidance": "Descarga este código QR para imprimirlo y adjuntarlo a tu producto físico",
       "copyLink": "Copiar enlace",
       "linkCopied": "¡Copiado!",
       "visible": "Público",
@@ -425,6 +430,16 @@
     "uploadImages": "Sube imágenes de tu artesanía",
     "browse": "Examinar archivos",
     "imagesSelected": "imagen(es) seleccionada(s)",
+    "uploadTab": "Subir nuevas",
+    "galleryTab": "Desde la galería",
+    "galleryHint": "Selecciona imágenes de tu galería para añadirlas a esta artesanía.",
+    "galleryLoading": "Cargando tu galería…",
+    "galleryLoadFailed": "No se pudo cargar tu galería.",
+    "galleryEmpty": "Tu galería multimedia está vacía. Sube imágenes primero en la página de la galería.",
+    "filesSelected": "archivo(s) seleccionado(s)",
+    "mediaTooLarge": "El archivo es demasiado grande. El tamaño máximo es 100 MB.",
+    "uploadFailed": "No se pudieron subir algunos archivos. Inténtalo de nuevo.",
+    "failed": "Error",
     "saving": "Guardando...",
     "updating": "Actualizando...",
     "createFailed": "No se pudo guardar la artesanía. Inténtalo de nuevo.",
