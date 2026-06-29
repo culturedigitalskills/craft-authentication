@@ -4,6 +4,7 @@ import { CreateGroupSchema } from '@/lib/validations/group'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAdmin } from '@/lib/auth-guard'
+import { generateUniqueSlug } from '@/lib/slug'
 
 export async function GET(request: NextRequest) {
     try {
@@ -65,20 +66,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const validatedData = CreateGroupSchema.parse(body)
 
-        const baseSlug = validatedData.name
-            .toLowerCase()
-            .replace(/[^a-z0-9-]/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '')
-
-        let slug = baseSlug
-        let slugExists = await prisma.group.findUnique({ where: { slug } })
-        let counter = 1
-        while (slugExists) {
-            slug = `${baseSlug}-${counter}`
-            slugExists = await prisma.group.findUnique({ where: { slug } })
-            counter++
-        }
+        const slug = await generateUniqueSlug('group', validatedData.name)
 
         const group = await prisma.group.create({
             data: {

@@ -4,6 +4,7 @@ import { CreateArtisanSchema } from '@/lib/validations/artisan'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
+import { generateUniqueSlug } from '@/lib/slug'
 
 export async function GET(request: NextRequest) {
     try {
@@ -85,20 +86,7 @@ export async function POST(request: NextRequest) {
             return errorResponse('Artisan profile already exists', 409)
         }
 
-        const baseSlug = `${validatedData.firstName}-${validatedData.lastName}`
-            .toLowerCase()
-            .replace(/[^a-z0-9-]/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '')
-
-        let slug = baseSlug
-        let slugExists = await prisma.artisan.findUnique({ where: { slug } })
-        let counter = 1
-        while (slugExists) {
-            slug = `${baseSlug}-${counter}`
-            slugExists = await prisma.artisan.findUnique({ where: { slug } })
-            counter++
-        }
+        const slug = await generateUniqueSlug('artisan', `${validatedData.firstName}-${validatedData.lastName}`)
 
         const artisan = await prisma.artisan.create({
             data: {

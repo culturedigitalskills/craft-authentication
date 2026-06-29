@@ -80,6 +80,7 @@ export default async function Home() {
     }))
 
     const featured = artisans[0] ?? null
+    const featuredCraft = crafts[0] ?? null
 
     return (
         <>
@@ -105,26 +106,27 @@ export default async function Home() {
 
                 {/* People-forward collage */}
                 <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-                    <div
-                        className="relative overflow-hidden"
-                        style={{ aspectRatio: '4 / 5', borderRadius: 'var(--sc-r-hero)', boxShadow: 'var(--sc-shadow-hero)', border: '1px solid var(--sc-border)' }}
-                    >
-                        <ScMedia
-                            src={featured?.photoUrl}
-                            alt={featured?.name ?? t('hero.chipKicker')}
-                            fallback={<PortraitFallback name={featured?.name ?? 'Artisan'} />}
-                            sizes="(max-width: 1024px) 90vw, 40vw"
-                            priority
-                        />
-                    </div>
-
-                    {/* Woven-textile inset */}
-                    <div
-                        className="absolute -left-6 -top-6 hidden h-32 w-32 overflow-hidden sm:block"
-                        style={{ borderRadius: 'var(--sc-r-card)', boxShadow: 'var(--sc-shadow-raise)', border: '4px solid var(--sc-surface)' }}
-                    >
-                        <IndigoDotsCover />
-                    </div>
+                    {(() => {
+                        const heroStyle = { aspectRatio: '1 / 1', borderRadius: 'var(--sc-r-hero)', boxShadow: 'var(--sc-shadow-hero)', border: '1px solid var(--sc-border)' }
+                        const heroMedia = (
+                            <ScMedia
+                                src={featuredCraft?.imageUrl}
+                                alt={featuredCraft?.title ?? t('hero.chipKicker')}
+                                fallback={<IndigoDotsCover />}
+                                sizes="(max-width: 1024px) 90vw, 40vw"
+                                priority
+                            />
+                        )
+                        return featuredCraft ? (
+                            <Link href={`/crafts/${featuredCraft.id}`} className="relative block overflow-hidden" style={heroStyle}>
+                                {heroMedia}
+                            </Link>
+                        ) : (
+                            <div className="relative overflow-hidden" style={heroStyle}>
+                                {heroMedia}
+                            </div>
+                        )
+                    })()}
 
                     {/* Floating maker chip */}
                     {featured && (

@@ -11,6 +11,7 @@ import {
     deleteCraftVC,
     setCraftMedia,
     getCraftMediaIds,
+    getCraftMediaItems,
     findUnownedMedia,
     CRAFT_ENTITY_TYPE,
 } from '@/lib/craft'
@@ -99,14 +100,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         // Re-issue the credential so its subject stays accurate after edits.
         try {
-            const orderedMedia = await getCraftMediaIds(id)
+            const orderedMedia = await getCraftMediaItems(id)
+            const firstImageId = orderedMedia.find(m => m.mimeType?.startsWith('image/'))?.mediaId ?? null
             await issueCraftVC({
                 id: updated.id,
                 title: updated.title,
                 description: updated.description,
                 artisanSlug: craft.artisan.slug,
                 createdAt: updated.createdAt,
-                firstMediaId: orderedMedia[0] ?? null,
+                firstMediaId: firstImageId,
             })
         } catch (vcError) {
             console.error('VC re-issuance failed for craft', id, vcError)

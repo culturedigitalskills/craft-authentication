@@ -339,6 +339,11 @@
     "connectWith": "Connect"
   },
   "crafts": {
+    "notFound": {
+      "title": "This craft isn't available",
+      "body": "It may have been removed by its maker. Browse other crafts instead.",
+      "browse": "Browse crafts"
+    },
     "welcomeTitle": "Gallery of Crafts",
     "description": "Discover authentic handmade crafts from skilled artisans around the world. Each piece is verified and tells a unique story of tradition and craftsmanship.",
     "explore": {
@@ -380,7 +385,7 @@
       "noDescription": "No description available",
       "qrCodeTitle": "Certificate of Authenticity",
       "qrCodeDescription": "Share this craft.",
-      "qrScanGuidance": "Scan with your phone camera to verify authenticity",
+      "qrScanGuidance": "Download this QR code for printing and attaching to your physical product",
       "copyLink": "Copy link",
       "linkCopied": "Copied!",
       "visible": "Public",
@@ -427,6 +432,16 @@
     "uploadImages": "Upload images of your craft",
     "browse": "Browse files",
     "imagesSelected": "image(s) selected",
+    "uploadTab": "Upload new",
+    "galleryTab": "From gallery",
+    "galleryHint": "Select images from your gallery to add to this craft.",
+    "galleryLoading": "Loading your gallery…",
+    "galleryLoadFailed": "Couldn't load your gallery.",
+    "galleryEmpty": "Your media gallery is empty. Upload images on the Media Gallery page first.",
+    "filesSelected": "file(s) selected",
+    "mediaTooLarge": "File is too large. Maximum size is 100 MB.",
+    "uploadFailed": "Some files failed to upload. Please try again.",
+    "failed": "Failed",
     "saving": "Saving...",
     "updating": "Updating...",
     "createFailed": "Failed to save craft. Please try again.",

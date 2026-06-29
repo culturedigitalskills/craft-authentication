@@ -51,7 +51,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         needsOnboarding = !artisan
     }
     return (
-        <html lang={`/${locale}`} suppressHydrationWarning>
+        <html lang={`${locale}`} suppressHydrationWarning>
             <head>
                 <link href="/favicon.ico" rel="icon" sizes="32x32" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
@@ -65,6 +65,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             </head>
 
             <body
+                suppressHydrationWarning
                 className={cn(
                     'min-h-screen overflow-x-hidden antialiased',
                     geistSans.variable,

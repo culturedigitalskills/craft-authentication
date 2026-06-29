@@ -337,6 +337,11 @@
     "artisansCount": "Kunsthandwerker"
   },
   "crafts": {
+    "notFound": {
+      "title": "Dieses Handwerk ist nicht verfügbar",
+      "body": "Es wurde möglicherweise von seinem Ersteller entfernt. Entdecke stattdessen andere Handwerke.",
+      "browse": "Handwerke entdecken"
+    },
     "welcomeTitle": "Handwerke entdecken",
     "description": "Entdecken Sie authentische handgefertigte Produkte von erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes Stück ist verifiziert und erzählt eine einzigartige Geschichte von Tradition und Handwerkskunst.",
     "explore": {
@@ -353,7 +358,7 @@
     },
     "details": {
       "qrCodeTitle": "Echtheitszertifikat",
-      "qrScanGuidance": "Scannen Sie mit der Handykamera, um die Echtheit zu überprüfen",
+      "qrScanGuidance": "Laden Sie diesen QR-Code herunter, um ihn auszudrucken und an Ihrem physischen Produkt anzubringen",
       "copyLink": "Link kopieren",
       "linkCopied": "Kopiert!",
       "visible": "Öffentlich",
@@ -499,6 +504,16 @@
     "uploadImages": "Lade Bilder deines Handwerks hoch",
     "browse": "Dateien durchsuchen",
     "imagesSelected": "Bild(er) ausgewählt",
+    "uploadTab": "Neu hochladen",
+    "galleryTab": "Aus Galerie",
+    "galleryHint": "Wähle Bilder aus deiner Galerie aus, um sie diesem Handwerk hinzuzufügen.",
+    "galleryLoading": "Galerie wird geladen…",
+    "galleryLoadFailed": "Galerie konnte nicht geladen werden.",
+    "galleryEmpty": "Deine Mediengalerie ist leer. Lade zuerst Bilder auf der Galerieseite hoch.",
+    "filesSelected": "Datei(en) ausgewählt",
+    "mediaTooLarge": "Die Datei ist zu groß. Maximale Größe ist 100 MB.",
+    "uploadFailed": "Einige Dateien konnten nicht hochgeladen werden. Bitte versuche es erneut.",
+    "failed": "Fehlgeschlagen",
     "saving": "Speichern...",
     "updating": "Wird aktualisiert...",
     "createFailed": "Handwerk konnte nicht gespeichert werden. Bitte versuche es erneut.",

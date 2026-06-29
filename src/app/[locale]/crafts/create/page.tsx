@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { CraftForm } from '@/components/craft/CraftForm'
-import { getCraftMediaIds } from '@/lib/craft'
+import { getCraftMediaItems } from '@/lib/craft'
 
 export default async function CraftCreatePage({
     searchParams,
@@ -29,7 +29,7 @@ export default async function CraftCreatePage({
             redirect('/crafts')
         }
 
-        const mediaIds = await getCraftMediaIds(record.id)
+        const media = await getCraftMediaItems(record.id)
         craft = {
             id: record.id,
             title: record.title,
@@ -51,7 +51,7 @@ export default async function CraftCreatePage({
             longitude: record.longitude,
             place: record.place,
             videos: record.videos,
-            mediaIds,
+            media,
         }
     }
 

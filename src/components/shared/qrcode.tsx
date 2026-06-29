@@ -2,7 +2,6 @@
 import QR from 'qrcode';
 
 import { type HTMLAttributes, useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { oklch, formatHex } from 'culori';
 
 export type QRCodeProps = HTMLAttributes<HTMLDivElement> & {
@@ -92,8 +91,8 @@ export const QRCode = ({data,
   return (
     <div className="flex flex-col items-center gap-4">
       <img src={stringsvg} alt="QR code" />
-      <a href={stringsvg} download="qrcode.svg">
-        <Button variant="outline" size="sm">Download SVG</Button>
+      <a href={stringsvg} download="qrcode.svg" className="sc-btn sc-btn--primary justify-center">
+        Download SVG
       </a>
     </div>
   );

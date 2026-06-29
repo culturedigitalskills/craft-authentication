@@ -337,6 +337,11 @@
     "connectWith": "Bağlan"
   },
   "crafts": {
+    "notFound": {
+      "title": "Bu ürün mevcut değil",
+      "body": "Üreticisi tarafından kaldırılmış olabilir. Bunun yerine diğer ürünlere göz atın.",
+      "browse": "Ürünlere göz at"
+    },
     "welcomeTitle": "Zanaat Galerisi",
     "description": "Dünyanın dört bir yanındaki yetenekli zanaatkârların özgün el yapımı zanaatlarını keşfedin. Her parça doğrulanmıştır ve gelenek ile ustalığın eşsiz bir hikâyesini anlatır.",
     "explore": {
@@ -378,7 +383,7 @@
       "noDescription": "Açıklama mevcut değil",
       "qrCodeTitle": "Özgünlük Sertifikası",
       "qrCodeDescription": "Bu zanaatı paylaşın.",
-      "qrScanGuidance": "Özgünlüğü doğrulamak için telefon kameranızla tarayın",
+      "qrScanGuidance": "Bu QR kodunu yazdırmak ve fiziksel ürününüze eklemek için indirin",
       "copyLink": "Bağlantıyı kopyala",
       "linkCopied": "Kopyalandı!",
       "visible": "Herkese Açık",
@@ -425,6 +430,16 @@
     "uploadImages": "Zanaatınızın görsellerini yükleyin",
     "browse": "Dosyalara göz at",
     "imagesSelected": "görsel seçildi",
+    "uploadTab": "Yeni yükle",
+    "galleryTab": "Galeriden",
+    "galleryHint": "Bu ürüne eklemek için galerinizden görseller seçin.",
+    "galleryLoading": "Galeriniz yükleniyor…",
+    "galleryLoadFailed": "Galeriniz yüklenemedi.",
+    "galleryEmpty": "Medya galeriniz boş. Önce Galeri sayfasından görsel yükleyin.",
+    "filesSelected": "dosya seçildi",
+    "mediaTooLarge": "Dosya çok büyük. Maksimum boyut 100 MB.",
+    "uploadFailed": "Bazı dosyalar yüklenemedi. Lütfen tekrar deneyin.",
+    "failed": "Başarısız",
     "saving": "Kaydediliyor...",
     "updating": "Güncelleniyor...",
     "createFailed": "Zanaat kaydedilemedi. Lütfen tekrar deneyin.",
