@@ -122,13 +122,13 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
             {/* Drawer */}
             <div
-                className={`fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
+                className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-full max-w-xs flex-col overflow-y-auto shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
                     menuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
                 style={{ background: 'var(--sc-surface)' }}
             >
                 {/* Drawer header */}
-                <div className="flex shrink-0 items-center justify-between border-b px-4 py-3" style={{ borderColor: 'var(--sc-border)' }}>
+                <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: 'var(--sc-border)' }}>
                     <Link
                         href="/"
                         onClick={() => setMenuOpen(false)}
@@ -158,7 +158,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                 </div>
 
                 {/* Drawer nav links */}
-                <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 py-2">
+                <nav className="flex flex-col px-2 py-2">
                     {navLinks.map(link => (
                         <Link
                             key={link.href}
@@ -177,7 +177,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                 </nav>
 
                 {/* Drawer auth & language */}
-                <div className="shrink-0 border-t px-4 py-4" style={{ borderColor: 'var(--sc-border)' }}>
+                <div className="mt-auto border-t px-4 py-4" style={{ borderColor: 'var(--sc-border)' }}>
                     <NavbarAuth variant="mobile" needsOnboarding={needsOnboarding} onAction={() => setMenuOpen(false)} />
                     <div className="mt-4 flex items-center gap-3">
                         <LanguageSelect isMobile={true} jsonlan={t('locale')} />
