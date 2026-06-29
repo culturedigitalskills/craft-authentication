@@ -12,8 +12,8 @@ export default async function GroupManagePage({ params }: PageProps) {
     if (!session?.user) redirect('/login')
 
     const { slug } = await params
-    const group = await prisma.group.findUnique({
-        where: { slug },
+    const group = await prisma.group.findFirst({
+        where: { OR: [{ slug }, { previousSlugs: { has: slug } }] },
         include: {
             memberships: {
                 where: { leftDate: null },
@@ -36,6 +36,9 @@ export default async function GroupManagePage({ params }: PageProps) {
     })
 
     if (!group) notFound()
+
+    // Requested via a retired slug — send to the current canonical URL.
+    if (group.slug !== slug) redirect(`/groups/${group.slug}/manage`)
 
     // Check authorization: site admin or group admin
     const isAdmin = session.user.role === 'ADMIN'

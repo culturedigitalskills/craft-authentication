@@ -2,48 +2,62 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { CraftForm } from '@/components/craft/CraftForm'
+import { getCraftMediaItems } from '@/lib/craft'
 
-interface PageProps {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-export default async function CraftCreatePage(
-  { searchParams }:
-   { searchParams: { id?: string } }) {
-
-  const params = await searchParams
-    const id = params.id
-    console.log('Craft ID from URL in Create Page:', id)
+export default async function CraftCreatePage({
+    searchParams,
+}: {
+    searchParams: Promise<{ id?: string }>
+}) {
+    const { id } = await searchParams
 
     const session = await auth()
-     if (!session?.user) {
+    if (!session?.user) {
         redirect('/login')
     }
 
-    console.log(session.user)
-    let craft: any = null
+    let craft = null
     if (id) {
-        craft = await prisma.dataRecord.findUnique({
-            where: { id: id },
-            select: {
-                id: true,
-                name: true,
-                description: true,
-                data: true
-            },
-        })  
-        // console.log('Craft from DB:', craft)  
-    }
-    // console.log('***Craft from DB:', craft)  
+        const record = await prisma.craft.findFirst({
+            where: { id, deletedAt: null },
+            include: { artisan: { select: { userId: true } } },
+        })
 
+        // Only the owner (or a site admin) may open a craft for editing.
+        if (!record) redirect('/crafts')
+        if (record.artisan.userId !== session.user.id && session.user.role !== 'ADMIN') {
+            redirect('/crafts')
+        }
+
+        const media = await getCraftMediaItems(record.id)
+        craft = {
+            id: record.id,
+            title: record.title,
+            description: record.description,
+            materials: record.materials,
+            technique: record.technique,
+            timeToMake: record.timeToMake,
+            width: record.width,
+            height: record.height,
+            depth: record.depth,
+            dimensionUnit: record.dimensionUnit,
+            weight: record.weight,
+            weightUnit: record.weightUnit,
+            inspiration: record.inspiration,
+            careInstructions: record.careInstructions,
+            isPublic: record.isPublic,
+            isSharedLocation: record.isSharedLocation,
+            latitude: record.latitude,
+            longitude: record.longitude,
+            place: record.place,
+            videos: record.videos,
+            media,
+        }
+    }
 
     return (
         <div className="container mx-auto px-4 py-10">
-            <CraftForm user={session.user?.email ?? null} craft={craft} />
+            <CraftForm craft={craft} />
         </div>
     )
-
-
 }

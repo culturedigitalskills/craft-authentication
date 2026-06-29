@@ -16,37 +16,80 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft, Loader2, X, Play, Youtube } from 'lucide-react'
+import { ArrowLeft, Loader2, X, Play, Check, Upload, Images } from 'lucide-react'
+import { FaYoutube } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
-import { Prisma } from '@prisma/client'
 import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
 
 interface Craft {
     id: string
-    name: string
+    title: string
     description: string | null
-    data: Prisma.JsonValue | null
+    materials: string | null
+    technique: string | null
+    timeToMake: string | null
+    width: number | null
+    height: number | null
+    depth: number | null
+    dimensionUnit: string | null
+    weight: number | null
+    weightUnit: string | null
+    inspiration: string | null
+    careInstructions: string | null
+    isPublic: boolean
+    isSharedLocation: boolean
+    latitude: number | null
+    longitude: number | null
+    place: string | null
+    videos: string[]
+    media: MediaItem[]
+}
+
+type MediaKind = 'image' | 'video'
+
+interface MediaItem {
+    mediaId: string
+    mimeType: string | null
 }
 
 interface CraftFormProps {
     craft: Craft | null
-    user: string | null
 }
 
-async function submitImages(images: File[]): Promise<string[]> {
-    if (images.length === 0) return []
-    return Promise.all(
-        images.map(async (image) => {
-            const formData = new FormData()
-            formData.append('file', image)
-            const res = await fetch('/api/media/upload', { method: 'POST', body: formData })
-            const media = await res.json()
-            return media?.id
-        })
-    )
+const kindFromMime = (mime: string | null | undefined): MediaKind =>
+    mime?.startsWith('video/') ? 'video' : 'image'
+
+// Upload a single file via XHR so we can report upload progress. Resolves to
+// the new media id, or undefined if the upload failed (the caller filters those
+// out, mirroring the previous fetch behaviour).
+function uploadFileWithProgress(file: File, onProgress: (pct: number) => void): Promise<string | undefined> {
+    return new Promise((resolve) => {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', '/api/media/upload')
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
+        }
+        xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                onProgress(100)
+                try {
+                    resolve(JSON.parse(xhr.responseText)?.id)
+                } catch {
+                    resolve(undefined)
+                }
+            } else {
+                resolve(undefined)
+            }
+        }
+        xhr.onerror = () => resolve(undefined)
+        xhr.send(formData)
+    })
 }
 
-export function CraftForm({ craft, user }: CraftFormProps) {
+export function CraftForm({ craft }: CraftFormProps) {
     const t = useTranslations('')
     const router = useRouter()
 
@@ -55,45 +98,63 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
-    const [name, setName] = useState(craft?.name ?? '')
+    const [name, setName] = useState(craft?.title ?? '')
     const [description, setDescription] = useState(craft?.description ?? '')
-
-    const [data, setData] = useState<Record<string, unknown> | null>(
-        (craft?.data as Record<string, unknown>) ?? null
-    )
-    const [material, setMaterial] = useState<string>(data?.['material'] as string ?? '')
-    const [artisan, setArtisan] = useState<string>(data?.['artisan'] as string ?? '')
-    const [isPublic, setIsPublic] = useState<boolean>(data?.['isPublic'] as boolean ?? false)
-    const [isSharedLocation, setIsSharedLocation] = useState<boolean>(
-        data?.['isSharedLocation'] === undefined ? true : Boolean(data?.['isSharedLocation'])
-    )
-    const [createdOn, setCreatedOn] = useState(data?.['createdOn'] as string ?? '')
-    const [updatedOn, setUpdatedOn] = useState(data?.['updatedOn'] as string ?? '')
+    const [materials, setMaterials] = useState<string>(craft?.materials ?? '')
+    const [technique, setTechnique] = useState<string>(craft?.technique ?? '')
+    const [timeToMake, setTimeToMake] = useState<string>(craft?.timeToMake ?? '')
+    const [width, setWidth] = useState<string>(craft?.width?.toString() ?? '')
+    const [height, setHeight] = useState<string>(craft?.height?.toString() ?? '')
+    const [depth, setDepth] = useState<string>(craft?.depth?.toString() ?? '')
+    const [dimensionUnit, setDimensionUnit] = useState<string>(craft?.dimensionUnit ?? 'cm')
+    const [weight, setWeight] = useState<string>(craft?.weight?.toString() ?? '')
+    const [weightUnit, setWeightUnit] = useState<string>(craft?.weightUnit ?? 'kg')
+    const [inspiration, setInspiration] = useState<string>(craft?.inspiration ?? '')
+    const [careInstructions, setCareInstructions] = useState<string>(craft?.careInstructions ?? '')
+    const [isPublic, setIsPublic] = useState<boolean>(craft?.isPublic ?? false)
+    const [isSharedLocation, setIsSharedLocation] = useState<boolean>(craft?.isSharedLocation ?? true)
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
-    const [existingMediaIds, setExistingMediaIds] = useState<string[]>(
-        Array.isArray(data?.['mediaIds']) ? (data['mediaIds'] as string[]).filter(Boolean) : []
-    )
+    const [existingMedia, setExistingMedia] = useState<MediaItem[]>(craft?.media ?? [])
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
-    const [images, setImages] = useState<File[]>([])
-    const [videos, setVideos] = useState<string[]>(
-        Array.isArray(data?.['videos']) ? (data['videos'] as string[]).filter(Boolean) : []
-    )
+    const [files, setFiles] = useState<File[]>([])
+    const [uploads, setUploads] = useState<{ name: string; progress: number; failed: boolean }[]>([])
+    const [videos, setVideos] = useState<string[]>(craft?.videos ?? [])
     const [videoInput, setVideoInput] = useState('')
 
-    useEffect(() => {
-        setMaterial(data?.['material'] as string ?? '')
-        setArtisan(data?.['artisan'] as string ?? '')
-        setIsPublic(data?.['isPublic'] as boolean ?? false)
-        setIsSharedLocation(data?.['isSharedLocation'] as boolean ?? true)
-        setCreatedOn(data?.['CreatedOn'] as string ?? '')
-        setUpdatedOn(data?.['updatedOn'] as string ?? '')
-        setExistingMediaIds(
-            Array.isArray(data?.['mediaIds']) ? (data['mediaIds'] as string[]).filter(Boolean) : []
+    // Media source: upload fresh files, or reuse media from the gallery.
+    const [mediaSource, setMediaSource] = useState<'upload' | 'gallery'>('upload')
+    const [gallery, setGallery] = useState<{ mediaId: string; url: string; mimeType: string | null }[] | null>(null)
+    const [galleryLoading, setGalleryLoading] = useState(false)
+    const [galleryError, setGalleryError] = useState(false)
+
+    async function loadGallery() {
+        if (gallery || galleryLoading) return
+        setGalleryLoading(true)
+        setGalleryError(false)
+        try {
+            const res = await fetch('/api/media/gallery')
+            if (!res.ok) throw new Error()
+            setGallery(await res.json())
+        } catch {
+            setGalleryError(true)
+        } finally {
+            setGalleryLoading(false)
+        }
+    }
+
+    function handleSelectGallery(source: 'upload' | 'gallery') {
+        setMediaSource(source)
+        if (source === 'gallery') void loadGallery()
+    }
+
+    // Toggle a gallery item into/out of the craft's attached media.
+    function toggleGalleryItem(item: { mediaId: string; mimeType: string | null }) {
+        setExistingMedia(prev =>
+            prev.some(m => m.mediaId === item.mediaId)
+                ? prev.filter(m => m.mediaId !== item.mediaId)
+                : [...prev, { mediaId: item.mediaId, mimeType: item.mimeType }],
         )
-        setVideos(
-            Array.isArray(data?.['videos']) ? (data['videos'] as string[]).filter(Boolean) : []
-        )
-    }, [data])
+    }
 
     function handleAddVideo() {
         const id = extractYouTubeId(videoInput)
@@ -114,19 +175,15 @@ export function CraftForm({ craft, user }: CraftFormProps) {
         setVideos(prev => prev.filter(v => v !== id))
     }
 
-    async function handleRemoveExisting(mediaId: string) {
+    // Remove from local state only; the underlying file is garbage-collected
+    // server-side on save when the new mediaIds list is reconciled.
+    function handleRemoveExisting(mediaId: string) {
         if (confirmDelete !== mediaId) {
             setConfirmDelete(mediaId)
             return
         }
         setConfirmDelete(null)
-        try {
-            const res = await fetch(`/api/media/${mediaId}`, { method: 'DELETE' })
-            if (!res.ok) throw new Error('Delete failed')
-            setExistingMediaIds(prev => prev.filter(id => id !== mediaId))
-        } catch {
-            setMessage({ text: t('createCraft.deleteImageFailed'), type: 'error' })
-        }
+        setExistingMedia(prev => prev.filter(m => m.mediaId !== mediaId))
     }
 
     useEffect(() => {
@@ -149,44 +206,81 @@ export function CraftForm({ craft, user }: CraftFormProps) {
         setIsSubmitting(true)
         setMessage(null)
 
-        const timestamp = new Date().toISOString()
-        if (isCreateMode) setCreatedOn(timestamp)
+        // Resolve location: only when the artisan opts to share it.
+        let latitude: number | null = craft?.latitude ?? null
+        let longitude: number | null = craft?.longitude ?? null
+        let place: string | null = craft?.place ?? null
 
-        let city = null
-        if (isSharedLocation && location?.lat && location?.lng) {
-            const geoRes = await fetch(`/api/geocode?lat=${location.lat}&lng=${location.lng}`)
-            const geoData = await geoRes.json()
-            city = geoData.city
+        if (isSharedLocation) {
+            if (location?.lat && location?.lng) {
+                latitude = location.lat
+                longitude = location.lng
+                try {
+                    const geoRes = await fetch(`/api/geocode?lat=${location.lat}&lng=${location.lng}`)
+                    const geoData = await geoRes.json()
+                    place = geoData.city ?? place
+                } catch {
+                    // Non-fatal — keep any existing place value.
+                }
+            }
+        } else {
+            latitude = null
+            longitude = null
+            place = null
         }
 
-        const ids = await submitImages(images)
+        let newIds: (string | undefined)[] = []
+        if (files.length > 0) {
+            setUploads(files.map(f => ({ name: f.name, progress: 0, failed: false })))
+            newIds = await Promise.all(
+                files.map((file, i) =>
+                    uploadFileWithProgress(file, (pct) =>
+                        setUploads(prev => prev.map((u, j) => (j === i ? { ...u, progress: pct } : u))),
+                    ).then((id) => {
+                        if (!id) setUploads(prev => prev.map((u, j) => (j === i ? { ...u, failed: true } : u)))
+                        return id
+                    }),
+                ),
+            )
+        }
+        if (newIds.some(id => !id)) {
+            setMessage({ text: t('createCraft.uploadFailed'), type: 'error' })
+            setIsSubmitting(false)
+            return
+        }
+        const mediaIds = [...existingMedia.map(m => m.mediaId), ...newIds].filter(Boolean) as string[]
 
-        const craftdata = {
-            name,
+        const payload = {
+            title: name,
             description,
-            data: {
-                ...data,
-                material,
-                isPublic,
-                isSharedLocation,
-                artisan: data?.artisan ?? user ?? '',
-                createdOn: data?.createdOn ?? timestamp,
-                updatedOn: timestamp,
-                mediaIds: [...existingMediaIds, ...ids],
-                videos,
-                location: data?.location ? data.location : location ? { lat: location.lat, lng: location.lng } : null,
-                place: data?.city ?? city,
-            },
+            materials: materials || undefined,
+            technique: technique || undefined,
+            timeToMake: timeToMake || undefined,
+            width: width ? parseFloat(width) : undefined,
+            height: height ? parseFloat(height) : undefined,
+            depth: depth ? parseFloat(depth) : undefined,
+            dimensionUnit,
+            weight: weight ? parseFloat(weight) : undefined,
+            weightUnit,
+            inspiration: inspiration || undefined,
+            careInstructions: careInstructions || undefined,
+            isPublic,
+            isSharedLocation,
+            latitude,
+            longitude,
+            place,
+            videos,
+            mediaIds,
         }
 
         try {
-            const url = isCreateMode ? '/api/data' : `/api/data/${craft?.id}`
+            const url = isCreateMode ? '/api/crafts' : `/api/crafts/${craft?.id}`
             const method = isCreateMode ? 'POST' : 'PUT'
 
             const res = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(craftdata),
+                body: JSON.stringify(payload),
             })
 
             if (!res.ok) throw new Error('Request failed')
@@ -215,15 +309,9 @@ export function CraftForm({ craft, user }: CraftFormProps) {
     async function handleDelete() {
         if (!confirm(t('createCraft.deleteCraftConfirm'))) return
 
-        if (existingMediaIds.length > 0) {
-            await Promise.all(
-                existingMediaIds.map(async (mediaId: string) => {
-                    await fetch(`/api/media/${mediaId}`, { method: 'DELETE' })
-                })
-            )
-        }
-
-        const res = await fetch(`/api/data/${craft?.id}`, { method: 'DELETE' })
+        // The craft DELETE endpoint cascades attachments and garbage-collects
+        // the underlying media files server-side.
+        const res = await fetch(`/api/crafts/${craft?.id}`, { method: 'DELETE' })
         if (res.ok) router.push('/crafts')
     }
 
@@ -292,19 +380,135 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="material">
+                        <Label htmlFor="materials">
                             {t('createCraft.createCraftMaterial')}
                         </Label>
-                        <Select value={material} onValueChange={setMaterial}>
-                            <SelectTrigger id="material">
-                                <SelectValue placeholder={t('createCraft.selectMaterial')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Cotton">{t('materials.cotton')}</SelectItem>
-                                <SelectItem value="Wool">{t('materials.wool')}</SelectItem>
-                                <SelectItem value="Mix">{t('materials.mix')}</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Textarea
+                            id="materials"
+                            value={materials}
+                            onChange={(e) => setMaterials(e.target.value)}
+                            placeholder={t('createCraft.createCraftMaterialsPlaceholder')}
+                            rows={3}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="technique">
+                            {t('createCraft.createCraftTechnique')}
+                        </Label>
+                        <Textarea
+                            id="technique"
+                            value={technique}
+                            onChange={(e) => setTechnique(e.target.value)}
+                            placeholder={t('createCraft.createCraftTechniquePlaceholder')}
+                            rows={3}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="timeToMake">
+                            {t('createCraft.createCraftTimeToMake')}
+                        </Label>
+                        <Input
+                            id="timeToMake"
+                            value={timeToMake}
+                            onChange={(e) => setTimeToMake(e.target.value)}
+                            placeholder={t('createCraft.createCraftTimeToMakePlaceholder')}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>{t('createCraft.createCraftDimensions')}</Label>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={width}
+                                onChange={(e) => setWidth(e.target.value)}
+                                placeholder={t('createCraft.dimensionWidth')}
+                                aria-label={t('createCraft.dimensionWidth')}
+                            />
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={height}
+                                onChange={(e) => setHeight(e.target.value)}
+                                placeholder={t('createCraft.dimensionHeight')}
+                                aria-label={t('createCraft.dimensionHeight')}
+                            />
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={depth}
+                                onChange={(e) => setDepth(e.target.value)}
+                                placeholder={t('createCraft.dimensionDepth')}
+                                aria-label={t('createCraft.dimensionDepth')}
+                            />
+                            <Select value={dimensionUnit} onValueChange={setDimensionUnit}>
+                                <SelectTrigger aria-label={t('createCraft.dimensionUnit')}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="cm">cm</SelectItem>
+                                    <SelectItem value="in">in</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>{t('createCraft.createCraftWeight')}</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                type="number"
+                                min="0"
+                                step="any"
+                                value={weight}
+                                onChange={(e) => setWeight(e.target.value)}
+                                placeholder={t('createCraft.createCraftWeight')}
+                                aria-label={t('createCraft.createCraftWeight')}
+                            />
+                            <Select value={weightUnit} onValueChange={setWeightUnit}>
+                                <SelectTrigger aria-label={t('createCraft.weightUnit')}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="g">g</SelectItem>
+                                    <SelectItem value="kg">kg</SelectItem>
+                                    <SelectItem value="oz">oz</SelectItem>
+                                    <SelectItem value="lb">lb</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="inspiration">
+                            {t('createCraft.createCraftInspiration')}
+                        </Label>
+                        <Textarea
+                            id="inspiration"
+                            value={inspiration}
+                            onChange={(e) => setInspiration(e.target.value)}
+                            placeholder={t('createCraft.createCraftInspirationPlaceholder')}
+                            rows={3}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="careInstructions">
+                            {t('createCraft.createCraftCareInstructions')}
+                        </Label>
+                        <Textarea
+                            id="careInstructions"
+                            value={careInstructions}
+                            onChange={(e) => setCareInstructions(e.target.value)}
+                            placeholder={t('createCraft.createCraftCareInstructionsPlaceholder')}
+                            rows={3}
+                        />
                     </div>
 
                     <div className="flex flex-col gap-3">
@@ -335,21 +539,38 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                             {t('createCraft.uploadImages')}
                         </Label>
 
-                        {existingMediaIds.length > 0 && (
+                        {existingMedia.length > 0 && (
                             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                                {existingMediaIds.map((mediaId) => (
+                                {existingMedia.map(({ mediaId, mimeType }) => (
                                     <div
                                         key={mediaId}
-                                        className="group relative aspect-square overflow-hidden rounded-lg border border-border"
+                                        className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
                                     >
-                                        <Image
-                                            src={`/api/media/${mediaId}`}
-                                            alt="Craft photo"
-                                            fill
-                                            sizes="(max-width: 768px) 33vw, 25vw"
-                                            unoptimized
-                                            className="object-cover"
-                                        />
+                                        {kindFromMime(mimeType) === 'video' ? (
+                                            <>
+                                                <video
+                                                    src={`/api/media/${mediaId}`}
+                                                    muted
+                                                    playsInline
+                                                    preload="metadata"
+                                                    className="h-full w-full object-cover"
+                                                />
+                                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                                    <div className="rounded-full bg-black/55 p-2">
+                                                        <Play className="h-4 w-4 fill-white text-white" />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <Image
+                                                src={`/api/media/${mediaId}`}
+                                                alt="Craft media"
+                                                fill
+                                                sizes="(max-width: 768px) 33vw, 25vw"
+                                                unoptimized
+                                                className="object-cover"
+                                            />
+                                        )}
                                         {confirmDelete === mediaId ? (
                                             <div
                                                 className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-1.5 text-center"
@@ -391,42 +612,161 @@ export function CraftForm({ craft, user }: CraftFormProps) {
                             </div>
                         )}
 
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="outline"
+                        {/* Source toggle: upload fresh files or reuse the gallery */}
+                        <div className="inline-flex rounded-lg border border-border p-0.5">
+                            <button
                                 type="button"
-                                onClick={() => document.getElementById('images')?.click()}
+                                onClick={() => handleSelectGallery('upload')}
+                                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    mediaSource === 'upload'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
                             >
-                                {t('createCraft.browse')}
-                            </Button>
-                            {images.length > 0 && (
-                                <span className="text-sm text-muted-foreground">
-                                    {images.length} {t('createCraft.imagesSelected')}
-                                </span>
-                            )}
+                                <Upload className="h-4 w-4" />
+                                {t('createCraft.uploadTab')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleSelectGallery('gallery')}
+                                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    mediaSource === 'gallery'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                <Images className="h-4 w-4" />
+                                {t('createCraft.galleryTab')}
+                            </button>
                         </div>
-                        <input
-                            type="file"
-                            id="images"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={(e) => {
-                                const files = Array.from(e.target.files || [])
-                                const oversized = files.find(f => f.size > 8 * 1024 * 1024)
-                                if (oversized) {
-                                    setMessage({ text: t('createCraft.fileTooLarge'), type: 'error' })
-                                    e.target.value = ''
-                                    return
-                                }
-                                setImages(files)
-                            }}
-                        />
+
+                        {mediaSource === 'upload' ? (
+                            <>
+                                <div className="flex items-center gap-3">
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        onClick={() => document.getElementById('images')?.click()}
+                                    >
+                                        {t('createCraft.browse')}
+                                    </Button>
+                                    {files.length > 0 && (
+                                        <span className="text-sm text-muted-foreground">
+                                            {files.length} {t('createCraft.filesSelected')}
+                                        </span>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    id="images"
+                                    accept="image/*,video/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const selected = Array.from(e.target.files || [])
+                                        const oversized = selected.find(f => f.size > 100 * 1024 * 1024)
+                                        if (oversized) {
+                                            setMessage({ text: t('createCraft.mediaTooLarge'), type: 'error' })
+                                            e.target.value = ''
+                                            return
+                                        }
+                                        setUploads([])
+                                        setFiles(selected)
+                                    }}
+                                />
+                            </>
+                        ) : (
+                            <div>
+                                <p className="mb-2 text-sm text-muted-foreground">{t('createCraft.galleryHint')}</p>
+                                {galleryLoading && (
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        {t('createCraft.galleryLoading')}
+                                    </div>
+                                )}
+                                {galleryError && (
+                                    <p className="text-sm text-red-600">{t('createCraft.galleryLoadFailed')}</p>
+                                )}
+                                {!galleryLoading && !galleryError && gallery?.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">{t('createCraft.galleryEmpty')}</p>
+                                )}
+                                {!galleryLoading && gallery && gallery.length > 0 && (
+                                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                                        {gallery.map((item) => {
+                                            const selected = existingMedia.some(m => m.mediaId === item.mediaId)
+                                            return (
+                                                <button
+                                                    key={item.mediaId}
+                                                    type="button"
+                                                    onClick={() => toggleGalleryItem(item)}
+                                                    aria-pressed={selected}
+                                                    className={`group relative aspect-square overflow-hidden rounded-lg border bg-muted transition-colors ${
+                                                        selected ? 'border-primary ring-2 ring-primary' : 'border-border'
+                                                    }`}
+                                                >
+                                                    {kindFromMime(item.mimeType) === 'video' ? (
+                                                        <>
+                                                            <video
+                                                                src={item.url}
+                                                                muted
+                                                                playsInline
+                                                                preload="metadata"
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                                                <div className="rounded-full bg-black/55 p-2">
+                                                                    <Play className="h-4 w-4 fill-white text-white" />
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <Image
+                                                            src={item.url}
+                                                            alt="Gallery media"
+                                                            fill
+                                                            sizes="(max-width: 768px) 33vw, 25vw"
+                                                            unoptimized
+                                                            className="object-cover"
+                                                        />
+                                                    )}
+                                                    {selected && (
+                                                        <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                                            <Check className="h-3.5 w-3.5" />
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {uploads.length > 0 && (
+                            <div className="space-y-2 pt-1">
+                                {uploads.map((u, i) => (
+                                    <div key={i} className="text-sm">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="truncate text-muted-foreground">{u.name}</span>
+                                            <span className={`shrink-0 tabular-nums ${u.failed ? 'text-red-600' : 'text-muted-foreground'}`}>
+                                                {u.failed ? t('createCraft.failed') : `${u.progress}%`}
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                            <div
+                                                className={`h-full rounded-full transition-all ${u.failed ? 'bg-red-500' : 'bg-primary'}`}
+                                                style={{ width: `${u.failed ? 100 : u.progress}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="videoUrl" className="flex items-center gap-1.5">
-                            <Youtube className="h-4 w-4" />
+                            <FaYoutube className="h-4 w-4" />
                             {t('createCraft.videosLabel')}
                         </Label>
 

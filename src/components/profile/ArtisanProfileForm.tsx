@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
-import { GalleryUpload } from './GalleryUpload'
 import { LocationSelect } from './LocationSelect'
 import { CraftStoryBanner, type CraftStoryBannerProps } from './CraftStoryBanner'
 import {
@@ -26,14 +26,11 @@ import {
     Shield,
     LogOut,
     Loader2,
-    Instagram,
-    Facebook,
-    Twitter,
-    Youtube,
     Globe,
     Hash,
     X,
 } from 'lucide-react'
+import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
 
 interface Artisan {
     id: string
@@ -54,12 +51,6 @@ interface Artisan {
     hashtags: string[]
 }
 
-interface GalleryImage {
-    id: string
-    mediaId: string
-    url: string
-}
-
 interface MyGroup {
     membershipId: string
     role: string
@@ -70,12 +61,17 @@ interface ArtisanProfileFormProps {
     artisan: Artisan | null
     photoUrl: string | null
     coverUrl: string | null
-    galleryImages: GalleryImage[]
     myGroups?: MyGroup[]
     storyBanner?: CraftStoryBannerProps
 }
 
-export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages, myGroups = [], storyBanner }: ArtisanProfileFormProps) {
+export function ArtisanProfileForm({
+    artisan,
+    photoUrl,
+    coverUrl,
+    myGroups = [],
+    storyBanner,
+}: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
@@ -86,7 +82,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
     const [lastName, setLastName] = useState(artisan?.lastName ?? '')
     const [bio, setBio] = useState(artisan?.bio ?? '')
     const [yearsOfExperience, setYearsOfExperience] = useState(
-        artisan?.yearsOfExperience?.toString() ?? ''
+        artisan?.yearsOfExperience?.toString() ?? '',
     )
     const [learningSource, setLearningSource] = useState(artisan?.learningSource ?? '')
     const [country, setCountry] = useState<string | null>(artisan?.country ?? null)
@@ -157,7 +153,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                 attachmentType: 'HERO',
                                 isPrimary: true,
                             }),
-                        })
+                        }),
                     )
                 }
 
@@ -173,7 +169,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                 attachmentType: 'COVER',
                                 isPrimary: true,
                             }),
-                        })
+                        }),
                     )
                 }
 
@@ -215,8 +211,13 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
 
     function addHashtag() {
         const tag = hashtagInput.replace(/^#/, '').trim()
-        if (tag && /^[A-Za-z0-9_]{1,50}$/.test(tag) && !hashtags.includes(tag) && hashtags.length < 20) {
-            setHashtags(prev => [...prev, tag])
+        if (
+            tag &&
+            /^[A-Za-z0-9_]{1,50}$/.test(tag) &&
+            !hashtags.includes(tag) &&
+            hashtags.length < 20
+        ) {
+            setHashtags((prev) => [...prev, tag])
         }
         setHashtagInput('')
     }
@@ -227,23 +228,22 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                 method: 'DELETE',
             })
             if (!res.ok) throw new Error('Failed to leave group')
-            setGroups(prev => prev.filter(g => g.membershipId !== membershipId))
+            setGroups((prev) => prev.filter((g) => g.membershipId !== membershipId))
             setConfirmLeave(null)
         } catch {
             alert(t('leaveGroupFailed'))
         }
     }
 
-    const locationText = artisan?.region && artisan?.country
-        ? `${artisan.region}, ${artisan.country}`
-        : null
+    const locationText =
+        artisan?.region && artisan?.country ? `${artisan.region}, ${artisan.country}` : null
 
     // ── View mode — scroll sections layout ──
     if (!showForm && artisan) {
         return (
-            <div className="-mt-16">
+            <div>
                 {/* ── Hero Banner ── */}
-                <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-24">
+                <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-14 pt-12">
                     {coverUrl ? (
                         <Image
                             src={coverUrl}
@@ -251,6 +251,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                             fill
                             sizes="100vw"
                             className="object-cover"
+                            unoptimized // <-- Preserves C2PA manifest
                         />
                     ) : (
                         <>
@@ -258,7 +259,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                             <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
                         </>
                     )}
-                    {coverUrl && <div className="absolute inset-0" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }} />}
+                    {coverUrl && (
+                        <div
+                            className="absolute inset-0"
+                            style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }}
+                        />
+                    )}
 
                     <div className="relative mx-auto max-w-4xl px-4 text-center">
                         {/* Avatar */}
@@ -270,6 +276,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                     width={128}
                                     height={128}
                                     className="h-full w-full object-cover"
+                                    unoptimized
                                 />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center bg-muted">
@@ -278,12 +285,16 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                             )}
                         </div>
 
-                        <h1 className={`text-2xl font-bold tracking-tight sm:text-3xl ${coverUrl ? 'text-white' : ''}`}>
+                        <h1
+                            className={`text-2xl font-bold tracking-tight sm:text-3xl ${coverUrl ? 'text-white' : ''}`}
+                        >
                             {artisan.firstName} {artisan.lastName}
                         </h1>
 
                         {locationText && (
-                            <p className={`mt-1.5 inline-flex items-center gap-1.5 text-sm ${coverUrl ? 'text-white/80' : 'text-muted-foreground'}`}>
+                            <p
+                                className={`mt-1.5 inline-flex items-center gap-1.5 text-sm ${coverUrl ? 'text-white/80' : 'text-muted-foreground'}`}
+                            >
                                 <MapPin className="h-4 w-4" />
                                 {locationText}
                             </p>
@@ -324,15 +335,21 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         {artisan.yearsOfExperience !== null && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
                                 <Clock className="mx-auto mb-2 h-6 w-6 text-warm" />
-                                <p className="font-semibold">{artisan.yearsOfExperience} {t('yearsLabel')}</p>
-                                <p className="text-xs text-muted-foreground">{t('craftExperience')}</p>
+                                <p className="font-semibold">
+                                    {artisan.yearsOfExperience} {t('yearsLabel')}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('craftExperience')}
+                                </p>
                             </div>
                         )}
                         {artisan.learningSource && (
                             <div className="rounded-lg bg-muted/60 p-5 text-center">
                                 <GraduationCap className="mx-auto mb-2 h-6 w-6 text-warm" />
                                 <p className="font-semibold">{artisan.learningSource}</p>
-                                <p className="text-xs text-muted-foreground">{t('learningSource')}</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('learningSource')}
+                                </p>
                             </div>
                         )}
                         {locationText && (
@@ -378,7 +395,7 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                 {t('myGroups')}
                             </h2>
                             <div className="space-y-2">
-                                {groups.map(g => (
+                                {groups.map((g) => (
                                     <div
                                         key={g.membershipId}
                                         className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
@@ -399,7 +416,9 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                                     {g.group.name}
                                                 </Link>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {g.role === 'ADMIN' ? t('groupAdmin') : t('groupMember')}
+                                                    {g.role === 'ADMIN'
+                                                        ? t('groupAdmin')
+                                                        : t('groupMember')}
                                                 </p>
                                             </div>
                                         </div>
@@ -409,7 +428,9 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                                 <Button
                                                     variant="destructive"
                                                     size="sm"
-                                                    onClick={() => handleLeaveGroup(g.membershipId, g.group.id)}
+                                                    onClick={() =>
+                                                        handleLeaveGroup(g.membershipId, g.group.id)
+                                                    }
                                                 >
                                                     {t('confirmLeave')}
                                                 </Button>
@@ -439,18 +460,6 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                     </section>
                 )}
 
-                {/* ── Gallery Section ── */}
-                <section className="py-10">
-                    <div className="mx-auto max-w-3xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-primary">
-                            {t('gallery')}
-                        </h2>
-                        <GalleryUpload
-                            artisanId={artisan.id}
-                            initialImages={galleryImages}
-                        />
-                    </div>
-                </section>
             </div>
         )
     }
@@ -458,22 +467,31 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
     // ── Create / Edit mode ──
     return (
         <div className="container mx-auto max-w-4xl px-4 py-10">
-            <div className="space-y-8">
-                {/* Header with back button */}
-                <div className="flex items-center gap-4 rounded-xl bg-primary px-6 py-5">
-                    {isEditing && (
-                        <button
-                            type="button"
-                            onClick={handleCancelEdit}
-                            className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
-                        >
-                            <ArrowLeft className="h-5 w-5" />
-                        </button>
-                    )}
-                    <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">
-                        {isCreateMode ? t('createTitle') : t('editTitle')}
-                    </h1>
+            <Card className="overflow-hidden rounded-2xl shadow-lg">
+                {/* Colour banner header */}
+                <div className="bg-primary px-6 py-6">
+                    <div className="flex items-center gap-3">
+                        {isEditing && (
+                            <button
+                                type="button"
+                                onClick={handleCancelEdit}
+                                className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                        )}
+                        <div>
+                            <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                                {isCreateMode ? t('createTitle') : t('editTitle')}
+                            </h1>
+                            <p className="text-left text-sm text-primary-foreground/70">
+                                {isCreateMode ? t('createHelper') : t('editHelper')}
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
+                <CardContent className="space-y-8 p-6">
 
                 {message && (
                     <div
@@ -511,7 +529,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         <div className="space-y-5">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="firstName" className="mb-1.5 block text-sm font-medium">{t('firstName')}</Label>
+                                    <Label
+                                        htmlFor="firstName"
+                                        className="mb-1.5 block text-sm font-medium"
+                                    >
+                                        {t('firstName')}
+                                    </Label>
                                     <Input
                                         id="firstName"
                                         value={firstName}
@@ -521,7 +544,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="lastName" className="mb-1.5 block text-sm font-medium">{t('lastName')}</Label>
+                                    <Label
+                                        htmlFor="lastName"
+                                        className="mb-1.5 block text-sm font-medium"
+                                    >
+                                        {t('lastName')}
+                                    </Label>
                                     <Input
                                         id="lastName"
                                         value={lastName}
@@ -532,7 +560,9 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                 </div>
                             </div>
                             <div>
-                                <Label htmlFor="bio" className="mb-1.5 block text-sm font-medium">{t('bio')}</Label>
+                                <Label htmlFor="bio" className="mb-1.5 block text-sm font-medium">
+                                    {t('bio')}
+                                </Label>
                                 <Textarea
                                     id="bio"
                                     value={bio}
@@ -549,7 +579,10 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         <h2 className="mb-4 text-lg font-semibold">{t('craftExperience')}</h2>
                         <div className="space-y-5">
                             <div>
-                                <Label htmlFor="yearsOfExperience" className="mb-1.5 block text-sm font-medium">
+                                <Label
+                                    htmlFor="yearsOfExperience"
+                                    className="mb-1.5 block text-sm font-medium"
+                                >
                                     {t('yearsOfExperience')}
                                 </Label>
                                 <Input
@@ -562,7 +595,12 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                 />
                             </div>
                             <div>
-                                <Label htmlFor="learningSource" className="mb-1.5 block text-sm font-medium">{t('learningSource')}</Label>
+                                <Label
+                                    htmlFor="learningSource"
+                                    className="mb-1.5 block text-sm font-medium"
+                                >
+                                    {t('learningSource')}
+                                </Label>
                                 <Input
                                     id="learningSource"
                                     value={learningSource}
@@ -592,22 +630,67 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         <div className="space-y-4">
                             <div className="grid gap-4 sm:grid-cols-2">
                                 {[
-                                    { id: 'socialInstagram', label: t('socialInstagram'), icon: Instagram, value: socialInstagram, setter: setSocialInstagram, placeholder: 'yourhandle' },
-                                    { id: 'socialFacebook', label: t('socialFacebook'), icon: Facebook, value: socialFacebook, setter: setSocialFacebook, placeholder: 'yourhandle' },
-                                    { id: 'socialTwitter', label: t('socialTwitter'), icon: Twitter, value: socialTwitter, setter: setSocialTwitter, placeholder: 'yourhandle' },
-                                    { id: 'socialTiktok', label: t('socialTiktok'), icon: Hash, value: socialTiktok, setter: setSocialTiktok, placeholder: 'yourhandle' },
-                                    { id: 'socialYoutube', label: t('socialYoutube'), icon: Youtube, value: socialYoutube, setter: setSocialYoutube, placeholder: 'yourchannel' },
-                                    { id: 'website', label: t('socialWebsite'), icon: Globe, value: website, setter: setWebsite, placeholder: 'https://yoursite.com' },
+                                    {
+                                        id: 'socialInstagram',
+                                        label: t('socialInstagram'),
+                                        icon: FaInstagram,
+                                        value: socialInstagram,
+                                        setter: setSocialInstagram,
+                                        placeholder: 'yourhandle',
+                                    },
+                                    {
+                                        id: 'socialFacebook',
+                                        label: t('socialFacebook'),
+                                        icon: FaFacebook,
+                                        value: socialFacebook,
+                                        setter: setSocialFacebook,
+                                        placeholder: 'yourhandle',
+                                    },
+                                    {
+                                        id: 'socialTwitter',
+                                        label: t('socialTwitter'),
+                                        icon: FaXTwitter,
+                                        value: socialTwitter,
+                                        setter: setSocialTwitter,
+                                        placeholder: 'yourhandle',
+                                    },
+                                    {
+                                        id: 'socialTiktok',
+                                        label: t('socialTiktok'),
+                                        icon: FaTiktok,
+                                        value: socialTiktok,
+                                        setter: setSocialTiktok,
+                                        placeholder: 'yourhandle',
+                                    },
+                                    {
+                                        id: 'socialYoutube',
+                                        label: t('socialYoutube'),
+                                        icon: FaYoutube,
+                                        value: socialYoutube,
+                                        setter: setSocialYoutube,
+                                        placeholder: 'yourchannel',
+                                    },
+                                    {
+                                        id: 'website',
+                                        label: t('socialWebsite'),
+                                        icon: Globe,
+                                        value: website,
+                                        setter: setWebsite,
+                                        placeholder: 'https://yoursite.com',
+                                    },
                                 ].map(({ id, label, icon: Icon, value, setter, placeholder }) => (
                                     <div key={id}>
-                                        <Label htmlFor={id} className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
+                                        <Label
+                                            htmlFor={id}
+                                            className="mb-1.5 flex items-center gap-1.5 text-sm font-medium"
+                                        >
                                             <Icon className="h-4 w-4 text-muted-foreground" />
                                             {label}
                                         </Label>
                                         <Input
                                             id={id}
                                             value={value}
-                                            onChange={e => setter(e.target.value)}
+                                            onChange={(e) => setter(e.target.value)}
                                             placeholder={placeholder}
                                         />
                                     </div>
@@ -622,19 +705,36 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                                 <div className="flex gap-2">
                                     <Input
                                         value={hashtagInput}
-                                        onChange={e => setHashtagInput(e.target.value)}
-                                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addHashtag() } }}
+                                        onChange={(e) => setHashtagInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault()
+                                                addHashtag()
+                                            }
+                                        }}
                                         placeholder={t('addHashtag')}
                                         className="flex-1"
                                     />
-                                    <Button type="button" variant="outline" onClick={addHashtag}>+</Button>
+                                    <Button type="button" variant="outline" onClick={addHashtag}>
+                                        +
+                                    </Button>
                                 </div>
                                 {hashtags.length > 0 && (
                                     <div className="mt-2 flex flex-wrap gap-1.5">
-                                        {hashtags.map(tag => (
-                                            <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                                        {hashtags.map((tag) => (
+                                            <span
+                                                key={tag}
+                                                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                                            >
                                                 #{tag}
-                                                <button type="button" onClick={() => setHashtags(prev => prev.filter(t => t !== tag))}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setHashtags((prev) =>
+                                                            prev.filter((t) => t !== tag),
+                                                        )
+                                                    }
+                                                >
                                                     <X className="h-3 w-3" />
                                                 </button>
                                             </span>
@@ -645,25 +745,10 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         </div>
                     </div>
 
-                    {/* Gallery section (edit mode only) */}
-                    {!isCreateMode && (
-                        <div className="rounded-lg border border-border bg-card p-6">
-                            <h2 className="mb-4 text-lg font-semibold">{t('gallery')}</h2>
-                            <GalleryUpload
-                                artisanId={artisan?.id ?? null}
-                                initialImages={galleryImages}
-                            />
-                        </div>
-                    )}
-
                     {/* Action buttons */}
                     <div className="flex justify-end gap-3">
                         {isEditing && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handleCancelEdit}
-                            >
+                            <Button type="button" variant="outline" onClick={handleCancelEdit}>
                                 {t('cancelEdit')}
                             </Button>
                         )}
@@ -679,7 +764,8 @@ export function ArtisanProfileForm({ artisan, photoUrl, coverUrl, galleryImages,
                         </Button>
                     </div>
                 </form>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }

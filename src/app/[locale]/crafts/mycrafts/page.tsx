@@ -9,70 +9,62 @@ import Image from 'next/image'
 import { Calendar, Eye, EyeOff, Pencil, Plus } from 'lucide-react'
 import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
-import { cookies } from 'next/dist/server/request/cookies'
 import { prisma } from '@/lib/prisma'
+import { getCraftPrimaryImageMap } from '@/lib/craft'
+
+const LIMIT = 21
 
 export default async function MyCraftsPage(
-    { searchParams }: { searchParams: { page?: string } }
+    { searchParams }: { searchParams: Promise<{ page?: string }> }
 ) {
     const session = await auth()
-    if (!session) redirect('/login')
+    if (!session?.user) redirect('/login')
 
     const params = await searchParams
-    const page = params.page ? parseInt(params.page) : 1
+    const page = params.page ? Math.max(1, parseInt(params.page)) : 1
+    const skip = (page - 1) * LIMIT
     const currentPageUrl = `${process.env.AUTH_URL}/crafts/mycrafts`
-    const cookieStore = await cookies()
-    const cookieHeader = cookieStore.toString()
 
-    try {
-        const res = await fetch(`${process.env.AUTH_URL}/api/data/?page=${page}&limit=21`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': cookieHeader,
-            },
-        })
-        if (!res.ok) throw new Error('Request failed')
-        const data = await res.json()
+    // Resolve the signed-in user's artisan profile — crafts are owned by it.
+    const artisan = await prisma.artisan.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true, firstName: true, lastName: true },
+    })
+    const artisanName = artisan
+        ? `${artisan.firstName} ${artisan.lastName}`
+        : session.user.name ?? session.user.email
 
-        const allCrafts = data.data
-        const pagination = data.pagination
+    let crafts: any[] = []
+    let pagination = { currentPage: page, totalPages: 1, totalCount: 0, hasNext: false, hasPrev: false }
 
-        const crafts = await Promise.all(
-            allCrafts
-                .filter((record: any) => record.data.artisan === session.user.email)
-                .map(async (record: any) => {
-                    const mediaIds = record.data['mediaIds']?.filter((id: any) => id !== null) ?? []
-                    let imageUrl = null
-                    if (mediaIds.length > 0) {
-                        const imageRes = await fetch(`${process.env.AUTH_URL}/api/media/${mediaIds[0]}`, {
-                            method: 'GET',
-                            headers: { 'Cookie': cookieHeader },
-                        })
-                        imageUrl = imageRes.url
-                    }
-                    return {
-                        id: record.id,
-                        title: record.name,
-                        createdOn: record.data.createdOn,
-                        isPublic: record.data.isPublic,
-                        mediaIds,
-                        imageUrl,
-                    }
-                })
-        )
+    if (artisan) {
+        const where = { artisanId: artisan.id, deletedAt: null }
+        const [records, totalCount] = await Promise.all([
+            prisma.craft.findMany({
+                where,
+                select: { id: true, title: true, description: true, isPublic: true, createdAt: true },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: LIMIT,
+            }),
+            prisma.craft.count({ where }),
+        ])
 
-        // Look up own artisan name
-        const artisan = await prisma.artisan.findFirst({
-            where: { user: { email: session.user.email! } },
-            select: { firstName: true, lastName: true },
-        })
-        const artisanName = artisan ? `${artisan.firstName} ${artisan.lastName}` : session.user.name ?? session.user.email
+        const imageMap = await getCraftPrimaryImageMap(records.map(r => r.id))
+        crafts = records.map(r => ({
+            id: r.id,
+            title: r.title,
+            description: r.description,
+            isPublic: r.isPublic,
+            createdOn: r.createdAt,
+            imageUrl: imageMap.has(r.id) ? `/api/media/${imageMap.get(r.id)}` : null,
+        }))
 
-        return <RenderMyCraftsPage crafts={crafts} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} artisanName={artisanName} />
-    } catch (error) {
-        console.error('Error loading my crafts:', error)
+        const totalPages = Math.max(1, Math.ceil(totalCount / LIMIT))
+        pagination = { currentPage: page, totalPages, totalCount, hasNext: page < totalPages, hasPrev: page > 1 }
     }
+
+    return <RenderMyCraftsPage crafts={crafts} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} artisanName={artisanName} />
 }
 
 function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, artisanName }: {

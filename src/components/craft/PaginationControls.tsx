@@ -36,10 +36,12 @@ export default function PaginationControls({ currentPage, pagination, currentPag
 
     if (pagination.totalPages <= 1) return null
 
+    const pillStyle = { borderColor: 'var(--sc-border-strong)', color: 'var(--sc-text-soft)' }
+
     return (
-        <div className="mt-10 flex flex-col items-center gap-3">
+        <div className="mt-12 flex flex-col items-center gap-3">
             {pagination.totalCount !== undefined && (
-                <p className="text-sm text-muted-foreground">
+                <p className="sc-meta">
                     Page {currentPage} of {pagination.totalPages}
                     {' '}· {pagination.totalCount} total
                 </p>
@@ -48,9 +50,10 @@ export default function PaginationControls({ currentPage, pagination, currentPag
                 <Link
                     href={buildUrl(currentPage - 1)}
                     aria-disabled={!pagination.hasPrev}
-                    className={`inline-flex items-center gap-1 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-muted ${
+                    className={`inline-flex items-center gap-1 rounded-[var(--sc-r-btn)] border px-3 py-2 text-sm transition-colors ${
                         !pagination.hasPrev ? 'pointer-events-none cursor-not-allowed opacity-40' : ''
                     }`}
+                    style={pillStyle}
                 >
                     <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                     Previous
@@ -64,13 +67,15 @@ export default function PaginationControls({ currentPage, pagination, currentPag
                         value={inputPage}
                         onChange={(e) => setInputPage(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handlePageSubmit()}
-                        className="w-14 rounded-md border px-2 py-2 text-center text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warm/30"
+                        className="w-14 rounded-[var(--sc-r-btn)] border px-2 py-2 text-center text-sm focus-visible:outline-none focus-visible:ring-2"
+                        style={pillStyle}
                     />
-                    <span className="text-sm text-muted-foreground">/ {pagination.totalPages}</span>
+                    <span className="sc-meta">/ {pagination.totalPages}</span>
                     <button
                         onClick={handlePageSubmit}
                         aria-label="Go to page"
-                        className="rounded-md border px-3 py-2 text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="rounded-[var(--sc-r-btn)] border px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2"
+                        style={pillStyle}
                     >
                         Go
                     </button>
@@ -79,9 +84,10 @@ export default function PaginationControls({ currentPage, pagination, currentPag
                 <Link
                     href={buildUrl(currentPage + 1)}
                     aria-disabled={!pagination.hasNext}
-                    className={`inline-flex items-center gap-1 rounded-md border px-3 py-2 text-sm transition-colors hover:bg-muted ${
+                    className={`inline-flex items-center gap-1 rounded-[var(--sc-r-btn)] border px-3 py-2 text-sm transition-colors ${
                         !pagination.hasNext ? 'pointer-events-none cursor-not-allowed opacity-40' : ''
                     }`}
+                    style={pillStyle}
                 >
                     Next
                     <ChevronRight className="h-4 w-4" aria-hidden="true" />

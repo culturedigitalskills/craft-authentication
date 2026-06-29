@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap } from 'lucide-react'
+import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Metadata } from 'next'
 
@@ -39,22 +39,23 @@ export default async function MyGroupsPage() {
           })
         : []
 
-    const groups = memberships.map(m => ({ ...m.group, memberRole: m.role }))
+    const groups = memberships.map((m) => ({ ...m.group, memberRole: m.role }))
 
     // Fetch logos for all groups
-    const groupIds = groups.map(g => g.id)
-    const logoAttachments = groupIds.length > 0
-        ? await prisma.mediaAttachment.findMany({
-              where: {
-                  entityType: 'Group',
-                  entityId: { in: groupIds },
-                  attachmentType: 'HERO',
-                  isPrimary: true,
-              },
-              select: { entityId: true, mediaId: true },
-          })
-        : []
-    const logoMap = new Map(logoAttachments.map(a => [a.entityId, `/api/media/${a.mediaId}`]))
+    const groupIds = groups.map((g) => g.id)
+    const logoAttachments =
+        groupIds.length > 0
+            ? await prisma.mediaAttachment.findMany({
+                  where: {
+                      entityType: 'Group',
+                      entityId: { in: groupIds },
+                      attachmentType: 'HERO',
+                      isPrimary: true,
+                  },
+                  select: { entityId: true, mediaId: true },
+              })
+            : []
+    const logoMap = new Map(logoAttachments.map((a) => [a.entityId, `/api/media/${a.mediaId}`]))
 
     return (
         <div className="container mx-auto max-w-6xl px-4 py-10">
@@ -73,25 +74,26 @@ export default async function MyGroupsPage() {
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {groups.map(group => (
-                        <Link
+                    {groups.map((group) => (
+                        <div
                             key={group.id}
-                            href={`/groups/${group.slug}`}
-                            className="group rounded-lg border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
+                            className="group relative rounded-lg border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
                         >
+                            <Link href={`/groups/${group.slug}`} className="block p-6">
                             <div className="flex items-center gap-3">
                                 {logoMap.get(group.id) ? (
-                                    <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg">
+                                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
                                         <Image
                                             src={logoMap.get(group.id)!}
                                             alt={group.name}
                                             fill
                                             sizes="40px"
                                             className="object-cover"
+                                            unoptimized
                                         />
                                     </div>
                                 ) : (
-                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-muted">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                                         <Users className="h-5 w-5 text-muted-foreground" />
                                     </div>
                                 )}
@@ -154,14 +156,30 @@ export default async function MyGroupsPage() {
                                         {t('trainingProgram')}
                                     </span>
                                 )}
-                                {group.certifications?.map(cert => (
-                                    <span key={cert} className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-800">
+                                {group.certifications?.map((cert) => (
+                                    <span
+                                        key={cert}
+                                        className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-800"
+                                    >
                                         <Award className="h-3 w-3" />
                                         {t(`cert_${cert}`)}
                                     </span>
                                 ))}
                             </div>
-                        </Link>
+                            </Link>
+
+                            {/* Edit button — outside the Link to avoid nesting */}
+                            {group.memberRole === 'ADMIN' && (
+                                <div className="absolute right-2 top-2">
+                                    <Button size="sm" variant="secondary" asChild>
+                                        <Link href={`/groups/${group.slug}/manage`}>
+                                            <Pencil className="mr-1 h-3 w-3" />
+                                            {t('editGroup')}
+                                        </Link>
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
             )}

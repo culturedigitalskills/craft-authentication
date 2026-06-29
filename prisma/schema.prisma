@@ -50,20 +50,26 @@ enum CraftStoryStatus {
 // Auth Models
 
 model User {
-    id            String      @id @default(uuid())
+    id            String                 @id @default(uuid())
     name          String?
-    email         String      @unique
-    emailVerified Boolean     @default(false)
+    email         String                 @unique
+    emailVerified Boolean                @default(false)
     password      String?
     image         String?
-    role          Role        @default(ARTISAN)
-    isActive      Boolean     @default(true)
-    createdAt     DateTime    @default(now())
-    updatedAt     DateTime    @updatedAt
+    role          Role                   @default(ARTISAN)
+    isActive      Boolean                @default(true)
+    masterKeyHash     String?                @map("master_key_hash")
+    c2paAutoRenew     Boolean                @default(false) @map("c2pa_auto_renew")
+    c2paCertExpiresAt DateTime?              @map("c2pa_cert_expires_at")
+    createdAt         DateTime               @default(now())
+    updatedAt     DateTime               @updatedAt
     accounts      Account[]
     sessions      Session[]
     artisan       Artisan?
     mediaFiles    MediaFile[]
+    secrets       UserSecrets[]
+    wrappedKeys   UserWrappedVaultKeys[]
+    taskEvents    TaskEvent[]
 }
 
 model Account {
@@ -122,6 +128,7 @@ model MediaFile {
     updatedAt        DateTime          @default(now())
     mediaAttachments MediaAttachment[]
     uploader         User?             @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+    taskEvents       TaskEvent[]
 
     @@index([createdAt], name: "idx_media_files_created_at")
     @@index([uploaderId], name: "idx_media_files_uploader_id")
@@ -144,6 +151,7 @@ model Group {
     id                 String              @id @default(uuid())
     name               String
     slug               String              @unique
+    previousSlugs      String[]            @default([])
     description        String?
     website            String?
     location           String?
@@ -156,6 +164,8 @@ model Group {
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
     memberships        ArtisanGroupMembership[]
+
+    @@index([previousSlugs], type: Gin)
 }
 
 model Artisan {
@@ -166,6 +176,7 @@ model Artisan {
     firstName         String
     lastName          String
     slug              String                       @unique
+    previousSlugs     String[]                     @default([])
     bio               String?
     yearsOfExperience Int?
     learningSource    String?
@@ -184,6 +195,40 @@ model Artisan {
     user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
     memberships       ArtisanGroupMembership[]
     craftStory        CraftStory?
+    crafts            Craft[]
+
+    @@index([previousSlugs], type: Gin)
+}
+
+model Craft {
+    id               String    @id @default(uuid())
+    artisanId        String
+    title            String
+    description      String?
+    materials        String?
+    technique        String?
+    timeToMake       String?
+    width            Float?
+    height           Float?
+    depth            Float?
+    dimensionUnit    String?
+    weight           Float?
+    weightUnit       String?
+    inspiration      String?
+    careInstructions String?
+    isPublic         Boolean   @default(false)
+    isSharedLocation Boolean   @default(true)
+    latitude         Float?
+    longitude        Float?
+    place            String?
+    videos           String[]  @default([]) // YouTube IDs
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
+    deletedAt        DateTime?
+    artisan          Artisan   @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+
+    @@index([artisanId])
+    @@index([isPublic])
 }
 
 model CraftStory {
@@ -278,6 +323,7 @@ model MediaAttachment {
     entityId       String
     attachmentType AttachmentType @default(GALLERY)
     isPrimary      Boolean        @default(false)
+    isPublic       Boolean        @default(true)
     displayOrder   Int            @default(0)
     createdAt      DateTime       @default(now())
     media          MediaFile      @relation(fields: [mediaId], references: [id], onDelete: Cascade)
@@ -285,3 +331,61 @@ model MediaAttachment {
     @@index([entityType, entityId])
     @@index([mediaId])
 }
+
+// Vault Models
+
+enum VaultWrapMode {
+    E2E_PRF
+    SSE_KMS
+    RECOVERY_TOKEN
+}
+
+model UserSecrets {
+    id             String   @id @default(uuid())
+    userId         String   @map("user_id")
+    type           String
+    ciphertextData String   @map("ciphertext_data")
+    createdAt      DateTime @default(now()) @map("created_at")
+    updatedAt      DateTime @updatedAt @map("updated_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
+model UserWrappedVaultKeys {
+    id           String        @id @default(uuid())
+    userId       String        @map("user_id")
+    credentialId String?       @map("credential_id")
+    wrapMode     VaultWrapMode @map("wrap_mode")
+    wrappedKey   String        @map("wrapped_key")
+    createdAt    DateTime      @default(now()) @map("created_at")
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([credentialId])
+}
+
+model TaskEvent {
+    id           String    @id @default(uuid())
+    userId       String    @map("user_id")
+    type         String    @default("image-generation")
+    settings     Json
+    errorMessage String?   @map("error_message")
+    mediaFileId  String?   @map("media_file_id")
+
+    createdAt    DateTime  @default(now()) @map("created_at")
+    sentAt       DateTime? @map("sent_at")
+    canceledAt   DateTime? @map("canceled_at")
+    receivedAt   DateTime? @map("received_at")
+    errorAt      DateTime? @map("error_at")
+
+    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    mediaFile    MediaFile? @relation(fields: [mediaFileId], references: [id], onDelete: SetNull)
+
+    @@index([userId])
+    @@index([type])
+    @@index([createdAt])
+}
+

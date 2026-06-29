@@ -1,14 +1,17 @@
 import { prisma } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
-import Image from 'next/image'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { MapPin, Clock, GraduationCap, User, Users, Package, Instagram, Facebook, Twitter, Youtube, Globe, Hash } from 'lucide-react'
+import { MapPin, Clock, GraduationCap, Users, Globe } from 'lucide-react'
+import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
 import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
-import { Card, CardContent } from '@/components/ui/card'
 import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
+import { getCraftPrimaryImageMap } from '@/lib/craft'
+import { ScMedia } from '@/components/sc/ScMedia'
+import { PortraitFallback, IndigoDotsCover } from '@/components/sc/fallbacks'
+import { SectionHeader } from '@/components/sc/SectionHeader'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -16,14 +19,16 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params
-    const artisan = await prisma.artisan.findUnique({
-        where: { slug, deletedAt: null },
+    const artisan = await prisma.artisan.findFirst({
+        where: { OR: [{ slug }, { previousSlugs: { has: slug } }], deletedAt: null },
         select: { id: true, firstName: true, lastName: true, bio: true },
     })
     if (!artisan) return { title: 'Artisan Not Found' }
 
     const title = `${artisan.firstName} ${artisan.lastName} — Artisan Profile`
-    const description = artisan.bio?.slice(0, 160) ?? `Discover the craft of ${artisan.firstName} ${artisan.lastName}.`
+    const description =
+        artisan.bio?.slice(0, 160) ??
+        `Discover the craft of ${artisan.firstName} ${artisan.lastName}.`
 
     // Use profile photo as OG image if available
     const photoAttachment = await prisma.mediaAttachment.findFirst({
@@ -59,10 +64,12 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     const { slug } = await params
     const t = await getTranslations('artisanProfile')
 
-    const artisan = await prisma.artisan.findUnique({
-        where: { slug, deletedAt: null },
+    const artisan = await prisma.artisan.findFirst({
+        where: { OR: [{ slug }, { previousSlugs: { has: slug } }], deletedAt: null },
         select: {
             id: true,
+            userId: true,
+            slug: true,
             firstName: true,
             lastName: true,
             bio: true,
@@ -95,28 +102,23 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
 
     if (!artisan) notFound()
 
+    // Requested via a retired slug — send to the current canonical URL.
+    if (artisan.slug !== slug) redirect(`/artisans/${artisan.slug}`)
+
     // Fetch the artisan's public crafts
-    const artisanEmail = artisan.user.email
-    const craftRecords = await prisma.dataRecord.findMany({
-        where: {
-            AND: [
-                { data: { path: ['artisan'], equals: artisanEmail } },
-                { data: { path: ['isPublic'], equals: true } },
-            ],
-        },
-        select: { id: true, name: true, data: true },
+    const craftRecords = await prisma.craft.findMany({
+        where: { artisanId: artisan.id, isPublic: true, deletedAt: null },
+        select: { id: true, title: true },
         orderBy: { createdAt: 'desc' },
         take: 6,
     })
 
-    // Fetch first media for each craft
-    const crafts = await Promise.all(
-        craftRecords.map(async record => {
-            const mediaIds = ((record.data as Record<string, unknown>)['mediaIds'] as string[] | undefined)?.filter(Boolean) ?? []
-            const imageUrl = mediaIds.length > 0 ? `/api/media/${mediaIds[0]}` : null
-            return { id: record.id, name: record.name, imageUrl }
-        })
-    )
+    const craftImageMap = await getCraftPrimaryImageMap(craftRecords.map((c) => c.id))
+    const crafts = craftRecords.map((record) => ({
+        id: record.id,
+        name: record.title,
+        imageUrl: craftImageMap.has(record.id) ? `/api/media/${craftImageMap.get(record.id)}` : null,
+    }))
 
     const photoAttachment = await prisma.mediaAttachment.findFirst({
         where: {
@@ -147,15 +149,17 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             entityType: 'Artisan',
             entityId: artisan.id,
             attachmentType: 'GALLERY',
+            isPublic: true,
         },
-        select: { id: true, mediaId: true },
+        select: { id: true, mediaId: true, media: { select: { mimeType: true } } },
         orderBy: { displayOrder: 'asc' },
     })
 
-    const galleryImages = galleryAttachments.map(a => ({
+    const galleryImages = galleryAttachments.map((a) => ({
         id: a.id,
         mediaId: a.mediaId,
         url: `/api/media/${a.mediaId}`,
+        mimeType: a.media.mimeType,
     }))
 
     const publishedStory = await prisma.craftStory.findUnique({
@@ -175,271 +179,203 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
             include: { media: { select: { mimeType: true } } },
             orderBy: { displayOrder: 'asc' },
         })
-        workshopMedia = workshopAttachments.map(a => ({
+        workshopMedia = workshopAttachments.map((a) => ({
             mediaId: a.mediaId,
             isVideo: (a.media.mimeType ?? '').startsWith('video/'),
         }))
 
-        const answerMediaIds = ANSWER_MEDIA_FIELDS
-            .map(k => story[k])
-            .filter((v): v is string => Boolean(v))
+        const answerMediaIds = ANSWER_MEDIA_FIELDS.map((k) => story[k]).filter((v): v is string =>
+            Boolean(v),
+        )
         if (answerMediaIds.length > 0) {
             const files = await prisma.mediaFile.findMany({
                 where: { id: { in: answerMediaIds } },
                 select: { id: true, mimeType: true },
             })
-            answerMediaMimeTypes = Object.fromEntries(files.map(f => [f.id, f.mimeType]))
+            answerMediaMimeTypes = Object.fromEntries(files.map((f) => [f.id, f.mimeType]))
         }
     }
 
-    const locationText = artisan.region && artisan.country
-        ? `${artisan.region}, ${artisan.country}`
-        : null
+    const locationText =
+        artisan.region && artisan.country ? `${artisan.region}, ${artisan.country}` : null
+
+    const socials = [
+        artisan.socialInstagram && { Icon: FaInstagram, label: `@${artisan.socialInstagram}`, href: `https://instagram.com/${artisan.socialInstagram}` },
+        artisan.socialFacebook && { Icon: FaFacebook, label: artisan.socialFacebook, href: `https://facebook.com/${artisan.socialFacebook}` },
+        artisan.socialTwitter && { Icon: FaXTwitter, label: `@${artisan.socialTwitter}`, href: `https://x.com/${artisan.socialTwitter}` },
+        artisan.socialTiktok && { Icon: FaTiktok, label: `@${artisan.socialTiktok}`, href: `https://tiktok.com/@${artisan.socialTiktok}` },
+        artisan.socialYoutube && { Icon: FaYoutube, label: artisan.socialYoutube, href: `https://youtube.com/@${artisan.socialYoutube}` },
+        artisan.website && { Icon: Globe, label: artisan.website.replace(/^https?:\/\//, ''), href: artisan.website },
+    ].filter(Boolean) as { Icon: React.ComponentType<{ className?: string }>; label: string; href: string }[]
 
     return (
-        <div className="">
-            {/* ── Hero Banner ── */}
-            <section className="relative overflow-hidden border-b border-border/50 bg-muted/60 pb-16 pt-24">
-                {coverUrl ? (
-                    <Image
+        <>
+            {/* ── Hero: cover band + overlapping portrait ── */}
+            <section className="relative">
+                <div className="relative h-56 w-full overflow-hidden sm:h-72">
+                    <ScMedia
                         src={coverUrl}
-                        alt="Cover photo"
-                        fill
+                        alt="Cover"
+                        fallback={<IndigoDotsCover />}
                         sizes="100vw"
-                        className="object-cover"
                         priority
                     />
-                ) : (
-                    <>
-                        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/[0.07] blur-3xl" />
-                        <div className="absolute -left-16 bottom-0 h-48 w-48 rounded-full bg-primary/[0.07] blur-3xl" />
-                    </>
-                )}
-                {coverUrl && <div className="absolute inset-0" style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.4)' }} />}
+                </div>
 
-                <div className="relative mx-auto max-w-4xl px-4 text-center">
-                    <div className="mx-auto mb-4 h-28 w-28 overflow-hidden rounded-full border-4 border-background shadow-xl sm:h-36 sm:w-36">
-                        {photoUrl ? (
-                            <Image
+                <div className="sc-container">
+                    <div className="-mt-16 flex flex-col items-start gap-4 sm:-mt-20 sm:flex-row sm:items-start">
+                        <div
+                            className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full sm:h-40 sm:w-40"
+                            style={{ border: '4px solid var(--sc-surface)', boxShadow: 'var(--sc-shadow-hero)' }}
+                        >
+                            <ScMedia
                                 src={photoUrl}
                                 alt={`${artisan.firstName} ${artisan.lastName}`}
-                                width={144}
-                                height={144}
-                                className="h-full w-full object-cover"
+                                fallback={<PortraitFallback name={`${artisan.firstName} ${artisan.lastName}`} />}
+                                sizes="160px"
                                 priority
                             />
-                        ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-muted">
-                                <User className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                        <div className="sm:pt-24">
+                            <p className="sc-eyebrow">{t('about')}</p>
+                            <h1 className="sc-h1 mt-1" style={{ fontSize: '44px' }}>
+                                {artisan.firstName} {artisan.lastName}
+                            </h1>
+                            {/* Stat chips */}
+                            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm" style={{ color: 'var(--sc-text-soft)' }}>
+                                {artisan.yearsOfExperience !== null && (
+                                    <span className="flex items-center gap-1.5">
+                                        <Clock className="h-4 w-4" style={{ color: 'var(--sc-accent)' }} />
+                                        <span style={{ color: 'var(--sc-text)', fontWeight: 600 }}>{artisan.yearsOfExperience}</span>
+                                        {t('yearsExperience')}
+                                    </span>
+                                )}
+                                {artisan.learningSource && (
+                                    <span className="flex items-center gap-1.5">
+                                        <GraduationCap className="h-4 w-4" style={{ color: 'var(--sc-accent)' }} />
+                                        {artisan.learningSource}
+                                    </span>
+                                )}
+                                {locationText && (
+                                    <span className="flex items-center gap-1.5">
+                                        <MapPin className="h-4 w-4" style={{ color: 'var(--sc-accent)' }} />
+                                        {locationText}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Story column + rail ── */}
+            <div className="sc-container py-12">
+                <div className="sc-split">
+                    {/* Main story column */}
+                    <div className="flex flex-col gap-12">
+                        {artisan.bio && (
+                            <p className="sc-lead whitespace-pre-line">{artisan.bio}</p>
+                        )}
+
+                        {story && (
+                            <CraftStoryDisplay
+                                story={story}
+                                workshop={workshopMedia}
+                                answerMediaMimeTypes={answerMediaMimeTypes}
+                            />
+                        )}
+
+                        {/* Crafts */}
+                        {crafts.length > 0 && (
+                            <div>
+                                <SectionHeader title={t('crafts')} className="mb-6" />
+                                <div className="grid gap-[var(--sc-grid-gap)] sm:grid-cols-2 md:grid-cols-3">
+                                    {crafts.map((craft) => (
+                                        <Link key={craft.id} href={`/crafts/${craft.id}`} className="sc-card group block">
+                                            <div className="relative aspect-square overflow-hidden">
+                                                <ScMedia
+                                                    src={craft.imageUrl}
+                                                    alt={craft.name}
+                                                    fallback={<IndigoDotsCover />}
+                                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                                    className="transition-transform duration-300 group-hover:scale-105"
+                                                />
+                                            </div>
+                                            <p className="line-clamp-1 p-3 text-sm font-medium transition-colors group-hover:text-[color:var(--sc-accent)]" style={{ color: 'var(--sc-text)' }}>
+                                                {craft.name}
+                                            </p>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Gallery (masonry) */}
+                        {galleryImages.length > 0 && (
+                            <div>
+                                <SectionHeader title={t('gallery')} className="mb-6" />
+                                <GalleryGrid images={galleryImages} artisanUserId={artisan.userId} />
                             </div>
                         )}
                     </div>
 
-                    <h1 className={`text-3xl font-bold tracking-tight sm:text-4xl ${coverUrl ? 'text-white' : ''}`}>
-                        {artisan.firstName} {artisan.lastName}
-                    </h1>
-                </div>
-            </section>
+                    {/* Rail: Connect + Communities + hashtags */}
+                    <aside className="sc-sticky flex flex-col gap-6">
+                        {socials.length > 0 && (
+                            <div className="sc-card p-5">
+                                <p className="sc-eyebrow mb-3">{t('connectWith')}</p>
+                                <div className="flex flex-col gap-2">
+                                    {socials.map((s, i) => (
+                                        <a
+                                            key={i}
+                                            href={s.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2.5 text-sm transition-colors hover:text-[color:var(--sc-accent)]"
+                                            style={{ color: 'var(--sc-text-soft)' }}
+                                        >
+                                            <s.Icon className="h-4 w-4 shrink-0" />
+                                            <span className="truncate">{s.label}</span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-            {/* ── Stats Section ── */}
-            {(artisan.yearsOfExperience !== null || artisan.learningSource || locationText) && (
-                <section className="border-b border-border/50 bg-background py-5">
-                    <div className="mx-auto max-w-4xl px-4">
-                        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                            {artisan.yearsOfExperience !== null && (
-                                <span className="flex items-center gap-1.5">
-                                    <Clock className="h-4 w-4 text-warm" />
-                                    <span className="font-medium text-foreground">{artisan.yearsOfExperience}</span>
-                                    {' '}{t('yearsExperience')}
-                                </span>
-                            )}
-                            {artisan.learningSource && (
-                                <span className="flex items-center gap-1.5">
-                                    <GraduationCap className="h-4 w-4 text-warm" />
-                                    {artisan.learningSource}
-                                </span>
-                            )}
-                            {locationText && (
-                                <span className="flex items-center gap-1.5">
-                                    <MapPin className="h-4 w-4 text-warm" />
-                                    {locationText}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* ── About Section ── */}
-            {artisan.bio && (
-                <section className="bg-muted/40 py-10">
-                    <div className="mx-auto max-w-4xl px-4">
-                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm">
-                            {t('about')}
-                        </h2>
-                        <div className="border-l-2 border-warm/30 pl-5">
-                            <p className="text-base leading-relaxed text-foreground/80">
-                                {artisan.bio}
-                            </p>
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* ── Craft Story Section ── */}
-            {story && (
-                <CraftStoryDisplay
-                    story={story}
-                    workshop={workshopMedia}
-                    answerMediaMimeTypes={answerMediaMimeTypes}
-                />
-            )}
-
-            {/* ── Connect Section ── */}
-            {(artisan.socialInstagram || artisan.socialFacebook || artisan.socialTwitter || artisan.socialTiktok || artisan.socialYoutube || artisan.website) && (
-                <section className="border-b border-border/50 bg-background py-8">
-                    <div className="mx-auto max-w-4xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
-                            {t('connectWith')}
-                        </h2>
-                        <div className="flex flex-wrap gap-3">
-                            {artisan.socialInstagram && (
-                                <a href={`https://instagram.com/${artisan.socialInstagram}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Instagram className="h-4 w-4" />@{artisan.socialInstagram}
-                                </a>
-                            )}
-                            {artisan.socialFacebook && (
-                                <a href={`https://facebook.com/${artisan.socialFacebook}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Facebook className="h-4 w-4" />{artisan.socialFacebook}
-                                </a>
-                            )}
-                            {artisan.socialTwitter && (
-                                <a href={`https://x.com/${artisan.socialTwitter}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Twitter className="h-4 w-4" />@{artisan.socialTwitter}
-                                </a>
-                            )}
-                            {artisan.socialTiktok && (
-                                <a href={`https://tiktok.com/@${artisan.socialTiktok}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Hash className="h-4 w-4" />@{artisan.socialTiktok}
-                                </a>
-                            )}
-                            {artisan.socialYoutube && (
-                                <a href={`https://youtube.com/@${artisan.socialYoutube}`} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Youtube className="h-4 w-4" />{artisan.socialYoutube}
-                                </a>
-                            )}
-                            {artisan.website && (
-                                <a href={artisan.website} target="_blank" rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm">
-                                    <Globe className="h-4 w-4" />{artisan.website.replace(/^https?:\/\//, '')}
-                                </a>
-                            )}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* ── Hashtags Section ── */}
-            {artisan.hashtags.length > 0 && (
-                <section className="bg-muted/20 py-6">
-                    <div className="mx-auto max-w-4xl px-4">
-                        <div className="flex flex-wrap gap-2">
-                            {artisan.hashtags.map(tag => (
-                                <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                                    #{tag}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* ── Groups Section ── */}
-            {artisan.memberships.length > 0 && (
-                <section className="py-10">
-                    <div className="mx-auto max-w-4xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
-                            <Users className="mr-1.5 inline h-4 w-4" />
-                            {t('groups')}
-                        </h2>
-                        <div className="flex flex-wrap gap-3">
-                            {artisan.memberships.map(m => (
-                                <Link
-                                    key={m.group.slug}
-                                    href={`/groups/${m.group.slug}`}
-                                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium transition-all hover:border-primary/30 hover:shadow-sm"
-                                >
-                                    <Users className="h-4 w-4 text-muted-foreground" />
-                                    {m.group.name}
-                                    {m.role === 'ADMIN' && (
-                                        <span className="rounded-full bg-warm/10 px-2 py-0.5 text-xs text-warm">
-                                            Admin
-                                        </span>
-                                    )}
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* ── Crafts Section ── */}
-            {crafts.length > 0 && (
-                <section className="py-10">
-                    <div className="mx-auto max-w-4xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
-                            <Package className="mr-1.5 inline h-4 w-4" />
-                            {t('crafts')}
-                        </h2>
-                        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                            {crafts.map(craft => (
-                                <Card key={craft.id} className="group overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-                                    <Link href={`/crafts/${craft.id}`} className="block">
-                                        <div className="relative aspect-square overflow-hidden bg-muted">
-                                            {craft.imageUrl ? (
-                                                <Image
-                                                    src={craft.imageUrl}
-                                                    alt={craft.name}
-                                                    fill
-                                                    unoptimized
-                                                    sizes="(max-width: 768px) 50vw, 33vw"
-                                                    className="object-cover transition-transform duration-200 group-hover:scale-105"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full items-center justify-center">
-                                                    <Package className="h-10 w-10 text-muted-foreground/40" />
-                                                </div>
+                        {artisan.memberships.length > 0 && (
+                            <div className="sc-card p-5">
+                                <p className="sc-eyebrow mb-3 flex items-center gap-1.5">
+                                    <Users className="h-3.5 w-3.5" />
+                                    {t('groups')}
+                                </p>
+                                <div className="flex flex-col gap-2">
+                                    {artisan.memberships.map((m) => (
+                                        <Link
+                                            key={m.group.slug}
+                                            href={`/groups/${m.group.slug}`}
+                                            className="flex items-center justify-between gap-2 text-sm transition-colors hover:text-[color:var(--sc-accent)]"
+                                            style={{ color: 'var(--sc-text-soft)' }}
+                                        >
+                                            <span className="truncate">{m.group.name}</span>
+                                            {m.role === 'ADMIN' && (
+                                                <span className="sc-badge shrink-0" style={{ ['--t' as string]: 'var(--sc-teal)' }}>Admin</span>
                                             )}
-                                        </div>
-                                        <CardContent className="p-3">
-                                            <p className="line-clamp-1 text-sm font-medium transition-colors group-hover:text-warm">
-                                                {craft.name}
-                                            </p>
-                                        </CardContent>
-                                    </Link>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-            {/* ── Gallery Section ── */}
-            {galleryImages.length > 0 && (
-                <section className="py-10">
-                    <div className="mx-auto max-w-4xl px-4">
-                        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
-                            {t('gallery')}
-                        </h2>
-                        <GalleryGrid images={galleryImages} />
-                    </div>
-                </section>
-            )}
-        </div>
+                        {artisan.hashtags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                                {artisan.hashtags.map((tag) => (
+                                    <span key={tag} className="sc-chip" style={{ cursor: 'default' }}>#{tag}</span>
+                                ))}
+                            </div>
+                        )}
+                    </aside>
+                </div>
+            </div>
+        </>
     )
 }

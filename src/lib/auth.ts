@@ -7,6 +7,7 @@ import { createAuthMiddleware, APIError } from 'better-auth/api'
 import { hashPassword } from 'better-auth/crypto'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
+import { C2PAService } from '@/lib/c2pa-service'
 
 export const betterAuthInstance = betterAuth({
     database: prismaAdapter(prisma, {
@@ -18,11 +19,17 @@ export const betterAuthInstance = betterAuth({
         enabled: true,
         // Using Better Auth's default highly secure scrypt hashing
     },
+    // Only register Google when credentials are configured — otherwise Better Auth
+    // warns about the missing clientId/clientSecret on every startup.
     socialProviders: {
-        google: {
-            clientId: process.env.GOOGLE_CLIENT_ID || '',
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-        },
+        ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+            ? {
+                  google: {
+                      clientId: process.env.GOOGLE_CLIENT_ID,
+                      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                  },
+              }
+            : {}),
     },
     user: {
         additionalFields: {
@@ -144,6 +151,13 @@ export async function auth() {
         headers: headersList,
     })
     if (!sessionData) return null
+
+    // Background auto-renew check
+    // Run asynchronously in the background so it doesn't block the request path
+    C2PAService.checkAndAutoRenew(sessionData.user.id).catch((err) => {
+        console.error('Error in background C2PA auto-renew check:', err)
+    })
+
     return {
         user: {
             id: sessionData.user.id,

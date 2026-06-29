@@ -1,30 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z, ZodError } from 'zod'
+import { requireAuth } from '@/lib/auth-guard'
+import { handleValidationError } from '@/lib/validations/types'
+
+const geocodeQuerySchema = z.object({
+    lat: z.coerce.number().min(-90).max(90),
+    lng: z.coerce.number().min(-180).max(180),
+})
 
 export async function GET(request: NextRequest) {
-  const lat = request.nextUrl.searchParams.get('lat')
-  const lng = request.nextUrl.searchParams.get('lng')
+    const { unauthorized } = await requireAuth()
+    if (unauthorized) return unauthorized
 
-  if (!lat || !lng) return NextResponse.json({ city: null })
+    try {
+        const { lat, lng } = geocodeQuerySchema.parse(
+            Object.fromEntries(request.nextUrl.searchParams),
+        )
 
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
-      { 
-        headers: { 
-          'Accept-Language': 'en', 
-          'User-Agent': 'MyApp/1.0 (karina.r.e@gmail.com)' } 
-      }
-    )
-    const text = await res.text()
-    const data = JSON.parse(text)
+        const url = new URL('https://nominatim.openstreetmap.org/reverse')
+        url.searchParams.set('lat', String(lat))
+        url.searchParams.set('lon', String(lng))
+        url.searchParams.set('format', 'json')
 
-    const cityName = data.address?.city ?? data.address?.town ?? data.address?.village ?? data.address?.county ?? 'Unknown'
-    const country = data.address?.country ?? ''
-    console.log("country ",country)
+        const res = await fetch(url, {
+            headers: {
+                'Accept-Language': 'en',
+                // Nominatim's usage policy requires an identifying User-Agent.
+                'User-Agent': `craft-authentication (+${process.env.AUTH_URL ?? 'http://localhost'})`,
+            },
+        })
+        const data = await res.json()
 
-    return NextResponse.json({ city: `${cityName}, ${country}` })
-  } catch (error) {
-    console.error('Geocode error:', error)
-    return NextResponse.json({ city: null })
-  }
+        const cityName =
+            data.address?.city ??
+            data.address?.town ??
+            data.address?.village ??
+            data.address?.county ??
+            'Unknown'
+        const country = data.address?.country ?? ''
+
+        return NextResponse.json({ city: `${cityName}, ${country}` })
+    } catch (error) {
+        if (error instanceof ZodError) return handleValidationError(error)
+        console.error('Geocode error:', error)
+        return NextResponse.json({ city: null })
+    }
 }
