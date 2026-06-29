@@ -27,10 +27,15 @@ export function LocationSelect({
     const [selectedCountry, setSelectedCountry] = useState(initialCountry ?? '')
     const [selectedRegion, setSelectedRegion] = useState(initialRegion ?? '')
 
+    const sortedCountries = useMemo(
+        () => [...countries].sort((a, b) => a.name.localeCompare(b.name)),
+        [],
+    )
+
     const regions = useMemo(() => {
         if (!selectedCountry) return []
         const country = countries.find((c) => c.name === selectedCountry)
-        return country?.regions ?? []
+        return [...(country?.regions ?? [])].sort((a, b) => a.name.localeCompare(b.name))
     }, [selectedCountry])
 
     function handleCountryChange(countryName: string) {
@@ -53,7 +58,7 @@ export function LocationSelect({
                         <SelectValue placeholder={t('selectCountry')} />
                     </SelectTrigger>
                     <SelectContent>
-                        {countries.map((country) => (
+                        {sortedCountries.map((country) => (
                             <SelectItem key={country.isoCode} value={country.name}>
                                 {country.name}
                             </SelectItem>
