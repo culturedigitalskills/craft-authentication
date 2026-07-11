@@ -87,7 +87,7 @@ export function CraftStoryDisplay({
                                                     : undefined
                                             }
                                             captionsLabel={t('captionsLabel')}
-                                            className="w-full rounded-[var(--sc-r-btn)]"
+                                            className="mx-auto w-auto max-w-full max-h-[480px] rounded-[var(--sc-r-btn)]"
                                         />
                                     ) : (
                                         <audio
