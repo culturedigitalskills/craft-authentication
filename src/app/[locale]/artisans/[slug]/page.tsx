@@ -169,6 +169,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
 
     let workshopMedia: WorkshopMediaItem[] = []
     let answerMediaMimeTypes: Record<string, string> = {}
+    let captionedMediaIds: string[] = []
     if (story) {
         const workshopAttachments = await prisma.mediaAttachment.findMany({
             where: {
@@ -193,6 +194,19 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                 select: { id: true, mimeType: true },
             })
             answerMediaMimeTypes = Object.fromEntries(files.map((f) => [f.id, f.mimeType]))
+        }
+
+        // Which story videos have ready English captions to serve as a <track>.
+        const videoMediaIds = [
+            ...answerMediaIds.filter((id) => (answerMediaMimeTypes[id] ?? '').startsWith('video/')),
+            ...workshopMedia.filter((m) => m.isVideo).map((m) => m.mediaId),
+        ]
+        if (videoMediaIds.length > 0) {
+            const transcripts = await prisma.mediaTranscript.findMany({
+                where: { mediaId: { in: videoMediaIds }, status: 'READY' },
+                select: { mediaId: true },
+            })
+            captionedMediaIds = transcripts.map((t) => t.mediaId)
         }
     }
 
@@ -282,6 +296,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                 story={story}
                                 workshop={workshopMedia}
                                 answerMediaMimeTypes={answerMediaMimeTypes}
+                                captionedMediaIds={captionedMediaIds}
                             />
                         )}
 

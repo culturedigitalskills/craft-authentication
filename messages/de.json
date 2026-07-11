@@ -149,6 +149,14 @@
     "reviewPhotos": "Fotos"
   },
   "craftStory": {
+    "captionsLabel": "Englisch",
+    "captions": {
+      "processing": "Englische Untertitel werden erstellt…",
+      "ready": "Englische Untertitel bereit",
+      "failed": "Für diese Aufnahme konnten keine Untertitel erstellt werden",
+      "someProcessing": "Einige Untertitel werden noch erstellt. Sie erscheinen in deiner öffentlichen Geschichte, sobald sie fertig sind.",
+      "someFailed": "Für einige Aufnahmen konnten keine Untertitel erstellt werden."
+    },
     "stepLabel": "Schritt {current} von {total}",
     "back": "Zurück",
     "next": "Weiter",

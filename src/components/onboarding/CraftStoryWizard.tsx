@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save } from 'lucide-react'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
@@ -36,12 +36,19 @@ interface CraftStoryWizardProps {
     initialStory: CraftStoryDraft | null
     initialWorkshopMedia: WorkshopMedia[]
     maxUploadMb: number
+    // mediaId -> mimeType for saved answer media, so reloaded previews render correctly.
+    answerMediaMimeTypes?: Record<string, string>
 }
 
 // 0=intro, 1-6=questions, 7=workshop media, 8=review
 const TOTAL_STEPS = 9
 
-export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUploadMb }: CraftStoryWizardProps) {
+export function CraftStoryWizard({
+    initialStory,
+    initialWorkshopMedia,
+    maxUploadMb,
+    answerMediaMimeTypes = {},
+}: CraftStoryWizardProps) {
     const t = useTranslations('craftStory')
     const router = useRouter()
 
@@ -55,6 +62,33 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
     // True while editing a single step reached by clicking a section on the
     // review screen — lets us offer a direct "back to review" action.
     const [returnToReview, setReturnToReview] = useState(false)
+    // mediaId -> transcript status for this story's videos (caption chips).
+    const [captionStatuses, setCaptionStatuses] = useState<Record<string, string>>({})
+
+    const refreshCaptionStatuses = useCallback(async () => {
+        try {
+            const res = await fetch('/api/artisans/me/story/transcripts')
+            if (!res.ok) return
+            const data = await res.json()
+            setCaptionStatuses(data.statuses ?? {})
+        } catch {
+            // Chips are informational only — never surface fetch failures.
+        }
+    }, [])
+
+    useEffect(() => {
+        void refreshCaptionStatuses()
+    }, [refreshCaptionStatuses])
+
+    // Poll while any caption job is still running so chips flip to ready/failed.
+    const hasActiveCaptionJobs = Object.values(captionStatuses).some(
+        s => s === 'PENDING' || s === 'PROCESSING'
+    )
+    useEffect(() => {
+        if (!hasActiveCaptionJobs) return
+        const id = setInterval(() => void refreshCaptionStatuses(), 8000)
+        return () => clearInterval(id)
+    }, [hasActiveCaptionJobs, refreshCaptionStatuses])
 
     function setAnswerText(key: AnswerKey, value: string) {
         setStory(s => ({ ...s, [`answer${key}Text`]: value }))
@@ -96,6 +130,8 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
             if (data.story?.id) setStoryId(data.story.id)
             if (data.story?.updatedAt) setKnownUpdatedAt(data.story.updatedAt)
             setStory(s => ({ ...s, ...data.story }))
+            // Saving enqueues caption jobs for new videos — pick up their status.
+            void refreshCaptionStatuses()
             return true
         } catch {
             setError(t('errors.saveFailed'))
@@ -160,6 +196,9 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
 
     const isQuestion = step >= 1 && step <= 6
     const currentKey = isQuestion ? ANSWER_KEYS[step - 1] : null
+    const currentMediaId = currentKey
+        ? ((story[`answer${currentKey}MediaId` as const] as string | null | undefined) ?? null)
+        : null
 
     return (
         <div className="container mx-auto px-4 py-10">
@@ -211,21 +250,30 @@ export function CraftStoryWizard({ initialStory, initialWorkshopMedia, maxUpload
                                 index={step}
                                 answerKey={currentKey}
                                 text={(story[`answer${currentKey}Text` as const] as string | null | undefined) ?? ''}
-                                mediaId={(story[`answer${currentKey}MediaId` as const] as string | null | undefined) ?? null}
+                                mediaId={currentMediaId}
                                 onTextChange={v => setAnswerText(currentKey, v)}
                                 onMediaChange={id => setAnswerMedia(currentKey, id)}
                                 maxUploadMb={maxUploadMb}
+                                captionStatus={currentMediaId ? captionStatuses[currentMediaId] : undefined}
+                                initialMimeType={currentMediaId ? (answerMediaMimeTypes[currentMediaId] ?? null) : null}
                             />
                         )}
 
                         {step === 7 && (
-                            <WorkshopStep storyId={storyId} initial={initialWorkshopMedia} maxUploadMb={maxUploadMb} />
+                            <WorkshopStep
+                                storyId={storyId}
+                                initial={initialWorkshopMedia}
+                                maxUploadMb={maxUploadMb}
+                                captionStatuses={captionStatuses}
+                                onUploaded={refreshCaptionStatuses}
+                            />
                         )}
 
                         {step === 8 && (
                             <ReviewStep
                                 story={story}
                                 workshopCount={initialWorkshopMedia.length}
+                                captionStatuses={captionStatuses}
                                 onEditStep={target => { setError(null); setReturnToReview(true); setStep(target) }}
                             />
                         )}
@@ -341,6 +389,8 @@ function QuestionStep({
     onTextChange,
     onMediaChange,
     maxUploadMb,
+    captionStatus,
+    initialMimeType,
 }: {
     index: number
     answerKey: AnswerKey
@@ -349,6 +399,8 @@ function QuestionStep({
     onTextChange: (value: string) => void
     onMediaChange: (id: string | null) => void
     maxUploadMb: number
+    captionStatus?: string
+    initialMimeType?: string | null
 }) {
     const t = useTranslations('craftStory')
     return (
@@ -374,20 +426,74 @@ function QuestionStep({
                         rows={6}
                     />
                 </div>
-                <AnswerMediaUpload mediaId={mediaId} onChange={onMediaChange} maxUploadMb={maxUploadMb} />
+                <AnswerMediaUpload
+                    mediaId={mediaId}
+                    onChange={onMediaChange}
+                    maxUploadMb={maxUploadMb}
+                    initialMimeType={initialMimeType}
+                    captionsReady={captionStatus === 'READY'}
+                />
+                {mediaId && <CaptionStatusChip status={captionStatus} />}
             </div>
         </div>
     )
 }
 
-function WorkshopStep({ storyId, initial, maxUploadMb }: { storyId: string | null; initial: WorkshopMedia[]; maxUploadMb: number }) {
+// Caption pipeline feedback — without it a FAILED transcription would be
+// invisible to the artisan (there is no editing step to surface it).
+function CaptionStatusChip({ status }: { status?: string }) {
+    const t = useTranslations('craftStory.captions')
+    if (!status) return null
+    if (status === 'READY') {
+        return (
+            <p className="flex items-center gap-1.5 text-xs font-medium text-warm">
+                <Check className="h-3.5 w-3.5" />
+                {t('ready')}
+            </p>
+        )
+    }
+    if (status === 'FAILED') {
+        return (
+            <p className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="h-3.5 w-3.5" />
+                {t('failed')}
+            </p>
+        )
+    }
+    return (
+        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            {t('processing')}
+        </p>
+    )
+}
+
+function WorkshopStep({
+    storyId,
+    initial,
+    maxUploadMb,
+    captionStatuses,
+    onUploaded,
+}: {
+    storyId: string | null
+    initial: WorkshopMedia[]
+    maxUploadMb: number
+    captionStatuses: Record<string, string>
+    onUploaded: () => void
+}) {
     const t = useTranslations('craftStory.step7')
     return (
         <div>
             <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
             <p className="mb-6 text-base text-muted-foreground">{t('prompt')}</p>
             {storyId ? (
-                <StoryWorkshopUpload storyId={storyId} initialItems={initial} maxUploadMb={maxUploadMb} />
+                <StoryWorkshopUpload
+                    storyId={storyId}
+                    initialItems={initial}
+                    maxUploadMb={maxUploadMb}
+                    captionStatuses={captionStatuses}
+                    onUploaded={onUploaded}
+                />
             ) : (
                 <p className="text-sm text-muted-foreground">{t('saveFirst')}</p>
             )}
@@ -398,13 +504,18 @@ function WorkshopStep({ storyId, initial, maxUploadMb }: { storyId: string | nul
 function ReviewStep({
     story,
     workshopCount,
+    captionStatuses,
     onEditStep,
 }: {
     story: Partial<CraftStoryDraft>
     workshopCount: number
+    captionStatuses: Record<string, string>
     onEditStep: (step: number) => void
 }) {
     const t = useTranslations('craftStory')
+    const statusValues = Object.values(captionStatuses)
+    const captionsProcessing = statusValues.some(s => s === 'PENDING' || s === 'PROCESSING')
+    const captionsFailed = statusValues.some(s => s === 'FAILED')
     const rows = ANSWER_KEYS.map((key, i) => {
         const text = story[`answer${key}Text` as const] as string | null | undefined
         const media = story[`answer${key}MediaId` as const] as string | null | undefined
@@ -452,6 +563,18 @@ function ReviewStep({
                 ))}
             </div>
             <p className="mt-3 text-center text-xs text-muted-foreground">{t('review.editHint')}</p>
+            {captionsProcessing && (
+                <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    {t('captions.someProcessing')}
+                </p>
+            )}
+            {captionsFailed && (
+                <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    {t('captions.someFailed')}
+                </p>
+            )}
         </div>
     )
 }

@@ -30,9 +30,12 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# Path to the ffmpeg binary used by the caption pipeline (audio extraction).
+ENV FFMPEG_PATH=/usr/bin/ffmpeg
 
-# Install system dependencies (openssl for credentials generation, curl & jq for healthchecks) and prisma CLI
-RUN apt-get update && apt-get install -y openssl curl jq && rm -rf /var/lib/apt/lists/* && npm install -g prisma@7
+# Install system dependencies (openssl for credentials generation, curl & jq for
+# healthchecks, ffmpeg for the My Story caption pipeline) and prisma CLI
+RUN apt-get update && apt-get install -y openssl curl jq ffmpeg && rm -rf /var/lib/apt/lists/* && npm install -g prisma@7
 
 # Application files
 COPY --from=builder /app/public ./public

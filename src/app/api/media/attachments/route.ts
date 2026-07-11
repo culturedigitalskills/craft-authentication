@@ -4,6 +4,7 @@ import { CreateMediaAttachmentSchema } from '@/lib/validations/media'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
+import { enqueueTranscription } from '@/lib/transcription'
 
 export async function POST(request: NextRequest) {
     const { session, unauthorized } = await requireAuth()
@@ -85,6 +86,12 @@ export async function POST(request: NextRequest) {
                 displayOrder: validatedData.displayOrder,
             },
         })
+
+        // Queue English captions for workshop videos attached to a story.
+        // enqueueTranscription no-ops for non-video media.
+        if (validatedData.entityType === 'CraftStory') {
+            await enqueueTranscription(validatedData.mediaId)
+        }
 
         return NextResponse.json(attachment, { status: 201 })
     } catch (error) {

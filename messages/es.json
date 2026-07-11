@@ -149,6 +149,14 @@
     "reviewPhotos": "Fotos"
   },
   "craftStory": {
+    "captionsLabel": "Inglés",
+    "captions": {
+      "processing": "Generando subtítulos en inglés…",
+      "ready": "Subtítulos en inglés listos",
+      "failed": "No se pudieron generar los subtítulos para esta grabación",
+      "someProcessing": "Algunos subtítulos aún se están generando. Aparecerán en tu historia pública cuando estén listos.",
+      "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones."
+    },
     "stepLabel": "Paso {current} de {total}",
     "back": "Atrás",
     "next": "Siguiente",

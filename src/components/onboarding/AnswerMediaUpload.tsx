@@ -3,20 +3,32 @@
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
+import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
 import { Loader2, Mic, Video, Trash2 } from 'lucide-react'
 
 interface AnswerMediaUploadProps {
     mediaId: string | null
     onChange: (mediaId: string | null) => void
     maxUploadMb: number
+    // Mime type of an already-saved answer, so a reloaded video renders as a
+    // video player (fresh uploads set it locally from the file).
+    initialMimeType?: string | null
+    captionsReady?: boolean
 }
 
-export function AnswerMediaUpload({ mediaId, onChange, maxUploadMb }: AnswerMediaUploadProps) {
+export function AnswerMediaUpload({
+    mediaId,
+    onChange,
+    maxUploadMb,
+    initialMimeType = null,
+    captionsReady = false,
+}: AnswerMediaUploadProps) {
     const t = useTranslations('craftStory.uploader')
+    const tStory = useTranslations('craftStory')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [mimeType, setMimeType] = useState<string | null>(null)
+    const [mimeType, setMimeType] = useState<string | null>(initialMimeType)
 
     async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0]
@@ -54,7 +66,16 @@ export function AnswerMediaUpload({ mediaId, onChange, maxUploadMb }: AnswerMedi
             {mediaUrl && !isUploading && (
                 <div className="mb-3">
                     {isVideo ? (
-                        <video src={mediaUrl} controls className="w-full max-h-64 rounded-md bg-black" />
+                        <CaptionedVideo
+                            src={mediaUrl}
+                            captionsSrc={
+                                captionsReady && mediaId
+                                    ? `/api/media/${mediaId}/subtitles`
+                                    : undefined
+                            }
+                            captionsLabel={tStory('captionsLabel')}
+                            className="w-full max-h-64 rounded-md bg-black"
+                        />
                     ) : (
                         <audio src={mediaUrl} controls className="w-full" />
                     )}
