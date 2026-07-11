@@ -49,6 +49,7 @@ Generic starter CRUD over the `DataRecord` table (not used by the craft feature)
 ### Artisan Profile
 
 - `GET /api/artisans/me` - Get current user's artisan profile
+- `GET /api/artisans/me/story/transcripts` - Caption-generation status per story video (authenticated)
 - `POST /api/artisans` - Create artisan profile (authenticated)
 - `PUT /api/artisans/:id` - Update artisan profile (owner only)
 
@@ -61,9 +62,14 @@ Generic starter CRUD over the `DataRecord` table (not used by the craft feature)
 
 - `GET /api/media` - List all media files (with pagination)
 - `GET /api/media/:id` - Retrieve media file
+- `GET /api/media/:id/subtitles` - English WebVTT captions for a story video (auto-generated; 404 until ready)
 - `POST /api/media/upload` - Upload image or video file
 - `POST /api/media/attachments` - Link media to an entity (authenticated)
 - `DELETE /api/media/:id` - Delete media file
+
+Story videos (My Story answers and workshop clips) are automatically transcribed and translated to English
+captions via Groq Whisper. Requires `GROQ_API_KEY` and ffmpeg (bundled via `ffmpeg-static` for local dev,
+installed in the production image).
 
 ### Verifiable Credentials
 

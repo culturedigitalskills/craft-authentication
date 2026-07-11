@@ -149,6 +149,14 @@
     "reviewPhotos": "Photos"
   },
   "craftStory": {
+    "captionsLabel": "English",
+    "captions": {
+      "processing": "Generating English captions…",
+      "ready": "English captions ready",
+      "failed": "Captions couldn't be generated for this recording",
+      "someProcessing": "Some captions are still being generated. They will appear on your public story when ready.",
+      "someFailed": "Captions couldn't be generated for some recordings."
+    },
     "wizardTitle": "My Story",
     "wizardHelper": "Share the story of your craft in your own words.",
     "stepLabel": "Step {current} of {total}",

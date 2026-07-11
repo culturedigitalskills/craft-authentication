@@ -8,6 +8,7 @@ import {
     UpdateCraftStorySchema,
 } from '@/lib/validations/craftStory'
 import { deleteMediaFiles } from '@/lib/media-delete'
+import { collectTranscriptAudioIds, enqueueTranscription } from '@/lib/transcription'
 
 export async function GET() {
     const { session, unauthorized } = await requireAuth()
@@ -102,8 +103,18 @@ export async function PUT(request: NextRequest) {
         })
 
         if (replacedMediaIds.length > 0) {
+            // Collect the extracted-audio assets before the source videos are
+            // GC'd (transcript rows cascade with the source; audio does not),
+            // then remove the source media and their audio together.
+            const audioIds = await collectTranscriptAudioIds(replacedMediaIds)
             // Fire-and-forget; failure here shouldn't fail the save.
-            void deleteMediaFiles(replacedMediaIds)
+            void deleteMediaFiles([...replacedMediaIds, ...audioIds])
+        }
+
+        // Queue English captions for any answer videos referenced in this save.
+        // enqueueTranscription no-ops for non-video media and work already done.
+        if (submittedMediaIds.length > 0) {
+            await Promise.all(submittedMediaIds.map(enqueueTranscription))
         }
 
         return NextResponse.json({ story })
@@ -146,8 +157,14 @@ export async function DELETE() {
         })
         await prisma.craftStory.delete({ where: { artisanId: artisan.id } })
 
+        // Extracted-audio assets are keyed off the source videos and have no
+        // attachment, so gather them before the source media (and their
+        // cascading transcripts) are removed.
+        const sourceMediaIds = [...answerMediaIds, ...workshopMediaIds]
+        const transcriptAudioIds = await collectTranscriptAudioIds(sourceMediaIds)
+
         // Best-effort cleanup of underlying MediaFile rows + Garage objects.
-        await deleteMediaFiles([...answerMediaIds, ...workshopMediaIds])
+        await deleteMediaFiles([...sourceMediaIds, ...transcriptAudioIds])
 
         return NextResponse.json({ ok: true })
     } catch (error) {

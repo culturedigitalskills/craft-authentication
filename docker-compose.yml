@@ -49,7 +49,7 @@ services:
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
             POSTGRES_DB: ${POSTGRES_DB}
         volumes:
-            - ./data/postgres:/var/lib/postgresql/data
+            - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
             interval: 10s
@@ -67,11 +67,20 @@ services:
         command: /garage server
         volumes:
             - ./garage.toml:/etc/garage.toml:ro
-            - ./data/garage-data:/data
-            - ./data/garage-meta:/meta
+            - garage_data:/data
+            - garage_meta:/meta
         healthcheck:
             test: ['CMD', 'curl', '-f', 'http://localhost:3903/health']
             interval: 30s
             timeout: 5s
             retries: 3
             start_period: 10s
+
+# Temporary Hyper-V workaround: named volumes live inside Docker's Linux VM and
+# satisfy Postgres's strict data-dir permissions (0700/0750), which Windows bind
+# mounts under ./data/ cannot. Revert to bind mounts before committing — prod
+# intentionally uses ./data/ for backup/inspection.
+volumes:
+    postgres_data:
+    garage_data:
+    garage_meta:

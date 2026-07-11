@@ -2,8 +2,9 @@
 
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { ImagePlus, Loader2, Trash2, FileVideo } from 'lucide-react'
+import { ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import Image from 'next/image'
+import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
 
 export interface WorkshopMedia {
     attachmentId: string
@@ -16,15 +17,22 @@ interface StoryWorkshopUploadProps {
     storyId: string
     initialItems: WorkshopMedia[]
     maxUploadMb: number
+    // mediaId -> transcript status; READY videos get a captions track.
+    captionStatuses?: Record<string, string>
+    // Uploads enqueue caption jobs server-side — lets the wizard refresh statuses.
+    onUploaded?: () => void
 }
 
 export function StoryWorkshopUpload({
     storyId,
     initialItems,
     maxUploadMb,
+    captionStatuses = {},
+    onUploaded,
 }: StoryWorkshopUploadProps) {
     void maxUploadMb // reserved for future per-file client-side size check
     const t = useTranslations('craftStory.workshop')
+    const tStory = useTranslations('craftStory')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
     const [items, setItems] = useState<WorkshopMedia[]>(initialItems)
@@ -83,6 +91,7 @@ export function StoryWorkshopUpload({
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
+            onUploaded?.()
         }
     }
 
@@ -105,10 +114,17 @@ export function StoryWorkshopUpload({
                         className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted/30"
                     >
                         {item.isVideo ? (
-                            <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-muted-foreground">
-                                <FileVideo className="h-8 w-8" />
-                                <span className="text-xs">{t('videoLabel')}</span>
-                            </div>
+                            <CaptionedVideo
+                                src={item.url}
+                                captionsSrc={
+                                    captionStatuses[item.mediaId] === 'READY'
+                                        ? `/api/media/${item.mediaId}/subtitles`
+                                        : undefined
+                                }
+                                captionsLabel={tStory('captionsLabel')}
+                                className="h-full w-full object-cover"
+                                preload="metadata"
+                            />
                         ) : (
                             <Image
                                 src={item.url}
