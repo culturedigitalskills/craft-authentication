@@ -81,14 +81,16 @@ export function GroupCreateForm() {
             if (!res.ok) {
                 const data = await res.json()
                 setError(data.error || t('saveFailed'))
+                setSaving(false)
                 return
             }
 
             const group = await res.json()
+            // Keep the button disabled on success — router.push doesn't unmount the
+            // form immediately, and re-enabling here allowed duplicate submissions.
             router.push(`/groups/${group.slug}`)
         } catch {
             setError(t('saveFailed'))
-        } finally {
             setSaving(false)
         }
     }

@@ -291,13 +291,14 @@ export function CraftForm({ craft }: CraftFormProps) {
             })
 
             const newCraft = await res.json()
+            // Keep the button disabled on success — router.push doesn't unmount the
+            // form immediately, and re-enabling here allowed duplicate submissions.
             router.push(`/crafts/${newCraft.id}`)
         } catch {
             setMessage({
                 text: isCreateMode ? t('createCraft.createFailed') : t('createCraft.updateFailed'),
                 type: 'error',
             })
-        } finally {
             setIsSubmitting(false)
         }
     }
@@ -834,12 +835,12 @@ export function CraftForm({ craft }: CraftFormProps) {
                                   : t('createCraft.updateCraft')}
                         </Button>
                         {!isCreateMode && (
-                            <Button variant="outline" onClick={handleCancelEdit}>
+                            <Button type="button" variant="outline" onClick={handleCancelEdit}>
                                 {t('createCraft.cancelEdit')}
                             </Button>
                         )}
                         {!isCreateMode && (
-                            <Button variant="destructive" onClick={handleDelete}>
+                            <Button type="button" variant="destructive" onClick={handleDelete}>
                                 {t('createCraft.deleteCraft')}
                             </Button>
                         )}
