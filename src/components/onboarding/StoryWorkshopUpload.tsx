@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
+import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
 
 export interface WorkshopMedia {
     attachmentId: string
@@ -16,7 +17,6 @@ export interface WorkshopMedia {
 interface StoryWorkshopUploadProps {
     storyId: string
     initialItems: WorkshopMedia[]
-    maxUploadMb: number
     // mediaId -> transcript status; READY videos get a captions track.
     captionStatuses?: Record<string, string>
     // Uploads enqueue caption jobs server-side — lets the wizard refresh statuses.
@@ -26,11 +26,9 @@ interface StoryWorkshopUploadProps {
 export function StoryWorkshopUpload({
     storyId,
     initialItems,
-    maxUploadMb,
     captionStatuses = {},
     onUploaded,
 }: StoryWorkshopUploadProps) {
-    void maxUploadMb // reserved for future per-file client-side size check
     const t = useTranslations('craftStory.workshop')
     const tStory = useTranslations('craftStory')
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -46,7 +44,16 @@ export function StoryWorkshopUpload({
         setIsUploading(true)
 
         try {
-            for (const file of files) {
+            for (const selected of files) {
+                const prepared = await prepareFileForUpload(selected)
+                if (!prepared.ok) {
+                    throw new Error(
+                        prepared.reason === 'videoTooLarge'
+                            ? t('videoTooLarge', { max: prepared.maxMb })
+                            : t('imageTooLarge', { max: prepared.maxMb }),
+                    )
+                }
+                const file = prepared.file
                 const formData = new FormData()
                 formData.append('file', file)
                 const uploadRes = await fetch('/api/media/upload', {
@@ -172,6 +179,9 @@ export function StoryWorkshopUpload({
                 className="hidden"
             />
 
+            <p className="mt-2 text-xs text-muted-foreground">
+                {t('sizeHint', { imageMax: MAX_IMAGE_MB, videoMax: MAX_VIDEO_MB })}
+            </p>
             {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
         </div>
     )

@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Camera, Loader2 } from 'lucide-react'
+import { MAX_IMAGE_MB, prepareFileForUpload } from '@/lib/media-limits'
 
 interface ProfilePhotoUploadProps {
     artisanId: string | null
@@ -23,14 +24,16 @@ export function ProfilePhotoUpload({
     const [error, setError] = useState<string | null>(null)
 
     async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0]
-        if (!file) return
+        const selected = e.target.files?.[0]
+        if (!selected) return
 
-        if (file.size > 8 * 1024 * 1024) {
-            setError(t('fileTooLarge'))
+        const prepared = await prepareFileForUpload(selected)
+        if (!prepared.ok) {
+            setError(t('fileTooLarge', { max: prepared.maxMb }))
             e.target.value = ''
             return
         }
+        const file = prepared.file
 
         setError(null)
         setIsUploading(true)
@@ -128,6 +131,9 @@ export function ProfilePhotoUpload({
                     : previewUrl
                       ? t('changePhoto')
                       : t('uploadPhoto')}
+            </p>
+            <p className="text-xs text-muted-foreground">
+                {t('imageLimitHint', { max: MAX_IMAGE_MB })}
             </p>
             {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
         </div>

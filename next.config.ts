@@ -6,9 +6,12 @@ const nextConfig: NextConfig = {
     output: 'standalone',
     experimental: {
         serverActions: {
-            bodySizeLimit: '50mb',
+            bodySizeLimit: '110mb',
         },
-        proxyClientMaxBodySize: '30mb',
+        // Must accommodate the 100 MB video limit (MAX_VIDEO_MB in
+        // src/lib/media-limits.ts) plus multipart overhead — uploads go
+        // through the proxy layer.
+        proxyClientMaxBodySize: '110mb',
     },
     // Keep these as external packages so Next.js does not bundle them into the
     // server chunk. This ensures they are traced into the standalone node_modules

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Loader2, X, Eye, EyeOff, Play, Music, Upload } from 'lucide-react'
 import { GalleryLightbox } from '@/components/shared/GalleryLightbox'
 import { mediaKind } from '@/lib/media-kind'
+import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
 
 interface MediaItem {
     attachmentId: string
@@ -36,7 +37,16 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
         setError(null)
         setIsUploading(true)
         try {
-            for (const file of files) {
+            for (const selected of files) {
+                const prepared = await prepareFileForUpload(selected)
+                if (!prepared.ok) {
+                    throw new Error(
+                        prepared.reason === 'videoTooLarge'
+                            ? t('videoTooLarge', { max: prepared.maxMb })
+                            : t('imageTooLarge', { max: prepared.maxMb }),
+                    )
+                }
+                const file = prepared.file
                 const formData = new FormData()
                 formData.append('file', file)
                 const uploadRes = await fetch('/api/media/upload', { method: 'POST', body: formData })
@@ -250,7 +260,9 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                         <>
                             <Upload className="h-8 w-8 text-muted-foreground" />
                             <span className="text-xs font-medium text-muted-foreground">{t('addMedia')}</span>
-                            <span className="text-[10px] text-muted-foreground/70">{t('uploadHint')}</span>
+                            <span className="text-[10px] text-muted-foreground/70">
+                                {t('uploadHint', { imageMax: MAX_IMAGE_MB, videoMax: MAX_VIDEO_MB })}
+                            </span>
                         </>
                     )}
                 </button>

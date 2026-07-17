@@ -5,11 +5,11 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
 import { Loader2, Mic, Video, Trash2 } from 'lucide-react'
+import { MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
 
 interface AnswerMediaUploadProps {
     mediaId: string | null
     onChange: (mediaId: string | null) => void
-    maxUploadMb: number
     // Mime type of an already-saved answer, so a reloaded video renders as a
     // video player (fresh uploads set it locally from the file).
     initialMimeType?: string | null
@@ -19,7 +19,6 @@ interface AnswerMediaUploadProps {
 export function AnswerMediaUpload({
     mediaId,
     onChange,
-    maxUploadMb,
     initialMimeType = null,
     captionsReady = false,
 }: AnswerMediaUploadProps) {
@@ -31,8 +30,16 @@ export function AnswerMediaUpload({
     const [mimeType, setMimeType] = useState<string | null>(initialMimeType)
 
     async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0]
-        if (!file) return
+        const selected = e.target.files?.[0]
+        if (!selected) return
+
+        const prepared = await prepareFileForUpload(selected)
+        if (!prepared.ok) {
+            setError(t('fileTooLarge', { max: prepared.maxMb }))
+            e.target.value = ''
+            return
+        }
+        const file = prepared.file
 
         setError(null)
         setIsUploading(true)
@@ -115,7 +122,7 @@ export function AnswerMediaUpload({
                         {t('remove')}
                     </Button>
                 )}
-                <p className="text-xs text-muted-foreground">{t('hint', { max: maxUploadMb })}</p>
+                <p className="text-xs text-muted-foreground">{t('hint', { max: MAX_VIDEO_MB })}</p>
             </div>
 
             <input

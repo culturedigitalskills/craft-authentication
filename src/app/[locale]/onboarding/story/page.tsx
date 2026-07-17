@@ -59,8 +59,6 @@ export default async function OnboardingStoryPage() {
           }
         : null
 
-    const maxUploadMb = parseInt(process.env.MAX_MEDIA_SIZE ?? '100', 10) || 100
-
     // Mime types of saved answer media, so reloaded previews render video
     // players (with captions) instead of falling back to audio.
     const answerMediaIds = story
@@ -79,7 +77,6 @@ export default async function OnboardingStoryPage() {
         <CraftStoryWizard
             initialStory={initial}
             initialWorkshopMedia={workshopMedia}
-            maxUploadMb={maxUploadMb}
             answerMediaMimeTypes={answerMediaMimeTypes}
         />
     )

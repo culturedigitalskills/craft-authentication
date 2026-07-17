@@ -20,6 +20,7 @@ import { ArrowLeft, Loader2, X, Play, Check, Upload, Images } from 'lucide-react
 import { FaYoutube } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
 import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
+import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
 
 interface Craft {
     id: string
@@ -657,22 +658,43 @@ export function CraftForm({ craft }: CraftFormProps) {
                                         </span>
                                     )}
                                 </div>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('createCraft.uploadLimitsHint', {
+                                        imageMax: MAX_IMAGE_MB,
+                                        videoMax: MAX_VIDEO_MB,
+                                    })}
+                                </p>
                                 <input
                                     type="file"
                                     id="images"
                                     accept="image/*,video/*"
                                     multiple
                                     className="hidden"
-                                    onChange={(e) => {
-                                        const selected = Array.from(e.target.files || [])
-                                        const oversized = selected.find(f => f.size > 100 * 1024 * 1024)
-                                        if (oversized) {
-                                            setMessage({ text: t('createCraft.mediaTooLarge'), type: 'error' })
-                                            e.target.value = ''
+                                    onChange={async (e) => {
+                                        const input = e.target
+                                        const selected = Array.from(input.files || [])
+                                        const prepared = await Promise.all(
+                                            selected.map(prepareFileForUpload),
+                                        )
+                                        const rejected = prepared.find((p) => !p.ok)
+                                        if (rejected && !rejected.ok) {
+                                            setMessage({
+                                                text:
+                                                    rejected.reason === 'videoTooLarge'
+                                                        ? t('createCraft.videoTooLarge', {
+                                                              max: rejected.maxMb,
+                                                          })
+                                                        : t('createCraft.imageTooLarge', {
+                                                              max: rejected.maxMb,
+                                                          }),
+                                                type: 'error',
+                                            })
+                                            input.value = ''
                                             return
                                         }
+                                        setMessage(null)
                                         setUploads([])
-                                        setFiles(selected)
+                                        setFiles(prepared.flatMap((p) => (p.ok ? [p.file] : [])))
                                     }}
                                 />
                             </>

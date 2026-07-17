@@ -35,7 +35,6 @@ export type CraftStoryDraft = {
 interface CraftStoryWizardProps {
     initialStory: CraftStoryDraft | null
     initialWorkshopMedia: WorkshopMedia[]
-    maxUploadMb: number
     // mediaId -> mimeType for saved answer media, so reloaded previews render correctly.
     answerMediaMimeTypes?: Record<string, string>
 }
@@ -46,7 +45,6 @@ const TOTAL_STEPS = 9
 export function CraftStoryWizard({
     initialStory,
     initialWorkshopMedia,
-    maxUploadMb,
     answerMediaMimeTypes = {},
 }: CraftStoryWizardProps) {
     const t = useTranslations('craftStory')
@@ -253,7 +251,6 @@ export function CraftStoryWizard({
                                 mediaId={currentMediaId}
                                 onTextChange={v => setAnswerText(currentKey, v)}
                                 onMediaChange={id => setAnswerMedia(currentKey, id)}
-                                maxUploadMb={maxUploadMb}
                                 captionStatus={currentMediaId ? captionStatuses[currentMediaId] : undefined}
                                 initialMimeType={currentMediaId ? (answerMediaMimeTypes[currentMediaId] ?? null) : null}
                             />
@@ -263,7 +260,6 @@ export function CraftStoryWizard({
                             <WorkshopStep
                                 storyId={storyId}
                                 initial={initialWorkshopMedia}
-                                maxUploadMb={maxUploadMb}
                                 captionStatuses={captionStatuses}
                                 onUploaded={refreshCaptionStatuses}
                             />
@@ -388,7 +384,6 @@ function QuestionStep({
     mediaId,
     onTextChange,
     onMediaChange,
-    maxUploadMb,
     captionStatus,
     initialMimeType,
 }: {
@@ -398,7 +393,6 @@ function QuestionStep({
     mediaId: string | null
     onTextChange: (value: string) => void
     onMediaChange: (id: string | null) => void
-    maxUploadMb: number
     captionStatus?: string
     initialMimeType?: string | null
 }) {
@@ -429,7 +423,6 @@ function QuestionStep({
                 <AnswerMediaUpload
                     mediaId={mediaId}
                     onChange={onMediaChange}
-                    maxUploadMb={maxUploadMb}
                     initialMimeType={initialMimeType}
                     captionsReady={captionStatus === 'READY'}
                 />
@@ -471,13 +464,11 @@ function CaptionStatusChip({ status }: { status?: string }) {
 function WorkshopStep({
     storyId,
     initial,
-    maxUploadMb,
     captionStatuses,
     onUploaded,
 }: {
     storyId: string | null
     initial: WorkshopMedia[]
-    maxUploadMb: number
     captionStatuses: Record<string, string>
     onUploaded: () => void
 }) {
@@ -490,7 +481,6 @@ function WorkshopStep({
                 <StoryWorkshopUpload
                     storyId={storyId}
                     initialItems={initial}
-                    maxUploadMb={maxUploadMb}
                     captionStatuses={captionStatuses}
                     onUploaded={onUploaded}
                 />
