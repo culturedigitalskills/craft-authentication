@@ -462,6 +462,8 @@
     "removeMemberFailed": "Das Mitglied konnte nicht entfernt werden. Bitte versuche es erneut.",
     "updateRoleFailed": "Die Rolle des Mitglieds konnte nicht geändert werden. Bitte versuche es erneut.",
     "saveFailed": "Gruppe konnte nicht gespeichert werden",
+    "creating": "Wird erstellt...",
+    "saving": "Wird gespeichert...",
     "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist {max} MB.",
     "imageLimitHint": "Bilder bis {max} MB — größere Fotos werden automatisch verkleinert.",
     "invalidWebsite": "Bitte gib eine gültige Website-Adresse ein (z. B. https://deineseite.de).",

@@ -533,6 +533,8 @@
     "removeMemberFailed": "No se pudo eliminar al miembro. Inténtalo de nuevo.",
     "updateRoleFailed": "No se pudo actualizar el rol del miembro. Inténtalo de nuevo.",
     "saveFailed": "Error al guardar el grupo",
+    "creating": "Creando...",
+    "saving": "Guardando...",
     "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
     "imageLimitHint": "Imágenes hasta {max} MB — las fotos más grandes se redimensionan automáticamente.",
     "invalidWebsite": "Introduce una dirección web válida (p. ej. https://tusitio.com).",

@@ -535,6 +535,8 @@
     "removeMemberFailed": "Could not remove the member. Please try again.",
     "updateRoleFailed": "Could not update the member's role. Please try again.",
     "saveFailed": "Failed to save community",
+    "creating": "Creating...",
+    "saving": "Saving...",
     "fileTooLarge": "Image is too large. Maximum size is {max} MB.",
     "imageLimitHint": "Images up to {max} MB — larger photos are resized automatically.",
     "invalidWebsite": "Please enter a valid website address (e.g. https://yoursite.com).",

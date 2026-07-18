@@ -429,7 +429,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                     )}
                     <Button type="submit" disabled={saving}>
                         {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
-                        {saving ? 'Saving...' : t('editGroup')}
+                        {saving ? t('saving') : t('editGroup')}
                     </Button>
                 </div>
             </form>

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import { normalizeWebsite } from '@/lib/validations/artisan'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -264,7 +264,8 @@ export function GroupCreateForm() {
 
                     <div className="flex justify-end">
                         <Button type="submit" disabled={saving}>
-                            {saving ? 'Creating...' : t('createGroup')}
+                            {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                            {saving ? t('creating') : t('createGroup')}
                         </Button>
                     </div>
                 </form>
