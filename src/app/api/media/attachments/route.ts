@@ -5,6 +5,7 @@ import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
 import { enqueueTranscription } from '@/lib/transcription'
+import { deleteMediaFiles } from '@/lib/media-delete'
 
 export async function POST(request: NextRequest) {
     const { session, unauthorized } = await requireAuth()
@@ -63,8 +64,20 @@ export async function POST(request: NextRequest) {
             return errorResponse('Unsupported entity type', 400)
         }
 
-        // Remove existing primary attachment for this entity if replacing
+        // Remove existing primary attachment for this entity if replacing,
+        // remembering the displaced media so its files can be GC'd below.
+        let displacedMediaIds: string[] = []
         if (validatedData.isPrimary) {
+            const displaced = await prisma.mediaAttachment.findMany({
+                where: {
+                    entityType: validatedData.entityType,
+                    entityId: validatedData.entityId,
+                    attachmentType: validatedData.attachmentType,
+                    isPrimary: true,
+                },
+                select: { mediaId: true },
+            })
+            displacedMediaIds = displaced.map(a => a.mediaId)
             await prisma.mediaAttachment.deleteMany({
                 where: {
                     entityType: validatedData.entityType,
@@ -87,10 +100,22 @@ export async function POST(request: NextRequest) {
             },
         })
 
+        // GC the replaced files. deleteMediaFiles is reference-aware, so a
+        // file still attached elsewhere (gallery, a craft, or re-attached by
+        // this very request) is kept. Must run after the create above so a
+        // re-attachment of the same media still counts as a reference.
+        if (displacedMediaIds.length > 0) void deleteMediaFiles(displacedMediaIds)
+
         // Queue English captions for workshop videos attached to a story.
-        // enqueueTranscription no-ops for non-video media.
+        // enqueueTranscription no-ops for non-video media. Non-fatal — the
+        // attachment already exists, and a failed enqueue retries on the
+        // artisan's next save.
         if (validatedData.entityType === 'CraftStory') {
-            await enqueueTranscription(validatedData.mediaId)
+            try {
+                await enqueueTranscription(validatedData.mediaId)
+            } catch (transcriptionError) {
+                console.error('Transcription enqueue failed for media', validatedData.mediaId, transcriptionError)
+            }
         }
 
         return NextResponse.json(attachment, { status: 201 })

@@ -333,7 +333,6 @@ export default async function Home() {
                                     height={768}
                                     sizes="(max-width: 1024px) 80vw, 18rem"
                                     className="h-auto w-full rounded-[calc(var(--sc-r-btn)-4px)] object-cover"
-                                    unoptimized
                                 />
                             </div>
                             <p className="sc-meta text-center">{t('trust.verified.title')}</p>
