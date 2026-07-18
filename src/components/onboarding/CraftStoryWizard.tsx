@@ -182,12 +182,14 @@ export function CraftStoryWizard({
                 } else {
                     setError(t('errors.publishFailed'))
                 }
+                setPublishing(false)
                 return
             }
+            // Keep the button disabled on success — router.push doesn't unmount
+            // the wizard immediately, and re-enabling allowed a second publish.
             router.push('/profile')
         } catch {
             setError(t('errors.publishFailed'))
-        } finally {
             setPublishing(false)
         }
     }

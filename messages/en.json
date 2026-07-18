@@ -535,6 +535,7 @@
     "saveFailed": "Failed to save community",
     "fileTooLarge": "Image is too large. Maximum size is {max} MB.",
     "imageLimitHint": "Images up to {max} MB — larger photos are resized automatically.",
+    "invalidWebsite": "Please enter a valid website address (e.g. https://yoursite.com).",
     "deleteFailed": "Failed to delete community",
     "viewGroup": "View Community",
     "viewPublicPage": "View Public Page",

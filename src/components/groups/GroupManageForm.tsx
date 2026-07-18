@@ -17,6 +17,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { GroupPhotoUpload } from './GroupPhotoUpload'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 
 interface GroupData {
     id: string
@@ -104,12 +105,24 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
 
     async function handleSave(e: React.FormEvent) {
         e.preventDefault()
+
+        // The server requires a full URL for the website field.
+        const website = normalizeWebsite(form.website)
+        if (website) {
+            try {
+                new URL(website)
+            } catch {
+                alert(t('invalidWebsite'))
+                return
+            }
+        }
+
         setSaving(true)
         try {
             const res = await fetch(`/api/groups/${group.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify({ ...form, website }),
             })
             if (!res.ok) throw new Error('Failed to save')
             router.refresh()
@@ -282,6 +295,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                             type="url"
                             value={form.website}
                             onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+                            onBlur={() => setForm(f => ({ ...f, website: normalizeWebsite(f.website) }))}
                             placeholder="https://"
                         />
                     </div>

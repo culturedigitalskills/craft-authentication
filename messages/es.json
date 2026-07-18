@@ -533,6 +533,7 @@
     "saveFailed": "Error al guardar el grupo",
     "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
     "imageLimitHint": "Imágenes hasta {max} MB — las fotos más grandes se redimensionan automáticamente.",
+    "invalidWebsite": "Introduce una dirección web válida (p. ej. https://tusitio.com).",
     "deleteFailed": "Error al eliminar el grupo",
     "viewGroup": "Ver Grupo",
     "viewPublicPage": "Ver página pública",

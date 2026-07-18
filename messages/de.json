@@ -462,6 +462,7 @@
     "saveFailed": "Gruppe konnte nicht gespeichert werden",
     "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist {max} MB.",
     "imageLimitHint": "Bilder bis {max} MB — größere Fotos werden automatisch verkleinert.",
+    "invalidWebsite": "Bitte gib eine gültige Website-Adresse ein (z. B. https://deineseite.de).",
     "deleteFailed": "Gruppe konnte nicht gelöscht werden",
     "viewGroup": "Gruppe ansehen",
     "searchArtisan": "Handwerker nach Namen suchen...",

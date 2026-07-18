@@ -533,6 +533,7 @@
     "saveFailed": "समूह सहेजने में विफल",
     "fileTooLarge": "छवि बहुत बड़ी है। अधिकतम आकार {max} MB है।",
     "imageLimitHint": "छवियाँ {max} MB तक — बड़ी तस्वीरें अपने आप छोटी कर दी जाती हैं।",
+    "invalidWebsite": "कृपया एक मान्य वेबसाइट पता दर्ज करें (जैसे https://yoursite.com)।",
     "deleteFailed": "समूह हटाने में विफल",
     "viewGroup": "समूह देखें",
     "viewPublicPage": "सार्वजनिक पृष्ठ देखें",

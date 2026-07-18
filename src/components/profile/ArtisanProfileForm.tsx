@@ -191,13 +191,14 @@ export function ArtisanProfileForm({
                 return
             }
 
+            // Keep the button disabled on success — router.push doesn't unmount the
+            // form immediately, and re-enabling here allowed duplicate submissions.
             router.push(`/artisans/${artisan.slug}`)
         } catch {
             setMessage({
                 text: isCreateMode ? t('createFailed') : t('updateFailed'),
                 type: 'error',
             })
-        } finally {
             setIsSubmitting(false)
         }
     }

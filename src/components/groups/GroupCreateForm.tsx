@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -71,11 +72,23 @@ export function GroupCreateForm() {
         setSaving(true)
         setError('')
 
+        // The server requires a full URL for the website field.
+        const website = normalizeWebsite(form.website)
+        if (website) {
+            try {
+                new URL(website)
+            } catch {
+                setError(t('invalidWebsite'))
+                setSaving(false)
+                return
+            }
+        }
+
         try {
             const res = await fetch('/api/groups', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify({ ...form, website }),
             })
 
             if (!res.ok) {
@@ -160,6 +173,7 @@ export function GroupCreateForm() {
                                 type="url"
                                 value={form.website}
                                 onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+                                onBlur={() => setForm(f => ({ ...f, website: normalizeWebsite(f.website) }))}
                                 placeholder="https://"
                             />
                         </div>
