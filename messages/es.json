@@ -295,6 +295,7 @@
     "photoUploadFailed": "Error al subir la foto",
     "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
     "imageLimitHint": "Imágenes hasta {max} MB — las fotos más grandes se redimensionan automáticamente.",
+    "invalidWebsite": "Introduce una dirección web válida (p. ej. https://tusitio.com).",
     "personalInfo": "Información personal",
     "craftExperience": "Experiencia artesanal",
     "location": "Ubicación",

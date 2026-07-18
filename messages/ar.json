@@ -295,6 +295,7 @@
     "photoUploadFailed": "فشل رفع الصورة",
     "fileTooLarge": "الصورة كبيرة جدًا. الحجم الأقصى هو {max} ميجابايت.",
     "imageLimitHint": "الصور حتى {max} ميجابايت — يُصغَّر حجم الصور الأكبر تلقائيًا.",
+    "invalidWebsite": "يرجى إدخال عنوان موقع إلكتروني صالح (مثل https://yoursite.com).",
     "personalInfo": "المعلومات الشخصية",
     "craftExperience": "الخبرة الحرفية",
     "location": "الموقع",

@@ -4,6 +4,14 @@ const nameField = (label: string) =>
     z.string().min(1, `${label} is required`).max(100).regex(/\D/, `${label} must contain at least one letter`)
 
 const handleField = z.string().trim().max(100).optional()
+
+// The server requires a full URL — auto-prefix https:// so "yoursite.com"
+// passes websiteField. Used by the client forms before submitting.
+export function normalizeWebsite(value: string): string {
+    const trimmed = value.trim()
+    if (!trimmed) return ''
+    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
+}
 const websiteField = z.union([z.string().url().max(255), z.literal('')]).optional()
 const hashtagsField = z
     .array(z.string().regex(/^[A-Za-z0-9_]{1,50}$/).max(50))

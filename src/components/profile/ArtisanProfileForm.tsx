@@ -31,6 +31,7 @@ import {
     X,
 } from 'lucide-react'
 import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 
 interface Artisan {
     id: string
@@ -108,6 +109,18 @@ export function ArtisanProfileForm({
         setIsSubmitting(true)
         setMessage(null)
 
+        // The server requires a full URL for the website field.
+        const normalizedWebsite = normalizeWebsite(website)
+        if (normalizedWebsite) {
+            try {
+                new URL(normalizedWebsite)
+            } catch {
+                setMessage({ text: t('invalidWebsite'), type: 'error' })
+                setIsSubmitting(false)
+                return
+            }
+        }
+
         const data: Record<string, unknown> = {
             firstName,
             lastName,
@@ -122,7 +135,7 @@ export function ArtisanProfileForm({
         if (socialTwitter) data.socialTwitter = socialTwitter.replace(/^@/, '')
         if (socialTiktok) data.socialTiktok = socialTiktok.replace(/^@/, '')
         if (socialYoutube) data.socialYoutube = socialYoutube.replace(/^@/, '')
-        if (website) data.website = website
+        if (normalizedWebsite) data.website = normalizedWebsite
         data.hashtags = hashtags
 
         try {
@@ -691,6 +704,11 @@ export function ArtisanProfileForm({
                                             id={id}
                                             value={value}
                                             onChange={(e) => setter(e.target.value)}
+                                            onBlur={
+                                                id === 'website'
+                                                    ? () => setWebsite(normalizeWebsite(website))
+                                                    : undefined
+                                            }
                                             placeholder={placeholder}
                                         />
                                     </div>

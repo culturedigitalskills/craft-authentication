@@ -295,6 +295,7 @@
     "photoUploadFailed": "Foto-Upload fehlgeschlagen",
     "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist {max} MB.",
     "imageLimitHint": "Bilder bis {max} MB — größere Fotos werden automatisch verkleinert.",
+    "invalidWebsite": "Bitte gib eine gültige Website-Adresse ein (z. B. https://deineseite.de).",
     "personalInfo": "Persönliche Informationen",
     "craftExperience": "Handwerkserfahrung",
     "location": "Standort",

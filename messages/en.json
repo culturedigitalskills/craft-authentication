@@ -297,6 +297,7 @@
     "photoUploadFailed": "Failed to upload photo",
     "fileTooLarge": "Image is too large. Maximum size is {max} MB.",
     "imageLimitHint": "Images up to {max} MB — larger photos are resized automatically.",
+    "invalidWebsite": "Please enter a valid website address (e.g. https://yoursite.com).",
     "personalInfo": "Personal Information",
     "craftExperience": "Craft Experience",
     "location": "Location",

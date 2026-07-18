@@ -295,6 +295,7 @@
     "photoUploadFailed": "फ़ोटो अपलोड करने में विफल",
     "fileTooLarge": "छवि बहुत बड़ी है। अधिकतम आकार {max} MB है।",
     "imageLimitHint": "छवियाँ {max} MB तक — बड़ी तस्वीरें अपने आप छोटी कर दी जाती हैं।",
+    "invalidWebsite": "कृपया एक मान्य वेबसाइट पता दर्ज करें (जैसे https://yoursite.com)।",
     "personalInfo": "व्यक्तिगत जानकारी",
     "craftExperience": "शिल्प अनुभव",
     "location": "स्थान",

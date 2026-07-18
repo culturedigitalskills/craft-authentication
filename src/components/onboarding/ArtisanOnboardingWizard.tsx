@@ -14,6 +14,7 @@ import { LocationSelect } from '@/components/profile/LocationSelect'
 import { ArrowLeft, ArrowRight, Globe, Hash, X, Loader2, Check } from 'lucide-react'
 import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
 import { parseApiError } from '@/lib/api-error'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 
 type WizardData = {
     firstName: string
@@ -81,13 +82,6 @@ const SOCIAL_KEYS = [
     'socialTiktok',
     'socialYoutube',
 ] as const
-
-// The server requires a full URL — auto-prefix https:// so "yoursite.com" works.
-function normalizeWebsite(value: string): string {
-    const trimmed = value.trim()
-    if (!trimmed) return ''
-    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
-}
 
 export function ArtisanOnboardingWizard() {
     const t = useTranslations('onboardingWizard')
