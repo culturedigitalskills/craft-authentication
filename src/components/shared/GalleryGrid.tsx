@@ -68,7 +68,6 @@ export function GalleryGrid({ images, artisanUserId }: GalleryGridProps) {
                                 alt="Gallery photo"
                                 fill
                                 sizes="(max-width: 768px) 50vw, 25vw"
-                                unoptimized
                                 className="object-cover transition-transform group-hover:scale-105"
                             />
                         )}

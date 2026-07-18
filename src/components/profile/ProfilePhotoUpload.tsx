@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Camera, Loader2 } from 'lucide-react'
 import { MAX_IMAGE_MB, prepareFileForUpload } from '@/lib/media-limits'
+import { uploadWithProgress } from '@/lib/upload'
 
 interface ProfilePhotoUploadProps {
     artisanId: string | null
@@ -20,6 +21,7 @@ export function ProfilePhotoUpload({
     const t = useTranslations('profile')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
+    const [progress, setProgress] = useState(0)
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl)
     const [error, setError] = useState<string | null>(null)
 
@@ -37,27 +39,16 @@ export function ProfilePhotoUpload({
 
         setError(null)
         setIsUploading(true)
+        setProgress(0)
 
         // Show preview immediately
         const localPreview = URL.createObjectURL(file)
         setPreviewUrl(localPreview)
 
         try {
-            // Upload the file
-            const formData = new FormData()
-            formData.append('file', file)
-
-            const uploadRes = await fetch('/api/media/upload', {
-                method: 'POST',
-                body: formData,
-            })
-
-            if (!uploadRes.ok) {
-                const errorData = await uploadRes.json().catch(() => ({}))
-                throw new Error(errorData.error || 'Upload failed')
-            }
-
-            const mediaFile = await uploadRes.json()
+            const outcome = await uploadWithProgress(file, setProgress)
+            if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+            const mediaFile = outcome.media
 
             // If artisan already exists, create the attachment now
             if (artisanId) {
@@ -113,8 +104,9 @@ export function ProfilePhotoUpload({
                     </div>
                 )}
                 {isUploading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-background/60">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <span className="text-xs font-medium text-primary">{progress}%</span>
                     </div>
                 )}
             </button>

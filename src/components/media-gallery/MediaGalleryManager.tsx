@@ -7,6 +7,7 @@ import { Loader2, X, Eye, EyeOff, Play, Music, Upload } from 'lucide-react'
 import { GalleryLightbox } from '@/components/shared/GalleryLightbox'
 import { mediaKind } from '@/lib/media-kind'
 import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
+import { uploadWithProgress } from '@/lib/upload'
 
 interface MediaItem {
     attachmentId: string
@@ -26,6 +27,7 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [items, setItems] = useState<MediaItem[]>(initialItems)
     const [isUploading, setIsUploading] = useState(false)
+    const [progress, setProgress] = useState(0)
     const [error, setError] = useState<string | null>(null)
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
@@ -35,57 +37,70 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
         const files = Array.from(e.target.files ?? [])
         if (files.length === 0) return
         setError(null)
-        setIsUploading(true)
-        try {
-            for (const selected of files) {
-                const prepared = await prepareFileForUpload(selected)
-                if (!prepared.ok) {
-                    throw new Error(
-                        prepared.reason === 'videoTooLarge'
-                            ? t('videoTooLarge', { max: prepared.maxMb })
-                            : t('imageTooLarge', { max: prepared.maxMb }),
-                    )
-                }
-                const file = prepared.file
-                const formData = new FormData()
-                formData.append('file', file)
-                const uploadRes = await fetch('/api/media/upload', { method: 'POST', body: formData })
-                if (!uploadRes.ok) {
-                    const d = await uploadRes.json().catch(() => ({}))
-                    throw new Error(d.error || t('uploadFailed'))
-                }
-                const mediaFile = await uploadRes.json()
 
-                const attachRes = await fetch('/api/media/attachments', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        mediaId: mediaFile.id,
-                        entityType: 'Artisan',
-                        entityId: artisanId,
-                        attachmentType: 'GALLERY',
+        // Validate (and downscale images) up front so nothing uploads when a
+        // file in the batch is over the limit.
+        const prepared = await Promise.all(files.map(prepareFileForUpload))
+        const rejected = prepared.find((p) => !p.ok)
+        if (rejected && !rejected.ok) {
+            setError(
+                rejected.reason === 'videoTooLarge'
+                    ? t('videoTooLarge', { max: rejected.maxMb })
+                    : t('imageTooLarge', { max: rejected.maxMb }),
+            )
+            if (fileInputRef.current) fileInputRef.current.value = ''
+            return
+        }
+        const readyFiles = prepared.flatMap((p) => (p.ok ? [p.file] : []))
+
+        setIsUploading(true)
+        setProgress(0)
+        const perFilePct = new Array(readyFiles.length).fill(0)
+        try {
+            // Upload and attach in parallel; failures don't block the rest.
+            const results = await Promise.allSettled(
+                readyFiles.map(async (file, i) => {
+                    const outcome = await uploadWithProgress(file, (pct) => {
+                        perFilePct[i] = pct
+                        setProgress(Math.round(perFilePct.reduce((a, b) => a + b, 0) / perFilePct.length))
+                    })
+                    if (!outcome.ok) throw new Error(outcome.error || t('uploadFailed'))
+
+                    const attachRes = await fetch('/api/media/attachments', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            mediaId: outcome.media.id,
+                            entityType: 'Artisan',
+                            entityId: artisanId,
+                            attachmentType: 'GALLERY',
+                            isPublic: true,
+                            displayOrder: items.length + i,
+                        }),
+                    })
+                    if (!attachRes.ok) {
+                        const d = await attachRes.json().catch(() => ({}))
+                        throw new Error(d.error || t('uploadFailed'))
+                    }
+                    const attachment = await attachRes.json()
+                    return {
+                        attachmentId: attachment.id as string,
+                        mediaId: outcome.media.id,
+                        url: `/api/media/${outcome.media.id}`,
+                        mimeType: outcome.media.mimeType,
                         isPublic: true,
-                        displayOrder: items.length,
-                    }),
-                })
-                if (!attachRes.ok) {
-                    const d = await attachRes.json().catch(() => ({}))
-                    throw new Error(d.error || t('uploadFailed'))
-                }
-                const attachment = await attachRes.json()
-                setItems((prev) => [
-                    ...prev,
-                    {
-                        attachmentId: attachment.id,
-                        mediaId: mediaFile.id,
-                        url: `/api/media/${mediaFile.id}`,
-                        mimeType: mediaFile.mimeType ?? null,
-                        isPublic: true,
-                    },
-                ])
+                    }
+                }),
+            )
+
+            const uploaded = results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []))
+            if (uploaded.length > 0) setItems((prev) => [...prev, ...uploaded])
+
+            const firstFailure = results.find((r) => r.status === 'rejected')
+            if (firstFailure && firstFailure.status === 'rejected') {
+                const reason = firstFailure.reason
+                setError(reason instanceof Error && reason.message ? reason.message : t('uploadFailed'))
             }
-        } catch (err: any) {
-            setError(err.message || t('uploadFailed'))
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
@@ -148,7 +163,6 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                     alt="Gallery item"
                                     fill
                                     sizes="(max-width: 768px) 50vw, 25vw"
-                                    unoptimized
                                     className="object-cover transition-transform group-hover:scale-105"
                                 />
                             )}
@@ -255,7 +269,10 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                     className="flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/30 p-3 text-center transition-all hover:border-warm/40 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                     {isUploading ? (
-                        <Loader2 className="h-8 w-8 animate-spin text-warm" />
+                        <>
+                            <Loader2 className="h-8 w-8 animate-spin text-warm" />
+                            <span className="text-xs font-medium text-warm">{progress}%</span>
+                        </>
                     ) : (
                         <>
                             <Upload className="h-8 w-8 text-muted-foreground" />

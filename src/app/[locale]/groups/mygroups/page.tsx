@@ -89,7 +89,6 @@ export default async function MyGroupsPage() {
                                             fill
                                             sizes="40px"
                                             className="object-cover"
-                                            unoptimized
                                         />
                                     </div>
                                 ) : (

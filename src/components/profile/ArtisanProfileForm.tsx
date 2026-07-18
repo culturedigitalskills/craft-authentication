@@ -92,6 +92,7 @@ export function ArtisanProfileForm({
     const [uploadedCoverId, setUploadedCoverId] = useState<string | null>(null)
     const [groups, setGroups] = useState(myGroups)
     const [confirmLeave, setConfirmLeave] = useState<string | null>(null)
+    const [leaveError, setLeaveError] = useState('')
     const [socialInstagram, setSocialInstagram] = useState(artisan?.socialInstagram ?? '')
     const [socialFacebook, setSocialFacebook] = useState(artisan?.socialFacebook ?? '')
     const [socialTwitter, setSocialTwitter] = useState(artisan?.socialTwitter ?? '')
@@ -237,6 +238,7 @@ export function ArtisanProfileForm({
     }
 
     async function handleLeaveGroup(membershipId: string, groupId: string) {
+        setLeaveError('')
         try {
             const res = await fetch(`/api/groups/${groupId}/members/${membershipId}`, {
                 method: 'DELETE',
@@ -245,7 +247,7 @@ export function ArtisanProfileForm({
             setGroups((prev) => prev.filter((g) => g.membershipId !== membershipId))
             setConfirmLeave(null)
         } catch {
-            alert(t('leaveGroupFailed'))
+            setLeaveError(t('leaveGroupFailed'))
         }
     }
 
@@ -290,7 +292,6 @@ export function ArtisanProfileForm({
                                     width={128}
                                     height={128}
                                     className="h-full w-full object-cover"
-                                    unoptimized
                                 />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center bg-muted">
@@ -408,6 +409,9 @@ export function ArtisanProfileForm({
                             <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
                                 {t('myGroups')}
                             </h2>
+                            {leaveError && (
+                                <p className="mb-3 text-sm text-destructive">{leaveError}</p>
+                            )}
                             <div className="space-y-2">
                                 {groups.map((g) => (
                                     <div

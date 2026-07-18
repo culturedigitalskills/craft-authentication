@@ -27,7 +27,6 @@ export function ScMedia({
             src={src}
             alt={alt}
             fill
-            unoptimized
             priority={priority}
             sizes={sizes}
             className={`object-cover ${className ?? ''}`}

@@ -459,6 +459,8 @@
     "deleteSuccess": "Gruppe erfolgreich gelöscht",
     "memberAdded": "Mitglied erfolgreich hinzugefügt",
     "memberRemoved": "Mitglied erfolgreich entfernt",
+    "removeMemberFailed": "Das Mitglied konnte nicht entfernt werden. Bitte versuche es erneut.",
+    "updateRoleFailed": "Die Rolle des Mitglieds konnte nicht geändert werden. Bitte versuche es erneut.",
     "saveFailed": "Gruppe konnte nicht gespeichert werden",
     "fileTooLarge": "Das Bild ist zu groß. Maximale Größe ist {max} MB.",
     "imageLimitHint": "Bilder bis {max} MB — größere Fotos werden automatisch verkleinert.",

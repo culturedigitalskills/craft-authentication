@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -95,28 +95,39 @@ export function CraftStoryWizard({
         setStory(s => ({ ...s, [`answer${key}MediaId`]: mediaId }))
     }
 
+    // Mirrors of state used inside queued background saves — a chained save
+    // must read the values current at execution time, not the ones captured
+    // when the save was queued.
+    const storyRef = useRef(story)
+    storyRef.current = story
+    const knownUpdatedAtRef = useRef(knownUpdatedAt)
+    knownUpdatedAtRef.current = knownUpdatedAt
+    // Serializes saves so expectedUpdatedAt conflict detection stays coherent.
+    const pendingSaveRef = useRef<Promise<boolean>>(Promise.resolve(true))
+
     async function save(nextStep: number): Promise<boolean> {
         setSaving(true)
         setError(null)
+        const draft = storyRef.current
         try {
             const res = await fetch('/api/artisans/me/story', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    lastStepReached: Math.max(nextStep, story.lastStepReached ?? 0),
-                    expectedUpdatedAt: knownUpdatedAt ?? undefined,
-                    answerSelfText: story.answerSelfText ?? null,
-                    answerSelfMediaId: story.answerSelfMediaId ?? null,
-                    answerCraftText: story.answerCraftText ?? null,
-                    answerCraftMediaId: story.answerCraftMediaId ?? null,
-                    answerMeaningText: story.answerMeaningText ?? null,
-                    answerMeaningMediaId: story.answerMeaningMediaId ?? null,
-                    answerBenefitsText: story.answerBenefitsText ?? null,
-                    answerBenefitsMediaId: story.answerBenefitsMediaId ?? null,
-                    answerFutureText: story.answerFutureText ?? null,
-                    answerFutureMediaId: story.answerFutureMediaId ?? null,
-                    answerChallengesText: story.answerChallengesText ?? null,
-                    answerChallengesMediaId: story.answerChallengesMediaId ?? null,
+                    lastStepReached: Math.max(nextStep, draft.lastStepReached ?? 0),
+                    expectedUpdatedAt: knownUpdatedAtRef.current ?? undefined,
+                    answerSelfText: draft.answerSelfText ?? null,
+                    answerSelfMediaId: draft.answerSelfMediaId ?? null,
+                    answerCraftText: draft.answerCraftText ?? null,
+                    answerCraftMediaId: draft.answerCraftMediaId ?? null,
+                    answerMeaningText: draft.answerMeaningText ?? null,
+                    answerMeaningMediaId: draft.answerMeaningMediaId ?? null,
+                    answerBenefitsText: draft.answerBenefitsText ?? null,
+                    answerBenefitsMediaId: draft.answerBenefitsMediaId ?? null,
+                    answerFutureText: draft.answerFutureText ?? null,
+                    answerFutureMediaId: draft.answerFutureMediaId ?? null,
+                    answerChallengesText: draft.answerChallengesText ?? null,
+                    answerChallengesMediaId: draft.answerChallengesMediaId ?? null,
                 }),
             })
             if (res.status === 409) {
@@ -126,7 +137,10 @@ export function CraftStoryWizard({
             if (!res.ok) throw new Error('Save failed')
             const data = await res.json()
             if (data.story?.id) setStoryId(data.story.id)
-            if (data.story?.updatedAt) setKnownUpdatedAt(data.story.updatedAt)
+            if (data.story?.updatedAt) {
+                setKnownUpdatedAt(data.story.updatedAt)
+                knownUpdatedAtRef.current = data.story.updatedAt
+            }
             setStory(s => ({ ...s, ...data.story }))
             // Saving enqueues caption jobs for new videos — pick up their status.
             void refreshCaptionStatuses()
@@ -139,10 +153,21 @@ export function CraftStoryWizard({
         }
     }
 
-    async function handleNext() {
+    // Queue a save behind any in-flight one. save() never rejects, so the
+    // chain cannot break; callers that care await the returned promise.
+    function queueSave(nextStep: number): Promise<boolean> {
+        const queued = pendingSaveRef.current.then(() => save(nextStep))
+        pendingSaveRef.current = queued
+        return queued
+    }
+
+    function handleNext() {
+        // Advance immediately — the save runs in the background so stepping
+        // through the wizard never waits on the network. Failures surface in
+        // the error banner, and publish/exit await the full save chain.
         const target = step + 1
-        const ok = await save(target)
-        if (ok) setStep(target)
+        setStep(target)
+        void queueSave(target)
     }
 
     function handleBack() {
@@ -150,16 +175,14 @@ export function CraftStoryWizard({
     }
 
     // Save the current step's edits and return straight to the review screen.
-    async function handleReturnToReview() {
-        const ok = await save(step)
-        if (ok) {
-            setReturnToReview(false)
-            setStep(TOTAL_STEPS - 1)
-        }
+    function handleReturnToReview() {
+        setReturnToReview(false)
+        setStep(TOTAL_STEPS - 1)
+        void queueSave(step)
     }
 
     async function handleSaveExit() {
-        await save(step)
+        await queueSave(step)
         router.push('/profile')
     }
 
@@ -167,8 +190,9 @@ export function CraftStoryWizard({
         setPublishing(true)
         setError(null)
         try {
-            // Persist final state, then publish
-            const saved = await save(step)
+            // Persist final state (behind any still-running background saves),
+            // then publish.
+            const saved = await queueSave(step)
             if (!saved) {
                 setPublishing(false)
                 return
@@ -289,7 +313,7 @@ export function CraftStoryWizard({
                             type="button"
                             variant="outline"
                             onClick={handleBack}
-                            disabled={step === 0 || saving || publishing}
+                            disabled={step === 0 || publishing}
                             className="w-full sm:w-auto"
                         >
                             <ArrowLeft className="mr-1.5 h-4 w-4" />
@@ -302,40 +326,28 @@ export function CraftStoryWizard({
                                     type="button"
                                     variant="ghost"
                                     onClick={handleSaveExit}
-                                    disabled={saving || publishing}
+                                    disabled={publishing}
                                     className="w-full sm:w-auto"
                                 >
                                     <Save className="mr-1.5 h-4 w-4" />
                                     {t('saveExit')}
                                 </Button>
                             )}
+                            {saving && !publishing && (
+                                <span className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground sm:mr-2">
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    {t('saving')}
+                                </span>
+                            )}
                             {returnToReview && step > 0 && step < TOTAL_STEPS - 1 ? (
-                                <Button type="button" onClick={handleReturnToReview} disabled={saving || publishing} className="w-full sm:w-auto">
-                                    {saving ? (
-                                        <>
-                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                                            {t('saving')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Check className="mr-1.5 h-4 w-4" />
-                                            {t('backToReview')}
-                                        </>
-                                    )}
+                                <Button type="button" onClick={handleReturnToReview} disabled={publishing} className="w-full sm:w-auto">
+                                    <Check className="mr-1.5 h-4 w-4" />
+                                    {t('backToReview')}
                                 </Button>
                             ) : step < TOTAL_STEPS - 1 ? (
-                                <Button type="button" onClick={handleNext} disabled={saving || publishing} className="w-full sm:w-auto">
-                                    {saving ? (
-                                        <>
-                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                                            {t('saving')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {step === 0 ? t('begin') : t('next')}
-                                            <ArrowRight className="ml-1.5 h-4 w-4" />
-                                        </>
-                                    )}
+                                <Button type="button" onClick={handleNext} disabled={publishing} className="w-full sm:w-auto">
+                                    {step === 0 ? t('begin') : t('next')}
+                                    <ArrowRight className="ml-1.5 h-4 w-4" />
                                 </Button>
                             ) : (
                                 <Button type="button" onClick={handlePublish} disabled={saving || publishing} className="w-full sm:w-auto">

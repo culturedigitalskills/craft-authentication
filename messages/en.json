@@ -532,6 +532,8 @@
     "deleteSuccess": "Community deleted successfully",
     "memberAdded": "Member added successfully",
     "memberRemoved": "Member removed successfully",
+    "removeMemberFailed": "Could not remove the member. Please try again.",
+    "updateRoleFailed": "Could not update the member's role. Please try again.",
     "saveFailed": "Failed to save community",
     "fileTooLarge": "Image is too large. Maximum size is {max} MB.",
     "imageLimitHint": "Images up to {max} MB — larger photos are resized automatically.",

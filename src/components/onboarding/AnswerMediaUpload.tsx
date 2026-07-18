@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
 import { Loader2, Mic, Video, Trash2 } from 'lucide-react'
 import { MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
+import { uploadWithProgress } from '@/lib/upload'
 
 interface AnswerMediaUploadProps {
     mediaId: string | null
@@ -26,6 +27,7 @@ export function AnswerMediaUpload({
     const tStory = useTranslations('craftStory')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
+    const [progress, setProgress] = useState(0)
     const [error, setError] = useState<string | null>(null)
     const [mimeType, setMimeType] = useState<string | null>(initialMimeType)
 
@@ -43,14 +45,12 @@ export function AnswerMediaUpload({
 
         setError(null)
         setIsUploading(true)
+        setProgress(0)
         try {
-            const formData = new FormData()
-            formData.append('file', file)
-            const res = await fetch('/api/media/upload', { method: 'POST', body: formData })
-            if (!res.ok) throw new Error('Upload failed')
-            const media = await res.json()
-            setMimeType(media.mimeType ?? file.type)
-            onChange(media.id)
+            const outcome = await uploadWithProgress(file, setProgress)
+            if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+            setMimeType(outcome.media.mimeType ?? file.type)
+            onChange(outcome.media.id)
         } catch {
             setError(t('uploadFailed'))
         } finally {
@@ -100,7 +100,7 @@ export function AnswerMediaUpload({
                     {isUploading ? (
                         <>
                             <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                            {t('uploading')}
+                            {t('uploading')} {progress}%
                         </>
                     ) : mediaUrl ? (
                         t('replace')

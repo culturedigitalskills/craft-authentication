@@ -21,6 +21,7 @@ import { FaYoutube } from 'react-icons/fa6'
 import { useRouter } from 'next/navigation'
 import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
 import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
+import { uploadWithProgress } from '@/lib/upload'
 
 interface Craft {
     id: string
@@ -60,36 +61,6 @@ interface CraftFormProps {
 const kindFromMime = (mime: string | null | undefined): MediaKind =>
     mime?.startsWith('video/') ? 'video' : 'image'
 
-// Upload a single file via XHR so we can report upload progress. Resolves to
-// the new media id, or undefined if the upload failed (the caller filters those
-// out, mirroring the previous fetch behaviour).
-function uploadFileWithProgress(file: File, onProgress: (pct: number) => void): Promise<string | undefined> {
-    return new Promise((resolve) => {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        const xhr = new XMLHttpRequest()
-        xhr.open('POST', '/api/media/upload')
-        xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
-        }
-        xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                onProgress(100)
-                try {
-                    resolve(JSON.parse(xhr.responseText)?.id)
-                } catch {
-                    resolve(undefined)
-                }
-            } else {
-                resolve(undefined)
-            }
-        }
-        xhr.onerror = () => resolve(undefined)
-        xhr.send(formData)
-    })
-}
-
 export function CraftForm({ craft }: CraftFormProps) {
     const t = useTranslations('')
     const router = useRouter()
@@ -115,6 +86,7 @@ export function CraftForm({ craft }: CraftFormProps) {
     const [isPublic, setIsPublic] = useState<boolean>(craft?.isPublic ?? false)
     const [isSharedLocation, setIsSharedLocation] = useState<boolean>(craft?.isSharedLocation ?? true)
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
+    const [resolvedPlace, setResolvedPlace] = useState<string | null>(null)
     const [existingMedia, setExistingMedia] = useState<MediaItem[]>(craft?.media ?? [])
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
     const [files, setFiles] = useState<File[]>([])
@@ -191,10 +163,17 @@ export function CraftForm({ craft }: CraftFormProps) {
         if (!navigator.geolocation) return
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                setLocation({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                })
+                const lat = position.coords.latitude
+                const lng = position.coords.longitude
+                setLocation({ lat, lng })
+                // Resolve the place name now so submitting doesn't have to wait
+                // for a geocode round-trip. Non-fatal on failure.
+                fetch(`/api/geocode?lat=${lat}&lng=${lng}`)
+                    .then((res) => res.json())
+                    .then((geo) => {
+                        if (geo?.city) setResolvedPlace(geo.city)
+                    })
+                    .catch(() => {})
             },
             (error) => {
                 console.error('Geolocation error:', error.message)
@@ -216,13 +195,9 @@ export function CraftForm({ craft }: CraftFormProps) {
             if (location?.lat && location?.lng) {
                 latitude = location.lat
                 longitude = location.lng
-                try {
-                    const geoRes = await fetch(`/api/geocode?lat=${location.lat}&lng=${location.lng}`)
-                    const geoData = await geoRes.json()
-                    place = geoData.city ?? place
-                } catch {
-                    // Non-fatal — keep any existing place value.
-                }
+                // Place name was resolved when the position arrived, so the
+                // save doesn't wait on a geocode round-trip.
+                place = resolvedPlace ?? place
             }
         } else {
             latitude = null
@@ -235,11 +210,14 @@ export function CraftForm({ craft }: CraftFormProps) {
             setUploads(files.map(f => ({ name: f.name, progress: 0, failed: false })))
             newIds = await Promise.all(
                 files.map((file, i) =>
-                    uploadFileWithProgress(file, (pct) =>
+                    uploadWithProgress(file, (pct) =>
                         setUploads(prev => prev.map((u, j) => (j === i ? { ...u, progress: pct } : u))),
-                    ).then((id) => {
-                        if (!id) setUploads(prev => prev.map((u, j) => (j === i ? { ...u, failed: true } : u)))
-                        return id
+                    ).then((outcome) => {
+                        if (!outcome.ok) {
+                            setUploads(prev => prev.map((u, j) => (j === i ? { ...u, failed: true } : u)))
+                            return undefined
+                        }
+                        return outcome.media.id
                     }),
                 ),
             )
@@ -569,7 +547,6 @@ export function CraftForm({ craft }: CraftFormProps) {
                                                 alt="Craft media"
                                                 fill
                                                 sizes="(max-width: 768px) 33vw, 25vw"
-                                                unoptimized
                                                 className="object-cover"
                                             />
                                         )}
@@ -748,7 +725,6 @@ export function CraftForm({ craft }: CraftFormProps) {
                                                             alt="Gallery media"
                                                             fill
                                                             sizes="(max-width: 768px) 33vw, 25vw"
-                                                            unoptimized
                                                             className="object-cover"
                                                         />
                                                     )}

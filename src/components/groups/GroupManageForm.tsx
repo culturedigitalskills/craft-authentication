@@ -57,6 +57,8 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     const [saving, setSaving] = useState(false)
     const [deleting, setDeleting] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
+    const [formError, setFormError] = useState('')
+    const [memberError, setMemberError] = useState('')
     const [members, setMembers] = useState(initialMembers)
     const [addError, setAddError] = useState('')
     const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
@@ -92,12 +94,13 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             return
         }
         setDeleting(true)
+        setFormError('')
         try {
             const res = await fetch(`/api/groups/${group.id}`, { method: 'DELETE' })
             if (!res.ok) throw new Error('Failed to delete')
             router.push('/groups')
         } catch {
-            alert(t('deleteFailed'))
+            setFormError(t('deleteFailed'))
             setDeleting(false)
             setConfirmDelete(false)
         }
@@ -105,6 +108,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
 
     async function handleSave(e: React.FormEvent) {
         e.preventDefault()
+        setFormError('')
 
         // The server requires a full URL for the website field.
         const website = normalizeWebsite(form.website)
@@ -112,7 +116,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             try {
                 new URL(website)
             } catch {
-                alert(t('invalidWebsite'))
+                setFormError(t('invalidWebsite'))
                 return
             }
         }
@@ -127,7 +131,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             if (!res.ok) throw new Error('Failed to save')
             router.refresh()
         } catch {
-            alert(t('saveFailed'))
+            setFormError(t('saveFailed'))
         } finally {
             setSaving(false)
         }
@@ -185,6 +189,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     }
 
     async function handleRemoveMember(membershipId: string) {
+        setMemberError('')
         try {
             const res = await fetch(`/api/groups/${group.id}/members/${membershipId}`, {
                 method: 'DELETE',
@@ -193,12 +198,13 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             setMembers(prev => prev.filter(m => m.id !== membershipId))
             setConfirmRemove(null)
         } catch {
-            alert('Failed to remove member')
+            setMemberError(t('removeMemberFailed'))
         }
     }
 
     async function handleToggleRole(membershipId: string, currentRole: string) {
         const newRole = currentRole === 'ADMIN' ? 'MEMBER' : 'ADMIN'
+        setMemberError('')
         try {
             const res = await fetch(`/api/groups/${group.id}/members/${membershipId}`, {
                 method: 'PUT',
@@ -210,7 +216,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 prev.map(m => m.id === membershipId ? { ...m, role: newRole } : m)
             )
         } catch {
-            alert('Failed to update role')
+            setMemberError(t('updateRoleFailed'))
         }
     }
 
@@ -387,6 +393,10 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                     </label>
                 </div>
 
+                {formError && (
+                    <p className="text-sm text-destructive">{formError}</p>
+                )}
+
                 <div className="flex items-center justify-between">
                     {confirmDelete ? (
                         <div className="flex items-center gap-2">
@@ -427,6 +437,10 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             {/* Members management */}
             <div className="rounded-lg border border-border bg-card p-6">
                 <h2 className="mb-4 text-lg font-semibold">{t('members')}</h2>
+
+                {memberError && (
+                    <p className="mb-3 text-sm text-destructive">{memberError}</p>
+                )}
 
                 {/* Add member */}
                 <div className="mb-6">

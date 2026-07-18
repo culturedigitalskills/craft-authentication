@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { ImagePlus, Loader2 } from 'lucide-react'
 import { MAX_IMAGE_MB, prepareFileForUpload } from '@/lib/media-limits'
+import { uploadWithProgress } from '@/lib/upload'
 
 interface GroupPhotoUploadProps {
     groupId: string
@@ -24,6 +25,7 @@ export function GroupPhotoUpload({
     const t = useTranslations('groups')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
+    const [progress, setProgress] = useState(0)
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentUrl)
     const [error, setError] = useState<string | null>(null)
 
@@ -41,24 +43,15 @@ export function GroupPhotoUpload({
 
         setError(null)
         setIsUploading(true)
+        setProgress(0)
 
         const localPreview = URL.createObjectURL(file)
         setPreviewUrl(localPreview)
 
         try {
-            const formData = new FormData()
-            formData.append('file', file)
-
-            const uploadRes = await fetch('/api/media/upload', {
-                method: 'POST',
-                body: formData,
-            })
-            if (!uploadRes.ok) {
-                const errorData = await uploadRes.json().catch(() => ({}))
-                throw new Error(errorData.error || 'Upload failed')
-            }
-
-            const mediaFile = await uploadRes.json()
+            const outcome = await uploadWithProgress(file, setProgress)
+            if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+            const mediaFile = outcome.media
 
             const attachRes = await fetch('/api/media/attachments', {
                 method: 'POST',
@@ -115,8 +108,9 @@ export function GroupPhotoUpload({
                     </div>
                 )}
                 {isUploading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-background/60">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="text-xs font-medium text-primary">{progress}%</span>
                     </div>
                 )}
             </button>

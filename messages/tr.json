@@ -530,6 +530,8 @@
     "deleteSuccess": "Topluluk başarıyla silindi",
     "memberAdded": "Üye başarıyla eklendi",
     "memberRemoved": "Üye başarıyla çıkarıldı",
+    "removeMemberFailed": "Üye çıkarılamadı. Lütfen tekrar deneyin.",
+    "updateRoleFailed": "Üyenin rolü güncellenemedi. Lütfen tekrar deneyin.",
     "saveFailed": "Topluluk kaydedilemedi",
     "fileTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
     "imageLimitHint": "Görseller en fazla {max} MB — daha büyük fotoğraflar otomatik küçültülür.",
