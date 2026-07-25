@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save } from 'lucide-react'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
+import { StoryFilmPanel } from './StoryFilmPanel'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
 
 export type CraftStoryDraft = {
@@ -579,6 +580,10 @@ function ReviewStep({
                     {t('captions.someFailed')}
                 </p>
             )}
+
+            <div className="mt-6">
+                <StoryFilmPanel />
+            </div>
         </div>
     )
 }

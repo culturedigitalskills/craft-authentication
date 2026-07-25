@@ -264,6 +264,23 @@
       "tooLarge": "Diese Aufnahme ist zu groß. Bitte nimm einen kürzeren Clip auf.",
       "cancel": "Abbrechen"
     },
+    "film": {
+      "title": "Mein-Geschichte-Film",
+      "description": "Wir können deine Aufnahmen und Werkstattfotos zu einem kurzen Film verweben — deine Stimme über den Bildern deines Handwerks.",
+      "create": "Meinen Film erstellen",
+      "processing": "Dein Film wird erstellt… das kann einige Minuten dauern.",
+      "failed": "Wir konnten deinen Film nicht erstellen. Bitte versuche es erneut.",
+      "retry": "Erneut versuchen",
+      "watch": "Film ansehen",
+      "published": "Wird in deiner öffentlichen Geschichte gezeigt",
+      "stale": "Deine Geschichte hat sich seit der Erstellung dieses Films geändert. Erstelle ihn neu, um ihn zu aktualisieren.",
+      "premiereTitle": "Dein Geschichtsfilm",
+      "regenerate": "Neu erstellen",
+      "download": "Herunterladen",
+      "publish": "In meiner öffentlichen Geschichte zeigen",
+      "unpublish": "Aus meiner Geschichte ausblenden",
+      "insufficientInputs": "Füge zuerst mindestens eine gesprochene Antwort (Audio oder Video) und ein Foto oder Video hinzu."
+    },
     "workshop": {
       "addFile": "Foto oder Video hinzufügen",
       "removeItem": "Entfernen",

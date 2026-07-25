@@ -266,6 +266,23 @@
       "tooLarge": "That recording is too large. Please record a shorter clip.",
       "cancel": "Cancel"
     },
+    "film": {
+      "title": "My Story film",
+      "description": "We can weave your recordings and workshop photos into a short film — your voice over the images of your craft.",
+      "create": "Create my film",
+      "processing": "Creating your film… this can take a few minutes.",
+      "failed": "We couldn't create your film. Please try again.",
+      "retry": "Try again",
+      "watch": "Watch film",
+      "published": "Showing on your public story",
+      "stale": "Your story changed since this film was made. Regenerate to update it.",
+      "premiereTitle": "Your Story film",
+      "regenerate": "Regenerate",
+      "download": "Download",
+      "publish": "Show on my public story",
+      "unpublish": "Hide from my story",
+      "insufficientInputs": "Add at least one spoken answer (audio or video) and one photo or video first."
+    },
     "workshop": {
       "addFile": "Add photo or video",
       "removeItem": "Remove",

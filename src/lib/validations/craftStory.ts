@@ -28,3 +28,15 @@ export const UpdateCraftStorySchema = z.object({
 })
 
 export type UpdateCraftStory = z.infer<typeof UpdateCraftStorySchema>
+
+// POST /api/artisans/me/story/film — enqueue (or force-regenerate) the film.
+export const CreateStoryFilmSchema = z.object({
+    force: z.boolean().optional(),
+})
+export type CreateStoryFilm = z.infer<typeof CreateStoryFilmSchema>
+
+// PATCH /api/artisans/me/story/film — publish/unpublish the rendered film.
+export const UpdateStoryFilmSchema = z.object({
+    isPublic: z.boolean(),
+})
+export type UpdateStoryFilm = z.infer<typeof UpdateStoryFilmSchema>

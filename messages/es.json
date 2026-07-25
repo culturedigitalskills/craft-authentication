@@ -264,6 +264,23 @@
       "tooLarge": "Esa grabación es demasiado grande. Graba un clip más corto.",
       "cancel": "Cancelar"
     },
+    "film": {
+      "title": "Película de Mi Historia",
+      "description": "Podemos entretejer tus grabaciones y fotos del taller en una película corta: tu voz sobre las imágenes de tu oficio.",
+      "create": "Crear mi película",
+      "processing": "Creando tu película… esto puede tardar unos minutos.",
+      "failed": "No pudimos crear tu película. Inténtalo de nuevo.",
+      "retry": "Intentar de nuevo",
+      "watch": "Ver película",
+      "published": "Se muestra en tu historia pública",
+      "stale": "Tu historia cambió desde que se creó esta película. Vuelve a generarla para actualizarla.",
+      "premiereTitle": "Tu película de historia",
+      "regenerate": "Regenerar",
+      "download": "Descargar",
+      "publish": "Mostrar en mi historia pública",
+      "unpublish": "Ocultar de mi historia",
+      "insufficientInputs": "Añade primero al menos una respuesta hablada (audio o vídeo) y una foto o vídeo."
+    },
     "workshop": {
       "addFile": "Añadir foto o vídeo",
       "removeItem": "Quitar",

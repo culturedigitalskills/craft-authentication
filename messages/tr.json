@@ -264,6 +264,23 @@
       "tooLarge": "Bu kayıt çok büyük. Lütfen daha kısa bir klip kaydedin.",
       "cancel": "İptal"
     },
+    "film": {
+      "title": "Hikâyem filmi",
+      "description": "Kayıtlarını ve atölye fotoğraflarını kısa bir filme dokuyabiliriz — zanaatının görüntüleri üzerinde senin sesin.",
+      "create": "Filmimi oluştur",
+      "processing": "Filmin oluşturuluyor… bu birkaç dakika sürebilir.",
+      "failed": "Filmini oluşturamadık. Lütfen tekrar dene.",
+      "retry": "Tekrar dene",
+      "watch": "Filmi izle",
+      "published": "Herkese açık hikâyende gösteriliyor",
+      "stale": "Bu film oluşturulduktan sonra hikâyen değişti. Güncellemek için yeniden oluştur.",
+      "premiereTitle": "Hikâye filmin",
+      "regenerate": "Yeniden oluştur",
+      "download": "İndir",
+      "publish": "Herkese açık hikâyemde göster",
+      "unpublish": "Hikâyemden gizle",
+      "insufficientInputs": "Önce en az bir sözlü yanıt (ses veya video) ve bir fotoğraf veya video ekle."
+    },
     "workshop": {
       "addFile": "Fotoğraf veya video ekle",
       "removeItem": "Kaldır",
