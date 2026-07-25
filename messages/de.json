@@ -249,6 +249,21 @@
       "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {max} MB.",
       "hint": "MP3, WAV, MP4 oder WebM. Bis zu {max} MB."
     },
+    "recorder": {
+      "recordAudio": "Audio aufnehmen",
+      "recordVideo": "Video aufnehmen",
+      "requesting": "Warten auf Kamera-/Mikrofonberechtigung…",
+      "recording": "Aufnahme läuft",
+      "stop": "Stopp",
+      "retake": "Neu aufnehmen",
+      "use": "Aufnahme verwenden",
+      "uploading": "Hochladen…",
+      "permissionDenied": "Wir konnten nicht auf deine Kamera oder dein Mikrofon zugreifen. Bitte erlaube den Zugriff und versuche es erneut.",
+      "notSupported": "Aufnahme wird in diesem Browser nicht unterstützt. Du kannst stattdessen eine Datei hochladen.",
+      "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
+      "tooLarge": "Diese Aufnahme ist zu groß. Bitte nimm einen kürzeren Clip auf.",
+      "cancel": "Abbrechen"
+    },
     "workshop": {
       "addFile": "Foto oder Video hinzufügen",
       "removeItem": "Entfernen",

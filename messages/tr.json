@@ -249,6 +249,21 @@
       "fileTooLarge": "Dosya çok büyük. Maksimum boyut {max} MB.",
       "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB."
     },
+    "recorder": {
+      "recordAudio": "Ses kaydet",
+      "recordVideo": "Video kaydet",
+      "requesting": "Kamera / mikrofon izni bekleniyor…",
+      "recording": "Kaydediliyor",
+      "stop": "Durdur",
+      "retake": "Yeniden kaydet",
+      "use": "Kaydı kullan",
+      "uploading": "Yükleniyor…",
+      "permissionDenied": "Kameranıza veya mikrofonunuza erişemedik. Lütfen erişime izin verip tekrar deneyin.",
+      "notSupported": "Bu tarayıcıda kayıt desteklenmiyor. Bunun yerine bir dosya yükleyebilirsiniz.",
+      "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
+      "tooLarge": "Bu kayıt çok büyük. Lütfen daha kısa bir klip kaydedin.",
+      "cancel": "İptal"
+    },
     "workshop": {
       "addFile": "Fotoğraf veya video ekle",
       "removeItem": "Kaldır",
