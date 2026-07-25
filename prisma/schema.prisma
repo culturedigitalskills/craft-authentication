@@ -265,6 +265,7 @@ model CraftStory {
     answerFutureMediaId     String?
     answerChallengesText    String?
     answerChallengesMediaId String?
+    summaryText             String?
     publishedAt             DateTime?
     createdAt               DateTime         @default(now())
     updatedAt               DateTime         @updatedAt

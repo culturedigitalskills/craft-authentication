@@ -281,6 +281,18 @@
       "unpublish": "Ocultar de mi historia",
       "insufficientInputs": "Añade primero al menos una respuesta hablada (audio o vídeo) y una foto o vídeo."
     },
+    "summary": {
+      "label": "Resumen breve (unas 100 palabras)",
+      "suggest": "Sugerir resumen",
+      "suggesting": "Escribiendo…",
+      "hint": "Un párrafo breve que presenta tu historia. Escríbelo tú mismo, o sugiere un borrador y edítalo.",
+      "empty": "Añade algunas respuestas antes de redactar un resumen.",
+      "failed": "No pudimos redactar un resumen. Inténtalo de nuevo.",
+      "rateLimited": "Has redactado varios resúmenes recientemente. Espera un poco e inténtalo de nuevo."
+    },
+    "publicFilm": {
+      "readFullStory": "Leer la historia completa"
+    },
     "workshop": {
       "addFile": "Añadir foto o vídeo",
       "removeItem": "Quitar",

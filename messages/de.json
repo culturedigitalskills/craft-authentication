@@ -281,6 +281,18 @@
       "unpublish": "Aus meiner Geschichte ausblenden",
       "insufficientInputs": "Füge zuerst mindestens eine gesprochene Antwort (Audio oder Video) und ein Foto oder Video hinzu."
     },
+    "summary": {
+      "label": "Kurze Zusammenfassung (etwa 100 Wörter)",
+      "suggest": "Zusammenfassung vorschlagen",
+      "suggesting": "Wird geschrieben…",
+      "hint": "Ein kurzer Absatz, der deine Geschichte vorstellt. Schreibe selbst oder lass dir einen Entwurf vorschlagen und bearbeite ihn.",
+      "empty": "Füge zuerst einige Antworten hinzu, bevor du eine Zusammenfassung erstellst.",
+      "failed": "Wir konnten keine Zusammenfassung erstellen. Bitte versuche es erneut.",
+      "rateLimited": "Du hast kürzlich einige Zusammenfassungen erstellt. Bitte warte kurz und versuche es erneut."
+    },
+    "publicFilm": {
+      "readFullStory": "Ganze Geschichte lesen"
+    },
     "workshop": {
       "addFile": "Foto oder Video hinzufügen",
       "removeItem": "Entfernen",

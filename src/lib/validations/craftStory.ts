@@ -25,6 +25,7 @@ export const UpdateCraftStorySchema = z.object({
     answerFutureMediaId: mediaId,
     answerChallengesText: textAnswer,
     answerChallengesMediaId: mediaId,
+    summaryText: z.string().max(1200).optional().nullable(),
 })
 
 export type UpdateCraftStory = z.infer<typeof UpdateCraftStorySchema>

@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save, Sparkles } from 'lucide-react'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { StoryFilmPanel } from './StoryFilmPanel'
@@ -31,6 +31,7 @@ export type CraftStoryDraft = {
     answerFutureMediaId: string | null
     answerChallengesText: string | null
     answerChallengesMediaId: string | null
+    summaryText: string | null
 }
 
 interface CraftStoryWizardProps {
@@ -129,6 +130,7 @@ export function CraftStoryWizard({
                     answerFutureMediaId: draft.answerFutureMediaId ?? null,
                     answerChallengesText: draft.answerChallengesText ?? null,
                     answerChallengesMediaId: draft.answerChallengesMediaId ?? null,
+                    summaryText: draft.summaryText ?? null,
                 }),
             })
             if (res.status === 409) {
@@ -298,6 +300,14 @@ export function CraftStoryWizard({
                                 workshopCount={initialWorkshopMedia.length}
                                 captionStatuses={captionStatuses}
                                 onEditStep={target => { setError(null); setReturnToReview(true); setStep(target) }}
+                                summaryText={(story.summaryText as string | null | undefined) ?? ''}
+                                onSummaryChange={value => {
+                                    // Update the save ref synchronously so an immediate
+                                    // persist (e.g. after applying an AI draft) sees it.
+                                    storyRef.current = { ...storyRef.current, summaryText: value }
+                                    setStory(s => ({ ...s, summaryText: value }))
+                                }}
+                                onPersistSummary={() => { void save(step) }}
                             />
                         )}
 
@@ -511,11 +521,17 @@ function ReviewStep({
     workshopCount,
     captionStatuses,
     onEditStep,
+    summaryText,
+    onSummaryChange,
+    onPersistSummary,
 }: {
     story: Partial<CraftStoryDraft>
     workshopCount: number
     captionStatuses: Record<string, string>
     onEditStep: (step: number) => void
+    summaryText: string
+    onSummaryChange: (value: string) => void
+    onPersistSummary: () => void
 }) {
     const t = useTranslations('craftStory')
     const statusValues = Object.values(captionStatuses)
@@ -581,9 +597,80 @@ function ReviewStep({
                 </p>
             )}
 
+            <SummaryEditor value={summaryText} onChange={onSummaryChange} onPersist={onPersistSummary} />
+
             <div className="mt-6">
                 <StoryFilmPanel />
             </div>
+        </div>
+    )
+}
+
+// A short editable summary of the whole story. "Suggest" drafts one from the
+// artisan's answers + transcripts via the server; the artisan owns the final text.
+function SummaryEditor({
+    value,
+    onChange,
+    onPersist,
+}: {
+    value: string
+    onChange: (value: string) => void
+    onPersist: () => void
+}) {
+    const t = useTranslations('craftStory.summary')
+    const [drafting, setDrafting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    async function suggest() {
+        setDrafting(true)
+        setError(null)
+        try {
+            const res = await fetch('/api/artisans/me/story/summary/draft', { method: 'POST' })
+            if (res.status === 429) return setError(t('rateLimited'))
+            if (res.status === 400) return setError(t('empty'))
+            if (!res.ok) return setError(t('failed'))
+            const data = await res.json()
+            if (data.draft) {
+                onChange(data.draft)
+                onPersist()
+            }
+        } catch {
+            setError(t('failed'))
+        } finally {
+            setDrafting(false)
+        }
+    }
+
+    return (
+        <div className="mt-6 rounded-lg border border-border p-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+                <Label htmlFor="story-summary" className="text-sm font-medium">
+                    {t('label')}
+                </Label>
+                <Button type="button" size="sm" variant="outline" onClick={() => void suggest()} disabled={drafting}>
+                    {drafting ? (
+                        <>
+                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                            {t('suggesting')}
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles className="mr-1.5 h-4 w-4" />
+                            {t('suggest')}
+                        </>
+                    )}
+                </Button>
+            </div>
+            <Textarea
+                id="story-summary"
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                onBlur={onPersist}
+                placeholder={t('hint')}
+                rows={4}
+                maxLength={1200}
+            />
+            {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
         </div>
     )
 }

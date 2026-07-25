@@ -283,6 +283,18 @@
       "unpublish": "Hide from my story",
       "insufficientInputs": "Add at least one spoken answer (audio or video) and one photo or video first."
     },
+    "summary": {
+      "label": "Short summary (about 100 words)",
+      "suggest": "Suggest summary",
+      "suggesting": "Writing…",
+      "hint": "A short paragraph introducing your story. Write your own, or suggest a draft and edit it.",
+      "empty": "Add some answers before drafting a summary.",
+      "failed": "We couldn't draft a summary. Please try again.",
+      "rateLimited": "You've drafted a few summaries recently. Please wait a little and try again."
+    },
+    "publicFilm": {
+      "readFullStory": "Read the full story"
+    },
     "workshop": {
       "addFile": "Add photo or video",
       "removeItem": "Remove",
