@@ -64,11 +64,10 @@ function buildCraftVC({ craftId, title, description, ownerSlug, createdAt, first
     const privateKey = getPrivateKey()
     const subjectId = `${DOMAIN}/credentials/crafts/${craftId}`
 
-    let imageHash
-    if (firstImageUrl) {
-        imageHash = crypto.createHash('sha256').update(firstImageUrl).digest('hex')
-    }
-
+    // No imageHash here: it must be the SHA-256 of the image bytes (see
+    // hashMediaFile in src/lib/craft.ts), which would mean giving this one-off
+    // script object-storage access. Backfilled crafts pick the claim up when
+    // the app re-issues their credential on the next edit.
     const credentialSubject = {
         id: subjectId,
         type: 'Craft',
@@ -77,7 +76,6 @@ function buildCraftVC({ craftId, title, description, ownerSlug, createdAt, first
         ownerId: ownerSlug,
         dateCreated: createdAt,
         ...(firstImageUrl && { imageUrl: firstImageUrl }),
-        ...(imageHash && { imageHash }),
     }
 
     const now = new Date().toISOString()

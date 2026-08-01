@@ -7,6 +7,7 @@ import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
+import { StoryFilmHero } from '@/components/artisan/StoryFilmHero'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 import { getCraftPrimaryImageMap } from '@/lib/craft'
 import { ScMedia } from '@/components/sc/ScMedia'
@@ -170,7 +171,17 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     let workshopMedia: WorkshopMediaItem[] = []
     let answerMediaMimeTypes: Record<string, string> = {}
     let captionedMediaIds: string[] = []
+    let publicFilm: { outputMediaId: string } | null = null
     if (story) {
+        // A published film that the artisan chose to show becomes the story hero.
+        const film = await prisma.storyFilm.findUnique({
+            where: { storyId: story.id },
+            select: { status: true, isPublic: true, outputMediaId: true },
+        })
+        if (film && film.status === 'READY' && film.isPublic && film.outputMediaId) {
+            publicFilm = { outputMediaId: film.outputMediaId }
+        }
+
         const workshopAttachments = await prisma.mediaAttachment.findMany({
             where: {
                 entityType: 'CraftStory',
@@ -291,7 +302,15 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             <p className="sc-lead whitespace-pre-line">{artisan.bio}</p>
                         )}
 
-                        {story && (
+                        {story && publicFilm && (
+                            <StoryFilmHero
+                                outputMediaId={publicFilm.outputMediaId}
+                                summaryText={story.summaryText}
+                                story={story}
+                            />
+                        )}
+
+                        {story && !publicFilm && (
                             <CraftStoryDisplay
                                 story={story}
                                 workshop={workshopMedia}

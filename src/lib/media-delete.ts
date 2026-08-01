@@ -10,13 +10,17 @@ import { DeleteObjectCommand } from '@aws-sdk/client-s3'
  * matters because the same file can be shared — e.g. an image picked from the
  * artisan's media gallery and also attached to a craft. Callers GC by removing
  * their own attachments first, then asking us to clean up; if any attachment
- * remains (another craft, the gallery), the file is kept.
+ * remains (another craft, the gallery), the file is kept. A rendered story-film
+ * output has no MediaAttachment but is referenced by StoryFilm.outputMediaId, so
+ * it is guarded separately.
  */
 export async function deleteMediaFile(id: string) {
     const file = await prisma.mediaFile.findUnique({ where: { id } })
     if (!file) return
     const remainingRefs = await prisma.mediaAttachment.count({ where: { mediaId: id } })
     if (remainingRefs > 0) return
+    const filmRefs = await prisma.storyFilm.count({ where: { outputMediaId: id } })
+    if (filmRefs > 0) return
     await prisma.$transaction(async tx => {
         await tx.mediaFile.delete({ where: { id } })
         await s3Client.send(new DeleteObjectCommand({ Bucket: BUCKET_NAME, Key: file.objectKey }))

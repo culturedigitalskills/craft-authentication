@@ -67,36 +67,43 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             }
         }
 
-        const updated = await prisma.craft.update({
-            where: { id },
-            data: {
-                title: input.title,
-                description: input.description,
-                materials: input.materials,
-                technique: input.technique,
-                timeToMake: input.timeToMake,
-                width: input.width,
-                height: input.height,
-                depth: input.depth,
-                dimensionUnit: input.dimensionUnit,
-                weight: input.weight,
-                weightUnit: input.weightUnit,
-                inspiration: input.inspiration,
-                careInstructions: input.careInstructions,
-                isPublic: input.isPublic,
-                isSharedLocation: input.isSharedLocation,
-                latitude: input.latitude,
-                longitude: input.longitude,
-                place: input.place,
-                videos: input.videos,
-            },
+        // Edit and media reconcile commit together, so a failure can't leave
+        // the craft's text updated but its photos stale (or vice versa).
+        const { updated, removed } = await prisma.$transaction(async (tx) => {
+            const record = await tx.craft.update({
+                where: { id },
+                data: {
+                    title: input.title,
+                    description: input.description,
+                    materials: input.materials,
+                    technique: input.technique,
+                    timeToMake: input.timeToMake,
+                    width: input.width,
+                    height: input.height,
+                    depth: input.depth,
+                    dimensionUnit: input.dimensionUnit,
+                    weight: input.weight,
+                    weightUnit: input.weightUnit,
+                    inspiration: input.inspiration,
+                    careInstructions: input.careInstructions,
+                    isPublic: input.isPublic,
+                    isSharedLocation: input.isSharedLocation,
+                    latitude: input.latitude,
+                    longitude: input.longitude,
+                    place: input.place,
+                    videos: input.videos,
+                },
+            })
+
+            // Only reconcile media when the client sent a list.
+            const dropped = input.mediaIds
+                ? await setCraftMedia(id, input.mediaIds, tx)
+                : []
+            return { updated: record, removed: dropped }
         })
 
-        // Reconcile media if the client sent a list, GC anything dropped.
-        if (input.mediaIds) {
-            const removed = await setCraftMedia(id, input.mediaIds)
-            if (removed.length > 0) void deleteMediaFiles(removed)
-        }
+        // GC dropped files only once the attachment removal has committed.
+        if (removed.length > 0) void deleteMediaFiles(removed)
 
         // Re-issue the credential so its subject stays accurate after edits.
         try {

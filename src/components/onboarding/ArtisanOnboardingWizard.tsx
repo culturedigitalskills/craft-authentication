@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
+import { StepDots } from '@/components/shared/StepDots'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -259,21 +260,8 @@ export function ArtisanOnboardingWizard() {
     return (
         <Container>
             <div className="mx-auto max-w-2xl py-10 sm:py-14">
-                {/* Progress dots */}
-                <div className="mb-2 flex justify-center gap-2">
-                    {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((n) => (
-                        <span
-                            key={n}
-                            className={`h-2 w-2 rounded-full transition-all ${
-                                n === step
-                                    ? 'w-8 bg-primary'
-                                    : n < step
-                                      ? 'bg-primary/40'
-                                      : 'bg-muted'
-                            }`}
-                        />
-                    ))}
-                </div>
+                {/* Steps are 1-based here; StepDots takes a zero-based index. */}
+                <StepDots current={step - 1} total={TOTAL_STEPS} />
                 <p className="mb-8 text-center text-xs text-muted-foreground">
                     {t('stepLabel', { current: step, total: TOTAL_STEPS })}
                 </p>

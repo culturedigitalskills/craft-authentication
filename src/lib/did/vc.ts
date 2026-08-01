@@ -55,6 +55,13 @@ function signData(data: string, privateKey: string): string {
     return sign.sign(privateKey, 'base64')
 }
 
+/**
+ * `imageHash` must be the SHA-256 of the image BYTES (see hashMediaFile in
+ * src/lib/craft.ts), never of the URL: a hash of the URL is just a restatement
+ * of the media id and would still "verify" after the stored object is swapped.
+ * It is omitted when the bytes could not be read, rather than falling back to
+ * something weaker.
+ */
 export async function generateCraftVC(
     craftId: string,
     craftTitle: string,
@@ -62,15 +69,11 @@ export async function generateCraftVC(
     craftOwner: string,
     craftCreatedAt: string,
     firstImageUrl: string | null,
+    imageHash: string | null,
 ): Promise<CraftCredential> {
     const privateKey = getPrivateKey()
 
     const subjectId = `${DOMAIN}/credentials/crafts/${craftId}`
-
-    let imageHash: string | undefined
-    if (firstImageUrl) {
-        imageHash = crypto.createHash('sha256').update(firstImageUrl).digest('hex')
-    }
 
     const credentialSubject: CraftVCSubject = {
         id: subjectId,

@@ -12,6 +12,12 @@ const apiLimiter = new RateLimiterMemory({
     duration: 60, // 60 requests per minute for general API
 })
 
+// AI summary drafting hits a paid LLM — cap per user to a few an hour.
+export const summaryDraftLimiter = new RateLimiterMemory({
+    points: 5,
+    duration: 60 * 60,
+})
+
 /**
  * Get client identifier from request
  * Prioritize: user session > IP address

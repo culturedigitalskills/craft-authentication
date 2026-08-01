@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { useTranslations } from 'next-intl'
 import { ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import Image from 'next/image'
@@ -17,7 +17,10 @@ export interface WorkshopMedia {
 
 interface StoryWorkshopUploadProps {
     storyId: string
-    initialItems: WorkshopMedia[]
+    // Controlled by the wizard so uploads survive stepping away and back — the
+    // step subtree remounts on navigation, which would otherwise reset local state.
+    items: WorkshopMedia[]
+    onItemsChange: Dispatch<SetStateAction<WorkshopMedia[]>>
     // mediaId -> transcript status; READY videos get a captions track.
     captionStatuses?: Record<string, string>
     // Uploads enqueue caption jobs server-side — lets the wizard refresh statuses.
@@ -26,7 +29,8 @@ interface StoryWorkshopUploadProps {
 
 export function StoryWorkshopUpload({
     storyId,
-    initialItems,
+    items,
+    onItemsChange,
     captionStatuses = {},
     onUploaded,
 }: StoryWorkshopUploadProps) {
@@ -35,7 +39,6 @@ export function StoryWorkshopUpload({
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
     const [progress, setProgress] = useState(0)
-    const [items, setItems] = useState<WorkshopMedia[]>(initialItems)
     const [error, setError] = useState<string | null>(null)
 
     async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -98,7 +101,7 @@ export function StoryWorkshopUpload({
             )
 
             const uploaded = results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []))
-            if (uploaded.length > 0) setItems((prev) => [...prev, ...uploaded])
+            if (uploaded.length > 0) onItemsChange((prev) => [...prev, ...uploaded])
 
             const firstFailure = results.find((r) => r.status === 'rejected')
             if (firstFailure && firstFailure.status === 'rejected') {
@@ -116,7 +119,7 @@ export function StoryWorkshopUpload({
         try {
             const res = await fetch(`/api/media/${item.mediaId}`, { method: 'DELETE' })
             if (!res.ok) throw new Error('Delete failed')
-            setItems((prev) => prev.filter((i) => i.mediaId !== item.mediaId))
+            onItemsChange((prev) => prev.filter((i) => i.mediaId !== item.mediaId))
         } catch {
             setError(t('deleteFailed'))
         }

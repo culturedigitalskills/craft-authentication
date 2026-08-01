@@ -54,6 +54,13 @@ enum TranscriptStatus {
     FAILED
 }
 
+enum FilmStatus {
+    PENDING
+    PROCESSING
+    READY
+    FAILED
+}
+
 // Auth Models
 
 model User {
@@ -138,6 +145,7 @@ model MediaFile {
     taskEvents       TaskEvent[]
     transcript          MediaTranscript?  @relation("SourceMedia")
     audioForTranscripts MediaTranscript[] @relation("AudioMedia")
+    filmOutput          StoryFilm?        @relation("StoryFilmOutput")
 
     @@index([createdAt], name: "idx_media_files_created_at")
     @@index([uploaderId], name: "idx_media_files_uploader_id")
@@ -257,10 +265,33 @@ model CraftStory {
     answerFutureMediaId     String?
     answerChallengesText    String?
     answerChallengesMediaId String?
+    summaryText             String?
     publishedAt             DateTime?
     createdAt               DateTime         @default(now())
     updatedAt               DateTime         @updatedAt
     artisan                 Artisan          @relation(fields: [artisanId], references: [id], onDelete: Cascade)
+    film                    StoryFilm?
+}
+
+// One auto-assembled voiceover documentary per story. The rendered mp4 lives in
+// outputMedia (a MediaFile); soft captions ride a synthetic MediaTranscript on
+// that same MediaFile, so no caption columns are needed here.
+model StoryFilm {
+    id              String     @id @default(uuid())
+    storyId         String     @unique
+    status          FilmStatus @default(PENDING)
+    isPublic        Boolean    @default(false)
+    outputMediaId   String?    @unique
+    templateVersion Int        @default(1)
+    inputsHash      String?
+    durationSec     Float?
+    error           String?
+    createdAt       DateTime   @default(now())
+    updatedAt       DateTime   @updatedAt
+    story           CraftStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
+    outputMedia     MediaFile? @relation("StoryFilmOutput", fields: [outputMediaId], references: [id], onDelete: SetNull)
+
+    @@index([status])
 }
 
 model ArtisanGroupMembership {

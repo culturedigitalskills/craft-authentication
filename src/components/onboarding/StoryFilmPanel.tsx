@@ -1,0 +1,219 @@
+'use client'
+
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog'
+import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
+import { AlertCircle, Clapperboard, Download, Loader2, RefreshCw } from 'lucide-react'
+
+type FilmStatus = 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED'
+
+interface FilmView {
+    status: FilmStatus
+    isPublic: boolean
+    outputMediaId: string | null
+    durationSec: number | null
+    error: string | null
+    updatedAt: string
+}
+
+export function StoryFilmPanel() {
+    const t = useTranslations('craftStory.film')
+    const tStory = useTranslations('craftStory')
+
+    const [film, setFilm] = useState<FilmView | null>(null)
+    const [stale, setStale] = useState(false)
+    const [busy, setBusy] = useState(false)
+    const [notice, setNotice] = useState<string | null>(null)
+    const [open, setOpen] = useState(false)
+
+    const refresh = useCallback(async () => {
+        try {
+            const res = await fetch('/api/artisans/me/story/film')
+            if (!res.ok) return
+            const data = await res.json()
+            setFilm(data.film ?? null)
+            setStale(Boolean(data.stale))
+        } catch {
+            // Status is informational — never surface fetch failures.
+        }
+    }, [])
+
+    useEffect(() => {
+        void refresh()
+    }, [refresh])
+
+    // Poll while a render is in flight so the panel flips to ready/failed.
+    const active = film?.status === 'PENDING' || film?.status === 'PROCESSING'
+    useEffect(() => {
+        if (!active) return
+        const id = setInterval(() => void refresh(), 8000)
+        return () => clearInterval(id)
+    }, [active, refresh])
+
+    async function startRender(force: boolean) {
+        setBusy(true)
+        setNotice(null)
+        try {
+            const res = await fetch('/api/artisans/me/story/film', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(force ? { force: true } : {}),
+            })
+            if (res.status === 400) {
+                setNotice(t('insufficientInputs'))
+                return
+            }
+            if (!res.ok) {
+                setNotice(t('failed'))
+                return
+            }
+            const data = await res.json()
+            setFilm(data.film ?? null)
+            setStale(false)
+        } catch {
+            setNotice(t('failed'))
+        } finally {
+            setBusy(false)
+        }
+    }
+
+    async function togglePublish() {
+        if (!film) return
+        setBusy(true)
+        try {
+            const res = await fetch('/api/artisans/me/story/film', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isPublic: !film.isPublic }),
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setFilm(f => (f ? { ...f, isPublic: data.film.isPublic } : f))
+            }
+        } finally {
+            setBusy(false)
+        }
+    }
+
+    const isProcessing = film?.status === 'PENDING' || film?.status === 'PROCESSING'
+    const isReady = film?.status === 'READY' && film.outputMediaId
+
+    return (
+        <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <div className="mb-2 flex items-center gap-2">
+                <Clapperboard className="h-5 w-5 text-warm" />
+                <h3 className="text-sm font-semibold">{t('title')}</h3>
+            </div>
+            <p className="mb-3 text-sm text-muted-foreground">{t('description')}</p>
+
+            {isProcessing && (
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t('processing')}
+                </p>
+            )}
+
+            {film?.status === 'FAILED' && (
+                <div className="space-y-2">
+                    <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
+                        <AlertCircle className="h-4 w-4" />
+                        {t('failed')}
+                    </p>
+                    <Button type="button" size="sm" variant="outline" onClick={() => void startRender(false)} disabled={busy}>
+                        <RefreshCw className="mr-1.5 h-4 w-4" />
+                        {t('retry')}
+                    </Button>
+                </div>
+            )}
+
+            {isReady && (
+                <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button type="button" size="sm" onClick={() => setOpen(true)}>
+                            <Clapperboard className="mr-1.5 h-4 w-4" />
+                            {t('watch')}
+                        </Button>
+                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(true)} disabled={busy}>
+                            {busy ? (
+                                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                            ) : (
+                                <RefreshCw className="mr-1.5 h-4 w-4" />
+                            )}
+                            {t('regenerate')}
+                        </Button>
+                        {film.isPublic && (
+                            <span className="text-xs font-medium text-warm">{t('published')}</span>
+                        )}
+                    </div>
+                    {!film.isPublic && (
+                        <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
+                    )}
+                    {stale && (
+                        <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            {t('stale')}
+                        </p>
+                    )}
+                </div>
+            )}
+
+            {!film && !isProcessing && (
+                <Button type="button" size="sm" onClick={() => void startRender(false)} disabled={busy}>
+                    {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Clapperboard className="mr-1.5 h-4 w-4" />}
+                    {t('create')}
+                </Button>
+            )}
+
+            {notice && <p className="mt-2 text-sm text-muted-foreground">{notice}</p>}
+
+            {isReady && film.outputMediaId && (
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>{t('premiereTitle')}</DialogTitle>
+                            <DialogDescription>{t('description')}</DialogDescription>
+                        </DialogHeader>
+                        <CaptionedVideo
+                            src={`/api/media/${film.outputMediaId}`}
+                            captionsSrc={`/api/media/${film.outputMediaId}/subtitles`}
+                            captionsLabel={tStory('captionsLabel')}
+                            className="w-full rounded-md bg-black"
+                        />
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                            <Button type="button" variant="outline" size="sm" onClick={() => void startRender(true)} disabled={busy}>
+                                <RefreshCw className="mr-1.5 h-4 w-4" />
+                                {t('regenerate')}
+                            </Button>
+                            <a
+                                href={`/api/media/${film.outputMediaId}`}
+                                download
+                                className="inline-flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                            >
+                                <Download className="mr-1.5 h-4 w-4" />
+                                {t('download')}
+                            </a>
+                            {/* No separate "publish film" button — publishing the
+                                story features a ready film. Only offer to hide it. */}
+                            {film.isPublic && (
+                                <Button type="button" variant="outline" size="sm" onClick={() => void togglePublish()} disabled={busy}>
+                                    {t('unpublish')}
+                                </Button>
+                            )}
+                        </div>
+                        {!film.isPublic && (
+                            <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
+                        )}
+                    </DialogContent>
+                </Dialog>
+            )}
+        </div>
+    )
+}

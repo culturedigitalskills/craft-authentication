@@ -157,8 +157,9 @@
       "processing": "Generating English captions…",
       "ready": "English captions ready",
       "failed": "Captions couldn't be generated for this recording",
-      "someProcessing": "Some captions are still being generated. They will appear on your public story when ready.",
-      "someFailed": "Captions couldn't be generated for some recordings."
+      "someProcessing": "Captions are still generating in the background. You can publish now, and they'll appear on your story automatically when ready.",
+      "someFailed": "Captions couldn't be generated for some recordings.",
+      "retry": "Try again"
     },
     "wizardTitle": "My Story",
     "wizardHelper": "Share the story of your craft in your own words.",
@@ -171,6 +172,10 @@
     "saving": "Saving...",
     "publish": "Publish my story",
     "publishing": "Publishing...",
+    "answerRecordTitle": "Record your answer",
+    "answerRecordHint": "Your recording is what appears in your film.",
+    "answerOr": "or",
+    "answerWriteHint": "Written answers aren't used in your film.",
     "writeYourAnswer": "Write your answer",
     "answerPlaceholder": "Take your time. Speak naturally. There is no wrong answer.",
     "questionLabel": "Question {index}",
@@ -180,6 +185,7 @@
       "saveFailed": "We couldn't save your progress. Please try again.",
       "publishFailed": "We couldn't publish your story. Please try again.",
       "emptyStory": "Add at least one written answer, recording, or workshop photo before publishing.",
+      "filmRequired": "Create your film before publishing your story.",
       "conflict": "Your story was updated in another window. Reload this page to see the latest version."
     },
     "banner": {
@@ -220,12 +226,12 @@
       "prompt": "What has this craft brought to you, your family, or your community?"
     },
     "step5": {
-      "title": "Knowledge Transfer and Future Generations",
-      "prompt": "How is this craft passed on to younger people, and do you think it can continue in the future?"
-    },
-    "step6": {
       "title": "Challenges and Barriers",
       "prompt": "What difficulties do you face in practicing this craft, and what kind of support would help keep it alive?"
+    },
+    "step6": {
+      "title": "Knowledge Transfer and Future Generations",
+      "prompt": "How is this craft passed on to younger people, and do you think it can continue in the future?"
     },
     "step7": {
       "title": "Workshop, Tools & Process",
@@ -250,6 +256,51 @@
       "uploadFailed": "Upload failed. Please try again.",
       "fileTooLarge": "File is too large. Maximum size is {max} MB.",
       "hint": "MP3, WAV, MP4 or WebM. Up to {max} MB."
+    },
+    "recorder": {
+      "recordAudio": "Record audio",
+      "recordVideo": "Record video",
+      "requesting": "Waiting for camera / microphone permission…",
+      "recording": "Recording",
+      "stop": "Stop",
+      "retake": "Retake",
+      "use": "Use recording",
+      "uploading": "Uploading…",
+      "permissionDenied": "We couldn't access your camera or microphone. Please allow access and try again.",
+      "notSupported": "Recording isn't supported in this browser. You can upload a file instead.",
+      "uploadFailed": "Upload failed. Please try again.",
+      "tooLarge": "That recording is too large. Please record a shorter clip.",
+      "cancel": "Cancel"
+    },
+    "film": {
+      "title": "My Story film",
+      "description": "Turn your story into a short film, with your voice over the images of your craft. It becomes the highlight of your public page.",
+      "willBeHighlight": "When you publish your story, this film will be its highlight.",
+      "create": "Create my film",
+      "processing": "Creating your film… this can take a few minutes.",
+      "failed": "We couldn't create your film. Please try again.",
+      "retry": "Try again",
+      "watch": "Watch film",
+      "published": "Showing on your public story",
+      "stale": "Your story changed since this film was made. Regenerate to update it.",
+      "premiereTitle": "Your Story film",
+      "regenerate": "Regenerate",
+      "download": "Download",
+      "publish": "Show on my public story",
+      "unpublish": "Hide from my story",
+      "insufficientInputs": "Add at least one spoken answer (audio or video) and one photo or video first."
+    },
+    "summary": {
+      "label": "Short summary (about 100 words)",
+      "suggest": "Suggest summary",
+      "suggesting": "Writing…",
+      "hint": "A short paragraph introducing your story. Write your own, or suggest a draft and edit it.",
+      "empty": "Add some answers before drafting a summary.",
+      "failed": "We couldn't draft a summary. Please try again.",
+      "rateLimited": "You've drafted a few summaries recently. Please wait a little and try again."
+    },
+    "publicFilm": {
+      "readFullStory": "Read the full story"
     },
     "workshop": {
       "addFile": "Add photo or video",
@@ -481,7 +532,49 @@
     "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
     "addVideo": "Add",
     "removeVideo": "Remove video",
-    "invalidYoutubeUrl": "Could not recognize that as a YouTube link."
+    "invalidYoutubeUrl": "Could not recognize that as a YouTube link.",
+    "wizard": {
+      "stepLabel": "Step {current} of {total}",
+      "back": "Back",
+      "next": "Next",
+      "backToReview": "Back to review",
+      "fixFields": "Please check the highlighted fields.",
+      "locationFound": "Location captured for this craft.",
+      "locationPending": "Asking your browser for your location...",
+      "basics": {
+        "title": "The basics",
+        "hint": "Start with what this piece is called and what it is."
+      },
+      "making": {
+        "title": "The making",
+        "hint": "Materials, technique, and how long it took."
+      },
+      "measurements": {
+        "title": "Size and weight",
+        "hint": "Optional, but visitors often ask. Leave blank if it does not apply."
+      },
+      "story": {
+        "title": "Story and care",
+        "hint": "What inspired the piece, and how to look after it."
+      },
+      "media": {
+        "title": "Photos and videos",
+        "hint": "Show the piece. The first photo becomes the cover image."
+      },
+      "visibility": {
+        "title": "Visibility",
+        "hint": "Choose who can see this craft and whether to share where it was made."
+      },
+      "review": {
+        "title": "Review and save",
+        "hint": "Check it over. Select any row to go back and change it.",
+        "edit": "Edit",
+        "notAdded": "Not added",
+        "mediaCount": "{photos, plural, =0 {No photos} one {1 photo} other {# photos}}, {videos, plural, =0 {no videos} one {1 video} other {# videos}}",
+        "isPublic": "Public, visible to everyone",
+        "isPrivate": "Private, only visible to you"
+      }
+    }
   },
   "groups": {
     "title": "Artisan Communities",

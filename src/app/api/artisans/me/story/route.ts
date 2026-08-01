@@ -152,6 +152,14 @@ export async function DELETE() {
         })
         const workshopMediaIds = workshopAttachments.map(a => a.mediaId)
 
+        // The rendered film output has no attachment and its StoryFilm row
+        // cascades with the story, so capture it before the delete.
+        const film = await prisma.storyFilm.findUnique({
+            where: { storyId: story.id },
+            select: { outputMediaId: true },
+        })
+        const filmOutputIds = film?.outputMediaId ? [film.outputMediaId] : []
+
         await prisma.mediaAttachment.deleteMany({
             where: { entityType: 'CraftStory', entityId: story.id },
         })
@@ -164,7 +172,9 @@ export async function DELETE() {
         const transcriptAudioIds = await collectTranscriptAudioIds(sourceMediaIds)
 
         // Best-effort cleanup of underlying MediaFile rows + Garage objects.
-        await deleteMediaFiles([...sourceMediaIds, ...transcriptAudioIds])
+        // The film output is now unreferenced (its StoryFilm row cascaded away),
+        // and its synthetic caption transcript cascades with it.
+        await deleteMediaFiles([...sourceMediaIds, ...transcriptAudioIds, ...filmOutputIds])
 
         return NextResponse.json({ ok: true })
     } catch (error) {
