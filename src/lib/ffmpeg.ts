@@ -24,30 +24,40 @@ export function runFfmpeg(args: string[]): Promise<void> {
     })
 }
 
-/**
- * Read a media file's duration in seconds by parsing ffmpeg's own stderr
- * ("Duration: HH:MM:SS.cc"). Avoids adding an ffprobe dependency — ffmpeg is
- * already bundled. ffmpeg exits non-zero here (no output file), which is
- * expected; we resolve from the parsed banner regardless of exit code.
- */
-export function probeDuration(filePath: string): Promise<number> {
+// Run ffmpeg and resolve its stderr regardless of exit code — probe commands
+// (`-i` only, or decode-to-null) exit non-zero by design.
+function captureStderr(args: string[]): Promise<string> {
     return new Promise((resolve, reject) => {
-        const proc = spawn(ffmpegPath(), ['-i', filePath])
+        const proc = spawn(ffmpegPath(), args)
         let stderr = ''
         proc.stderr.on('data', chunk => {
             stderr += chunk.toString()
         })
         proc.on('error', reject)
-        proc.on('close', () => {
-            const match = stderr.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/)
-            if (!match) {
-                reject(new Error(`Could not parse duration from ffmpeg output for ${filePath}`))
-                return
-            }
-            const hours = parseInt(match[1], 10)
-            const minutes = parseInt(match[2], 10)
-            const seconds = parseFloat(match[3])
-            resolve(hours * 3600 + minutes * 60 + seconds)
-        })
+        proc.on('close', () => resolve(stderr))
     })
+}
+
+function hmsToSeconds(h: string, m: string, s: string): number {
+    return parseInt(h, 10) * 3600 + parseInt(m, 10) * 60 + parseFloat(s)
+}
+
+/**
+ * Read a media file's duration in seconds without ffprobe. Prefers the
+ * container "Duration:" banner; when that is absent or "N/A" — common for
+ * MediaRecorder webm/mp4, whose headers omit the length — it falls back to
+ * decoding the audio to null and taking the last processed timestamp.
+ */
+export async function probeDuration(filePath: string): Promise<number> {
+    const banner = await captureStderr(['-i', filePath])
+    const dur = banner.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/)
+    if (dur) return hmsToSeconds(dur[1], dur[2], dur[3])
+
+    // No usable Duration header — decode audio to null and read the final time.
+    const decoded = await captureStderr(['-i', filePath, '-vn', '-f', 'null', '-'])
+    const times = [...decoded.matchAll(/time=\s*(\d+):(\d+):(\d+(?:\.\d+)?)/g)]
+    const last = times[times.length - 1]
+    if (last) return hmsToSeconds(last[1], last[2], last[3])
+
+    throw new Error(`Could not determine duration for ${filePath}`)
 }
