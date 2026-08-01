@@ -530,7 +530,49 @@
     "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
     "addVideo": "Ekle",
     "removeVideo": "Videoyu kaldır",
-    "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı."
+    "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı.",
+    "wizard": {
+      "stepLabel": "Adım {current} / {total}",
+      "back": "Geri",
+      "next": "İleri",
+      "backToReview": "Özete dön",
+      "fixFields": "Lütfen işaretli alanları kontrol et.",
+      "locationFound": "Bu eser için konum alındı.",
+      "locationPending": "Tarayıcıdan konumun isteniyor...",
+      "basics": {
+        "title": "Temel bilgiler",
+        "hint": "Eserin adıyla ve ne olduğuyla başla."
+      },
+      "making": {
+        "title": "Yapım",
+        "hint": "Malzemeler, teknik ve ne kadar sürdüğü."
+      },
+      "measurements": {
+        "title": "Boyut ve ağırlık",
+        "hint": "İsteğe bağlı, ama sık sorulur. Uygun değilse boş bırak."
+      },
+      "story": {
+        "title": "Hikaye ve bakım",
+        "hint": "Eseri neyin esinlendirdiği ve nasıl bakılacağı."
+      },
+      "media": {
+        "title": "Fotoğraflar ve videolar",
+        "hint": "Eseri göster. İlk fotoğraf kapak görseli olur."
+      },
+      "visibility": {
+        "title": "Görünürlük",
+        "hint": "Bu eseri kimlerin görebileceğini ve yapıldığı yerin paylaşılıp paylaşılmayacağını seç."
+      },
+      "review": {
+        "title": "Gözden geçir ve kaydet",
+        "hint": "Her şeyi kontrol et. Değiştirmek için bir satır seç.",
+        "edit": "Düzenle",
+        "notAdded": "Eklenmedi",
+        "mediaCount": "{photos, plural, =0 {Fotoğraf yok} one {1 fotoğraf} other {# fotoğraf}}, {videos, plural, =0 {video yok} one {1 video} other {# video}}",
+        "isPublic": "Herkese açık, herkes görebilir",
+        "isPrivate": "Özel, yalnızca sen görebilirsin"
+      }
+    }
   },
   "groups": {
     "title": "Zanaatkâr Toplulukları",

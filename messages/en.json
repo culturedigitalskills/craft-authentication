@@ -532,7 +532,49 @@
     "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
     "addVideo": "Add",
     "removeVideo": "Remove video",
-    "invalidYoutubeUrl": "Could not recognize that as a YouTube link."
+    "invalidYoutubeUrl": "Could not recognize that as a YouTube link.",
+    "wizard": {
+      "stepLabel": "Step {current} of {total}",
+      "back": "Back",
+      "next": "Next",
+      "backToReview": "Back to review",
+      "fixFields": "Please check the highlighted fields.",
+      "locationFound": "Location captured for this craft.",
+      "locationPending": "Asking your browser for your location...",
+      "basics": {
+        "title": "The basics",
+        "hint": "Start with what this piece is called and what it is."
+      },
+      "making": {
+        "title": "The making",
+        "hint": "Materials, technique, and how long it took."
+      },
+      "measurements": {
+        "title": "Size and weight",
+        "hint": "Optional, but visitors often ask. Leave blank if it does not apply."
+      },
+      "story": {
+        "title": "Story and care",
+        "hint": "What inspired the piece, and how to look after it."
+      },
+      "media": {
+        "title": "Photos and videos",
+        "hint": "Show the piece. The first photo becomes the cover image."
+      },
+      "visibility": {
+        "title": "Visibility",
+        "hint": "Choose who can see this craft and whether to share where it was made."
+      },
+      "review": {
+        "title": "Review and save",
+        "hint": "Check it over. Select any row to go back and change it.",
+        "edit": "Edit",
+        "notAdded": "Not added",
+        "mediaCount": "{photos, plural, =0 {No photos} one {1 photo} other {# photos}}, {videos, plural, =0 {no videos} one {1 video} other {# videos}}",
+        "isPublic": "Public, visible to everyone",
+        "isPrivate": "Private, only visible to you"
+      }
+    }
   },
   "groups": {
     "title": "Artisan Communities",

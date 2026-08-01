@@ -596,7 +596,49 @@
     "savingCraft": "Handwerk wird gespeichert...",
     "updatingCraft": "Handwerk wird aktualisiert...",
     "craftCreateSuccess": "Handwerk erfolgreich erstellt!",
-    "craftUpdateSuccess": "Handwerk erfolgreich aktualisiert!"
+    "craftUpdateSuccess": "Handwerk erfolgreich aktualisiert!",
+    "wizard": {
+      "stepLabel": "Schritt {current} von {total}",
+      "back": "Zurück",
+      "next": "Weiter",
+      "backToReview": "Zurück zur Übersicht",
+      "fixFields": "Bitte überprüfe die markierten Felder.",
+      "locationFound": "Standort für dieses Werk erfasst.",
+      "locationPending": "Standort wird beim Browser abgefragt...",
+      "basics": {
+        "title": "Die Grundlagen",
+        "hint": "Beginne mit dem Namen des Stücks und was es ist."
+      },
+      "making": {
+        "title": "Die Herstellung",
+        "hint": "Materialien, Technik und wie lange es gedauert hat."
+      },
+      "measurements": {
+        "title": "Größe und Gewicht",
+        "hint": "Optional, wird aber oft gefragt. Leer lassen, wenn es nicht zutrifft."
+      },
+      "story": {
+        "title": "Geschichte und Pflege",
+        "hint": "Was das Stück inspiriert hat und wie man es pflegt."
+      },
+      "media": {
+        "title": "Fotos und Videos",
+        "hint": "Zeige das Stück. Das erste Foto wird zum Titelbild."
+      },
+      "visibility": {
+        "title": "Sichtbarkeit",
+        "hint": "Lege fest, wer dieses Werk sehen darf und ob der Herstellungsort geteilt wird."
+      },
+      "review": {
+        "title": "Prüfen und speichern",
+        "hint": "Sieh alles noch einmal durch. Wähle eine Zeile, um sie zu ändern.",
+        "edit": "Bearbeiten",
+        "notAdded": "Nicht angegeben",
+        "mediaCount": "{photos, plural, =0 {Keine Fotos} one {1 Foto} other {# Fotos}}, {videos, plural, =0 {keine Videos} one {1 Video} other {# Videos}}",
+        "isPublic": "Öffentlich, für alle sichtbar",
+        "isPrivate": "Privat, nur für dich sichtbar"
+      }
+    }
   },
   "imageWorkspace": {
     "title": "Bildgenerierung",

@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Mic, Pencil, Save, Sparkles, Video } from 'lucide-react'
+import { StepDots } from '@/components/shared/StepDots'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { StoryFilmPanel } from './StoryFilmPanel'
@@ -254,7 +255,7 @@ export function CraftStoryWizard({
     return (
         <div className="container mx-auto px-4 py-10">
             <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
-                <div className="bg-primary px-6 py-6">
+                <div className="px-6 py-6" style={{ background: 'var(--sc-ink-deep)' }}>
                     <div className="flex items-center gap-3">
                         <Link
                             href="/profile"
@@ -274,21 +275,7 @@ export function CraftStoryWizard({
                 </div>
 
                 <CardContent className="p-6">
-                    {/* Progress dots */}
-                    <div className="mb-2 flex justify-center gap-2">
-                        {Array.from({ length: TOTAL_STEPS }, (_, i) => i).map(n => (
-                            <span
-                                key={n}
-                                className={`h-2 w-2 rounded-full transition-all ${
-                                    n === step
-                                        ? 'w-8 bg-primary'
-                                        : n < step
-                                          ? 'bg-primary/40'
-                                          : 'bg-muted'
-                                }`}
-                            />
-                        ))}
-                    </div>
+                    <StepDots current={step} total={TOTAL_STEPS} />
                     <p className="mb-8 text-center text-xs text-muted-foreground">
                         {t('stepLabel', { current: step + 1, total: TOTAL_STEPS })}
                     </p>

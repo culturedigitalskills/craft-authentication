@@ -530,7 +530,49 @@
     "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
     "addVideo": "Añadir",
     "removeVideo": "Eliminar video",
-    "invalidYoutubeUrl": "No se pudo reconocer como un enlace de YouTube."
+    "invalidYoutubeUrl": "No se pudo reconocer como un enlace de YouTube.",
+    "wizard": {
+      "stepLabel": "Paso {current} de {total}",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "backToReview": "Volver al resumen",
+      "fixFields": "Revisa los campos marcados.",
+      "locationFound": "Ubicación registrada para esta pieza.",
+      "locationPending": "Pidiendo tu ubicación al navegador...",
+      "basics": {
+        "title": "Lo esencial",
+        "hint": "Empieza por el nombre de la pieza y qué es."
+      },
+      "making": {
+        "title": "La elaboración",
+        "hint": "Materiales, técnica y tiempo de trabajo."
+      },
+      "measurements": {
+        "title": "Tamaño y peso",
+        "hint": "Opcional, pero suelen preguntarlo. Déjalo vacío si no aplica."
+      },
+      "story": {
+        "title": "Historia y cuidados",
+        "hint": "Qué inspiró la pieza y cómo cuidarla."
+      },
+      "media": {
+        "title": "Fotos y vídeos",
+        "hint": "Muestra la pieza. La primera foto será la portada."
+      },
+      "visibility": {
+        "title": "Visibilidad",
+        "hint": "Elige quién puede ver esta pieza y si compartes dónde se hizo."
+      },
+      "review": {
+        "title": "Revisar y guardar",
+        "hint": "Repásalo todo. Selecciona cualquier fila para cambiarla.",
+        "edit": "Editar",
+        "notAdded": "Sin completar",
+        "mediaCount": "{photos, plural, =0 {Sin fotos} one {1 foto} other {# fotos}}, {videos, plural, =0 {sin vídeos} one {1 vídeo} other {# vídeos}}",
+        "isPublic": "Pública, visible para todos",
+        "isPrivate": "Privada, solo visible para ti"
+      }
+    }
   },
   "groups": {
     "title": "Grupos de Artesanos",
