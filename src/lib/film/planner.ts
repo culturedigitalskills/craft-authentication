@@ -128,6 +128,10 @@ function cutDurations(durationSec: number, segments: TranscriptSegment[] | null)
         cuts.push(cut - start)
         start = cut
     }
+    // If the shot cap was hit before covering the whole answer, fold the rest
+    // into a final shot — otherwise the shots sum to less than the voice and the
+    // muxed audio gets truncated by -shortest.
+    if (start < durationSec - 0.05) cuts.push(durationSec - start)
     if (cuts.length === 0) cuts.push(durationSec)
     return cuts
 }

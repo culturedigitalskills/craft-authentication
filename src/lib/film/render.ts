@@ -135,7 +135,9 @@ async function renderImageShot(
 }
 
 // A workshop clip (or talking head) trimmed to length, muted, and blur-padded
-// to 16:9 so any aspect ratio fills the frame.
+// to 16:9 so any aspect ratio fills the frame. `-stream_loop -1` + an output `-t`
+// guarantee the shot fills durationSec even when the source clip is shorter (a
+// short clip would otherwise leave the body shorter than the voiceover).
 async function renderVideoShot(videoPath: string, durationSec: number, outPath: string): Promise<void> {
     const filter =
         `[0:v]split[a][b];` +
@@ -143,10 +145,23 @@ async function renderVideoShot(videoPath: string, durationSec: number, outPath: 
         `[b]scale=${FILM_WIDTH}:${FILM_HEIGHT}:force_original_aspect_ratio=decrease[fg];` +
         `[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1,format=yuv420p[v]`
     await runFfmpeg([
-        '-t', String(durationSec),
+        '-stream_loop', '-1',
         '-i', videoPath,
         '-filter_complex', filter,
         '-map', '[v]',
+        '-t', String(durationSec),
+        '-c:v', 'libx264', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-r', String(FILM_FPS),
+        '-an',
+        '-y', outPath,
+    ])
+}
+
+// A neutral filler clip, used when a shot's source can't be rendered so one bad
+// visual never fails the whole film.
+async function renderBlankShot(durationSec: number, outPath: string): Promise<void> {
+    await runFfmpeg([
+        '-f', 'lavfi', '-i', `color=c=${CARD_BG}:s=${FILM_WIDTH}x${FILM_HEIGHT}:r=${FILM_FPS}:d=${durationSec}`,
+        '-vf', 'setsar=1,format=yuv420p',
         '-c:v', 'libx264', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-r', String(FILM_FPS),
         '-an',
         '-y', outPath,
@@ -154,11 +169,24 @@ async function renderVideoShot(videoPath: string, durationSec: number, outPath: 
 }
 
 // High-quality voice track extracted from the ORIGINAL answer media (not the
-// 16 kHz Whisper mp3), so the film's audio isn't a degraded copy.
-async function extractVoice(sourcePath: string, outPath: string): Promise<void> {
+// 16 kHz Whisper mp3). If the source has no audio track (e.g. a silent video),
+// falls back to silence of the same length so the chapter still plays visually
+// instead of failing the whole render.
+async function extractVoice(sourcePath: string, outPath: string, durationSec: number): Promise<void> {
+    try {
+        await runFfmpeg([
+            '-i', sourcePath,
+            '-vn', '-ac', '2', '-ar', '48000', '-c:a', 'pcm_s16le',
+            '-y', outPath,
+        ])
+        return
+    } catch (err) {
+        console.error('Voice extraction failed, using silence:', err)
+    }
     await runFfmpeg([
-        '-i', sourcePath,
-        '-vn', '-ac', '2', '-ar', '48000', '-c:a', 'pcm_s16le',
+        '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000',
+        '-t', String(durationSec),
+        '-c:a', 'pcm_s16le',
         '-y', outPath,
     ])
 }
@@ -363,17 +391,26 @@ async function renderTimeline(
         })
         units.push(titlePath)
 
-        // Render each shot to a uniform silent clip.
+        // Render each shot to a uniform silent clip. A shot that can't be built
+        // (missing or unreadable source) becomes a neutral filler of the same
+        // length, so one bad visual never fails the film and the body stays the
+        // same length as the voiceover.
         const shotPaths: string[] = []
         for (let si = 0; si < chapter.shots.length; si++) {
             const shot = chapter.shots[si]
             const shotPath = path.join(tmpDir, `shot-${ci}-${si}.mp4`)
             const src = localPath.get(shot.source.mediaId)
-            if (!src) continue
-            if (shot.source.type === 'image') {
-                await renderImageShot(src, shot.durationSec, shot.source.panDirection, shotPath)
-            } else {
-                await renderVideoShot(src, shot.durationSec, shotPath)
+            try {
+                if (src && shot.source.type === 'image') {
+                    await renderImageShot(src, shot.durationSec, shot.source.panDirection, shotPath)
+                } else if (src) {
+                    await renderVideoShot(src, shot.durationSec, shotPath)
+                } else {
+                    await renderBlankShot(shot.durationSec, shotPath)
+                }
+            } catch (err) {
+                console.error(`Film shot ${ci}-${si} failed, using filler:`, err)
+                await renderBlankShot(shot.durationSec, shotPath)
             }
             shotPaths.push(shotPath)
         }
@@ -382,7 +419,7 @@ async function renderTimeline(
         await concatShots(shotPaths, path.join(tmpDir, `body-list-${ci}.txt`), bodyVideo)
 
         const voice = path.join(tmpDir, `voice-${ci}.wav`)
-        await extractVoice(localPath.get(chapter.voiceMediaId) as string, voice)
+        await extractVoice(localPath.get(chapter.voiceMediaId) as string, voice, chapter.voiceDurationSec)
 
         const bodyPath = path.join(tmpDir, `unit-body-${ci}.mp4`)
         await muxBodyWithVoice(bodyVideo, voice, bodyPath)
