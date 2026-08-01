@@ -169,6 +169,10 @@
     "saving": "Speichern...",
     "publish": "Meine Geschichte veröffentlichen",
     "publishing": "Veröffentlichen...",
+    "answerRecordTitle": "Nimm deine Antwort auf",
+    "answerRecordHint": "Deine Aufnahme ist das, was in deinem Film erscheint.",
+    "answerOr": "oder",
+    "answerWriteHint": "Geschriebene Antworten werden nicht in deinem Film verwendet.",
     "writeYourAnswer": "Schreibe deine Antwort",
     "answerPlaceholder": "Lass dir Zeit. Sprich natürlich. Es gibt keine falsche Antwort.",
     "questionLabel": "Frage {index}",
@@ -218,12 +222,12 @@
       "prompt": "Was hat dir dieses Handwerk, deiner Familie oder deiner Gemeinschaft gebracht?"
     },
     "step5": {
-      "title": "Wissensweitergabe und zukünftige Generationen",
-      "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben? Glaubst du, dass es in Zukunft weiterleben kann?"
-    },
-    "step6": {
       "title": "Herausforderungen und Hürden",
       "prompt": "Welche Schwierigkeiten begegnen dir beim Ausüben dieses Handwerks? Welche Art von Unterstützung würde helfen, es am Leben zu halten?"
+    },
+    "step6": {
+      "title": "Wissensweitergabe und zukünftige Generationen",
+      "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben? Glaubst du, dass es in Zukunft weiterleben kann?"
     },
     "step7": {
       "title": "Werkstatt, Werkzeuge & Prozess",

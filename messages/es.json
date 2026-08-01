@@ -169,6 +169,10 @@
     "saving": "Guardando...",
     "publish": "Publicar mi historia",
     "publishing": "Publicando...",
+    "answerRecordTitle": "Graba tu respuesta",
+    "answerRecordHint": "Tu grabación es lo que aparece en tu película.",
+    "answerOr": "o",
+    "answerWriteHint": "Las respuestas escritas no se usan en tu película.",
     "writeYourAnswer": "Escribe tu respuesta",
     "answerPlaceholder": "Tómate tu tiempo. Habla con naturalidad. No hay respuestas incorrectas.",
     "questionLabel": "Pregunta {index}",
@@ -218,12 +222,12 @@
       "prompt": "¿Qué te ha aportado esta artesanía a ti, a tu familia o a tu comunidad?"
     },
     "step5": {
-      "title": "Transmisión del conocimiento y generaciones futuras",
-      "prompt": "¿Cómo se transmite esta artesanía a los más jóvenes y crees que podrá continuar en el futuro?"
-    },
-    "step6": {
       "title": "Desafíos y barreras",
       "prompt": "¿Qué dificultades enfrentas al practicar esta artesanía y qué tipo de apoyo ayudaría a mantenerla viva?"
+    },
+    "step6": {
+      "title": "Transmisión del conocimiento y generaciones futuras",
+      "prompt": "¿Cómo se transmite esta artesanía a los más jóvenes y crees que podrá continuar en el futuro?"
     },
     "step7": {
       "title": "Taller, herramientas y proceso",

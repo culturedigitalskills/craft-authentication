@@ -79,13 +79,7 @@ export function AnswerMediaUpload({
     const mediaUrl = mediaId ? `/api/media/${mediaId}` : null
 
     return (
-        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4">
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Mic className="h-4 w-4" />
-                <Video className="h-4 w-4" />
-                <span>{t('label')}</span>
-            </div>
-
+        <div className="rounded-lg border border-dashed border-border bg-background/60 p-4">
             {recorderMode ? (
                 <RecorderControl
                     mode={recorderMode}

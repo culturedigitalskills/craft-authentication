@@ -169,6 +169,10 @@
     "saving": "Kaydediliyor...",
     "publish": "Hikâyemi yayınla",
     "publishing": "Yayınlanıyor...",
+    "answerRecordTitle": "Yanıtını kaydet",
+    "answerRecordHint": "Kaydın, filminde görünen şeydir.",
+    "answerOr": "veya",
+    "answerWriteHint": "Yazılı yanıtlar filminde kullanılmaz.",
     "writeYourAnswer": "Cevabını yaz",
     "answerPlaceholder": "Acele etme. Doğal konuş. Yanlış cevap yoktur.",
     "questionLabel": "Soru {index}",
@@ -218,12 +222,12 @@
       "prompt": "Bu zanaat sana, ailene veya topluluğuna neler kazandırdı?"
     },
     "step5": {
-      "title": "Bilginin Aktarımı ve Gelecek Nesiller",
-      "prompt": "Bu zanaat gençlere nasıl aktarılıyor ve gelecekte sürdürülebileceğini düşünüyor musun?"
-    },
-    "step6": {
       "title": "Zorluklar ve Engeller",
       "prompt": "Bu zanaatı icra ederken ne tür zorluklarla karşılaşıyorsun ve onu yaşatmak için ne tür bir destek faydalı olurdu?"
+    },
+    "step6": {
+      "title": "Bilginin Aktarımı ve Gelecek Nesiller",
+      "prompt": "Bu zanaat gençlere nasıl aktarılıyor ve gelecekte sürdürülebileceğini düşünüyor musun?"
     },
     "step7": {
       "title": "Atölye, Aletler ve Süreç",

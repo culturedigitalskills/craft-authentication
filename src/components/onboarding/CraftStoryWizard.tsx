@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save, Sparkles } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Mic, Pencil, Save, Sparkles, Video } from 'lucide-react'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { StoryFilmPanel } from './StoryFilmPanel'
@@ -443,25 +443,50 @@ function QuestionStep({
             <p className="mb-6 text-base text-muted-foreground">{t(`step${index}.prompt`)}</p>
 
             <div className="space-y-4">
+                {/* Primary: the recording is what plays in the film. */}
+                <div className="rounded-xl border border-warm/30 bg-warm/5 p-4">
+                    <div className="mb-1 flex items-center gap-2">
+                        <Mic className="h-4 w-4 text-warm" />
+                        <Video className="h-4 w-4 text-warm" />
+                        <span className="text-sm font-semibold text-warm">{t('answerRecordTitle')}</span>
+                    </div>
+                    <p className="mb-3 text-xs text-muted-foreground">{t('answerRecordHint')}</p>
+                    <AnswerMediaUpload
+                        mediaId={mediaId}
+                        onChange={onMediaChange}
+                        initialMimeType={initialMimeType}
+                        captionsReady={captionStatus === 'READY'}
+                    />
+                    {mediaId && (
+                        <div className="mt-2">
+                            <CaptionStatusChip status={captionStatus} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Clear either/or between recording and writing. */}
+                <div className="flex items-center gap-3">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        {t('answerOr')}
+                    </span>
+                    <div className="h-px flex-1 bg-border" />
+                </div>
+
+                {/* Secondary: a written answer, not used in the film. */}
                 <div>
-                    <Label htmlFor={`answer-${answerKey}`} className="mb-1.5 block text-sm font-medium">
+                    <Label htmlFor={`answer-${answerKey}`} className="mb-1 block text-sm font-medium">
                         {t('writeYourAnswer')}
                     </Label>
+                    <p className="mb-1.5 text-xs text-muted-foreground">{t('answerWriteHint')}</p>
                     <Textarea
                         id={`answer-${answerKey}`}
                         value={text}
                         onChange={e => onTextChange(e.target.value)}
                         placeholder={t('answerPlaceholder')}
-                        rows={6}
+                        rows={5}
                     />
                 </div>
-                <AnswerMediaUpload
-                    mediaId={mediaId}
-                    onChange={onMediaChange}
-                    initialMimeType={initialMimeType}
-                    captionsReady={captionStatus === 'READY'}
-                />
-                {mediaId && <CaptionStatusChip status={captionStatus} />}
             </div>
         </div>
     )

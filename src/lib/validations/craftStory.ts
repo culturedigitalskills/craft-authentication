@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-// Single source of truth — order is the wizard step order (1..6).
-export const ANSWER_KEYS = ['Self', 'Craft', 'Meaning', 'Benefits', 'Future', 'Challenges'] as const
+// Single source of truth. Order is the wizard step order (1..6) and the film's
+// chapter order. Challenges is asked before Future.
+export const ANSWER_KEYS = ['Self', 'Craft', 'Meaning', 'Benefits', 'Challenges', 'Future'] as const
 export type AnswerKey = (typeof ANSWER_KEYS)[number]
 
 export const ANSWER_TEXT_FIELDS = ANSWER_KEYS.map(k => `answer${k}Text` as const)

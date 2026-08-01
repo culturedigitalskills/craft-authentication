@@ -171,6 +171,10 @@
     "saving": "Saving...",
     "publish": "Publish my story",
     "publishing": "Publishing...",
+    "answerRecordTitle": "Record your answer",
+    "answerRecordHint": "Your recording is what appears in your film.",
+    "answerOr": "or",
+    "answerWriteHint": "Written answers aren't used in your film.",
     "writeYourAnswer": "Write your answer",
     "answerPlaceholder": "Take your time. Speak naturally. There is no wrong answer.",
     "questionLabel": "Question {index}",
@@ -220,12 +224,12 @@
       "prompt": "What has this craft brought to you, your family, or your community?"
     },
     "step5": {
-      "title": "Knowledge Transfer and Future Generations",
-      "prompt": "How is this craft passed on to younger people, and do you think it can continue in the future?"
-    },
-    "step6": {
       "title": "Challenges and Barriers",
       "prompt": "What difficulties do you face in practicing this craft, and what kind of support would help keep it alive?"
+    },
+    "step6": {
+      "title": "Knowledge Transfer and Future Generations",
+      "prompt": "How is this craft passed on to younger people, and do you think it can continue in the future?"
     },
     "step7": {
       "title": "Workshop, Tools & Process",
