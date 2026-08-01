@@ -158,7 +158,8 @@
       "ready": "Subtítulos en inglés listos",
       "failed": "No se pudieron generar los subtítulos para esta grabación",
       "someProcessing": "Los subtítulos aún se generan en segundo plano: puedes publicar ahora y aparecerán automáticamente en tu historia cuando estén listos.",
-      "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones."
+      "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones.",
+      "retry": "Intentar de nuevo"
     },
     "stepLabel": "Paso {current} de {total}",
     "back": "Atrás",
@@ -182,6 +183,7 @@
       "saveFailed": "No pudimos guardar tu progreso. Inténtalo de nuevo.",
       "publishFailed": "No pudimos publicar tu historia. Inténtalo de nuevo.",
       "emptyStory": "Añade al menos una respuesta escrita, una grabación o una foto del taller antes de publicar.",
+      "filmRequired": "Crea tu película antes de publicar tu historia.",
       "conflict": "Tu historia se actualizó en otra ventana. Recarga esta página para ver la versión más reciente."
     },
     "banner": {

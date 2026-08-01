@@ -158,7 +158,8 @@
       "ready": "İngilizce altyazılar hazır",
       "failed": "Bu kayıt için altyazı oluşturulamadı",
       "someProcessing": "Altyazılar hâlâ arka planda oluşturuluyor. Şimdi yayımlayabilirsin, hazır olduklarında hikâyende otomatik olarak görünecekler.",
-      "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı."
+      "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı.",
+      "retry": "Tekrar dene"
     },
     "stepLabel": "Adım {current} / {total}",
     "back": "Geri",
@@ -182,6 +183,7 @@
       "saveFailed": "İlerlemeni kaydedemedik. Lütfen tekrar dene.",
       "publishFailed": "Hikâyeni yayınlayamadık. Lütfen tekrar dene.",
       "emptyStory": "Yayınlamadan önce en az bir yazılı cevap, kayıt veya atölye fotoğrafı ekle.",
+      "filmRequired": "Hikâyeni yayımlamadan önce filmini oluştur.",
       "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle."
     },
     "banner": {

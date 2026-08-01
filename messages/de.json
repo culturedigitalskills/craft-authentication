@@ -158,7 +158,8 @@
       "ready": "Englische Untertitel bereit",
       "failed": "Für diese Aufnahme konnten keine Untertitel erstellt werden",
       "someProcessing": "Untertitel werden noch im Hintergrund erstellt – du kannst jetzt veröffentlichen, sie erscheinen automatisch in deiner Geschichte, sobald sie fertig sind.",
-      "someFailed": "Für einige Aufnahmen konnten keine Untertitel erstellt werden."
+      "someFailed": "Für einige Aufnahmen konnten keine Untertitel erstellt werden.",
+      "retry": "Erneut versuchen"
     },
     "stepLabel": "Schritt {current} von {total}",
     "back": "Zurück",
@@ -182,6 +183,7 @@
       "saveFailed": "Wir konnten deinen Fortschritt nicht speichern. Bitte versuche es erneut.",
       "publishFailed": "Wir konnten deine Geschichte nicht veröffentlichen. Bitte versuche es erneut.",
       "emptyStory": "Füge mindestens eine schriftliche Antwort, eine Aufnahme oder ein Werkstattfoto hinzu, bevor du veröffentlichst.",
+      "filmRequired": "Erstelle deinen Film, bevor du deine Geschichte veröffentlichst.",
       "conflict": "Deine Geschichte wurde in einem anderen Fenster aktualisiert. Lade diese Seite neu, um die neueste Version zu sehen."
     },
     "banner": {

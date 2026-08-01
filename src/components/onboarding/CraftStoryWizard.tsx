@@ -82,6 +82,19 @@ export function CraftStoryWizard({
         }
     }, [])
 
+    // Re-run any failed captions (e.g. a transient upstream error). The failed
+    // rows flip back to processing, and the poll below picks them up.
+    const retryCaptions = useCallback(async () => {
+        try {
+            const res = await fetch('/api/artisans/me/story/transcripts', { method: 'POST' })
+            if (!res.ok) return
+            const data = await res.json()
+            setCaptionStatuses(data.statuses ?? {})
+        } catch {
+            // Informational retry — never surface fetch failures.
+        }
+    }, [])
+
     useEffect(() => {
         void refreshCaptionStatuses()
     }, [refreshCaptionStatuses])
@@ -215,6 +228,8 @@ export function CraftStoryWizard({
                 try { body = await res.json() } catch { /* ignore */ }
                 if (body?.error === 'EMPTY_STORY') {
                     setError(t('errors.emptyStory'))
+                } else if (body?.error === 'FILM_REQUIRED') {
+                    setError(t('errors.filmRequired'))
                 } else {
                     setError(t('errors.publishFailed'))
                 }
@@ -318,6 +333,7 @@ export function CraftStoryWizard({
                                     setStory(s => ({ ...s, summaryText: value }))
                                 }}
                                 onPersistSummary={() => { void save(step) }}
+                                onRetryCaptions={retryCaptions}
                             />
                         )}
 
@@ -562,6 +578,7 @@ function ReviewStep({
     summaryText,
     onSummaryChange,
     onPersistSummary,
+    onRetryCaptions,
 }: {
     story: Partial<CraftStoryDraft>
     workshopCount: number
@@ -570,6 +587,7 @@ function ReviewStep({
     summaryText: string
     onSummaryChange: (value: string) => void
     onPersistSummary: () => void
+    onRetryCaptions: () => void
 }) {
     const t = useTranslations('craftStory')
     const statusValues = Object.values(captionStatuses)
@@ -637,10 +655,15 @@ function ReviewStep({
                 </p>
             )}
             {captionsFailed && (
-                <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-red-600 dark:text-red-400">
-                    <AlertCircle className="h-3.5 w-3.5" />
-                    {t('captions.someFailed')}
-                </p>
+                <div className="mt-3 flex flex-col items-center gap-1.5">
+                    <p className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {t('captions.someFailed')}
+                    </p>
+                    <Button type="button" variant="ghost" size="sm" onClick={onRetryCaptions}>
+                        {t('captions.retry')}
+                    </Button>
+                </div>
             )}
         </div>
     )

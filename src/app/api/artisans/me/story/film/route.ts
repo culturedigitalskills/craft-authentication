@@ -10,6 +10,7 @@ import {
 } from '@/lib/validations/craftStory'
 import { mediaKind } from '@/lib/media-kind'
 import { computeInputsHash, type FilmInputs } from '@/lib/film/planner'
+import { canMakeFilm } from '@/lib/film/eligibility'
 import { enqueueFilm } from '@/lib/film/jobs'
 
 const FILM_TEMPLATE_VERSION = 1
@@ -107,9 +108,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json().catch(() => ({}))
         const { force } = CreateStoryFilmSchema.parse(body)
 
-        const { spokenCount, videoAnswerCount, workshopCount } = await collectMeta(story)
-        const hasVisual = workshopCount > 0 || videoAnswerCount > 0
-        if (spokenCount === 0 || !hasVisual) {
+        if (!canMakeFilm(await collectMeta(story))) {
             return NextResponse.json(
                 {
                     error: 'INSUFFICIENT_INPUTS',

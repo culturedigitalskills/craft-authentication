@@ -158,7 +158,8 @@
       "ready": "English captions ready",
       "failed": "Captions couldn't be generated for this recording",
       "someProcessing": "Captions are still generating in the background. You can publish now, and they'll appear on your story automatically when ready.",
-      "someFailed": "Captions couldn't be generated for some recordings."
+      "someFailed": "Captions couldn't be generated for some recordings.",
+      "retry": "Try again"
     },
     "wizardTitle": "My Story",
     "wizardHelper": "Share the story of your craft in your own words.",
@@ -184,6 +185,7 @@
       "saveFailed": "We couldn't save your progress. Please try again.",
       "publishFailed": "We couldn't publish your story. Please try again.",
       "emptyStory": "Add at least one written answer, recording, or workshop photo before publishing.",
+      "filmRequired": "Create your film before publishing your story.",
       "conflict": "Your story was updated in another window. Reload this page to see the latest version."
     },
     "banner": {

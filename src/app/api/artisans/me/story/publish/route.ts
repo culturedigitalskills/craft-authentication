@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth-guard'
 import { errorResponse } from '@/lib/validations/types'
 import { ANSWER_MEDIA_FIELDS, ANSWER_TEXT_FIELDS } from '@/lib/validations/craftStory'
+import { canMakeFilm, getFilmIngredients } from '@/lib/film/eligibility'
 
 export async function POST() {
     const { session, unauthorized } = await requireAuth()
@@ -39,15 +40,33 @@ export async function POST() {
             )
         }
 
+        // If this story has the raw material for a film, require a finished one
+        // before publishing (the film is the story's headline). A story that
+        // can't make a film publishes as the written page, and a FAILED render
+        // is allowed through so a broken render never traps the artisan.
+        if (canMakeFilm(await getFilmIngredients(story))) {
+            const film = await prisma.storyFilm.findUnique({
+                where: { storyId: story.id },
+                select: { status: true },
+            })
+            if (!film || film.status === 'PENDING' || film.status === 'PROCESSING') {
+                return NextResponse.json(
+                    {
+                        error: 'FILM_REQUIRED',
+                        message: 'Create your film before publishing your story.',
+                    },
+                    { status: 400 }
+                )
+            }
+        }
+
         const updated = await prisma.craftStory.update({
             where: { artisanId: artisan.id },
             data: { status: 'PUBLISHED', publishedAt: new Date() },
         })
 
-        // One publish: a rendered, READY film becomes the story's public hero.
-        // The artisan has already previewed it in the wizard, so publishing the
-        // story approves it too. A still-rendering film is left private (not yet
-        // seen) — this never blocks or waits on the render.
+        // A rendered, READY film becomes the story's public hero. The artisan has
+        // already previewed it in the wizard, so publishing the story approves it.
         await prisma.storyFilm.updateMany({
             where: { storyId: story.id, status: 'READY' },
             data: { isPublic: true },
