@@ -141,6 +141,14 @@ export function StoryFilmPanel() {
                             <Clapperboard className="mr-1.5 h-4 w-4" />
                             {t('watch')}
                         </Button>
+                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(true)} disabled={busy}>
+                            {busy ? (
+                                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                            ) : (
+                                <RefreshCw className="mr-1.5 h-4 w-4" />
+                            )}
+                            {t('regenerate')}
+                        </Button>
                         {film.isPublic && (
                             <span className="text-xs font-medium text-warm">{t('published')}</span>
                         )}
