@@ -291,9 +291,6 @@
       "failed": "No pudimos redactar un resumen. Inténtalo de nuevo.",
       "rateLimited": "Has redactado varios resúmenes recientemente. Espera un poco e inténtalo de nuevo."
     },
-    "publicFilm": {
-      "readFullStory": "Leer la historia completa"
-    },
     "workshop": {
       "addFile": "Añadir foto o vídeo",
       "removeItem": "Quitar",

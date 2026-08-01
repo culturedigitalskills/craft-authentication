@@ -1,33 +1,17 @@
 import { useTranslations } from 'next-intl'
 import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
-import {
-    CraftStoryDisplay,
-    type PublishedCraftStory,
-    type WorkshopMediaItem,
-} from './CraftStoryDisplay'
 
 interface StoryFilmHeroProps {
     outputMediaId: string
     summaryText: string | null
-    story: PublishedCraftStory
-    workshop: WorkshopMediaItem[]
-    answerMediaMimeTypes: Record<string, string>
-    captionedMediaIds: string[]
 }
 
 /**
- * Film-first public rendering: the story film as the hero, the editable summary
- * beneath it, and the full Q&A tucked into a native <details> for readers who
- * want the words (and for search engines / screen readers — it stays in the DOM).
+ * Film-first public rendering: the story film is the story. The film (with its
+ * soft caption track) plus the written summary tell it in full, so there's no
+ * separate Q&A section.
  */
-export function StoryFilmHero({
-    outputMediaId,
-    summaryText,
-    story,
-    workshop,
-    answerMediaMimeTypes,
-    captionedMediaIds,
-}: StoryFilmHeroProps) {
+export function StoryFilmHero({ outputMediaId, summaryText }: StoryFilmHeroProps) {
     const t = useTranslations('craftStory')
 
     return (
@@ -51,24 +35,6 @@ export function StoryFilmHero({
             {summaryText?.trim() && (
                 <p className="sc-lead mt-6 whitespace-pre-line">{summaryText}</p>
             )}
-
-            <details className="mt-6">
-                <summary
-                    className="cursor-pointer text-sm font-medium"
-                    style={{ color: 'var(--sc-accent)' }}
-                >
-                    {t('publicFilm.readFullStory')}
-                </summary>
-                <div className="mt-6">
-                    <CraftStoryDisplay
-                        nested
-                        story={story}
-                        workshop={workshop}
-                        answerMediaMimeTypes={answerMediaMimeTypes}
-                        captionedMediaIds={captionedMediaIds}
-                    />
-                </div>
-            </details>
         </section>
     )
 }

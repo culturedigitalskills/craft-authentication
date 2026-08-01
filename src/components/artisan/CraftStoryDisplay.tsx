@@ -27,9 +27,6 @@ interface CraftStoryDisplayProps {
     workshop: WorkshopMediaItem[]
     answerMediaMimeTypes: Record<string, string>
     captionedMediaIds?: string[]
-    // When rendered inside the film hero's "read the full story" section, drop
-    // the section id and heading so they aren't duplicated on the page.
-    nested?: boolean
 }
 
 export function CraftStoryDisplay({
@@ -37,7 +34,6 @@ export function CraftStoryDisplay({
     workshop,
     answerMediaMimeTypes,
     captionedMediaIds = [],
-    nested = false,
 }: CraftStoryDisplayProps) {
     const t = useTranslations('craftStory')
     const captioned = new Set(captionedMediaIds)
@@ -52,13 +48,9 @@ export function CraftStoryDisplay({
     if (!hasAny) return null
 
     return (
-        <section id={nested ? undefined : 'craft-story'} className="scroll-mt-24">
-            {!nested && (
-                <>
-                    <p className="sc-eyebrow mb-2">{t('publicHeading')}</p>
-                    <h2 className="sc-h2 mb-8">{t('publicTitle')}</h2>
-                </>
-            )}
+        <section id="craft-story" className="scroll-mt-24">
+            <p className="sc-eyebrow mb-2">{t('publicHeading')}</p>
+            <h2 className="sc-h2 mb-8">{t('publicTitle')}</h2>
 
             <div className="flex flex-col gap-10">
                 {ANSWER_KEYS.map((key, i) => {
