@@ -291,6 +291,9 @@
       "failed": "Wir konnten keine Zusammenfassung erstellen. Bitte versuche es erneut.",
       "rateLimited": "Du hast kürzlich einige Zusammenfassungen erstellt. Bitte warte kurz und versuche es erneut."
     },
+    "publicFilm": {
+      "readFullStory": "Ganze Geschichte lesen"
+    },
     "workshop": {
       "addFile": "Foto oder Video hinzufügen",
       "removeItem": "Entfernen",

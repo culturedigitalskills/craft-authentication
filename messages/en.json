@@ -293,6 +293,9 @@
       "failed": "We couldn't draft a summary. Please try again.",
       "rateLimited": "You've drafted a few summaries recently. Please wait a little and try again."
     },
+    "publicFilm": {
+      "readFullStory": "Read the full story"
+    },
     "workshop": {
       "addFile": "Add photo or video",
       "removeItem": "Remove",

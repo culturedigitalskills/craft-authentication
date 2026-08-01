@@ -291,6 +291,9 @@
       "failed": "Özet oluşturamadık. Lütfen tekrar dene.",
       "rateLimited": "Son zamanlarda birkaç özet oluşturdun. Lütfen biraz bekleyip tekrar dene."
     },
+    "publicFilm": {
+      "readFullStory": "Hikâyenin tamamını oku"
+    },
     "workshop": {
       "addFile": "Fotoğraf veya video ekle",
       "removeItem": "Kaldır",

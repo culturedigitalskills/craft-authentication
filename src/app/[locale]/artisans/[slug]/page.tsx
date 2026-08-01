@@ -306,6 +306,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             <StoryFilmHero
                                 outputMediaId={publicFilm.outputMediaId}
                                 summaryText={story.summaryText}
+                                story={story}
                             />
                         )}
 
