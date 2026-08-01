@@ -157,7 +157,7 @@
       "processing": "Englische Untertitel werden erstellt…",
       "ready": "Englische Untertitel bereit",
       "failed": "Für diese Aufnahme konnten keine Untertitel erstellt werden",
-      "someProcessing": "Einige Untertitel werden noch erstellt. Sie erscheinen in deiner öffentlichen Geschichte, sobald sie fertig sind.",
+      "someProcessing": "Untertitel werden noch im Hintergrund erstellt – du kannst jetzt veröffentlichen, sie erscheinen automatisch in deiner Geschichte, sobald sie fertig sind.",
       "someFailed": "Für einige Aufnahmen konnten keine Untertitel erstellt werden."
     },
     "stepLabel": "Schritt {current} von {total}",

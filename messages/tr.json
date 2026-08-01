@@ -157,7 +157,7 @@
       "processing": "İngilizce altyazılar oluşturuluyor…",
       "ready": "İngilizce altyazılar hazır",
       "failed": "Bu kayıt için altyazı oluşturulamadı",
-      "someProcessing": "Bazı altyazılar hâlâ oluşturuluyor. Hazır olduklarında herkese açık hikayenizde görünecekler.",
+      "someProcessing": "Altyazılar hâlâ arka planda oluşturuluyor — şimdi yayımlayabilirsin, hazır olduklarında hikâyende otomatik olarak görünecekler.",
       "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı."
     },
     "stepLabel": "Adım {current} / {total}",

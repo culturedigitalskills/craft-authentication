@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -64,6 +64,12 @@ export function CraftStoryWizard({
     const [returnToReview, setReturnToReview] = useState(false)
     // mediaId -> transcript status for this story's videos (caption chips).
     const [captionStatuses, setCaptionStatuses] = useState<Record<string, string>>({})
+    // Workshop media lives here (not inside the step component) so it survives
+    // stepping away and back — the step subtree remounts on navigation.
+    const [workshopMedia, setWorkshopMedia] = useState<WorkshopMedia[]>(initialWorkshopMedia)
+    // mediaId -> mimeType for answer media, seeded from the server and extended
+    // as new recordings upload, so a revisited video answer still renders as video.
+    const [answerMimeTypes, setAnswerMimeTypes] = useState<Record<string, string>>(answerMediaMimeTypes)
 
     const refreshCaptionStatuses = useCallback(async () => {
         try {
@@ -93,8 +99,11 @@ export function CraftStoryWizard({
     function setAnswerText(key: AnswerKey, value: string) {
         setStory(s => ({ ...s, [`answer${key}Text`]: value }))
     }
-    function setAnswerMedia(key: AnswerKey, mediaId: string | null) {
+    function setAnswerMedia(key: AnswerKey, mediaId: string | null, mimeType?: string | null) {
         setStory(s => ({ ...s, [`answer${key}MediaId`]: mediaId }))
+        if (mediaId && mimeType) {
+            setAnswerMimeTypes(m => ({ ...m, [mediaId]: mimeType }))
+        }
     }
 
     // Mirrors of state used inside queued background saves — a chained save
@@ -279,16 +288,17 @@ export function CraftStoryWizard({
                                 text={(story[`answer${currentKey}Text` as const] as string | null | undefined) ?? ''}
                                 mediaId={currentMediaId}
                                 onTextChange={v => setAnswerText(currentKey, v)}
-                                onMediaChange={id => setAnswerMedia(currentKey, id)}
+                                onMediaChange={(id, mime) => setAnswerMedia(currentKey, id, mime)}
                                 captionStatus={currentMediaId ? captionStatuses[currentMediaId] : undefined}
-                                initialMimeType={currentMediaId ? (answerMediaMimeTypes[currentMediaId] ?? null) : null}
+                                initialMimeType={currentMediaId ? (answerMimeTypes[currentMediaId] ?? null) : null}
                             />
                         )}
 
                         {step === 7 && (
                             <WorkshopStep
                                 storyId={storyId}
-                                initial={initialWorkshopMedia}
+                                items={workshopMedia}
+                                onItemsChange={setWorkshopMedia}
                                 captionStatuses={captionStatuses}
                                 onUploaded={refreshCaptionStatuses}
                             />
@@ -297,7 +307,7 @@ export function CraftStoryWizard({
                         {step === 8 && (
                             <ReviewStep
                                 story={story}
-                                workshopCount={initialWorkshopMedia.length}
+                                workshopCount={workshopMedia.length}
                                 captionStatuses={captionStatuses}
                                 onEditStep={target => { setError(null); setReturnToReview(true); setStep(target) }}
                                 summaryText={(story.summaryText as string | null | undefined) ?? ''}
@@ -417,7 +427,7 @@ function QuestionStep({
     text: string
     mediaId: string | null
     onTextChange: (value: string) => void
-    onMediaChange: (id: string | null) => void
+    onMediaChange: (id: string | null, mimeType?: string | null) => void
     captionStatus?: string
     initialMimeType?: string | null
 }) {
@@ -488,12 +498,14 @@ function CaptionStatusChip({ status }: { status?: string }) {
 
 function WorkshopStep({
     storyId,
-    initial,
+    items,
+    onItemsChange,
     captionStatuses,
     onUploaded,
 }: {
     storyId: string | null
-    initial: WorkshopMedia[]
+    items: WorkshopMedia[]
+    onItemsChange: Dispatch<SetStateAction<WorkshopMedia[]>>
     captionStatuses: Record<string, string>
     onUploaded: () => void
 }) {
@@ -505,7 +517,8 @@ function WorkshopStep({
             {storyId ? (
                 <StoryWorkshopUpload
                     storyId={storyId}
-                    initialItems={initial}
+                    items={items}
+                    onItemsChange={onItemsChange}
                     captionStatuses={captionStatuses}
                     onUploaded={onUploaded}
                 />

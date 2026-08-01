@@ -157,7 +157,7 @@
       "processing": "Generating English captions…",
       "ready": "English captions ready",
       "failed": "Captions couldn't be generated for this recording",
-      "someProcessing": "Some captions are still being generated. They will appear on your public story when ready.",
+      "someProcessing": "Captions are still generating in the background — you can publish now, and they'll appear on your story automatically when ready.",
       "someFailed": "Captions couldn't be generated for some recordings."
     },
     "wizardTitle": "My Story",

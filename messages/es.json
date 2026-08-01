@@ -157,7 +157,7 @@
       "processing": "Generando subtítulos en inglés…",
       "ready": "Subtítulos en inglés listos",
       "failed": "No se pudieron generar los subtítulos para esta grabación",
-      "someProcessing": "Algunos subtítulos aún se están generando. Aparecerán en tu historia pública cuando estén listos.",
+      "someProcessing": "Los subtítulos aún se generan en segundo plano: puedes publicar ahora y aparecerán automáticamente en tu historia cuando estén listos.",
       "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones."
     },
     "stepLabel": "Paso {current} de {total}",

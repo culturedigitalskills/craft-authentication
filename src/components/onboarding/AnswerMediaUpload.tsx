@@ -11,7 +11,9 @@ import { uploadWithProgress } from '@/lib/upload'
 
 interface AnswerMediaUploadProps {
     mediaId: string | null
-    onChange: (mediaId: string | null) => void
+    // Reports the mimeType alongside the id so the wizard can remember it and
+    // still render a video (not audio) after the artisan navigates away and back.
+    onChange: (mediaId: string | null, mimeType?: string | null) => void
     // Mime type of an already-saved answer, so a reloaded video renders as a
     // video player (fresh uploads set it locally from the file).
     initialMimeType?: string | null
@@ -62,8 +64,9 @@ export function AnswerMediaUpload({
         try {
             const outcome = await uploadWithProgress(file, setProgress)
             if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
-            setMimeType(outcome.media.mimeType ?? file.type)
-            onChange(outcome.media.id)
+            const resolvedMime = outcome.media.mimeType ?? file.type
+            setMimeType(resolvedMime)
+            onChange(outcome.media.id, resolvedMime)
         } catch {
             setError(t('uploadFailed'))
         } finally {
@@ -88,7 +91,7 @@ export function AnswerMediaUpload({
                     mode={recorderMode}
                     onUploaded={(id, mime) => {
                         setMimeType(mime)
-                        onChange(id)
+                        onChange(id, mime)
                         setRecorderMode(null)
                     }}
                     onCancel={() => setRecorderMode(null)}

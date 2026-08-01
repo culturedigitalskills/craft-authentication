@@ -5,9 +5,9 @@ import { errorResponse } from '@/lib/validations/types'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 
 /**
- * Caption-generation status for the current user's story videos, keyed by
- * mediaId. Only videos have transcript rows, so audio answers simply don't
- * appear. Powers the status chips in the story wizard.
+ * Caption-generation status for the current user's story recordings, keyed by
+ * mediaId. Both video and audio answers (and workshop videos) get transcript
+ * rows; media with none simply doesn't appear. Powers the wizard status chips.
  */
 export async function GET() {
     const { session, unauthorized } = await requireAuth()
