@@ -266,7 +266,8 @@
     },
     "film": {
       "title": "Mein-Geschichte-Film",
-      "description": "Wir können deine Aufnahmen und Werkstattfotos zu einem kurzen Film verweben — deine Stimme über den Bildern deines Handwerks.",
+      "description": "Verwandle deine Geschichte in einen kurzen Film, mit deiner Stimme über den Bildern deines Handwerks. Er wird zum Höhepunkt deiner öffentlichen Seite.",
+      "willBeHighlight": "Wenn du deine Geschichte veröffentlichst, wird dieser Film ihr Höhepunkt.",
       "create": "Meinen Film erstellen",
       "processing": "Dein Film wird erstellt… das kann einige Minuten dauern.",
       "failed": "Wir konnten deinen Film nicht erstellen. Bitte versuche es erneut.",

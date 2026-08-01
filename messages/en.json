@@ -157,7 +157,7 @@
       "processing": "Generating English captions…",
       "ready": "English captions ready",
       "failed": "Captions couldn't be generated for this recording",
-      "someProcessing": "Captions are still generating in the background — you can publish now, and they'll appear on your story automatically when ready.",
+      "someProcessing": "Captions are still generating in the background. You can publish now, and they'll appear on your story automatically when ready.",
       "someFailed": "Captions couldn't be generated for some recordings."
     },
     "wizardTitle": "My Story",
@@ -268,7 +268,8 @@
     },
     "film": {
       "title": "My Story film",
-      "description": "We can weave your recordings and workshop photos into a short film — your voice over the images of your craft.",
+      "description": "Turn your story into a short film, with your voice over the images of your craft. It becomes the highlight of your public page.",
+      "willBeHighlight": "When you publish your story, this film will be its highlight.",
       "create": "Create my film",
       "processing": "Creating your film… this can take a few minutes.",
       "failed": "We couldn't create your film. Please try again.",

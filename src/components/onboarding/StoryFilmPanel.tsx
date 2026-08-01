@@ -145,6 +145,9 @@ export function StoryFilmPanel() {
                             <span className="text-xs font-medium text-warm">{t('published')}</span>
                         )}
                     </div>
+                    {!film.isPublic && (
+                        <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
+                    )}
                     {stale && (
                         <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
                             <AlertCircle className="h-3.5 w-3.5" />
@@ -189,10 +192,17 @@ export function StoryFilmPanel() {
                                 <Download className="mr-1.5 h-4 w-4" />
                                 {t('download')}
                             </a>
-                            <Button type="button" size="sm" onClick={() => void togglePublish()} disabled={busy}>
-                                {film.isPublic ? t('unpublish') : t('publish')}
-                            </Button>
+                            {/* No separate "publish film" button — publishing the
+                                story features a ready film. Only offer to hide it. */}
+                            {film.isPublic && (
+                                <Button type="button" variant="outline" size="sm" onClick={() => void togglePublish()} disabled={busy}>
+                                    {t('unpublish')}
+                                </Button>
+                            )}
                         </div>
+                        {!film.isPublic && (
+                            <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
+                        )}
                     </DialogContent>
                 </Dialog>
             )}

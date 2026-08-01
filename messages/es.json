@@ -266,7 +266,8 @@
     },
     "film": {
       "title": "Película de Mi Historia",
-      "description": "Podemos entretejer tus grabaciones y fotos del taller en una película corta: tu voz sobre las imágenes de tu oficio.",
+      "description": "Convierte tu historia en una película corta, con tu voz sobre las imágenes de tu oficio. Se convierte en lo más destacado de tu página pública.",
+      "willBeHighlight": "Cuando publiques tu historia, esta película será su elemento destacado.",
       "create": "Crear mi película",
       "processing": "Creando tu película… esto puede tardar unos minutos.",
       "failed": "No pudimos crear tu película. Inténtalo de nuevo.",

@@ -44,6 +44,15 @@ export async function POST() {
             data: { status: 'PUBLISHED', publishedAt: new Date() },
         })
 
+        // One publish: a rendered, READY film becomes the story's public hero.
+        // The artisan has already previewed it in the wizard, so publishing the
+        // story approves it too. A still-rendering film is left private (not yet
+        // seen) — this never blocks or waits on the render.
+        await prisma.storyFilm.updateMany({
+            where: { storyId: story.id, status: 'READY' },
+            data: { isPublic: true },
+        })
+
         return NextResponse.json({ story: updated })
     } catch (error) {
         console.error('Error publishing craft story:', error)

@@ -575,7 +575,15 @@ function ReviewStep({
         <div>
             <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('review.title')}</h1>
             <p className="mb-6 text-base text-muted-foreground">{t('review.lead')}</p>
-            <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+
+            {/* The film is the headline of the story — offer it first. */}
+            <StoryFilmPanel />
+
+            <div className="mt-6">
+                <SummaryEditor value={summaryText} onChange={onSummaryChange} onPersist={onPersistSummary} />
+            </div>
+
+            <div className="mt-8 divide-y divide-border overflow-hidden rounded-lg border border-border">
                 {allRows.map(({ step, label, value }) => (
                     <button
                         key={label}
@@ -609,12 +617,6 @@ function ReviewStep({
                     {t('captions.someFailed')}
                 </p>
             )}
-
-            <SummaryEditor value={summaryText} onChange={onSummaryChange} onPersist={onPersistSummary} />
-
-            <div className="mt-6">
-                <StoryFilmPanel />
-            </div>
         </div>
     )
 }
