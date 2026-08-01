@@ -123,7 +123,7 @@ async function renderImageShot(
             : `z='max(1.3-0.0007*on,1.0)'`
     const vf =
         `scale=4000:-2,zoompan=${zoom}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':` +
-        `d=${frames}:s=${FILM_WIDTH}x${FILM_HEIGHT}:fps=${FILM_FPS},format=yuv420p`
+        `d=${frames}:s=${FILM_WIDTH}x${FILM_HEIGHT}:fps=${FILM_FPS},format=yuv420p,setsar=1`
     await runFfmpeg([
         '-i', imagePath,
         '-vf', vf,
@@ -141,7 +141,7 @@ async function renderVideoShot(videoPath: string, durationSec: number, outPath: 
         `[0:v]split[a][b];` +
         `[a]scale=${FILM_WIDTH}:${FILM_HEIGHT}:force_original_aspect_ratio=increase,crop=${FILM_WIDTH}:${FILM_HEIGHT},boxblur=20:2[bg];` +
         `[b]scale=${FILM_WIDTH}:${FILM_HEIGHT}:force_original_aspect_ratio=decrease[fg];` +
-        `[bg][fg]overlay=(W-w)/2:(H-h)/2,format=yuv420p[v]`
+        `[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1,format=yuv420p[v]`
     await runFfmpeg([
         '-t', String(durationSec),
         '-i', videoPath,
@@ -196,15 +196,26 @@ async function muxBodyWithVoice(bodyVideoPath: string, voicePath: string, outPat
 }
 
 // Join every unit (intro, per-chapter title + body, outro) and normalise
-// loudness in one final re-encode. The concat filter tolerates minor parameter
-// drift between units better than the demuxer, at the cost of one re-encode.
+// loudness in one final re-encode. Every input is first forced to identical
+// params: the concat filter rejects ANY mismatch in size, SAR, fps, pixel
+// format, sample rate or channel layout (one workshop clip with non-square
+// pixels is enough to break it).
 async function finalConcat(unitPaths: string[], outPath: string): Promise<void> {
     const inputs: string[] = []
     unitPaths.forEach(p => inputs.push('-i', p))
-    const streams = unitPaths.map((_, i) => `[${i}:v][${i}:a]`).join('')
+
+    const norm: string[] = []
+    const labels: string[] = []
+    unitPaths.forEach((_, i) => {
+        norm.push(`[${i}:v]scale=${FILM_WIDTH}:${FILM_HEIGHT},setsar=1,fps=${FILM_FPS},format=yuv420p[v${i}]`)
+        norm.push(`[${i}:a]aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo[a${i}]`)
+        labels.push(`[v${i}][a${i}]`)
+    })
     const filter =
-        `${streams}concat=n=${unitPaths.length}:v=1:a=1[v][a];` +
+        `${norm.join(';')};` +
+        `${labels.join('')}concat=n=${unitPaths.length}:v=1:a=1[v][a];` +
         `[a]loudnorm=I=-16:TP=-1.5:LRA=11[ao]`
+
     await runFfmpeg([
         ...inputs,
         '-filter_complex', filter,
