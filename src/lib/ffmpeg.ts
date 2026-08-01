@@ -9,9 +9,9 @@ export function ffmpegPath(): string {
     return process.env.FFMPEG_PATH || ffmpegStatic || 'ffmpeg'
 }
 
-export function runFfmpeg(args: string[]): Promise<void> {
+export function runFfmpeg(args: string[], opts?: { cwd?: string }): Promise<void> {
     return new Promise((resolve, reject) => {
-        const proc = spawn(ffmpegPath(), args)
+        const proc = spawn(ffmpegPath(), args, opts?.cwd ? { cwd: opts.cwd } : {})
         let stderr = ''
         proc.stderr.on('data', chunk => {
             stderr += chunk.toString()

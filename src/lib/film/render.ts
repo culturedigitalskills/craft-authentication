@@ -81,8 +81,11 @@ async function renderCard(params: {
         const txtFile = path.join(params.tmpDir, `card-${randomUUID()}.txt`)
         await fs.promises.writeFile(txtFile, line.text, 'utf8')
         const family = fontFamilyForText(line.text)
+        // Reference the textfile by basename (resolved via cwd below): an
+        // absolute path inside a filtergraph breaks on Windows, where the
+        // drive-letter ":" is read as ffmpeg's option separator.
         drawParts.push(
-            `drawtext=font=${family}:textfile='${txtFile}':fontcolor=white:fontsize=${line.fontSize}:x=(w-text_w)/2:y=${line.yExpr}`,
+            `drawtext=font=${family}:textfile=${path.basename(txtFile)}:fontcolor=white:fontsize=${line.fontSize}:x=(w-text_w)/2:y=${line.yExpr}`,
         )
     }
 
@@ -102,7 +105,7 @@ async function renderCard(params: {
         '-c:v', 'libx264', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-r', String(FILM_FPS),
         '-c:a', 'aac', '-ar', '48000', '-ac', '2',
         '-y', params.outPath,
-    ])
+    ], { cwd: params.tmpDir })
 }
 
 // A still photo with a slow Ken Burns move. Feeds a single frame and lets
@@ -161,8 +164,13 @@ async function extractVoice(sourcePath: string, outPath: string): Promise<void> 
 }
 
 function concatListFile(paths: string[], listPath: string): Promise<void> {
-    // Escape single quotes for the concat demuxer's `file '...'` syntax.
-    const body = paths.map(p => `file '${p.replace(/'/g, "'\\''")}'`).join('\n')
+    // The concat demuxer resolves relative entries against the list file's own
+    // directory, so use basenames — an absolute Windows path (drive-letter colon
+    // + backslashes) breaks the `file '...'` parsing. All clips live alongside
+    // the list in the temp dir. Single quotes in a name are still escaped.
+    const body = paths
+        .map(p => `file '${path.basename(p).replace(/'/g, "'\\''")}'`)
+        .join('\n')
     return fs.promises.writeFile(listPath, body, 'utf8')
 }
 
