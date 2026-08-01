@@ -4,7 +4,12 @@ import { z } from 'zod'
 // authenticated session's artisan profile.
 
 const mediaIdsField = z.array(z.uuid()).max(50).optional()
-const videosField = z.array(z.string().min(1).max(50)).max(50).optional()
+// Same shape extractYouTubeId produces client-side. Without it the server
+// accepts any string and it lands straight in an embed/thumbnail URL.
+const videosField = z
+    .array(z.string().regex(/^[a-zA-Z0-9_-]{11}$/, 'Invalid YouTube video id'))
+    .max(50)
+    .optional()
 
 const dimensionField = z.number().positive().max(1_000_000).nullish()
 const dimensionUnitField = z.enum(['cm', 'in']).nullish()

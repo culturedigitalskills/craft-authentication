@@ -8,6 +8,16 @@ import { CRAFT_ENTITY_TYPE } from '@/lib/craft'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { parseRangeHeader } from '@/lib/http-range'
 
+// originalName is client-supplied, so neutralise the quotes, backslashes and
+// control characters that would otherwise break out of (or inject a header
+// after) the quoted filename in Content-Disposition.
+function headerSafeFilename(name: string) {
+    return Array.from(name, (char) => {
+        const code = char.charCodeAt(0)
+        return char === '"' || char === '\\' || code < 32 || code === 127 ? '_' : char
+    }).join('')
+}
+
 // errorResponse can't carry headers, and 416 requires Content-Range per RFC 9110.
 function rangeNotSatisfiable(size: number) {
     return NextResponse.json(
@@ -85,7 +95,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
         const headers = new Headers()
         headers.set('Content-Type', fileData.mimeType)
-        headers.set('Content-Disposition', `inline; filename="${fileData.originalName}"`)
+        headers.set(
+            'Content-Disposition',
+            `inline; filename="${headerSafeFilename(fileData.originalName)}"`,
+        )
         // This assumes, that the media files are immutable and allways public meaning that access
         // is not restricted by authentication or other permission checks.
         headers.set('Cache-Control', 'public, max-age=31536000')

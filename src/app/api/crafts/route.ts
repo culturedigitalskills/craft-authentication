@@ -90,32 +90,37 @@ export async function POST(request: NextRequest) {
             return errorResponse('You do not own one or more of the referenced media files', 403)
         }
 
-        const craft = await prisma.craft.create({
-            data: {
-                artisanId: artisan.id,
-                title: input.title,
-                description: input.description,
-                materials: input.materials,
-                technique: input.technique,
-                timeToMake: input.timeToMake,
-                width: input.width ?? null,
-                height: input.height ?? null,
-                depth: input.depth ?? null,
-                dimensionUnit: input.dimensionUnit ?? null,
-                weight: input.weight ?? null,
-                weightUnit: input.weightUnit ?? null,
-                inspiration: input.inspiration,
-                careInstructions: input.careInstructions,
-                isPublic: input.isPublic,
-                isSharedLocation: input.isSharedLocation,
-                latitude: input.latitude ?? null,
-                longitude: input.longitude ?? null,
-                place: input.place ?? null,
-                videos: input.videos ?? [],
-            },
+        // One transaction so a failed media reconcile can't leave behind a
+        // craft with no photos for the artisan to puzzle over (and duplicate
+        // on retry).
+        const craft = await prisma.$transaction(async (tx) => {
+            const created = await tx.craft.create({
+                data: {
+                    artisanId: artisan.id,
+                    title: input.title,
+                    description: input.description,
+                    materials: input.materials,
+                    technique: input.technique,
+                    timeToMake: input.timeToMake,
+                    width: input.width ?? null,
+                    height: input.height ?? null,
+                    depth: input.depth ?? null,
+                    dimensionUnit: input.dimensionUnit ?? null,
+                    weight: input.weight ?? null,
+                    weightUnit: input.weightUnit ?? null,
+                    inspiration: input.inspiration,
+                    careInstructions: input.careInstructions,
+                    isPublic: input.isPublic,
+                    isSharedLocation: input.isSharedLocation,
+                    latitude: input.latitude ?? null,
+                    longitude: input.longitude ?? null,
+                    place: input.place ?? null,
+                    videos: input.videos ?? [],
+                },
+            })
+            await setCraftMedia(created.id, mediaIds, tx)
+            return created
         })
-
-        await setCraftMedia(craft.id, mediaIds)
 
         // Issue the provenance credential (non-fatal — craft still succeeds).
         try {
