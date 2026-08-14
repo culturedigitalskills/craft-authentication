@@ -1,8 +1,39 @@
+import crypto from 'crypto'
+import { Prisma } from '@prisma/client'
+import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { prisma } from '@/lib/prisma'
+import s3Client from '@/lib/object-store'
 import { generateCraftVC } from '@/lib/did/vc'
 import { DOMAIN } from '@/lib/did/config'
 
 export const CRAFT_ENTITY_TYPE = 'Craft'
+
+/**
+ * SHA-256 of a stored object's actual bytes, for the credential's imageHash
+ * claim. Returns null when the row or the object cannot be read so a storage
+ * blip costs us the claim rather than the whole credential. Reading the object
+ * whole is fine here: only images are hashed and they are capped at 8MB.
+ */
+async function hashMediaFile(mediaId: string): Promise<string | null> {
+    try {
+        const file = await prisma.mediaFile.findUnique({
+            where: { id: mediaId },
+            select: { bucket: true, objectKey: true },
+        })
+        if (!file) return null
+
+        const response = await s3Client.send(
+            new GetObjectCommand({ Bucket: file.bucket, Key: file.objectKey }),
+        )
+        const bytes = await response.Body?.transformToByteArray()
+        if (!bytes) return null
+
+        return crypto.createHash('sha256').update(bytes).digest('hex')
+    } catch (error) {
+        console.error('Failed to hash media for credential', mediaId, error)
+        return null
+    }
+}
 
 export function craftCredentialId(craftId: string): string {
     return `${DOMAIN}/credentials/crafts/${craftId}`
@@ -25,6 +56,7 @@ export async function issueCraftVC(params: {
     const firstImageUrl = params.firstMediaId
         ? `${process.env.AUTH_URL}/api/media/${params.firstMediaId}`
         : null
+    const imageHash = params.firstMediaId ? await hashMediaFile(params.firstMediaId) : null
 
     const vc = await generateCraftVC(
         params.id,
@@ -33,6 +65,7 @@ export async function issueCraftVC(params: {
         params.artisanSlug,
         params.createdAt.toISOString(),
         firstImageUrl,
+        imageHash,
     )
 
     const credentialId = craftCredentialId(params.id)
@@ -66,30 +99,37 @@ export async function deleteCraftVC(craftId: string): Promise<void> {
  * Replace a craft's media attachments with the supplied ordered mediaIds.
  * First image becomes HERO + primary, the rest GALLERY. Returns the mediaIds
  * that were removed so the caller can garbage-collect the underlying files.
+ *
+ * Pass `db` to run inside a caller's transaction, so a craft is never written
+ * without the attachments that were saved alongside it.
  */
-export async function setCraftMedia(craftId: string, mediaIds: string[]): Promise<string[]> {
-    const existing = await prisma.mediaAttachment.findMany({
+export async function setCraftMedia(
+    craftId: string,
+    mediaIds: string[],
+    db: Prisma.TransactionClient = prisma,
+): Promise<string[]> {
+    const existing = await db.mediaAttachment.findMany({
         where: { entityType: CRAFT_ENTITY_TYPE, entityId: craftId },
         select: { mediaId: true },
     })
     const existingIds = existing.map(a => a.mediaId)
     const nextIds = [...new Set(mediaIds.filter(Boolean))]
 
-    await prisma.mediaAttachment.deleteMany({
+    await db.mediaAttachment.deleteMany({
         where: { entityType: CRAFT_ENTITY_TYPE, entityId: craftId },
     })
 
     if (nextIds.length > 0) {
         // The hero/primary must be an image — it's reused as the thumbnail in
         // list views (rendered as <img>), so a video must never be primary.
-        const files = await prisma.mediaFile.findMany({
+        const files = await db.mediaFile.findMany({
             where: { id: { in: nextIds } },
             select: { id: true, mimeType: true },
         })
         const mimeById = new Map(files.map(f => [f.id, f.mimeType]))
         const heroId = nextIds.find(id => mimeById.get(id)?.startsWith('image/')) ?? nextIds[0]
 
-        await prisma.mediaAttachment.createMany({
+        await db.mediaAttachment.createMany({
             data: nextIds.map((mediaId, i) => ({
                 mediaId,
                 entityType: CRAFT_ENTITY_TYPE,

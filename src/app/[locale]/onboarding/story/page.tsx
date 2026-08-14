@@ -56,6 +56,7 @@ export default async function OnboardingStoryPage() {
               answerFutureMediaId: story.answerFutureMediaId,
               answerChallengesText: story.answerChallengesText,
               answerChallengesMediaId: story.answerChallengesMediaId,
+              summaryText: story.summaryText,
           }
         : null
 

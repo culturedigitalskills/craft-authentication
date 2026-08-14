@@ -1,14 +1,11 @@
-import { spawn } from 'child_process'
 import { randomUUID } from 'crypto'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import { pipeline } from 'stream/promises'
-import type { Readable } from 'stream'
-import ffmpegStatic from 'ffmpeg-static'
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { prisma } from '@/lib/prisma'
-import s3Client, { BUCKET_NAME, initGarage } from '@/lib/object-store'
+import { initGarage } from '@/lib/object-store'
+import { runFfmpeg } from '@/lib/ffmpeg'
+import { downloadObjectToFile, createMediaFileFromBuffer } from '@/lib/media-io'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import type { TranscriptSegment } from '@/lib/vtt'
 
@@ -26,10 +23,6 @@ const STALE_JOB_MS = 15 * 60 * 1000
 
 function whisperModel(): string {
     return process.env.GROQ_WHISPER_MODEL || 'whisper-large-v3'
-}
-
-function ffmpegPath(): string {
-    return process.env.FFMPEG_PATH || ffmpegStatic || 'ffmpeg'
 }
 
 // Jobs run one at a time per server instance: each holds a full video on disk
@@ -66,16 +59,19 @@ async function claimTranscription(mediaId: string): Promise<boolean> {
 }
 
 /**
- * Ensure a video has a caption transcript. Idempotent and safe to call on
- * every save: it no-ops for non-video media and for transcripts already done
- * or actively in flight, otherwise it claims the row and queues processing.
+ * Ensure a spoken answer (video or audio) has a caption transcript. Idempotent
+ * and safe to call on every save: it no-ops for non-audio/video media and for
+ * transcripts already done or actively in flight, otherwise it claims the row
+ * and queues processing.
  */
 export async function enqueueTranscription(mediaId: string): Promise<void> {
     const media = await prisma.mediaFile.findUnique({
         where: { id: mediaId },
         select: { id: true, mimeType: true },
     })
-    if (!media || !media.mimeType.startsWith('video/')) return
+    // Audio answers get captions too — the worker extracts an mp3 from either
+    // source, so both feed Whisper the same way.
+    if (!media || !/^(video|audio)\//.test(media.mimeType)) return
 
     // Ensure the row exists without touching an existing one — the atomic
     // claim below is the only place that transitions state.
@@ -106,30 +102,6 @@ export async function recoverStaleTranscriptions(): Promise<void> {
     for (const { mediaId } of stale) {
         if (await claimTranscription(mediaId)) scheduleJob(mediaId)
     }
-}
-
-function runFfmpeg(args: string[]): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const proc = spawn(ffmpegPath(), args)
-        let stderr = ''
-        proc.stderr.on('data', chunk => {
-            stderr += chunk.toString()
-        })
-        proc.on('error', reject)
-        proc.on('close', code => {
-            if (code === 0) resolve()
-            else reject(new Error(`ffmpeg exited with code ${code}: ${stderr.slice(-500)}`))
-        })
-    })
-}
-
-// Stream the object straight to disk — story videos can be ~100 MB and must
-// not be buffered in memory.
-async function downloadObjectToFile(objectKey: string, destPath: string): Promise<void> {
-    const res = await s3Client.send(
-        new GetObjectCommand({ Bucket: BUCKET_NAME, Key: objectKey }),
-    )
-    await pipeline(res.Body as Readable, fs.createWriteStream(destPath))
 }
 
 async function setStatus(
@@ -194,37 +166,22 @@ async function processTranscription(mediaId: string): Promise<void> {
         }
 
         // 3. Store the extracted audio as its own MediaFile (kept for reuse).
-        const audioId = randomUUID()
-        const audioKey = `${audioId}.mp3`
-        await s3Client.send(
-            new PutObjectCommand({
-                Bucket: BUCKET_NAME,
-                Key: audioKey,
-                Body: audioBuffer,
-                ContentType: 'audio/mpeg',
-            }),
-        )
-        await prisma.mediaFile.create({
-            data: {
-                id: audioId,
-                filename: audioKey,
-                originalName: `audio-${mediaId}.mp3`,
-                mimeType: 'audio/mpeg',
-                size: audioBuffer.byteLength,
-                bucket: BUCKET_NAME,
-                objectKey: audioKey,
-                uploaderId: media.uploaderId,
-            },
+        const audio = await createMediaFileFromBuffer({
+            buffer: audioBuffer,
+            mimeType: 'audio/mpeg',
+            extension: 'mp3',
+            originalName: `audio-${mediaId}.mp3`,
+            uploaderId: media.uploaderId,
         })
         try {
             await prisma.mediaTranscript.update({
                 where: { mediaId },
-                data: { audioMediaId: audioId },
+                data: { audioMediaId: audio.id },
             })
         } catch {
             // The transcript row vanished mid-job (source video replaced or
             // deleted). Don't strand the audio we just created.
-            await deleteMediaFiles([audioId])
+            await deleteMediaFiles([audio.id])
             return
         }
 

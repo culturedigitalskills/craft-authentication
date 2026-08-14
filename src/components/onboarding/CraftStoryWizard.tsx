@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -8,9 +8,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Pencil, Save } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Mic, Pencil, Save, Sparkles, Video } from 'lucide-react'
+import { StepDots } from '@/components/shared/StepDots'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
+import { StoryFilmPanel } from './StoryFilmPanel'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
 
 export type CraftStoryDraft = {
@@ -30,6 +32,7 @@ export type CraftStoryDraft = {
     answerFutureMediaId: string | null
     answerChallengesText: string | null
     answerChallengesMediaId: string | null
+    summaryText: string | null
 }
 
 interface CraftStoryWizardProps {
@@ -62,6 +65,12 @@ export function CraftStoryWizard({
     const [returnToReview, setReturnToReview] = useState(false)
     // mediaId -> transcript status for this story's videos (caption chips).
     const [captionStatuses, setCaptionStatuses] = useState<Record<string, string>>({})
+    // Workshop media lives here (not inside the step component) so it survives
+    // stepping away and back — the step subtree remounts on navigation.
+    const [workshopMedia, setWorkshopMedia] = useState<WorkshopMedia[]>(initialWorkshopMedia)
+    // mediaId -> mimeType for answer media, seeded from the server and extended
+    // as new recordings upload, so a revisited video answer still renders as video.
+    const [answerMimeTypes, setAnswerMimeTypes] = useState<Record<string, string>>(answerMediaMimeTypes)
 
     const refreshCaptionStatuses = useCallback(async () => {
         try {
@@ -71,6 +80,19 @@ export function CraftStoryWizard({
             setCaptionStatuses(data.statuses ?? {})
         } catch {
             // Chips are informational only — never surface fetch failures.
+        }
+    }, [])
+
+    // Re-run any failed captions (e.g. a transient upstream error). The failed
+    // rows flip back to processing, and the poll below picks them up.
+    const retryCaptions = useCallback(async () => {
+        try {
+            const res = await fetch('/api/artisans/me/story/transcripts', { method: 'POST' })
+            if (!res.ok) return
+            const data = await res.json()
+            setCaptionStatuses(data.statuses ?? {})
+        } catch {
+            // Informational retry — never surface fetch failures.
         }
     }, [])
 
@@ -91,8 +113,11 @@ export function CraftStoryWizard({
     function setAnswerText(key: AnswerKey, value: string) {
         setStory(s => ({ ...s, [`answer${key}Text`]: value }))
     }
-    function setAnswerMedia(key: AnswerKey, mediaId: string | null) {
+    function setAnswerMedia(key: AnswerKey, mediaId: string | null, mimeType?: string | null) {
         setStory(s => ({ ...s, [`answer${key}MediaId`]: mediaId }))
+        if (mediaId && mimeType) {
+            setAnswerMimeTypes(m => ({ ...m, [mediaId]: mimeType }))
+        }
     }
 
     // Mirrors of state used inside queued background saves — a chained save
@@ -128,6 +153,7 @@ export function CraftStoryWizard({
                     answerFutureMediaId: draft.answerFutureMediaId ?? null,
                     answerChallengesText: draft.answerChallengesText ?? null,
                     answerChallengesMediaId: draft.answerChallengesMediaId ?? null,
+                    summaryText: draft.summaryText ?? null,
                 }),
             })
             if (res.status === 409) {
@@ -203,6 +229,8 @@ export function CraftStoryWizard({
                 try { body = await res.json() } catch { /* ignore */ }
                 if (body?.error === 'EMPTY_STORY') {
                     setError(t('errors.emptyStory'))
+                } else if (body?.error === 'FILM_REQUIRED') {
+                    setError(t('errors.filmRequired'))
                 } else {
                     setError(t('errors.publishFailed'))
                 }
@@ -227,7 +255,7 @@ export function CraftStoryWizard({
     return (
         <div className="container mx-auto px-4 py-10">
             <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
-                <div className="bg-primary px-6 py-6">
+                <div className="px-6 py-6" style={{ background: 'var(--sc-ink-deep)' }}>
                     <div className="flex items-center gap-3">
                         <Link
                             href="/profile"
@@ -247,21 +275,7 @@ export function CraftStoryWizard({
                 </div>
 
                 <CardContent className="p-6">
-                    {/* Progress dots */}
-                    <div className="mb-2 flex justify-center gap-2">
-                        {Array.from({ length: TOTAL_STEPS }, (_, i) => i).map(n => (
-                            <span
-                                key={n}
-                                className={`h-2 w-2 rounded-full transition-all ${
-                                    n === step
-                                        ? 'w-8 bg-primary'
-                                        : n < step
-                                          ? 'bg-primary/40'
-                                          : 'bg-muted'
-                                }`}
-                            />
-                        ))}
-                    </div>
+                    <StepDots current={step} total={TOTAL_STEPS} />
                     <p className="mb-8 text-center text-xs text-muted-foreground">
                         {t('stepLabel', { current: step + 1, total: TOTAL_STEPS })}
                     </p>
@@ -276,16 +290,17 @@ export function CraftStoryWizard({
                                 text={(story[`answer${currentKey}Text` as const] as string | null | undefined) ?? ''}
                                 mediaId={currentMediaId}
                                 onTextChange={v => setAnswerText(currentKey, v)}
-                                onMediaChange={id => setAnswerMedia(currentKey, id)}
+                                onMediaChange={(id, mime) => setAnswerMedia(currentKey, id, mime)}
                                 captionStatus={currentMediaId ? captionStatuses[currentMediaId] : undefined}
-                                initialMimeType={currentMediaId ? (answerMediaMimeTypes[currentMediaId] ?? null) : null}
+                                initialMimeType={currentMediaId ? (answerMimeTypes[currentMediaId] ?? null) : null}
                             />
                         )}
 
                         {step === 7 && (
                             <WorkshopStep
                                 storyId={storyId}
-                                initial={initialWorkshopMedia}
+                                items={workshopMedia}
+                                onItemsChange={setWorkshopMedia}
                                 captionStatuses={captionStatuses}
                                 onUploaded={refreshCaptionStatuses}
                             />
@@ -294,9 +309,18 @@ export function CraftStoryWizard({
                         {step === 8 && (
                             <ReviewStep
                                 story={story}
-                                workshopCount={initialWorkshopMedia.length}
+                                workshopCount={workshopMedia.length}
                                 captionStatuses={captionStatuses}
                                 onEditStep={target => { setError(null); setReturnToReview(true); setStep(target) }}
+                                summaryText={(story.summaryText as string | null | undefined) ?? ''}
+                                onSummaryChange={value => {
+                                    // Update the save ref synchronously so an immediate
+                                    // persist (e.g. after applying an AI draft) sees it.
+                                    storyRef.current = { ...storyRef.current, summaryText: value }
+                                    setStory(s => ({ ...s, summaryText: value }))
+                                }}
+                                onPersistSummary={() => { void save(step) }}
+                                onRetryCaptions={retryCaptions}
                             />
                         )}
 
@@ -406,7 +430,7 @@ function QuestionStep({
     text: string
     mediaId: string | null
     onTextChange: (value: string) => void
-    onMediaChange: (id: string | null) => void
+    onMediaChange: (id: string | null, mimeType?: string | null) => void
     captionStatus?: string
     initialMimeType?: string | null
 }) {
@@ -422,25 +446,50 @@ function QuestionStep({
             <p className="mb-6 text-base text-muted-foreground">{t(`step${index}.prompt`)}</p>
 
             <div className="space-y-4">
+                {/* Primary: the recording is what plays in the film. */}
+                <div className="rounded-xl border border-warm/30 bg-warm/5 p-4">
+                    <div className="mb-1 flex items-center gap-2">
+                        <Mic className="h-4 w-4 text-warm" />
+                        <Video className="h-4 w-4 text-warm" />
+                        <span className="text-sm font-semibold text-warm">{t('answerRecordTitle')}</span>
+                    </div>
+                    <p className="mb-3 text-xs text-muted-foreground">{t('answerRecordHint')}</p>
+                    <AnswerMediaUpload
+                        mediaId={mediaId}
+                        onChange={onMediaChange}
+                        initialMimeType={initialMimeType}
+                        captionsReady={captionStatus === 'READY'}
+                    />
+                    {mediaId && (
+                        <div className="mt-2">
+                            <CaptionStatusChip status={captionStatus} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Clear either/or between recording and writing. */}
+                <div className="flex items-center gap-3">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        {t('answerOr')}
+                    </span>
+                    <div className="h-px flex-1 bg-border" />
+                </div>
+
+                {/* Secondary: a written answer, not used in the film. */}
                 <div>
-                    <Label htmlFor={`answer-${answerKey}`} className="mb-1.5 block text-sm font-medium">
+                    <Label htmlFor={`answer-${answerKey}`} className="mb-1 block text-sm font-medium">
                         {t('writeYourAnswer')}
                     </Label>
+                    <p className="mb-1.5 text-xs text-muted-foreground">{t('answerWriteHint')}</p>
                     <Textarea
                         id={`answer-${answerKey}`}
                         value={text}
                         onChange={e => onTextChange(e.target.value)}
                         placeholder={t('answerPlaceholder')}
-                        rows={6}
+                        rows={5}
                     />
                 </div>
-                <AnswerMediaUpload
-                    mediaId={mediaId}
-                    onChange={onMediaChange}
-                    initialMimeType={initialMimeType}
-                    captionsReady={captionStatus === 'READY'}
-                />
-                {mediaId && <CaptionStatusChip status={captionStatus} />}
             </div>
         </div>
     )
@@ -477,12 +526,14 @@ function CaptionStatusChip({ status }: { status?: string }) {
 
 function WorkshopStep({
     storyId,
-    initial,
+    items,
+    onItemsChange,
     captionStatuses,
     onUploaded,
 }: {
     storyId: string | null
-    initial: WorkshopMedia[]
+    items: WorkshopMedia[]
+    onItemsChange: Dispatch<SetStateAction<WorkshopMedia[]>>
     captionStatuses: Record<string, string>
     onUploaded: () => void
 }) {
@@ -494,7 +545,8 @@ function WorkshopStep({
             {storyId ? (
                 <StoryWorkshopUpload
                     storyId={storyId}
-                    initialItems={initial}
+                    items={items}
+                    onItemsChange={onItemsChange}
                     captionStatuses={captionStatuses}
                     onUploaded={onUploaded}
                 />
@@ -510,11 +562,19 @@ function ReviewStep({
     workshopCount,
     captionStatuses,
     onEditStep,
+    summaryText,
+    onSummaryChange,
+    onPersistSummary,
+    onRetryCaptions,
 }: {
     story: Partial<CraftStoryDraft>
     workshopCount: number
     captionStatuses: Record<string, string>
     onEditStep: (step: number) => void
+    summaryText: string
+    onSummaryChange: (value: string) => void
+    onPersistSummary: () => void
+    onRetryCaptions: () => void
 }) {
     const t = useTranslations('craftStory')
     const statusValues = Object.values(captionStatuses)
@@ -545,7 +605,15 @@ function ReviewStep({
         <div>
             <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('review.title')}</h1>
             <p className="mb-6 text-base text-muted-foreground">{t('review.lead')}</p>
-            <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+
+            {/* The film is the headline of the story — offer it first. */}
+            <StoryFilmPanel />
+
+            <div className="mt-6">
+                <SummaryEditor value={summaryText} onChange={onSummaryChange} onPersist={onPersistSummary} />
+            </div>
+
+            <div className="mt-8 divide-y divide-border overflow-hidden rounded-lg border border-border">
                 {allRows.map(({ step, label, value }) => (
                     <button
                         key={label}
@@ -574,11 +642,85 @@ function ReviewStep({
                 </p>
             )}
             {captionsFailed && (
-                <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-red-600 dark:text-red-400">
-                    <AlertCircle className="h-3.5 w-3.5" />
-                    {t('captions.someFailed')}
-                </p>
+                <div className="mt-3 flex flex-col items-center gap-1.5">
+                    <p className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {t('captions.someFailed')}
+                    </p>
+                    <Button type="button" variant="ghost" size="sm" onClick={onRetryCaptions}>
+                        {t('captions.retry')}
+                    </Button>
+                </div>
             )}
+        </div>
+    )
+}
+
+// A short editable summary of the whole story. "Suggest" drafts one from the
+// artisan's answers + transcripts via the server; the artisan owns the final text.
+function SummaryEditor({
+    value,
+    onChange,
+    onPersist,
+}: {
+    value: string
+    onChange: (value: string) => void
+    onPersist: () => void
+}) {
+    const t = useTranslations('craftStory.summary')
+    const [drafting, setDrafting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    async function suggest() {
+        setDrafting(true)
+        setError(null)
+        try {
+            const res = await fetch('/api/artisans/me/story/summary/draft', { method: 'POST' })
+            if (res.status === 429) return setError(t('rateLimited'))
+            if (res.status === 400) return setError(t('empty'))
+            if (!res.ok) return setError(t('failed'))
+            const data = await res.json()
+            if (data.draft) {
+                onChange(data.draft)
+                onPersist()
+            }
+        } catch {
+            setError(t('failed'))
+        } finally {
+            setDrafting(false)
+        }
+    }
+
+    return (
+        <div className="mt-6 rounded-lg border border-border p-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+                <Label htmlFor="story-summary" className="text-sm font-medium">
+                    {t('label')}
+                </Label>
+                <Button type="button" size="sm" variant="outline" onClick={() => void suggest()} disabled={drafting}>
+                    {drafting ? (
+                        <>
+                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                            {t('suggesting')}
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles className="mr-1.5 h-4 w-4" />
+                            {t('suggest')}
+                        </>
+                    )}
+                </Button>
+            </div>
+            <Textarea
+                id="story-summary"
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                onBlur={onPersist}
+                placeholder={t('hint')}
+                rows={4}
+                maxLength={1200}
+            />
+            {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
         </div>
     )
 }

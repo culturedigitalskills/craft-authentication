@@ -157,8 +157,9 @@
       "processing": "Englische Untertitel werden erstellt…",
       "ready": "Englische Untertitel bereit",
       "failed": "Für diese Aufnahme konnten keine Untertitel erstellt werden",
-      "someProcessing": "Einige Untertitel werden noch erstellt. Sie erscheinen in deiner öffentlichen Geschichte, sobald sie fertig sind.",
-      "someFailed": "Für einige Aufnahmen konnten keine Untertitel erstellt werden."
+      "someProcessing": "Untertitel werden noch im Hintergrund erstellt – du kannst jetzt veröffentlichen, sie erscheinen automatisch in deiner Geschichte, sobald sie fertig sind.",
+      "someFailed": "Für einige Aufnahmen konnten keine Untertitel erstellt werden.",
+      "retry": "Erneut versuchen"
     },
     "stepLabel": "Schritt {current} von {total}",
     "back": "Zurück",
@@ -169,6 +170,10 @@
     "saving": "Speichern...",
     "publish": "Meine Geschichte veröffentlichen",
     "publishing": "Veröffentlichen...",
+    "answerRecordTitle": "Nimm deine Antwort auf",
+    "answerRecordHint": "Deine Aufnahme ist das, was in deinem Film erscheint.",
+    "answerOr": "oder",
+    "answerWriteHint": "Geschriebene Antworten werden nicht in deinem Film verwendet.",
     "writeYourAnswer": "Schreibe deine Antwort",
     "answerPlaceholder": "Lass dir Zeit. Sprich natürlich. Es gibt keine falsche Antwort.",
     "questionLabel": "Frage {index}",
@@ -178,6 +183,7 @@
       "saveFailed": "Wir konnten deinen Fortschritt nicht speichern. Bitte versuche es erneut.",
       "publishFailed": "Wir konnten deine Geschichte nicht veröffentlichen. Bitte versuche es erneut.",
       "emptyStory": "Füge mindestens eine schriftliche Antwort, eine Aufnahme oder ein Werkstattfoto hinzu, bevor du veröffentlichst.",
+      "filmRequired": "Erstelle deinen Film, bevor du deine Geschichte veröffentlichst.",
       "conflict": "Deine Geschichte wurde in einem anderen Fenster aktualisiert. Lade diese Seite neu, um die neueste Version zu sehen."
     },
     "banner": {
@@ -218,12 +224,12 @@
       "prompt": "Was hat dir dieses Handwerk, deiner Familie oder deiner Gemeinschaft gebracht?"
     },
     "step5": {
-      "title": "Wissensweitergabe und zukünftige Generationen",
-      "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben? Glaubst du, dass es in Zukunft weiterleben kann?"
-    },
-    "step6": {
       "title": "Herausforderungen und Hürden",
       "prompt": "Welche Schwierigkeiten begegnen dir beim Ausüben dieses Handwerks? Welche Art von Unterstützung würde helfen, es am Leben zu halten?"
+    },
+    "step6": {
+      "title": "Wissensweitergabe und zukünftige Generationen",
+      "prompt": "Wie wird dieses Handwerk an jüngere Menschen weitergegeben? Glaubst du, dass es in Zukunft weiterleben kann?"
     },
     "step7": {
       "title": "Produkte, Werkzeuge und Prozesse",
@@ -248,6 +254,51 @@
       "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
       "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {max} MB.",
       "hint": "MP3, WAV, MP4 oder WebM. Bis zu {max} MB."
+    },
+    "recorder": {
+      "recordAudio": "Audio aufnehmen",
+      "recordVideo": "Video aufnehmen",
+      "requesting": "Warten auf Kamera-/Mikrofonberechtigung…",
+      "recording": "Aufnahme läuft",
+      "stop": "Stopp",
+      "retake": "Neu aufnehmen",
+      "use": "Aufnahme verwenden",
+      "uploading": "Hochladen…",
+      "permissionDenied": "Wir konnten nicht auf deine Kamera oder dein Mikrofon zugreifen. Bitte erlaube den Zugriff und versuche es erneut.",
+      "notSupported": "Aufnahme wird in diesem Browser nicht unterstützt. Du kannst stattdessen eine Datei hochladen.",
+      "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
+      "tooLarge": "Diese Aufnahme ist zu groß. Bitte nimm einen kürzeren Clip auf.",
+      "cancel": "Abbrechen"
+    },
+    "film": {
+      "title": "Mein-Geschichte-Film",
+      "description": "Verwandle deine Geschichte in einen kurzen Film, mit deiner Stimme über den Bildern deines Handwerks. Er wird zum Höhepunkt deiner öffentlichen Seite.",
+      "willBeHighlight": "Wenn du deine Geschichte veröffentlichst, wird dieser Film ihr Höhepunkt.",
+      "create": "Meinen Film erstellen",
+      "processing": "Dein Film wird erstellt… das kann einige Minuten dauern.",
+      "failed": "Wir konnten deinen Film nicht erstellen. Bitte versuche es erneut.",
+      "retry": "Erneut versuchen",
+      "watch": "Film ansehen",
+      "published": "Wird in deiner öffentlichen Geschichte gezeigt",
+      "stale": "Deine Geschichte hat sich seit der Erstellung dieses Films geändert. Erstelle ihn neu, um ihn zu aktualisieren.",
+      "premiereTitle": "Dein Geschichtsfilm",
+      "regenerate": "Neu erstellen",
+      "download": "Herunterladen",
+      "publish": "In meiner öffentlichen Geschichte zeigen",
+      "unpublish": "Aus meiner Geschichte ausblenden",
+      "insufficientInputs": "Füge zuerst mindestens eine gesprochene Antwort (Audio oder Video) und ein Foto oder Video hinzu."
+    },
+    "summary": {
+      "label": "Kurze Zusammenfassung (etwa 100 Wörter)",
+      "suggest": "Zusammenfassung vorschlagen",
+      "suggesting": "Wird geschrieben…",
+      "hint": "Ein kurzer Absatz, der deine Geschichte vorstellt. Schreibe selbst oder lass dir einen Entwurf vorschlagen und bearbeite ihn.",
+      "empty": "Füge zuerst einige Antworten hinzu, bevor du eine Zusammenfassung erstellst.",
+      "failed": "Wir konnten keine Zusammenfassung erstellen. Bitte versuche es erneut.",
+      "rateLimited": "Du hast kürzlich einige Zusammenfassungen erstellt. Bitte warte kurz und versuche es erneut."
+    },
+    "publicFilm": {
+      "readFullStory": "Ganze Geschichte lesen"
     },
     "workshop": {
       "addFile": "Foto oder Video hinzufügen",
@@ -545,7 +596,49 @@
     "savingCraft": "Handwerk wird gespeichert...",
     "updatingCraft": "Handwerk wird aktualisiert...",
     "craftCreateSuccess": "Handwerk erfolgreich erstellt!",
-    "craftUpdateSuccess": "Handwerk erfolgreich aktualisiert!"
+    "craftUpdateSuccess": "Handwerk erfolgreich aktualisiert!",
+    "wizard": {
+      "stepLabel": "Schritt {current} von {total}",
+      "back": "Zurück",
+      "next": "Weiter",
+      "backToReview": "Zurück zur Übersicht",
+      "fixFields": "Bitte überprüfe die markierten Felder.",
+      "locationFound": "Standort für dieses Werk erfasst.",
+      "locationPending": "Standort wird beim Browser abgefragt...",
+      "basics": {
+        "title": "Die Grundlagen",
+        "hint": "Beginne mit dem Namen des Stücks und was es ist."
+      },
+      "making": {
+        "title": "Die Herstellung",
+        "hint": "Materialien, Technik und wie lange es gedauert hat."
+      },
+      "measurements": {
+        "title": "Größe und Gewicht",
+        "hint": "Optional, wird aber oft gefragt. Leer lassen, wenn es nicht zutrifft."
+      },
+      "story": {
+        "title": "Geschichte und Pflege",
+        "hint": "Was das Stück inspiriert hat und wie man es pflegt."
+      },
+      "media": {
+        "title": "Fotos und Videos",
+        "hint": "Zeige das Stück. Das erste Foto wird zum Titelbild."
+      },
+      "visibility": {
+        "title": "Sichtbarkeit",
+        "hint": "Lege fest, wer dieses Werk sehen darf und ob der Herstellungsort geteilt wird."
+      },
+      "review": {
+        "title": "Prüfen und speichern",
+        "hint": "Sieh alles noch einmal durch. Wähle eine Zeile, um sie zu ändern.",
+        "edit": "Bearbeiten",
+        "notAdded": "Nicht angegeben",
+        "mediaCount": "{photos, plural, =0 {Keine Fotos} one {1 Foto} other {# Fotos}}, {videos, plural, =0 {keine Videos} one {1 Video} other {# Videos}}",
+        "isPublic": "Öffentlich, für alle sichtbar",
+        "isPrivate": "Privat, nur für dich sichtbar"
+      }
+    }
   },
   "imageWorkspace": {
     "title": "Bildgenerierung",

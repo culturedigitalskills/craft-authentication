@@ -157,8 +157,9 @@
       "processing": "İngilizce altyazılar oluşturuluyor…",
       "ready": "İngilizce altyazılar hazır",
       "failed": "Bu kayıt için altyazı oluşturulamadı",
-      "someProcessing": "Bazı altyazılar hâlâ oluşturuluyor. Hazır olduklarında herkese açık hikayenizde görünecekler.",
-      "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı."
+      "someProcessing": "Altyazılar hâlâ arka planda oluşturuluyor. Şimdi yayımlayabilirsin, hazır olduklarında hikâyende otomatik olarak görünecekler.",
+      "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı.",
+      "retry": "Tekrar dene"
     },
     "stepLabel": "Adım {current} / {total}",
     "back": "Geri",
@@ -169,6 +170,10 @@
     "saving": "Kaydediliyor...",
     "publish": "Hikâyemi yayınla",
     "publishing": "Yayınlanıyor...",
+    "answerRecordTitle": "Yanıtını kaydet",
+    "answerRecordHint": "Kaydın, filminde görünen şeydir.",
+    "answerOr": "veya",
+    "answerWriteHint": "Yazılı yanıtlar filminde kullanılmaz.",
     "writeYourAnswer": "Cevabını yaz",
     "answerPlaceholder": "Acele etme. Doğal konuş. Yanlış cevap yoktur.",
     "questionLabel": "Soru {index}",
@@ -178,6 +183,7 @@
       "saveFailed": "İlerlemeni kaydedemedik. Lütfen tekrar dene.",
       "publishFailed": "Hikâyeni yayınlayamadık. Lütfen tekrar dene.",
       "emptyStory": "Yayınlamadan önce en az bir yazılı cevap, kayıt veya atölye fotoğrafı ekle.",
+      "filmRequired": "Hikâyeni yayımlamadan önce filmini oluştur.",
       "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle."
     },
     "banner": {
@@ -218,12 +224,12 @@
       "prompt": "Bu zanaat sana, ailene veya topluluğuna neler kazandırdı?"
     },
     "step5": {
-      "title": "Bilginin Aktarımı ve Gelecek Nesiller",
-      "prompt": "Bu zanaat gençlere nasıl aktarılıyor ve gelecekte sürdürülebileceğini düşünüyor musun?"
-    },
-    "step6": {
       "title": "Zorluklar ve Engeller",
       "prompt": "Bu zanaatı icra ederken ne tür zorluklarla karşılaşıyorsun ve onu yaşatmak için ne tür bir destek faydalı olurdu?"
+    },
+    "step6": {
+      "title": "Bilginin Aktarımı ve Gelecek Nesiller",
+      "prompt": "Bu zanaat gençlere nasıl aktarılıyor ve gelecekte sürdürülebileceğini düşünüyor musun?"
     },
     "step7": {
       "title": "Ürünler, Aletler ve Süreçler",
@@ -248,6 +254,51 @@
       "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
       "fileTooLarge": "Dosya çok büyük. Maksimum boyut {max} MB.",
       "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB."
+    },
+    "recorder": {
+      "recordAudio": "Ses kaydet",
+      "recordVideo": "Video kaydet",
+      "requesting": "Kamera / mikrofon izni bekleniyor…",
+      "recording": "Kaydediliyor",
+      "stop": "Durdur",
+      "retake": "Yeniden kaydet",
+      "use": "Kaydı kullan",
+      "uploading": "Yükleniyor…",
+      "permissionDenied": "Kameranıza veya mikrofonunuza erişemedik. Lütfen erişime izin verip tekrar deneyin.",
+      "notSupported": "Bu tarayıcıda kayıt desteklenmiyor. Bunun yerine bir dosya yükleyebilirsiniz.",
+      "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
+      "tooLarge": "Bu kayıt çok büyük. Lütfen daha kısa bir klip kaydedin.",
+      "cancel": "İptal"
+    },
+    "film": {
+      "title": "Hikâyem filmi",
+      "description": "Hikâyeni kısa bir filme dönüştür, zanaatının görüntüleri üzerinde senin sesinle. Herkese açık sayfanın öne çıkan parçası olur.",
+      "willBeHighlight": "Hikâyeni yayımladığında bu film onun öne çıkan parçası olacak.",
+      "create": "Filmimi oluştur",
+      "processing": "Filmin oluşturuluyor… bu birkaç dakika sürebilir.",
+      "failed": "Filmini oluşturamadık. Lütfen tekrar dene.",
+      "retry": "Tekrar dene",
+      "watch": "Filmi izle",
+      "published": "Herkese açık hikâyende gösteriliyor",
+      "stale": "Bu film oluşturulduktan sonra hikâyen değişti. Güncellemek için yeniden oluştur.",
+      "premiereTitle": "Hikâye filmin",
+      "regenerate": "Yeniden oluştur",
+      "download": "İndir",
+      "publish": "Herkese açık hikâyemde göster",
+      "unpublish": "Hikâyemden gizle",
+      "insufficientInputs": "Önce en az bir sözlü yanıt (ses veya video) ve bir fotoğraf veya video ekle."
+    },
+    "summary": {
+      "label": "Kısa özet (yaklaşık 100 kelime)",
+      "suggest": "Özet öner",
+      "suggesting": "Yazılıyor…",
+      "hint": "Hikâyeni tanıtan kısa bir paragraf. Kendin yaz ya da bir taslak öner ve düzenle.",
+      "empty": "Özet oluşturmadan önce birkaç yanıt ekle.",
+      "failed": "Özet oluşturamadık. Lütfen tekrar dene.",
+      "rateLimited": "Son zamanlarda birkaç özet oluşturdun. Lütfen biraz bekleyip tekrar dene."
+    },
+    "publicFilm": {
+      "readFullStory": "Hikâyenin tamamını oku"
     },
     "workshop": {
       "addFile": "Fotoğraf veya video ekle",
@@ -479,7 +530,49 @@
     "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
     "addVideo": "Ekle",
     "removeVideo": "Videoyu kaldır",
-    "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı."
+    "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı.",
+    "wizard": {
+      "stepLabel": "Adım {current} / {total}",
+      "back": "Geri",
+      "next": "İleri",
+      "backToReview": "Özete dön",
+      "fixFields": "Lütfen işaretli alanları kontrol et.",
+      "locationFound": "Bu eser için konum alındı.",
+      "locationPending": "Tarayıcıdan konumun isteniyor...",
+      "basics": {
+        "title": "Temel bilgiler",
+        "hint": "Eserin adıyla ve ne olduğuyla başla."
+      },
+      "making": {
+        "title": "Yapım",
+        "hint": "Malzemeler, teknik ve ne kadar sürdüğü."
+      },
+      "measurements": {
+        "title": "Boyut ve ağırlık",
+        "hint": "İsteğe bağlı, ama sık sorulur. Uygun değilse boş bırak."
+      },
+      "story": {
+        "title": "Hikaye ve bakım",
+        "hint": "Eseri neyin esinlendirdiği ve nasıl bakılacağı."
+      },
+      "media": {
+        "title": "Fotoğraflar ve videolar",
+        "hint": "Eseri göster. İlk fotoğraf kapak görseli olur."
+      },
+      "visibility": {
+        "title": "Görünürlük",
+        "hint": "Bu eseri kimlerin görebileceğini ve yapıldığı yerin paylaşılıp paylaşılmayacağını seç."
+      },
+      "review": {
+        "title": "Gözden geçir ve kaydet",
+        "hint": "Her şeyi kontrol et. Değiştirmek için bir satır seç.",
+        "edit": "Düzenle",
+        "notAdded": "Eklenmedi",
+        "mediaCount": "{photos, plural, =0 {Fotoğraf yok} one {1 fotoğraf} other {# fotoğraf}}, {videos, plural, =0 {video yok} one {1 video} other {# video}}",
+        "isPublic": "Herkese açık, herkes görebilir",
+        "isPrivate": "Özel, yalnızca sen görebilirsin"
+      }
+    }
   },
   "groups": {
     "title": "Zanaatkâr Toplulukları",

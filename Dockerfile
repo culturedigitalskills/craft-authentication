@@ -34,8 +34,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV FFMPEG_PATH=/usr/bin/ffmpeg
 
 # Install system dependencies (openssl for credentials generation, curl & jq for
-# healthchecks, ffmpeg for the My Story caption pipeline) and prisma CLI
-RUN apt-get update && apt-get install -y openssl curl jq ffmpeg && rm -rf /var/lib/apt/lists/* && npm install -g prisma@7
+# healthchecks, ffmpeg for the My Story caption + film pipelines, fonts-noto-core
+# for the film's title/name cards incl. Arabic & Devanagari) and prisma CLI
+RUN apt-get update && apt-get install -y openssl curl jq ffmpeg fonts-noto-core && rm -rf /var/lib/apt/lists/* && npm install -g prisma@7
 
 # Application files
 COPY --from=builder /app/public ./public
