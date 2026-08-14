@@ -226,8 +226,8 @@
       "prompt": "¿Qué dificultades enfrentas al practicar esta artesanía y qué tipo de apoyo ayudaría a mantenerla viva?"
     },
     "step7": {
-      "title": "Taller, herramientas y proceso",
-      "prompt": "Graba o fotografía por separado tu taller, tus herramientas, tus materiales, cómo haces tu artesanía y el lugar donde trabajas.",
+      "title": "Productos, herramientas y procesos",
+      "prompt": "Sube fotos o vídeos de tu taller, tus herramientas, materiales, productos y tu proceso de elaboración. Por favor, elige imágenes relacionadas con la historia que estás contando. Si subes más de una, ordénalas según cómo quieras que la gente las vea.",
       "saveFirst": "Guarda primero una respuesta en un paso anterior y luego vuelve para añadir contenido del taller."
     },
     "review": {

@@ -228,8 +228,8 @@
       "prompt": "What difficulties do you face in practicing this craft, and what kind of support would help keep it alive?"
     },
     "step7": {
-      "title": "Workshop, Tools & Process",
-      "prompt": "Separately record or photograph your workshop, your tools, your materials, how you make your craft, and the place where you work.",
+      "title": "Products, Tools and Processes",
+      "prompt": "Upload photos or videos of your workshop, tools, materials, products, and making process. Please choose images that are related to the story you are telling. If you upload more than one, please arrange them in the order you want people to see them.",
       "saveFirst": "Save an answer in a previous step first, then come back to add workshop media."
     },
     "review": {

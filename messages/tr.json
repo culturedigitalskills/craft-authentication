@@ -226,8 +226,8 @@
       "prompt": "Bu zanaatı icra ederken ne tür zorluklarla karşılaşıyorsun ve onu yaşatmak için ne tür bir destek faydalı olurdu?"
     },
     "step7": {
-      "title": "Atölye, Aletler ve Süreç",
-      "prompt": "Atölyeni, aletlerini, malzemelerini, zanaatını nasıl yaptığını ve çalıştığın yeri ayrı ayrı kaydet veya fotoğrafla.",
+      "title": "Ürünler, Aletler ve Süreçler",
+      "prompt": "Atölyenin, aletlerinin, malzemelerinin, ürünlerinin ve yapım sürecinin fotoğraflarını veya videolarını yükle. Lütfen anlattığın hikâyeyle ilgili görseller seç. Birden fazla yüklersen, lütfen onları insanların görmesini istediğin sıraya göre düzenle.",
       "saveFirst": "Önce bir önceki adımda bir cevap kaydet, ardından atölye medyası eklemek için geri dön."
     },
     "review": {

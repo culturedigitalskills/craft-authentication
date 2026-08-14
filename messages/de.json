@@ -226,8 +226,8 @@
       "prompt": "Welche Schwierigkeiten begegnen dir beim Ausüben dieses Handwerks? Welche Art von Unterstützung würde helfen, es am Leben zu halten?"
     },
     "step7": {
-      "title": "Werkstatt, Werkzeuge & Prozess",
-      "prompt": "Nimm separat deine Werkstatt, deine Werkzeuge, deine Materialien, wie du dein Handwerk machst, und den Ort, an dem du arbeitest, auf oder fotografiere sie.",
+      "title": "Produkte, Werkzeuge und Prozesse",
+      "prompt": "Lade Fotos oder Videos von deiner Werkstatt, deinen Werkzeugen, Materialien, Produkten und deinem Herstellungsprozess hoch. Bitte wähle Bilder, die zu der Geschichte passen, die du erzählst. Wenn du mehrere hochlädst, ordne sie bitte in der Reihenfolge an, in der die Leute sie sehen sollen.",
       "saveFirst": "Speichere zuerst eine Antwort in einem früheren Schritt, dann komme zurück, um Werkstattmedien hinzuzufügen."
     },
     "review": {
