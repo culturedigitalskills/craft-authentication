@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -71,24 +72,38 @@ export function GroupCreateForm() {
         setSaving(true)
         setError('')
 
+        // The server requires a full URL for the website field.
+        const website = normalizeWebsite(form.website)
+        if (website) {
+            try {
+                new URL(website)
+            } catch {
+                setError(t('invalidWebsite'))
+                setSaving(false)
+                return
+            }
+        }
+
         try {
             const res = await fetch('/api/groups', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify({ ...form, website }),
             })
 
             if (!res.ok) {
                 const data = await res.json()
                 setError(data.error || t('saveFailed'))
+                setSaving(false)
                 return
             }
 
             const group = await res.json()
+            // Keep the button disabled on success — router.push doesn't unmount the
+            // form immediately, and re-enabling here allowed duplicate submissions.
             router.push(`/groups/${group.slug}`)
         } catch {
             setError(t('saveFailed'))
-        } finally {
             setSaving(false)
         }
     }
@@ -158,6 +173,7 @@ export function GroupCreateForm() {
                                 type="url"
                                 value={form.website}
                                 onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+                                onBlur={() => setForm(f => ({ ...f, website: normalizeWebsite(f.website) }))}
                                 placeholder="https://"
                             />
                         </div>
@@ -248,7 +264,8 @@ export function GroupCreateForm() {
 
                     <div className="flex justify-end">
                         <Button type="submit" disabled={saving}>
-                            {saving ? 'Creating...' : t('createGroup')}
+                            {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                            {saving ? t('creating') : t('createGroup')}
                         </Button>
                     </div>
                 </form>

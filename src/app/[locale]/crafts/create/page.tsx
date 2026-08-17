@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { CraftForm } from '@/components/craft/CraftForm'
+import { CraftWizard } from '@/components/craft/CraftWizard'
 import { getCraftMediaItems } from '@/lib/craft'
 
 export default async function CraftCreatePage({
@@ -14,6 +14,17 @@ export default async function CraftCreatePage({
     const session = await auth()
     if (!session?.user) {
         redirect('/login')
+    }
+
+    // Crafts belong to an artisan profile, so send anyone without one to
+    // onboarding rather than letting them fill in the whole wizard and hit a
+    // 409 at the end.
+    const artisan = await prisma.artisan.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true },
+    })
+    if (!artisan) {
+        redirect('/onboarding/artisan')
     }
 
     let craft = null
@@ -57,7 +68,7 @@ export default async function CraftCreatePage({
 
     return (
         <div className="container mx-auto px-4 py-10">
-            <CraftForm craft={craft} />
+            <CraftWizard craft={craft} />
         </div>
     )
 }

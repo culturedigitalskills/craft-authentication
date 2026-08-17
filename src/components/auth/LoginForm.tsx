@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { signIn } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -27,6 +27,11 @@ export function LoginForm() {
     const router = useRouter()
     const [serverError, setServerError] = useState<string | null>(null)
     const [showPassword, setShowPassword] = useState(false)
+    // Keeps the button in its busy state through the post-login redirect —
+    // isSubmitting resets as soon as onSubmit resolves, well before the
+    // navigation finishes.
+    const [redirecting, setRedirecting] = useState(false)
+    const [googleLoading, setGoogleLoading] = useState(false)
 
     const {
         register,
@@ -49,10 +54,13 @@ export function LoginForm() {
         if (result?.error) {
             setServerError(t('invalidCredentials'))
         } else {
+            setRedirecting(true)
             router.push('/auth/redirect')
             router.refresh()
         }
     }
+
+    const busy = isSubmitting || redirecting
 
     return (
         <Card className="mx-auto max-w-md">
@@ -108,9 +116,10 @@ export function LoginForm() {
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={isSubmitting}
+                        disabled={busy || googleLoading}
                     >
-                        {isSubmitting ? t('signingIn') : t('login')}
+                        {busy && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                        {busy ? t('signingIn') : t('login')}
                     </Button>
                     <div className="relative my-4">
                         <div className="absolute inset-0 flex items-center">
@@ -126,8 +135,13 @@ export function LoginForm() {
                         type="button"
                         variant="outline"
                         className="w-full"
-                        onClick={() => signIn('google', { callbackUrl: '/auth/redirect' })}
+                        disabled={busy || googleLoading}
+                        onClick={() => {
+                            setGoogleLoading(true)
+                            void signIn('google', { callbackUrl: '/auth/redirect' })
+                        }}
                     >
+                        {googleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                             <path
                                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"

@@ -31,6 +31,7 @@ import {
     X,
 } from 'lucide-react'
 import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 
 interface Artisan {
     id: string
@@ -91,6 +92,7 @@ export function ArtisanProfileForm({
     const [uploadedCoverId, setUploadedCoverId] = useState<string | null>(null)
     const [groups, setGroups] = useState(myGroups)
     const [confirmLeave, setConfirmLeave] = useState<string | null>(null)
+    const [leaveError, setLeaveError] = useState('')
     const [socialInstagram, setSocialInstagram] = useState(artisan?.socialInstagram ?? '')
     const [socialFacebook, setSocialFacebook] = useState(artisan?.socialFacebook ?? '')
     const [socialTwitter, setSocialTwitter] = useState(artisan?.socialTwitter ?? '')
@@ -108,6 +110,18 @@ export function ArtisanProfileForm({
         setIsSubmitting(true)
         setMessage(null)
 
+        // The server requires a full URL for the website field.
+        const normalizedWebsite = normalizeWebsite(website)
+        if (normalizedWebsite) {
+            try {
+                new URL(normalizedWebsite)
+            } catch {
+                setMessage({ text: t('invalidWebsite'), type: 'error' })
+                setIsSubmitting(false)
+                return
+            }
+        }
+
         const data: Record<string, unknown> = {
             firstName,
             lastName,
@@ -122,7 +136,7 @@ export function ArtisanProfileForm({
         if (socialTwitter) data.socialTwitter = socialTwitter.replace(/^@/, '')
         if (socialTiktok) data.socialTiktok = socialTiktok.replace(/^@/, '')
         if (socialYoutube) data.socialYoutube = socialYoutube.replace(/^@/, '')
-        if (website) data.website = website
+        if (normalizedWebsite) data.website = normalizedWebsite
         data.hashtags = hashtags
 
         try {
@@ -178,13 +192,14 @@ export function ArtisanProfileForm({
                 return
             }
 
+            // Keep the button disabled on success — router.push doesn't unmount the
+            // form immediately, and re-enabling here allowed duplicate submissions.
             router.push(`/artisans/${artisan.slug}`)
         } catch {
             setMessage({
                 text: isCreateMode ? t('createFailed') : t('updateFailed'),
                 type: 'error',
             })
-        } finally {
             setIsSubmitting(false)
         }
     }
@@ -223,6 +238,7 @@ export function ArtisanProfileForm({
     }
 
     async function handleLeaveGroup(membershipId: string, groupId: string) {
+        setLeaveError('')
         try {
             const res = await fetch(`/api/groups/${groupId}/members/${membershipId}`, {
                 method: 'DELETE',
@@ -231,7 +247,7 @@ export function ArtisanProfileForm({
             setGroups((prev) => prev.filter((g) => g.membershipId !== membershipId))
             setConfirmLeave(null)
         } catch {
-            alert(t('leaveGroupFailed'))
+            setLeaveError(t('leaveGroupFailed'))
         }
     }
 
@@ -276,7 +292,6 @@ export function ArtisanProfileForm({
                                     width={128}
                                     height={128}
                                     className="h-full w-full object-cover"
-                                    unoptimized
                                 />
                             ) : (
                                 <div className="flex h-full w-full items-center justify-center bg-muted">
@@ -394,6 +409,9 @@ export function ArtisanProfileForm({
                             <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-warm">
                                 {t('myGroups')}
                             </h2>
+                            {leaveError && (
+                                <p className="mb-3 text-sm text-destructive">{leaveError}</p>
+                            )}
                             <div className="space-y-2">
                                 {groups.map((g) => (
                                     <div
@@ -691,6 +709,11 @@ export function ArtisanProfileForm({
                                             id={id}
                                             value={value}
                                             onChange={(e) => setter(e.target.value)}
+                                            onBlur={
+                                                id === 'website'
+                                                    ? () => setWebsite(normalizeWebsite(website))
+                                                    : undefined
+                                            }
                                             placeholder={placeholder}
                                         />
                                     </div>

@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-// Single source of truth — order is the wizard step order (1..6).
-export const ANSWER_KEYS = ['Self', 'Craft', 'Meaning', 'Benefits', 'Future', 'Challenges'] as const
+// Single source of truth. Order is the wizard step order (1..6) and the film's
+// chapter order. Challenges is asked before Future.
+export const ANSWER_KEYS = ['Self', 'Craft', 'Meaning', 'Benefits', 'Challenges', 'Future'] as const
 export type AnswerKey = (typeof ANSWER_KEYS)[number]
 
 export const ANSWER_TEXT_FIELDS = ANSWER_KEYS.map(k => `answer${k}Text` as const)
@@ -25,6 +26,19 @@ export const UpdateCraftStorySchema = z.object({
     answerFutureMediaId: mediaId,
     answerChallengesText: textAnswer,
     answerChallengesMediaId: mediaId,
+    summaryText: z.string().max(1200).optional().nullable(),
 })
 
 export type UpdateCraftStory = z.infer<typeof UpdateCraftStorySchema>
+
+// POST /api/artisans/me/story/film — enqueue (or force-regenerate) the film.
+export const CreateStoryFilmSchema = z.object({
+    force: z.boolean().optional(),
+})
+export type CreateStoryFilm = z.infer<typeof CreateStoryFilmSchema>
+
+// PATCH /api/artisans/me/story/film — publish/unpublish the rendered film.
+export const UpdateStoryFilmSchema = z.object({
+    isPublic: z.boolean(),
+})
+export type UpdateStoryFilm = z.infer<typeof UpdateStoryFilmSchema>

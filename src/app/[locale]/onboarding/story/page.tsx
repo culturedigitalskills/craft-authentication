@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { CraftStoryWizard, type CraftStoryDraft } from '@/components/onboarding/CraftStoryWizard'
 import type { WorkshopMedia } from '@/components/onboarding/StoryWorkshopUpload'
+import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 
 export default async function OnboardingStoryPage() {
     const session = await auth()
@@ -55,16 +56,29 @@ export default async function OnboardingStoryPage() {
               answerFutureMediaId: story.answerFutureMediaId,
               answerChallengesText: story.answerChallengesText,
               answerChallengesMediaId: story.answerChallengesMediaId,
+              summaryText: story.summaryText,
           }
         : null
 
-    const maxUploadMb = parseInt(process.env.MAX_MEDIA_SIZE ?? '100', 10) || 100
+    // Mime types of saved answer media, so reloaded previews render video
+    // players (with captions) instead of falling back to audio.
+    const answerMediaIds = story
+        ? ANSWER_MEDIA_FIELDS.map(k => story[k]).filter((v): v is string => typeof v === 'string')
+        : []
+    let answerMediaMimeTypes: Record<string, string> = {}
+    if (answerMediaIds.length > 0) {
+        const files = await prisma.mediaFile.findMany({
+            where: { id: { in: answerMediaIds } },
+            select: { id: true, mimeType: true },
+        })
+        answerMediaMimeTypes = Object.fromEntries(files.map(f => [f.id, f.mimeType]))
+    }
 
     return (
         <CraftStoryWizard
             initialStory={initial}
             initialWorkshopMedia={workshopMedia}
-            maxUploadMb={maxUploadMb}
+            answerMediaMimeTypes={answerMediaMimeTypes}
         />
     )
 }

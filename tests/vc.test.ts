@@ -22,7 +22,8 @@ describe('Verifiable Credentials (VC) API Integration Tests', () => {
             'Beautiful clay mug fired in wood kiln',
             'artisan-uuid-12345',
             new Date().toISOString(),
-            'https://example.com/mug.png'
+            'https://example.com/mug.png',
+            crypto.createHash('sha256').update('fake-image-bytes').digest('hex')
         )
     })
 

@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -9,6 +10,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { SessionProvider } from '@/components/auth/SessionProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import NextTopLoader from 'nextjs-toploader'
 import {routing} from '@/i8n/routing'
 //we are using the css in the main app folder
 import '../globals.css'
@@ -30,17 +32,12 @@ type Props = {
 
 
 
-export default async function LocaleLayout({ children, params }: Props) {
-// Ensure that the incoming `locale` is valid
-    const {locale} = await params;
-    const messages = await getMessages();
-
-    if (!hasLocale(routing.locales, locale)) {
-    notFound();
-    }
-
-    // A signed-in user with no artisan profile still needs onboarding — surface a
-    // "Complete your profile" entry point in the nav so it's reachable after skipping.
+// A signed-in user with no artisan profile still needs onboarding — surface a
+// "Complete your profile" entry point in the nav so it's reachable after
+// skipping. Streamed behind Suspense so the session + profile lookup never
+// blocks the page shell: the header renders immediately without the badge and
+// re-renders with it once the lookup resolves.
+async function OnboardingAwareHeader() {
     const session = await auth()
     let needsOnboarding = false
     if (session?.user) {
@@ -50,6 +47,18 @@ export default async function LocaleLayout({ children, params }: Props) {
         })
         needsOnboarding = !artisan
     }
+    return <Header needsOnboarding={needsOnboarding} />
+}
+
+export default async function LocaleLayout({ children, params }: Props) {
+// Ensure that the incoming `locale` is valid
+    const {locale} = await params;
+    const messages = await getMessages();
+
+    if (!hasLocale(routing.locales, locale)) {
+    notFound();
+    }
+
     return (
         <html lang={`${locale}`} suppressHydrationWarning>
             <head>
@@ -74,18 +83,23 @@ export default async function LocaleLayout({ children, params }: Props) {
             >
 
 
+                {/* Slim top progress bar during navigation — the page stays
+                    visible instead of swapping to a full-screen spinner. */}
+                <NextTopLoader color="#bb5a2c" height={3} showSpinner={false} />
                         <ThemeProvider
                             attribute="class"
                             defaultTheme="light"
                             forcedTheme="light"
                             enableSystem={false}
                             disableTransitionOnChange
-                        >                    
+                        >
                         <SessionProvider>
                         <NextIntlClientProvider messages={messages}>
                             <div className="sc-page flex min-h-screen flex-col">
                                 <div className="sc-grain" />
-                                <Header needsOnboarding={needsOnboarding} />
+                                <Suspense fallback={<Header />}>
+                                    <OnboardingAwareHeader />
+                                </Suspense>
                                 <main className="flex-1">
                                     {children}
                                 </main>
