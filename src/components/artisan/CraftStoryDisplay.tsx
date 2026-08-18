@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl'
 import { ANSWER_KEYS } from '@/lib/validations/craftStory'
+import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
 
 export interface PublishedCraftStory {
     answerSelfText: string | null
@@ -25,10 +26,17 @@ interface CraftStoryDisplayProps {
     story: PublishedCraftStory
     workshop: WorkshopMediaItem[]
     answerMediaMimeTypes: Record<string, string>
+    captionedMediaIds?: string[]
 }
 
-export function CraftStoryDisplay({ story, workshop, answerMediaMimeTypes }: CraftStoryDisplayProps) {
+export function CraftStoryDisplay({
+    story,
+    workshop,
+    answerMediaMimeTypes,
+    captionedMediaIds = [],
+}: CraftStoryDisplayProps) {
     const t = useTranslations('craftStory')
+    const captioned = new Set(captionedMediaIds)
 
     const hasAny =
         ANSWER_KEYS.some(k => {
@@ -71,10 +79,15 @@ export function CraftStoryDisplay({ story, workshop, answerMediaMimeTypes }: Cra
                                     style={{ border: '1px solid var(--sc-border)', background: 'var(--sc-surface-trans)' }}
                                 >
                                     {isVideo ? (
-                                        <video
+                                        <CaptionedVideo
                                             src={`/api/media/${mediaId}`}
-                                            controls
-                                            className="w-full rounded-[var(--sc-r-btn)]"
+                                            captionsSrc={
+                                                captioned.has(mediaId)
+                                                    ? `/api/media/${mediaId}/subtitles`
+                                                    : undefined
+                                            }
+                                            captionsLabel={t('captionsLabel')}
+                                            className="mx-auto w-auto max-w-full max-h-[480px] rounded-[var(--sc-r-btn)]"
                                         />
                                     ) : (
                                         <audio
@@ -105,9 +118,14 @@ export function CraftStoryDisplay({ story, workshop, answerMediaMimeTypes }: Cra
                                     style={{ border: '1px solid var(--sc-border)', background: 'var(--sc-surface-trans)', boxShadow: 'var(--sc-shadow-card)' }}
                                 >
                                     {item.isVideo ? (
-                                        <video
+                                        <CaptionedVideo
                                             src={`/api/media/${item.mediaId}`}
-                                            controls
+                                            captionsSrc={
+                                                captioned.has(item.mediaId)
+                                                    ? `/api/media/${item.mediaId}/subtitles`
+                                                    : undefined
+                                            }
+                                            captionsLabel={t('captionsLabel')}
                                             className="aspect-square w-full object-cover"
                                         />
                                     ) : (

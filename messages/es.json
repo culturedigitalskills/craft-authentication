@@ -133,6 +133,9 @@
     "creating": "Creando...",
     "skipped": "Omitido",
     "createFailed": "No se pudo crear tu perfil. Por favor, inténtalo de nuevo.",
+    "fixFieldsError": "Algunos campos necesitan atención. Revisa los campos resaltados.",
+    "invalidWebsite": "Introduce una dirección web válida (p. ej. https://tusitio.com).",
+    "handleTooLong": "El nombre de usuario es demasiado largo (máximo 100 caracteres).",
     "step1Title": "¿Cuál es tu nombre?",
     "step1Hint": "Lo usaremos en tu perfil público de artesano.",
     "step2Title": "Agrega tus fotos",
@@ -149,6 +152,15 @@
     "reviewPhotos": "Fotos"
   },
   "craftStory": {
+    "captionsLabel": "Inglés",
+    "captions": {
+      "processing": "Generando subtítulos en inglés…",
+      "ready": "Subtítulos en inglés listos",
+      "failed": "No se pudieron generar los subtítulos para esta grabación",
+      "someProcessing": "Los subtítulos aún se generan en segundo plano: puedes publicar ahora y aparecerán automáticamente en tu historia cuando estén listos.",
+      "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones.",
+      "retry": "Intentar de nuevo"
+    },
     "stepLabel": "Paso {current} de {total}",
     "back": "Atrás",
     "next": "Siguiente",
@@ -158,6 +170,10 @@
     "saving": "Guardando...",
     "publish": "Publicar mi historia",
     "publishing": "Publicando...",
+    "answerRecordTitle": "Graba tu respuesta",
+    "answerRecordHint": "Tu grabación es lo que aparece en tu película.",
+    "answerOr": "o",
+    "answerWriteHint": "Las respuestas escritas no se usan en tu película.",
     "writeYourAnswer": "Escribe tu respuesta",
     "answerPlaceholder": "Tómate tu tiempo. Habla con naturalidad. No hay respuestas incorrectas.",
     "questionLabel": "Pregunta {index}",
@@ -167,6 +183,7 @@
       "saveFailed": "No pudimos guardar tu progreso. Inténtalo de nuevo.",
       "publishFailed": "No pudimos publicar tu historia. Inténtalo de nuevo.",
       "emptyStory": "Añade al menos una respuesta escrita, una grabación o una foto del taller antes de publicar.",
+      "filmRequired": "Crea tu película antes de publicar tu historia.",
       "conflict": "Tu historia se actualizó en otra ventana. Recarga esta página para ver la versión más reciente."
     },
     "banner": {
@@ -207,16 +224,16 @@
       "prompt": "¿Qué te ha aportado esta artesanía a ti, a tu familia o a tu comunidad?"
     },
     "step5": {
-      "title": "Transmisión del conocimiento y generaciones futuras",
-      "prompt": "¿Cómo se transmite esta artesanía a los más jóvenes y crees que podrá continuar en el futuro?"
-    },
-    "step6": {
       "title": "Desafíos y barreras",
       "prompt": "¿Qué dificultades enfrentas al practicar esta artesanía y qué tipo de apoyo ayudaría a mantenerla viva?"
     },
+    "step6": {
+      "title": "Transmisión del conocimiento y generaciones futuras",
+      "prompt": "¿Cómo se transmite esta artesanía a los más jóvenes y crees que podrá continuar en el futuro?"
+    },
     "step7": {
-      "title": "Taller, herramientas y proceso",
-      "prompt": "Graba o fotografía por separado tu taller, tus herramientas, tus materiales, cómo haces tu artesanía y el lugar donde trabajas.",
+      "title": "Productos, herramientas y procesos",
+      "prompt": "Sube fotos o vídeos de tu taller, tus herramientas, materiales, productos y tu proceso de elaboración. Por favor, elige imágenes relacionadas con la historia que estás contando. Si subes más de una, ordénalas según cómo quieras que la gente las vea.",
       "saveFirst": "Guarda primero una respuesta en un paso anterior y luego vuelve para añadir contenido del taller."
     },
     "review": {
@@ -235,7 +252,53 @@
       "remove": "Quitar",
       "uploading": "Subiendo...",
       "uploadFailed": "Error al subir. Inténtalo de nuevo.",
+      "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es {max} MB.",
       "hint": "MP3, WAV, MP4 o WebM. Hasta {max} MB."
+    },
+    "recorder": {
+      "recordAudio": "Grabar audio",
+      "recordVideo": "Grabar vídeo",
+      "requesting": "Esperando permiso de cámara / micrófono…",
+      "recording": "Grabando",
+      "stop": "Detener",
+      "retake": "Repetir",
+      "use": "Usar grabación",
+      "uploading": "Subiendo…",
+      "permissionDenied": "No pudimos acceder a tu cámara o micrófono. Permite el acceso e inténtalo de nuevo.",
+      "notSupported": "La grabación no es compatible con este navegador. Puedes subir un archivo en su lugar.",
+      "uploadFailed": "Error al subir. Inténtalo de nuevo.",
+      "tooLarge": "Esa grabación es demasiado grande. Graba un clip más corto.",
+      "cancel": "Cancelar"
+    },
+    "film": {
+      "title": "Película de Mi Historia",
+      "description": "Convierte tu historia en una película corta, con tu voz sobre las imágenes de tu oficio. Se convierte en lo más destacado de tu página pública.",
+      "willBeHighlight": "Cuando publiques tu historia, esta película será su elemento destacado.",
+      "create": "Crear mi película",
+      "processing": "Creando tu película… esto puede tardar unos minutos.",
+      "failed": "No pudimos crear tu película. Inténtalo de nuevo.",
+      "retry": "Intentar de nuevo",
+      "watch": "Ver película",
+      "published": "Se muestra en tu historia pública",
+      "stale": "Tu historia cambió desde que se creó esta película. Vuelve a generarla para actualizarla.",
+      "premiereTitle": "Tu película de historia",
+      "regenerate": "Regenerar",
+      "download": "Descargar",
+      "publish": "Mostrar en mi historia pública",
+      "unpublish": "Ocultar de mi historia",
+      "insufficientInputs": "Añade primero al menos una respuesta hablada (audio o vídeo) y una foto o vídeo."
+    },
+    "summary": {
+      "label": "Resumen breve (unas 100 palabras)",
+      "suggest": "Sugerir resumen",
+      "suggesting": "Escribiendo…",
+      "hint": "Un párrafo breve que presenta tu historia. Escríbelo tú mismo, o sugiere un borrador y edítalo.",
+      "empty": "Añade algunas respuestas antes de redactar un resumen.",
+      "failed": "No pudimos redactar un resumen. Inténtalo de nuevo.",
+      "rateLimited": "Has redactado varios resúmenes recientemente. Espera un poco e inténtalo de nuevo."
+    },
+    "publicFilm": {
+      "readFullStory": "Leer la historia completa"
     },
     "workshop": {
       "addFile": "Añadir foto o vídeo",
@@ -243,7 +306,10 @@
       "videoLabel": "Vídeo",
       "itemAlt": "Imagen del taller o del proceso",
       "uploadFailed": "Error al subir. Inténtalo de nuevo.",
-      "deleteFailed": "No se pudo eliminar ese archivo. Inténtalo de nuevo."
+      "deleteFailed": "No se pudo eliminar ese archivo. Inténtalo de nuevo.",
+      "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
+      "videoTooLarge": "El vídeo es demasiado grande. El tamaño máximo es {max} MB.",
+      "sizeHint": "Imágenes hasta {imageMax} MB (las fotos grandes se redimensionan automáticamente), vídeo hasta {videoMax} MB."
     }
   },
   "profile": {
@@ -278,7 +344,9 @@
     "changePhoto": "Cambiar foto",
     "photoUploading": "Subiendo...",
     "photoUploadFailed": "Error al subir la foto",
-    "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
+    "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
+    "imageLimitHint": "Imágenes hasta {max} MB — las fotos más grandes se redimensionan automáticamente.",
+    "invalidWebsite": "Introduce una dirección web válida (p. ej. https://tusitio.com).",
     "personalInfo": "Información personal",
     "craftExperience": "Experiencia artesanal",
     "location": "Ubicación",
@@ -437,7 +505,9 @@
     "galleryLoadFailed": "No se pudo cargar tu galería.",
     "galleryEmpty": "Tu galería multimedia está vacía. Sube imágenes primero en la página de la galería.",
     "filesSelected": "archivo(s) seleccionado(s)",
-    "mediaTooLarge": "El archivo es demasiado grande. El tamaño máximo es 100 MB.",
+    "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
+    "videoTooLarge": "El vídeo es demasiado grande. El tamaño máximo es {max} MB.",
+    "uploadLimitsHint": "Imágenes hasta {imageMax} MB (las fotos grandes se redimensionan automáticamente), vídeo hasta {videoMax} MB.",
     "uploadFailed": "No se pudieron subir algunos archivos. Inténtalo de nuevo.",
     "failed": "Error",
     "saving": "Guardando...",
@@ -451,7 +521,6 @@
     "createCraftDescriptionPlaceholder": "¿Qué materiales, técnicas o historia hacen especial a esta artesanía?",
     "selectMaterial": "Elige un material...",
     "deleteCraftConfirm": "¿Eliminar esta artesanía? Esto no se puede deshacer.",
-    "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
     "deleteImage": "Eliminar imagen",
     "deleteImageConfirm": "¿Eliminar esta imagen?",
     "deleteImageYes": "Eliminar",
@@ -461,7 +530,49 @@
     "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
     "addVideo": "Añadir",
     "removeVideo": "Eliminar video",
-    "invalidYoutubeUrl": "No se pudo reconocer como un enlace de YouTube."
+    "invalidYoutubeUrl": "No se pudo reconocer como un enlace de YouTube.",
+    "wizard": {
+      "stepLabel": "Paso {current} de {total}",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "backToReview": "Volver al resumen",
+      "fixFields": "Revisa los campos marcados.",
+      "locationFound": "Ubicación registrada para esta pieza.",
+      "locationPending": "Pidiendo tu ubicación al navegador...",
+      "basics": {
+        "title": "Lo esencial",
+        "hint": "Empieza por el nombre de la pieza y qué es."
+      },
+      "making": {
+        "title": "La elaboración",
+        "hint": "Materiales, técnica y tiempo de trabajo."
+      },
+      "measurements": {
+        "title": "Tamaño y peso",
+        "hint": "Opcional, pero suelen preguntarlo. Déjalo vacío si no aplica."
+      },
+      "story": {
+        "title": "Historia y cuidados",
+        "hint": "Qué inspiró la pieza y cómo cuidarla."
+      },
+      "media": {
+        "title": "Fotos y vídeos",
+        "hint": "Muestra la pieza. La primera foto será la portada."
+      },
+      "visibility": {
+        "title": "Visibilidad",
+        "hint": "Elige quién puede ver esta pieza y si compartes dónde se hizo."
+      },
+      "review": {
+        "title": "Revisar y guardar",
+        "hint": "Repásalo todo. Selecciona cualquier fila para cambiarla.",
+        "edit": "Editar",
+        "notAdded": "Sin completar",
+        "mediaCount": "{photos, plural, =0 {Sin fotos} one {1 foto} other {# fotos}}, {videos, plural, =0 {sin vídeos} one {1 vídeo} other {# vídeos}}",
+        "isPublic": "Pública, visible para todos",
+        "isPrivate": "Privada, solo visible para ti"
+      }
+    }
   },
   "groups": {
     "title": "Grupos de Artesanos",
@@ -512,8 +623,14 @@
     "deleteSuccess": "Grupo eliminado exitosamente",
     "memberAdded": "Miembro agregado exitosamente",
     "memberRemoved": "Miembro eliminado exitosamente",
+    "removeMemberFailed": "No se pudo eliminar al miembro. Inténtalo de nuevo.",
+    "updateRoleFailed": "No se pudo actualizar el rol del miembro. Inténtalo de nuevo.",
     "saveFailed": "Error al guardar el grupo",
-    "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es 8 MB.",
+    "creating": "Creando...",
+    "saving": "Guardando...",
+    "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
+    "imageLimitHint": "Imágenes hasta {max} MB — las fotos más grandes se redimensionan automáticamente.",
+    "invalidWebsite": "Introduce una dirección web válida (p. ej. https://tusitio.com).",
     "deleteFailed": "Error al eliminar el grupo",
     "viewGroup": "Ver Grupo",
     "viewPublicPage": "Ver página pública",
@@ -557,7 +674,9 @@
     "title": "Galería multimedia",
     "description": "Gestiona las imágenes, los vídeos y el audio que se muestran en tu perfil público.",
     "addMedia": "Añadir contenido",
-    "uploadHint": "Imágenes, vídeo o audio",
+    "uploadHint": "Imágenes hasta {imageMax} MB, vídeo/audio hasta {videoMax} MB",
+    "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
+    "videoTooLarge": "El archivo es demasiado grande. El tamaño máximo es {max} MB.",
     "audio": "Audio",
     "private": "Privado",
     "makePublic": "Hacer público",

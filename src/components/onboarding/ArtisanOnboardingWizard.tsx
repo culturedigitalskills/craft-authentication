@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
+import { StepDots } from '@/components/shared/StepDots'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -13,6 +14,8 @@ import { CoverPhotoUpload } from '@/components/profile/CoverPhotoUpload'
 import { LocationSelect } from '@/components/profile/LocationSelect'
 import { ArrowLeft, ArrowRight, Globe, Hash, X, Loader2, Check } from 'lucide-react'
 import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
+import { parseApiError } from '@/lib/api-error'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 
 type WizardData = {
     firstName: string
@@ -54,6 +57,33 @@ const INITIAL_DATA: WizardData = {
 
 const TOTAL_STEPS = 6
 
+// Which wizard step each server-validated field lives on, so a validation
+// error can send the user back to the right screen.
+const FIELD_STEPS: Record<string, number> = {
+    firstName: 1,
+    lastName: 1,
+    bio: 3,
+    yearsOfExperience: 3,
+    learningSource: 3,
+    country: 4,
+    region: 4,
+    socialInstagram: 5,
+    socialFacebook: 5,
+    socialTwitter: 5,
+    socialTiktok: 5,
+    socialYoutube: 5,
+    website: 5,
+    hashtags: 5,
+}
+
+const SOCIAL_KEYS = [
+    'socialInstagram',
+    'socialFacebook',
+    'socialTwitter',
+    'socialTiktok',
+    'socialYoutube',
+] as const
+
 export function ArtisanOnboardingWizard() {
     const t = useTranslations('onboardingWizard')
     const tp = useTranslations('profile')
@@ -64,9 +94,24 @@ export function ArtisanOnboardingWizard() {
     const [hashtagInput, setHashtagInput] = useState('')
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
-    const update = <K extends keyof WizardData>(key: K, value: WizardData[K]) =>
+    const update = <K extends keyof WizardData>(key: K, value: WizardData[K]) => {
         setData((d) => ({ ...d, [key]: value }))
+        setFieldErrors((fe) => {
+            if (!(key in fe)) return fe
+            const next = { ...fe }
+            delete next[key]
+            return next
+        })
+    }
+
+    function showFieldErrors(errors: Record<string, string>) {
+        setFieldErrors(errors)
+        setError(t('fixFieldsError'))
+        setStep(Math.min(...Object.keys(errors).map((k) => FIELD_STEPS[k] ?? TOTAL_STEPS)))
+        setSubmitting(false)
+    }
 
     const nameValid = /\D/.test(data.firstName.trim()) && /\D/.test(data.lastName.trim())
 
@@ -94,6 +139,26 @@ export function ArtisanOnboardingWizard() {
     async function handleSubmit() {
         setSubmitting(true)
         setError(null)
+        setFieldErrors({})
+
+        // Validate client-side the fields the server is strict about, so the
+        // user gets a field-level message instead of an opaque failure.
+        const clientErrors: Record<string, string> = {}
+        const website = normalizeWebsite(data.website)
+        if (website) {
+            try {
+                new URL(website)
+            } catch {
+                clientErrors.website = t('invalidWebsite')
+            }
+        }
+        for (const key of SOCIAL_KEYS) {
+            if (data[key].trim().length > 100) clientErrors[key] = t('handleTooLong')
+        }
+        if (Object.keys(clientErrors).length > 0) {
+            showFieldErrors(clientErrors)
+            return
+        }
 
         const body: Record<string, unknown> = {
             firstName: data.firstName.trim(),
@@ -104,12 +169,11 @@ export function ArtisanOnboardingWizard() {
         if (data.learningSource) body.learningSource = data.learningSource
         if (data.country) body.country = data.country
         if (data.region) body.region = data.region
-        if (data.socialInstagram) body.socialInstagram = data.socialInstagram.replace(/^@/, '')
-        if (data.socialFacebook) body.socialFacebook = data.socialFacebook.replace(/^@/, '')
-        if (data.socialTwitter) body.socialTwitter = data.socialTwitter.replace(/^@/, '')
-        if (data.socialTiktok) body.socialTiktok = data.socialTiktok.replace(/^@/, '')
-        if (data.socialYoutube) body.socialYoutube = data.socialYoutube.replace(/^@/, '')
-        if (data.website) body.website = data.website
+        for (const key of SOCIAL_KEYS) {
+            const handle = data[key].trim().replace(/^@/, '')
+            if (handle) body[key] = handle
+        }
+        if (website) body.website = website
         body.hashtags = data.hashtags
 
         try {
@@ -118,8 +182,38 @@ export function ArtisanOnboardingWizard() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body),
             })
-            if (!res.ok) throw new Error('Create failed')
-            const artisan = await res.json()
+
+            let artisan: { id: string; slug: string }
+            if (res.ok) {
+                artisan = await res.json()
+            } else if (res.status === 409) {
+                // Profile already exists — e.g. a previous attempt created it but
+                // a follow-up step failed. Resume with the existing profile
+                // instead of dead-ending on the error.
+                const meRes = await fetch('/api/artisans/me')
+                const me = meRes.ok ? await meRes.json() : null
+                if (!me?.artisan) throw new Error('Create failed')
+                artisan = me.artisan
+            } else if (res.status === 400) {
+                const { issues } = await parseApiError(res)
+                const mapped: Record<string, string> = {}
+                for (const issue of issues) {
+                    const field = issue.path.split('.')[0]
+                    if (!mapped[field]) mapped[field] = issue.message
+                }
+                if (Object.keys(mapped).length > 0) {
+                    showFieldErrors(mapped)
+                } else {
+                    setError(t('createFailed'))
+                    setSubmitting(false)
+                }
+                return
+            } else {
+                const { error: serverError } = await parseApiError(res)
+                setError(serverError || t('createFailed'))
+                setSubmitting(false)
+                return
+            }
 
             const attachments: Promise<Response>[] = []
             if (data.photoMediaId) {
@@ -152,7 +246,9 @@ export function ArtisanOnboardingWizard() {
                     }),
                 )
             }
-            if (attachments.length > 0) await Promise.all(attachments)
+            // Attachment failures are non-fatal — the profile exists and photos
+            // can be re-uploaded from the profile page.
+            if (attachments.length > 0) await Promise.allSettled(attachments)
 
             router.push(`/artisans/${artisan.slug}`)
         } catch {
@@ -164,21 +260,8 @@ export function ArtisanOnboardingWizard() {
     return (
         <Container>
             <div className="mx-auto max-w-2xl py-10 sm:py-14">
-                {/* Progress dots */}
-                <div className="mb-2 flex justify-center gap-2">
-                    {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((n) => (
-                        <span
-                            key={n}
-                            className={`h-2 w-2 rounded-full transition-all ${
-                                n === step
-                                    ? 'w-8 bg-primary'
-                                    : n < step
-                                      ? 'bg-primary/40'
-                                      : 'bg-muted'
-                            }`}
-                        />
-                    ))}
-                </div>
+                {/* Steps are 1-based here; StepDots takes a zero-based index. */}
+                <StepDots current={step - 1} total={TOTAL_STEPS} />
                 <p className="mb-8 text-center text-xs text-muted-foreground">
                     {t('stepLabel', { current: step, total: TOTAL_STEPS })}
                 </p>
@@ -207,9 +290,15 @@ export function ArtisanOnboardingWizard() {
                                         value={data.firstName}
                                         onChange={(e) => update('firstName', e.target.value)}
                                         pattern=".*\D.*"
+                                        aria-invalid={!!fieldErrors.firstName || undefined}
                                         autoFocus
                                         required
                                     />
+                                    {fieldErrors.firstName && (
+                                        <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                            {fieldErrors.firstName}
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
                                     <Label
@@ -223,8 +312,14 @@ export function ArtisanOnboardingWizard() {
                                         value={data.lastName}
                                         onChange={(e) => update('lastName', e.target.value)}
                                         pattern=".*\D.*"
+                                        aria-invalid={!!fieldErrors.lastName || undefined}
                                         required
                                     />
+                                    {fieldErrors.lastName && (
+                                        <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                            {fieldErrors.lastName}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -374,8 +469,23 @@ export function ArtisanOnboardingWizard() {
                                                 id={id}
                                                 value={data[key]}
                                                 onChange={(e) => update(key, e.target.value)}
+                                                onBlur={
+                                                    key === 'website'
+                                                        ? () =>
+                                                              update(
+                                                                  'website',
+                                                                  normalizeWebsite(data.website),
+                                                              )
+                                                        : undefined
+                                                }
                                                 placeholder={placeholder}
+                                                aria-invalid={!!fieldErrors[key] || undefined}
                                             />
+                                            {fieldErrors[key] && (
+                                                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                                    {fieldErrors[key]}
+                                                </p>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

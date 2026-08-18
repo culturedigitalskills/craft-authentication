@@ -17,6 +17,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { GroupPhotoUpload } from './GroupPhotoUpload'
+import { normalizeWebsite } from '@/lib/validations/artisan'
 
 interface GroupData {
     id: string
@@ -56,6 +57,8 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     const [saving, setSaving] = useState(false)
     const [deleting, setDeleting] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
+    const [formError, setFormError] = useState('')
+    const [memberError, setMemberError] = useState('')
     const [members, setMembers] = useState(initialMembers)
     const [addError, setAddError] = useState('')
     const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
@@ -91,12 +94,13 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             return
         }
         setDeleting(true)
+        setFormError('')
         try {
             const res = await fetch(`/api/groups/${group.id}`, { method: 'DELETE' })
             if (!res.ok) throw new Error('Failed to delete')
             router.push('/groups')
         } catch {
-            alert(t('deleteFailed'))
+            setFormError(t('deleteFailed'))
             setDeleting(false)
             setConfirmDelete(false)
         }
@@ -104,17 +108,30 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
 
     async function handleSave(e: React.FormEvent) {
         e.preventDefault()
+        setFormError('')
+
+        // The server requires a full URL for the website field.
+        const website = normalizeWebsite(form.website)
+        if (website) {
+            try {
+                new URL(website)
+            } catch {
+                setFormError(t('invalidWebsite'))
+                return
+            }
+        }
+
         setSaving(true)
         try {
             const res = await fetch(`/api/groups/${group.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify({ ...form, website }),
             })
             if (!res.ok) throw new Error('Failed to save')
             router.refresh()
         } catch {
-            alert(t('saveFailed'))
+            setFormError(t('saveFailed'))
         } finally {
             setSaving(false)
         }
@@ -172,6 +189,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     }
 
     async function handleRemoveMember(membershipId: string) {
+        setMemberError('')
         try {
             const res = await fetch(`/api/groups/${group.id}/members/${membershipId}`, {
                 method: 'DELETE',
@@ -180,12 +198,13 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             setMembers(prev => prev.filter(m => m.id !== membershipId))
             setConfirmRemove(null)
         } catch {
-            alert('Failed to remove member')
+            setMemberError(t('removeMemberFailed'))
         }
     }
 
     async function handleToggleRole(membershipId: string, currentRole: string) {
         const newRole = currentRole === 'ADMIN' ? 'MEMBER' : 'ADMIN'
+        setMemberError('')
         try {
             const res = await fetch(`/api/groups/${group.id}/members/${membershipId}`, {
                 method: 'PUT',
@@ -197,7 +216,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 prev.map(m => m.id === membershipId ? { ...m, role: newRole } : m)
             )
         } catch {
-            alert('Failed to update role')
+            setMemberError(t('updateRoleFailed'))
         }
     }
 
@@ -282,6 +301,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                             type="url"
                             value={form.website}
                             onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+                            onBlur={() => setForm(f => ({ ...f, website: normalizeWebsite(f.website) }))}
                             placeholder="https://"
                         />
                     </div>
@@ -373,6 +393,10 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                     </label>
                 </div>
 
+                {formError && (
+                    <p className="text-sm text-destructive">{formError}</p>
+                )}
+
                 <div className="flex items-center justify-between">
                     {confirmDelete ? (
                         <div className="flex items-center gap-2">
@@ -405,7 +429,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                     )}
                     <Button type="submit" disabled={saving}>
                         {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
-                        {saving ? 'Saving...' : t('editGroup')}
+                        {saving ? t('saving') : t('editGroup')}
                     </Button>
                 </div>
             </form>
@@ -413,6 +437,10 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             {/* Members management */}
             <div className="rounded-lg border border-border bg-card p-6">
                 <h2 className="mb-4 text-lg font-semibold">{t('members')}</h2>
+
+                {memberError && (
+                    <p className="mb-3 text-sm text-destructive">{memberError}</p>
+                )}
 
                 {/* Add member */}
                 <div className="mb-6">

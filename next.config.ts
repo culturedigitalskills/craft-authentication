@@ -6,15 +6,29 @@ const nextConfig: NextConfig = {
     output: 'standalone',
     experimental: {
         serverActions: {
-            bodySizeLimit: '50mb',
+            bodySizeLimit: '110mb',
         },
-        proxyClientMaxBodySize: '30mb',
+        // Must accommodate the 100 MB video limit (MAX_VIDEO_MB in
+        // src/lib/media-limits.ts) plus multipart overhead — uploads go
+        // through the proxy layer.
+        proxyClientMaxBodySize: '110mb',
     },
     // Keep these as external packages so Next.js does not bundle them into the
     // server chunk. This ensures they are traced into the standalone node_modules
     // and remain resolvable by other scripts in the container (e.g. seed.mjs).
-    serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg', '@contentauth/c2pa-node'],
+    serverExternalPackages: [
+        '@prisma/client',
+        '@prisma/adapter-pg',
+        'pg',
+        '@contentauth/c2pa-node',
+        // Must resolve its bundled ffmpeg binary via a real __dirname at runtime;
+        // bundling it rewrites the path to a virtual /ROOT/ location.
+        'ffmpeg-static',
+    ],
     images: {
+        // Media files are immutable per id, so optimized variants can be
+        // cached aggressively (31 days) instead of the 60s default.
+        minimumCacheTTL: 2678400,
         remotePatterns: [
             {
                 protocol: 'https',

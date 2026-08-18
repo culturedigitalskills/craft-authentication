@@ -1,4 +1,10 @@
 import { z } from 'zod'
+import {
+    MAX_IMAGE_MB,
+    MAX_VIDEO_MB,
+    MAX_IMAGE_BYTES,
+    MAX_VIDEO_BYTES,
+} from '@/lib/media-limits'
 
 const ALLOWED_EXTENSIONS = /\.(jpeg|jpg|png|gif|webp|mp4|avi|mov|wmv|flv|webm|mkv|mp3|wav|m4a|ogg|oga)$/i
 const ALLOWED_MIME_TYPES = [
@@ -8,7 +14,6 @@ const ALLOWED_MIME_TYPES = [
     'audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a',
     'audio/webm', 'audio/ogg',
 ]
-const MAX_FILE_SIZE = (parseInt(process.env.MAX_MEDIA_SIZE ?? '100') || 100) * 1024 * 1024 // 100MB
 
 export const fileUploadSchema = z.object({
     file: z
@@ -29,11 +34,15 @@ export const fileUploadSchema = z.object({
             },
         )
         .refine(
-            (file) => {
-                return file.size <= MAX_FILE_SIZE
-            },
+            (file) => !file.type.startsWith('image/') || file.size <= MAX_IMAGE_BYTES,
             {
-                message: `File size exceeds maximum of ${process.env.MAX_MEDIA_SIZE || 100}MB`,
+                message: `Image size exceeds maximum of ${MAX_IMAGE_MB}MB`,
+            },
+        )
+        .refine(
+            (file) => file.type.startsWith('image/') || file.size <= MAX_VIDEO_BYTES,
+            {
+                message: `File size exceeds maximum of ${MAX_VIDEO_MB}MB`,
             },
         ),
 })

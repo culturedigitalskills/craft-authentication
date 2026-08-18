@@ -133,6 +133,9 @@
     "creating": "Oluşturuluyor...",
     "skipped": "Atlandı",
     "createFailed": "Profiliniz oluşturulamadı. Lütfen tekrar deneyin.",
+    "fixFieldsError": "Bazı alanlar dikkat gerektiriyor. Lütfen vurgulanan alanları gözden geçirin.",
+    "invalidWebsite": "Lütfen geçerli bir web sitesi adresi girin (ör. https://siteniz.com).",
+    "handleTooLong": "Kullanıcı adı çok uzun (en fazla 100 karakter).",
     "step1Title": "Adın ne?",
     "step1Hint": "Bunu herkese açık zanaatkar profilinde kullanacağız.",
     "step2Title": "Fotoğraflarını ekle",
@@ -149,6 +152,15 @@
     "reviewPhotos": "Fotoğraflar"
   },
   "craftStory": {
+    "captionsLabel": "İngilizce",
+    "captions": {
+      "processing": "İngilizce altyazılar oluşturuluyor…",
+      "ready": "İngilizce altyazılar hazır",
+      "failed": "Bu kayıt için altyazı oluşturulamadı",
+      "someProcessing": "Altyazılar hâlâ arka planda oluşturuluyor. Şimdi yayımlayabilirsin, hazır olduklarında hikâyende otomatik olarak görünecekler.",
+      "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı.",
+      "retry": "Tekrar dene"
+    },
     "stepLabel": "Adım {current} / {total}",
     "back": "Geri",
     "next": "İleri",
@@ -158,6 +170,10 @@
     "saving": "Kaydediliyor...",
     "publish": "Hikâyemi yayınla",
     "publishing": "Yayınlanıyor...",
+    "answerRecordTitle": "Yanıtını kaydet",
+    "answerRecordHint": "Kaydın, filminde görünen şeydir.",
+    "answerOr": "veya",
+    "answerWriteHint": "Yazılı yanıtlar filminde kullanılmaz.",
     "writeYourAnswer": "Cevabını yaz",
     "answerPlaceholder": "Acele etme. Doğal konuş. Yanlış cevap yoktur.",
     "questionLabel": "Soru {index}",
@@ -167,6 +183,7 @@
       "saveFailed": "İlerlemeni kaydedemedik. Lütfen tekrar dene.",
       "publishFailed": "Hikâyeni yayınlayamadık. Lütfen tekrar dene.",
       "emptyStory": "Yayınlamadan önce en az bir yazılı cevap, kayıt veya atölye fotoğrafı ekle.",
+      "filmRequired": "Hikâyeni yayımlamadan önce filmini oluştur.",
       "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle."
     },
     "banner": {
@@ -207,16 +224,16 @@
       "prompt": "Bu zanaat sana, ailene veya topluluğuna neler kazandırdı?"
     },
     "step5": {
-      "title": "Bilginin Aktarımı ve Gelecek Nesiller",
-      "prompt": "Bu zanaat gençlere nasıl aktarılıyor ve gelecekte sürdürülebileceğini düşünüyor musun?"
-    },
-    "step6": {
       "title": "Zorluklar ve Engeller",
       "prompt": "Bu zanaatı icra ederken ne tür zorluklarla karşılaşıyorsun ve onu yaşatmak için ne tür bir destek faydalı olurdu?"
     },
+    "step6": {
+      "title": "Bilginin Aktarımı ve Gelecek Nesiller",
+      "prompt": "Bu zanaat gençlere nasıl aktarılıyor ve gelecekte sürdürülebileceğini düşünüyor musun?"
+    },
     "step7": {
-      "title": "Atölye, Aletler ve Süreç",
-      "prompt": "Atölyeni, aletlerini, malzemelerini, zanaatını nasıl yaptığını ve çalıştığın yeri ayrı ayrı kaydet veya fotoğrafla.",
+      "title": "Ürünler, Aletler ve Süreçler",
+      "prompt": "Atölyenin, aletlerinin, malzemelerinin, ürünlerinin ve yapım sürecinin fotoğraflarını veya videolarını yükle. Lütfen anlattığın hikâyeyle ilgili görseller seç. Birden fazla yüklersen, lütfen onları insanların görmesini istediğin sıraya göre düzenle.",
       "saveFirst": "Önce bir önceki adımda bir cevap kaydet, ardından atölye medyası eklemek için geri dön."
     },
     "review": {
@@ -235,7 +252,53 @@
       "remove": "Kaldır",
       "uploading": "Yükleniyor...",
       "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
+      "fileTooLarge": "Dosya çok büyük. Maksimum boyut {max} MB.",
       "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB."
+    },
+    "recorder": {
+      "recordAudio": "Ses kaydet",
+      "recordVideo": "Video kaydet",
+      "requesting": "Kamera / mikrofon izni bekleniyor…",
+      "recording": "Kaydediliyor",
+      "stop": "Durdur",
+      "retake": "Yeniden kaydet",
+      "use": "Kaydı kullan",
+      "uploading": "Yükleniyor…",
+      "permissionDenied": "Kameranıza veya mikrofonunuza erişemedik. Lütfen erişime izin verip tekrar deneyin.",
+      "notSupported": "Bu tarayıcıda kayıt desteklenmiyor. Bunun yerine bir dosya yükleyebilirsiniz.",
+      "uploadFailed": "Yükleme başarısız. Lütfen tekrar deneyin.",
+      "tooLarge": "Bu kayıt çok büyük. Lütfen daha kısa bir klip kaydedin.",
+      "cancel": "İptal"
+    },
+    "film": {
+      "title": "Hikâyem filmi",
+      "description": "Hikâyeni kısa bir filme dönüştür, zanaatının görüntüleri üzerinde senin sesinle. Herkese açık sayfanın öne çıkan parçası olur.",
+      "willBeHighlight": "Hikâyeni yayımladığında bu film onun öne çıkan parçası olacak.",
+      "create": "Filmimi oluştur",
+      "processing": "Filmin oluşturuluyor… bu birkaç dakika sürebilir.",
+      "failed": "Filmini oluşturamadık. Lütfen tekrar dene.",
+      "retry": "Tekrar dene",
+      "watch": "Filmi izle",
+      "published": "Herkese açık hikâyende gösteriliyor",
+      "stale": "Bu film oluşturulduktan sonra hikâyen değişti. Güncellemek için yeniden oluştur.",
+      "premiereTitle": "Hikâye filmin",
+      "regenerate": "Yeniden oluştur",
+      "download": "İndir",
+      "publish": "Herkese açık hikâyemde göster",
+      "unpublish": "Hikâyemden gizle",
+      "insufficientInputs": "Önce en az bir sözlü yanıt (ses veya video) ve bir fotoğraf veya video ekle."
+    },
+    "summary": {
+      "label": "Kısa özet (yaklaşık 100 kelime)",
+      "suggest": "Özet öner",
+      "suggesting": "Yazılıyor…",
+      "hint": "Hikâyeni tanıtan kısa bir paragraf. Kendin yaz ya da bir taslak öner ve düzenle.",
+      "empty": "Özet oluşturmadan önce birkaç yanıt ekle.",
+      "failed": "Özet oluşturamadık. Lütfen tekrar dene.",
+      "rateLimited": "Son zamanlarda birkaç özet oluşturdun. Lütfen biraz bekleyip tekrar dene."
+    },
+    "publicFilm": {
+      "readFullStory": "Hikâyenin tamamını oku"
     },
     "workshop": {
       "addFile": "Fotoğraf veya video ekle",
@@ -243,7 +306,10 @@
       "videoLabel": "Video",
       "itemAlt": "Atölye veya süreç görseli",
       "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
-      "deleteFailed": "Bu dosya silinemedi. Lütfen tekrar dene."
+      "deleteFailed": "Bu dosya silinemedi. Lütfen tekrar dene.",
+      "imageTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
+      "videoTooLarge": "Video çok büyük. Maksimum boyut {max} MB.",
+      "sizeHint": "Görseller en fazla {imageMax} MB (büyük fotoğraflar otomatik küçültülür), videolar en fazla {videoMax} MB."
     }
   },
   "profile": {
@@ -278,7 +344,9 @@
     "changePhoto": "Fotoğrafı Değiştir",
     "photoUploading": "Yükleniyor...",
     "photoUploadFailed": "Fotoğraf yüklenemedi",
-    "fileTooLarge": "Resim çok büyük. Maksimum boyut 8 MB.",
+    "fileTooLarge": "Resim çok büyük. Maksimum boyut {max} MB.",
+    "imageLimitHint": "Görseller en fazla {max} MB — daha büyük fotoğraflar otomatik küçültülür.",
+    "invalidWebsite": "Lütfen geçerli bir web sitesi adresi girin (ör. https://siteniz.com).",
     "personalInfo": "Kişisel Bilgiler",
     "craftExperience": "Zanaat Deneyimi",
     "location": "Konum",
@@ -437,7 +505,9 @@
     "galleryLoadFailed": "Galeriniz yüklenemedi.",
     "galleryEmpty": "Medya galeriniz boş. Önce Galeri sayfasından görsel yükleyin.",
     "filesSelected": "dosya seçildi",
-    "mediaTooLarge": "Dosya çok büyük. Maksimum boyut 100 MB.",
+    "imageTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
+    "videoTooLarge": "Video çok büyük. Maksimum boyut {max} MB.",
+    "uploadLimitsHint": "Görseller en fazla {imageMax} MB (büyük fotoğraflar otomatik küçültülür), videolar en fazla {videoMax} MB.",
     "uploadFailed": "Bazı dosyalar yüklenemedi. Lütfen tekrar deneyin.",
     "failed": "Başarısız",
     "saving": "Kaydediliyor...",
@@ -451,7 +521,6 @@
     "createCraftDescriptionPlaceholder": "Bu zanaatı özel kılan malzemeler, teknikler veya hikâye nedir?",
     "selectMaterial": "Bir malzeme seçin...",
     "deleteCraftConfirm": "Bu zanaat silinsin mi? Bu işlem geri alınamaz.",
-    "fileTooLarge": "Resim çok büyük. Maksimum boyut 8 MB.",
     "deleteImage": "Resmi kaldır",
     "deleteImageConfirm": "Bu resmi kaldırmak istiyor musunuz?",
     "deleteImageYes": "Kaldır",
@@ -461,7 +530,49 @@
     "youtubePlaceholder": "https://www.youtube.com/watch?v=...",
     "addVideo": "Ekle",
     "removeVideo": "Videoyu kaldır",
-    "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı."
+    "invalidYoutubeUrl": "Bu bir YouTube bağlantısı olarak tanınmadı.",
+    "wizard": {
+      "stepLabel": "Adım {current} / {total}",
+      "back": "Geri",
+      "next": "İleri",
+      "backToReview": "Özete dön",
+      "fixFields": "Lütfen işaretli alanları kontrol et.",
+      "locationFound": "Bu eser için konum alındı.",
+      "locationPending": "Tarayıcıdan konumun isteniyor...",
+      "basics": {
+        "title": "Temel bilgiler",
+        "hint": "Eserin adıyla ve ne olduğuyla başla."
+      },
+      "making": {
+        "title": "Yapım",
+        "hint": "Malzemeler, teknik ve ne kadar sürdüğü."
+      },
+      "measurements": {
+        "title": "Boyut ve ağırlık",
+        "hint": "İsteğe bağlı, ama sık sorulur. Uygun değilse boş bırak."
+      },
+      "story": {
+        "title": "Hikaye ve bakım",
+        "hint": "Eseri neyin esinlendirdiği ve nasıl bakılacağı."
+      },
+      "media": {
+        "title": "Fotoğraflar ve videolar",
+        "hint": "Eseri göster. İlk fotoğraf kapak görseli olur."
+      },
+      "visibility": {
+        "title": "Görünürlük",
+        "hint": "Bu eseri kimlerin görebileceğini ve yapıldığı yerin paylaşılıp paylaşılmayacağını seç."
+      },
+      "review": {
+        "title": "Gözden geçir ve kaydet",
+        "hint": "Her şeyi kontrol et. Değiştirmek için bir satır seç.",
+        "edit": "Düzenle",
+        "notAdded": "Eklenmedi",
+        "mediaCount": "{photos, plural, =0 {Fotoğraf yok} one {1 fotoğraf} other {# fotoğraf}}, {videos, plural, =0 {video yok} one {1 video} other {# video}}",
+        "isPublic": "Herkese açık, herkes görebilir",
+        "isPrivate": "Özel, yalnızca sen görebilirsin"
+      }
+    }
   },
   "groups": {
     "title": "Zanaatkâr Toplulukları",
@@ -512,8 +623,14 @@
     "deleteSuccess": "Topluluk başarıyla silindi",
     "memberAdded": "Üye başarıyla eklendi",
     "memberRemoved": "Üye başarıyla çıkarıldı",
+    "removeMemberFailed": "Üye çıkarılamadı. Lütfen tekrar deneyin.",
+    "updateRoleFailed": "Üyenin rolü güncellenemedi. Lütfen tekrar deneyin.",
     "saveFailed": "Topluluk kaydedilemedi",
-    "fileTooLarge": "Görsel çok büyük. Maksimum boyut 8 MB.",
+    "creating": "Oluşturuluyor...",
+    "saving": "Kaydediliyor...",
+    "fileTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
+    "imageLimitHint": "Görseller en fazla {max} MB — daha büyük fotoğraflar otomatik küçültülür.",
+    "invalidWebsite": "Lütfen geçerli bir web sitesi adresi girin (ör. https://siteniz.com).",
     "deleteFailed": "Topluluk silinemedi",
     "viewGroup": "Topluluğu Görüntüle",
     "viewPublicPage": "Herkese Açık Sayfayı Görüntüle",
@@ -557,7 +674,9 @@
     "title": "Medya Galerisi",
     "description": "Herkese açık profilinde gösterilen görselleri, videoları ve sesleri yönet.",
     "addMedia": "Medya ekle",
-    "uploadHint": "Görsel, video veya ses",
+    "uploadHint": "Görseller en fazla {imageMax} MB, video/ses en fazla {videoMax} MB",
+    "imageTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
+    "videoTooLarge": "Dosya çok büyük. Maksimum boyut {max} MB.",
     "audio": "Ses",
     "private": "Gizli",
     "makePublic": "Herkese açık yap",

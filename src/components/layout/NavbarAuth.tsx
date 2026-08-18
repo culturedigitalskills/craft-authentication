@@ -31,6 +31,9 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
     const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
+    // Creating communities is restricted to site admins (the create page
+    // redirects everyone else) — don't advertise the link to non-admins.
+    const isAdmin = session?.user?.role === 'ADMIN'
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -121,10 +124,12 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                         <Users className="h-4 w-4" />
                         {t('mygroups')}
                     </Link>
-                    <Link href="/groups/create" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
-                        <UserPlus className="h-4 w-4" />
-                        {t('createGroup')}
-                    </Link>
+                    {isAdmin && (
+                        <Link href="/groups/create" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
+                            <UserPlus className="h-4 w-4" />
+                            {t('createGroup')}
+                        </Link>
+                    )}
 
                     <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
 
@@ -268,14 +273,16 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                             <Users className="h-4 w-4" />
                             <span className={isActive('/groups/mygroups') ? activeUnderline : ''}>{t('mygroups')}</span>
                         </Link>
-                        <Link
-                            href="/groups/create"
-                            onClick={() => { setDropdownOpen(false); onAction?.() }}
-                            className={`${rowBase} ${isActive('/groups/create') ? rowActive : rowIdle}`}
-                        >
-                            <UserPlus className="h-4 w-4" />
-                            <span className={isActive('/groups/create') ? activeUnderline : ''}>{t('createGroup')}</span>
-                        </Link>
+                        {isAdmin && (
+                            <Link
+                                href="/groups/create"
+                                onClick={() => { setDropdownOpen(false); onAction?.() }}
+                                className={`${rowBase} ${isActive('/groups/create') ? rowActive : rowIdle}`}
+                            >
+                                <UserPlus className="h-4 w-4" />
+                                <span className={isActive('/groups/create') ? activeUnderline : ''}>{t('createGroup')}</span>
+                            </Link>
+                        )}
                     </div>
 
                     {/* Image tools */}

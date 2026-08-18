@@ -1,3 +1,48 @@
+# v0.14.0 -> v0.15.0
+
+### My Story Auto-Captions (Groq Whisper)
+
+Uploaded **video** answers and workshop clips in the My Story flow are now automatically transcribed and
+translated to **English captions** (soft WebVTT) shown over the original video on the public artisan page.
+The pipeline extracts audio with ffmpeg, sends it to Groq's hosted Whisper (`audio/translations`), and stores
+the timestamped result. The extracted audio is retained as its own `MediaFile` for future reuse.
+
+**Schema Changes**:
+
+- Added `TranscriptStatus` enum (`PENDING`, `PROCESSING`, `READY`, `FAILED`).
+- Added `MediaTranscript` table: `mediaId` (unique FK to the source `MediaFile`, cascade delete),
+  `audioMediaId` (nullable FK to the extracted-audio `MediaFile`), `status`, `sourceLanguage`, `segments`
+  (JSON), `error`, timestamps.
+
+**Configuration Changes** (add to `.env.local` and `.env.production`):
+
+- `GROQ_API_KEY` — **required for captions**. Get one at https://console.groq.com/keys. If unset, transcripts
+  are recorded as `FAILED` and videos simply play without captions (no crash).
+- `GROQ_WHISPER_MODEL` — optional, defaults to `whisper-large-v3`.
+- `FFMPEG_PATH` — optional. Defaults to the bundled `ffmpeg-static` binary, then `ffmpeg` on `PATH`. The
+  production image installs system ffmpeg and sets `FFMPEG_PATH=/usr/bin/ffmpeg`.
+
+**New API endpoints**:
+
+- `GET /api/media/[id]/subtitles` — returns the English WebVTT captions for a media file (404 until ready).
+- `GET /api/artisans/me/story/transcripts` — caption status per story video; powers the status chips in the
+  story wizard.
+
+**Reliability**: transcription jobs are claimed atomically in the database and survive redeploys — a recovery
+sweep (`src/instrumentation.ts`) re-queues any job orphaned by a container restart on boot and hourly. Failed
+jobs retry automatically the next time the artisan saves their story.
+
+**Migration Steps**:
+
+1. `pnpm install` to pick up the new `ffmpeg-static` dependency. For local dev, that bundled binary is used;
+   no system ffmpeg install is required.
+2. Apply the schema migration. Locally `pnpm db:migrate`; on staging/production the app container runs
+   `prisma migrate deploy` automatically on startup.
+3. Add `GROQ_API_KEY` to the environment files. Recreate the prod app container so the new value (and the
+   ffmpeg binary in the rebuilt image) are loaded.
+4. Verify: upload a short talking-head video as a story answer, confirm the `MediaTranscript` row reaches
+   `READY`, then open the published public profile and confirm the English captions track plays.
+
 # v0.13.0 -> v0.14.0
 
 ### Craft Model (DataRecord → Craft)
