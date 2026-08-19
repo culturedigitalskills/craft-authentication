@@ -30,7 +30,7 @@ export default async function Home() {
         }),
         prisma.craft.findMany({
             where: { isPublic: true, deletedAt: null },
-            select: { id: true, title: true, artisan: { select: { firstName: true, lastName: true, slug: true } } },
+            select: { id: true, title: true, artisan: { select: { id: true, firstName: true, lastName: true, slug: true } } },
             orderBy: { createdAt: 'desc' },
             take: 4,
         }),
@@ -39,9 +39,15 @@ export default async function Home() {
     const artisanIds = artisanRecords.map(a => a.id)
     const groupIds = groupRecords.map(g => g.id)
 
+    // The hero chip portrays the maker of the hero craft, who is not necessarily
+    // one of the three newest artisans — fetch their photo too, or the chip falls
+    // back to initials even when a portrait exists.
+    const heroMakerId = craftRecords[0]?.artisan.id
+    const photoArtisanIds = [...new Set(heroMakerId ? [...artisanIds, heroMakerId] : artisanIds)]
+
     const [artisanPhotos, groupLogos, groupMembers, craftImageMap] = await Promise.all([
-        artisanIds.length
-            ? prisma.mediaAttachment.findMany({ where: { entityType: 'Artisan', entityId: { in: artisanIds }, attachmentType: 'HERO', isPrimary: true }, select: { entityId: true, mediaId: true } })
+        photoArtisanIds.length
+            ? prisma.mediaAttachment.findMany({ where: { entityType: 'Artisan', entityId: { in: photoArtisanIds }, attachmentType: 'HERO', isPrimary: true }, select: { entityId: true, mediaId: true } })
             : [],
         groupIds.length
             ? prisma.mediaAttachment.findMany({ where: { entityType: 'Group', entityId: { in: groupIds }, attachmentType: 'HERO', isPrimary: true }, select: { entityId: true, mediaId: true } })
@@ -74,13 +80,25 @@ export default async function Home() {
     const crafts = craftRecords.map(c => ({
         id: c.id,
         title: c.title,
+        makerId: c.artisan.id,
         maker: `${c.artisan.firstName} ${c.artisan.lastName}`,
         makerSlug: c.artisan.slug,
         imageUrl: craftImageMap.has(c.id) ? `/api/media/${craftImageMap.get(c.id)}` : null,
     }))
 
-    const featured = artisans[0] ?? null
     const featuredCraft = crafts[0] ?? null
+
+    // The chip captions the hero image, so it has to name that craft's own maker.
+    // Taking the newest artisan instead paired the two independent `createdAt`
+    // orderings and credited the hero craft to whoever had signed up most
+    // recently. Without a craft to caption, the newest artisan still stands in.
+    const featured = featuredCraft
+        ? {
+              name: featuredCraft.maker,
+              slug: featuredCraft.makerSlug,
+              photoUrl: artisanPhotoMap.get(featuredCraft.makerId) ?? null,
+          }
+        : artisans[0] ?? null
 
     return (
         <>
