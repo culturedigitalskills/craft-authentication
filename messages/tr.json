@@ -61,7 +61,9 @@
     "contact": "İletişim"
   },
   "footer": {
-    "description": "Proje web sitesi Brighton Üniversitesi tarafından üretilmiş ve yönetilmektedir. Bu proje, Birleşik Krallık Sanat ve Beşeri Bilimler Araştırma Konseyi tarafından, Hindistan-Birleşik Krallık yaratıcı endüstriler ve kültürel miras araştırması kapsamında şu başlıkla finanse edilmektedir: Sürdürülebilir Bir Gelecek Yaratmak: Yaratıcı Endüstrilerde Hint El Sanatlarını Güçlendirmek. (Hibe No. OPP080)."
+    "description": "Proje web sitesi Brighton Üniversitesi tarafından üretilmiş ve yönetilmektedir. Bu proje, Birleşik Krallık Sanat ve Beşeri Bilimler Araştırma Konseyi tarafından, Hindistan-Birleşik Krallık yaratıcı endüstriler ve kültürel miras araştırması kapsamında şu başlıkla finanse edilmektedir: Sürdürülebilir Bir Gelecek Yaratmak: Yaratıcı Endüstrilerde Hint El Sanatlarını Güçlendirmek. (Hibe No. OPP080).",
+    "terms": "Hizmet Koşulları",
+    "privacy": "Gizlilik Politikası"
   },
   "socialmedia": {
     "title": "Bizi Takip Edin",
@@ -742,5 +744,8 @@
       "point3": "Kurcalamaya karşı korumalı bir kimlik bilgisiyle desteklenir",
       "cta": "Nasıl çalıştığını görün"
     }
+  },
+  "legal": {
+    "eyebrow": "Yasal"
   }
 }

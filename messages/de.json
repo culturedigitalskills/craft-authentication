@@ -61,7 +61,9 @@
     "contact": "Kontakt"
   },
   "footer": {
-    "description": "Die Projektwebsite wurde von der University of Brighton erstellt und wird von ihr verwaltet. Dieses Projekt wird vom Arts and Humanities Research Council des Vereinigten Königreichs im Rahmen der Indien–UK-Forschung zu kreativen Industrien und kulturellem Erbe mit dem Titel „Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries“ finanziert. (Fördernummer OPP080)."
+    "description": "Die Projektwebsite wurde von der University of Brighton erstellt und wird von ihr verwaltet. Dieses Projekt wird vom Arts and Humanities Research Council des Vereinigten Königreichs im Rahmen der Indien–UK-Forschung zu kreativen Industrien und kulturellem Erbe mit dem Titel „Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries“ finanziert. (Fördernummer OPP080).",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzerklärung"
   },
   "socialmedia": {
     "title": "Folge uns",
@@ -742,5 +744,8 @@
       "point3": "Abgesichert durch einen fälschungssicheren Nachweis",
       "cta": "So funktioniert es"
     }
+  },
+  "legal": {
+    "eyebrow": "Rechtliches"
   }
 }

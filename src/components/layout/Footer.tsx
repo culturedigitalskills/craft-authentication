@@ -67,6 +67,19 @@ export function Footer() {
                         </Link>
                     </div>
                 </div>
+
+                {/* Policy links */}
+                <div
+                    className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t pt-4 text-xs"
+                    style={{ borderColor: 'var(--sc-text-on-dark-muted)', color: 'var(--sc-text-on-dark-muted)' }}
+                >
+                    <Link href="/terms" className="transition-opacity hover:opacity-100 hover:underline">
+                        {t('footer.terms')}
+                    </Link>
+                    <Link href="/privacy" className="transition-opacity hover:opacity-100 hover:underline">
+                        {t('footer.privacy')}
+                    </Link>
+                </div>
             </div>
         </footer>
     )

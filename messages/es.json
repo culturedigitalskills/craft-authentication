@@ -61,7 +61,9 @@
     "contact": "Contacto"
   },
   "footer": {
-    "description": "El sitio web del proyecto ha sido producido y es gestionado por la Universidad de Brighton. Este proyecto está financiado por el Consejo de Investigación en Artes y Humanidades del Reino Unido dentro de la investigación India-Reino Unido sobre industrias creativas y patrimonio cultural, con el título: Forjando un Futuro Sostenible: Empoderando las Artesanías Indias en las Industrias Creativas. (Subvención No. OPP080)."
+    "description": "El sitio web del proyecto ha sido producido y es gestionado por la Universidad de Brighton. Este proyecto está financiado por el Consejo de Investigación en Artes y Humanidades del Reino Unido dentro de la investigación India-Reino Unido sobre industrias creativas y patrimonio cultural, con el título: Forjando un Futuro Sostenible: Empoderando las Artesanías Indias en las Industrias Creativas. (Subvención No. OPP080).",
+    "terms": "Términos del servicio",
+    "privacy": "Política de privacidad"
   },
   "socialmedia": {
     "title": "Síguenos",
@@ -742,5 +744,8 @@
       "point3": "Respaldada por una credencial a prueba de manipulaciones",
       "cta": "Descubre cómo funciona"
     }
+  },
+  "legal": {
+    "eyebrow": "Legal"
   }
 }
