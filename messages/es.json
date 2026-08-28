@@ -161,6 +161,8 @@
       "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones.",
       "retry": "Intentar de nuevo"
     },
+    "wizardTitle": "Mi historia",
+    "wizardHelper": "Comparte la historia de tu artesanía con tus propias palabras.",
     "stepLabel": "Paso {current} de {total}",
     "back": "Atrás",
     "next": "Siguiente",

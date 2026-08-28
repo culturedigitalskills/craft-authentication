@@ -161,6 +161,8 @@
       "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı.",
       "retry": "Tekrar dene"
     },
+    "wizardTitle": "Benim Hikâyem",
+    "wizardHelper": "Zanaatının hikâyesini kendi sözlerinle paylaş.",
     "stepLabel": "Adım {current} / {total}",
     "back": "Geri",
     "next": "İleri",

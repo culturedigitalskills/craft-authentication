@@ -161,6 +161,8 @@
       "someFailed": "تعذّر إنشاء الترجمة لبعض التسجيلات.",
       "retry": "حاول مرة أخرى"
     },
+    "wizardTitle": "قصتي",
+    "wizardHelper": "شارك قصة حرفتك بكلماتك الخاصة.",
     "stepLabel": "الخطوة {current} من {total}",
     "back": "رجوع",
     "next": "التالي",

@@ -310,7 +310,9 @@
       "imageTooLarge": "Das Bild ist zu groß. Maximale Größe ist {max} MB.",
       "videoTooLarge": "Das Video ist zu groß. Maximale Größe ist {max} MB.",
       "sizeHint": "Bilder bis {imageMax} MB (große Fotos werden automatisch verkleinert), Videos bis {videoMax} MB."
-    }
+    },
+    "wizardTitle": "Meine Geschichte",
+    "wizardHelper": "Erzähle die Geschichte deines Handwerks in deinen eigenen Worten."
   },
   "profile": {
     "title": "Handwerkerprofil",
