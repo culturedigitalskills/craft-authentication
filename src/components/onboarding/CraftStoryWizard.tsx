@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -13,7 +13,10 @@ import { StepDots } from '@/components/shared/StepDots'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { StoryFilmPanel } from './StoryFilmPanel'
+import { FilmStoryboard, type StoryboardAnswer } from './FilmStoryboard'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
+import { mediaKind } from '@/lib/media-kind'
+import type { TranscriptSegment } from '@/lib/vtt'
 
 export type CraftStoryDraft = {
     id: string
@@ -76,12 +79,29 @@ export function CraftStoryWizard({
     // as new recordings upload, so a revisited video answer still renders as video.
     const [answerMimeTypes, setAnswerMimeTypes] = useState<Record<string, string>>(answerMediaMimeTypes)
 
+    // Timed caption segments per media id, used by the film storyboard to snap
+    // its preview cuts to the same speech beats the renderer will use.
+    const [captionSegments, setCaptionSegments] = useState<Record<string, TranscriptSegment[]>>({})
+
+    // Spoken answers drive the film's chapters and its length. Text-only answers
+    // contribute nothing to the timeline, so they are left out.
+    const storyboardAnswers: StoryboardAnswer[] = useMemo(() => {
+        return ANSWER_KEYS.flatMap(key => {
+            const mediaId = story[`answer${key}MediaId` as const] as string | null | undefined
+            if (!mediaId) return []
+            const kind = mediaKind(answerMimeTypes[mediaId])
+            if (kind !== 'audio' && kind !== 'video') return []
+            return [{ key, mediaId, kind }]
+        })
+    }, [story, answerMimeTypes])
+
     const refreshCaptionStatuses = useCallback(async () => {
         try {
             const res = await fetch('/api/artisans/me/story/transcripts')
             if (!res.ok) return
             const data = await res.json()
             setCaptionStatuses(data.statuses ?? {})
+            setCaptionSegments(data.segments ?? {})
         } catch {
             // Chips are informational only — never surface fetch failures.
         }
@@ -313,6 +333,8 @@ export function CraftStoryWizard({
                                 onItemsChange={setWorkshopMedia}
                                 captionStatuses={captionStatuses}
                                 onUploaded={refreshCaptionStatuses}
+                                storyboardAnswers={storyboardAnswers}
+                                captionSegments={captionSegments}
                             />
                         )}
 
@@ -542,12 +564,16 @@ function WorkshopStep({
     onItemsChange,
     captionStatuses,
     onUploaded,
+    storyboardAnswers,
+    captionSegments,
 }: {
     storyId: string | null
     items: WorkshopMedia[]
     onItemsChange: Dispatch<SetStateAction<WorkshopMedia[]>>
     captionStatuses: Record<string, string>
     onUploaded: () => void
+    storyboardAnswers: StoryboardAnswer[]
+    captionSegments: Record<string, TranscriptSegment[]>
 }) {
     const t = useTranslations('craftStory.step7')
     return (
@@ -555,13 +581,22 @@ function WorkshopStep({
             <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
             <p className="mb-6 text-base text-muted-foreground">{t('prompt')}</p>
             {storyId ? (
-                <StoryWorkshopUpload
-                    storyId={storyId}
-                    items={items}
-                    onItemsChange={onItemsChange}
-                    captionStatuses={captionStatuses}
-                    onUploaded={onUploaded}
-                />
+                <>
+                    <StoryWorkshopUpload
+                        storyId={storyId}
+                        items={items}
+                        onItemsChange={onItemsChange}
+                        captionStatuses={captionStatuses}
+                        onUploaded={onUploaded}
+                    />
+                    {/* Sits directly under the grid so a reorder and its effect
+                        on the film are visible in one glance. */}
+                    <FilmStoryboard
+                        answers={storyboardAnswers}
+                        workshopMedia={items}
+                        segments={captionSegments}
+                    />
+                </>
             ) : (
                 <p className="text-sm text-muted-foreground">{t('saveFirst')}</p>
             )}

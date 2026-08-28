@@ -318,11 +318,21 @@
       "deleteFailed": "No se pudo eliminar ese archivo. Inténtalo de nuevo.",
       "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
       "videoTooLarge": "El vídeo es demasiado grande. El tamaño máximo es {max} MB.",
-      "sizeHint": "Imágenes hasta {imageMax} MB (las fotos grandes se redimensionan automáticamente), vídeo hasta {videoMax} MB."
+      "sizeHint": "Imágenes hasta {imageMax} MB (las fotos grandes se redimensionan automáticamente), vídeo hasta {videoMax} MB.",
+      "position": "Elemento {index} de {count}",
+      "moveEarlier": "Mover antes",
+      "moveLater": "Mover después",
+      "reorderFailed": "No se pudo guardar el nuevo orden. Inténtalo de nuevo."
     },
     "consent": {
       "title": "Consentimiento para publicar",
       "body": "Confirmo que esta historia es mía y puedo compartirla, y acepto que se publique en este sitio, incluidas mis grabaciones, mi nombre y cualquier ubicación que haya añadido. Puedo dejar de publicarla en cualquier momento."
+    },
+    "storyboard": {
+      "title": "Vista previa del film",
+      "total": "Unos {duration} de duración",
+      "approxHint": "Los tiempos se ajustan cuando terminen los subtítulos.",
+      "measuring": "Calculando la duración de cada grabación..."
     }
   },
   "profile": {

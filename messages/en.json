@@ -318,11 +318,21 @@
       "deleteFailed": "Could not delete that file. Please try again.",
       "imageTooLarge": "Image is too large. Maximum size is {max} MB.",
       "videoTooLarge": "Video is too large. Maximum size is {max} MB.",
-      "sizeHint": "Images up to {imageMax} MB (large photos are resized automatically), video up to {videoMax} MB."
+      "sizeHint": "Images up to {imageMax} MB (large photos are resized automatically), video up to {videoMax} MB.",
+      "position": "Item {index} of {count}",
+      "moveEarlier": "Move earlier",
+      "moveLater": "Move later",
+      "reorderFailed": "Could not save the new order. Please try again."
     },
     "consent": {
       "title": "Consent to publish",
       "body": "I confirm this story is mine to share, and I agree to it being published on this site, including my recordings, my name and any location I chose to add. I can unpublish it at any time."
+    },
+    "storyboard": {
+      "title": "Film preview",
+      "total": "About {duration} long",
+      "approxHint": "Timings settle once captions finish.",
+      "measuring": "Working out how long each recording runs..."
     }
   },
   "profile": {

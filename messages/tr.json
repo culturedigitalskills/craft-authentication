@@ -318,11 +318,21 @@
       "deleteFailed": "Bu dosya silinemedi. Lütfen tekrar dene.",
       "imageTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
       "videoTooLarge": "Video çok büyük. Maksimum boyut {max} MB.",
-      "sizeHint": "Görseller en fazla {imageMax} MB (büyük fotoğraflar otomatik küçültülür), videolar en fazla {videoMax} MB."
+      "sizeHint": "Görseller en fazla {imageMax} MB (büyük fotoğraflar otomatik küçültülür), videolar en fazla {videoMax} MB.",
+      "position": "{count} ögeden {index}.",
+      "moveEarlier": "Öne al",
+      "moveLater": "Sona al",
+      "reorderFailed": "Yeni sıra kaydedilemedi. Lütfen tekrar dene."
     },
     "consent": {
       "title": "Yayımlama onayı",
       "body": "Bu hikâyenin bana ait olduğunu ve paylaşma hakkım olduğunu onaylıyorum; kayıtlarım, adım ve eklediğim konum dahil olmak üzere bu sitede yayımlanmasını kabul ediyorum. Yayımdan istediğim zaman kaldırabilirim."
+    },
+    "storyboard": {
+      "title": "Film önizlemesi",
+      "total": "Yaklaşık {duration} uzunluğunda",
+      "approxHint": "Altyazılar bitince süreler kesinleşir.",
+      "measuring": "Her kaydın süresi hesaplanıyor..."
     }
   },
   "profile": {

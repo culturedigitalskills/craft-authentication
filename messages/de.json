@@ -316,13 +316,23 @@
       "deleteFailed": "Diese Datei konnte nicht gelöscht werden. Bitte versuche es erneut.",
       "imageTooLarge": "Das Bild ist zu groß. Maximale Größe ist {max} MB.",
       "videoTooLarge": "Das Video ist zu groß. Maximale Größe ist {max} MB.",
-      "sizeHint": "Bilder bis {imageMax} MB (große Fotos werden automatisch verkleinert), Videos bis {videoMax} MB."
+      "sizeHint": "Bilder bis {imageMax} MB (große Fotos werden automatisch verkleinert), Videos bis {videoMax} MB.",
+      "position": "Element {index} von {count}",
+      "moveEarlier": "Nach vorne verschieben",
+      "moveLater": "Nach hinten verschieben",
+      "reorderFailed": "Die neue Reihenfolge konnte nicht gespeichert werden. Bitte versuche es erneut."
     },
     "wizardTitle": "Meine Geschichte",
     "wizardHelper": "Erzähle die Geschichte deines Handwerks in deinen eigenen Worten.",
     "consent": {
       "title": "Einwilligung zur Veröffentlichung",
       "body": "Ich bestätige, dass diese Geschichte mir gehört und ich sie teilen darf, und ich stimme ihrer Veröffentlichung auf dieser Website zu, einschließlich meiner Aufnahmen, meines Namens und jedes Ortes, den ich hinzugefügt habe. Ich kann die Veröffentlichung jederzeit zurücknehmen."
+    },
+    "storyboard": {
+      "title": "Filmvorschau",
+      "total": "Etwa {duration} lang",
+      "approxHint": "Die Zeiten stehen fest, sobald die Untertitel fertig sind.",
+      "measuring": "Die Länge der Aufnahmen wird ermittelt..."
     }
   },
   "profile": {
