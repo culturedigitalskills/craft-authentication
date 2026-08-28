@@ -261,7 +261,8 @@
       "uploading": "Μεταφόρτωση...",
       "uploadFailed": "Η μεταφόρτωση απέτυχε. Παρακαλώ δοκιμάστε ξανά.",
       "fileTooLarge": "Το αρχείο είναι πολύ μεγάλο. Το μέγιστο μέγεθος είναι {max} MB.",
-      "hint": "MP3, WAV, MP4 ή WebM. Έως {max} MB."
+      "hint": "MP3, WAV, MP4 ή WebM. Έως {max} MB.",
+      "unsupportedType": "Αυτός ο τύπος αρχείου δεν υποστηρίζεται. Δοκιμάστε MP3, WAV, M4A, MP4 ή WebM."
     },
     "recorder": {
       "recordAudio": "Εγγραφή ήχου",

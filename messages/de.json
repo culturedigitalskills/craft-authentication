@@ -259,7 +259,8 @@
       "uploading": "Hochladen...",
       "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
       "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {max} MB.",
-      "hint": "MP3, WAV, MP4 oder WebM. Bis zu {max} MB."
+      "hint": "MP3, WAV, MP4 oder WebM. Bis zu {max} MB.",
+      "unsupportedType": "Dieser Dateityp wird nicht unterstützt. Versuche MP3, WAV, M4A, MP4 oder WebM."
     },
     "recorder": {
       "recordAudio": "Audio aufnehmen",

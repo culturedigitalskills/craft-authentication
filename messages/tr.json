@@ -261,7 +261,8 @@
       "uploading": "Yükleniyor...",
       "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
       "fileTooLarge": "Dosya çok büyük. Maksimum boyut {max} MB.",
-      "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB."
+      "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB.",
+      "unsupportedType": "Bu dosya türü desteklenmiyor. MP3, WAV, M4A, MP4 veya WebM dene."
     },
     "recorder": {
       "recordAudio": "Ses kaydet",

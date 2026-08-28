@@ -261,7 +261,8 @@
       "uploading": "Subiendo...",
       "uploadFailed": "Error al subir. Inténtalo de nuevo.",
       "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es {max} MB.",
-      "hint": "MP3, WAV, MP4 o WebM. Hasta {max} MB."
+      "hint": "MP3, WAV, MP4 o WebM. Hasta {max} MB.",
+      "unsupportedType": "Ese tipo de archivo no es compatible. Prueba con MP3, WAV, M4A, MP4 o WebM."
     },
     "recorder": {
       "recordAudio": "Grabar audio",

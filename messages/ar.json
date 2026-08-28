@@ -261,7 +261,8 @@
       "uploading": "جارٍ الرفع...",
       "uploadFailed": "فشل الرفع. يرجى المحاولة مرة أخرى.",
       "fileTooLarge": "الملف كبير جدًا. الحجم الأقصى هو {max} ميجابايت.",
-      "hint": "MP3 أو WAV أو MP4 أو WebM. حتى {max} ميجابايت."
+      "hint": "MP3 أو WAV أو MP4 أو WebM. حتى {max} ميجابايت.",
+      "unsupportedType": "نوع الملف هذا غير مدعوم. جرّب MP3 أو WAV أو M4A أو MP4 أو WebM."
     },
     "recorder": {
       "recordAudio": "تسجيل صوت",

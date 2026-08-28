@@ -261,7 +261,8 @@
       "uploading": "अपलोड हो रहा है...",
       "uploadFailed": "अपलोड विफल। कृपया पुनः प्रयास करें।",
       "fileTooLarge": "फ़ाइल बहुत बड़ी है। अधिकतम आकार {max} MB है।",
-      "hint": "MP3, WAV, MP4 या WebM। अधिकतम {max} MB तक।"
+      "hint": "MP3, WAV, MP4 या WebM। अधिकतम {max} MB तक।",
+      "unsupportedType": "यह फ़ाइल प्रकार समर्थित नहीं है। MP3, WAV, M4A, MP4 या WebM आज़माएँ।"
     },
     "recorder": {
       "recordAudio": "ऑडियो रिकॉर्ड करें",
