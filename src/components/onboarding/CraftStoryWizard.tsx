@@ -33,6 +33,7 @@ export type CraftStoryDraft = {
     answerChallengesText: string | null
     answerChallengesMediaId: string | null
     summaryText: string | null
+    consentedAt: string | null
 }
 
 interface CraftStoryWizardProps {
@@ -60,6 +61,9 @@ export function CraftStoryWizard({
     const [saving, setSaving] = useState(false)
     const [publishing, setPublishing] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    // Publication consent. A story consented to on an earlier publish keeps it,
+    // so re-publishing an edit does not ask again.
+    const [consented, setConsented] = useState(Boolean(initialStory?.consentedAt))
     // True while editing a single step reached by clicking a section on the
     // review screen — lets us offer a direct "back to review" action.
     const [returnToReview, setReturnToReview] = useState(false)
@@ -223,7 +227,11 @@ export function CraftStoryWizard({
                 setPublishing(false)
                 return
             }
-            const res = await fetch('/api/artisans/me/story/publish', { method: 'POST' })
+            const res = await fetch('/api/artisans/me/story/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ consent: consented }),
+            })
             if (!res.ok) {
                 let body: { error?: string; message?: string } | null = null
                 try { body = await res.json() } catch { /* ignore */ }
@@ -231,6 +239,8 @@ export function CraftStoryWizard({
                     setError(t('errors.emptyStory'))
                 } else if (body?.error === 'FILM_REQUIRED') {
                     setError(t('errors.filmRequired'))
+                } else if (body?.error === 'CONSENT_REQUIRED') {
+                    setError(t('errors.consentRequired'))
                 } else {
                     setError(t('errors.publishFailed'))
                 }
@@ -321,6 +331,8 @@ export function CraftStoryWizard({
                                 }}
                                 onPersistSummary={() => { void save(step) }}
                                 onRetryCaptions={retryCaptions}
+                                consented={consented}
+                                onConsentChange={setConsented}
                             />
                         )}
 
@@ -374,7 +386,7 @@ export function CraftStoryWizard({
                                     <ArrowRight className="ml-1.5 h-4 w-4" />
                                 </Button>
                             ) : (
-                                <Button type="button" onClick={handlePublish} disabled={saving || publishing} className="w-full sm:w-auto">
+                                <Button type="button" onClick={handlePublish} disabled={saving || publishing || !consented} className="w-full sm:w-auto">
                                     {publishing ? (
                                         <>
                                             <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
@@ -566,6 +578,8 @@ function ReviewStep({
     onSummaryChange,
     onPersistSummary,
     onRetryCaptions,
+    consented,
+    onConsentChange,
 }: {
     story: Partial<CraftStoryDraft>
     workshopCount: number
@@ -575,6 +589,8 @@ function ReviewStep({
     onSummaryChange: (value: string) => void
     onPersistSummary: () => void
     onRetryCaptions: () => void
+    consented: boolean
+    onConsentChange: (value: boolean) => void
 }) {
     const t = useTranslations('craftStory')
     const statusValues = Object.values(captionStatuses)
@@ -652,6 +668,22 @@ function ReviewStep({
                     </Button>
                 </div>
             )}
+
+            {/* Publishing puts the artisan's face, voice and chosen location in
+                public, so it is confirmed explicitly rather than implied by the
+                Publish button. */}
+            <div className="mt-8 rounded-lg border border-border bg-muted/30 p-4">
+                <h2 className="mb-2 text-sm font-semibold">{t('consent.title')}</h2>
+                <label className="flex items-start gap-3 text-sm">
+                    <input
+                        type="checkbox"
+                        checked={consented}
+                        onChange={e => onConsentChange(e.target.checked)}
+                        className="mt-1 h-4 w-4 shrink-0 accent-[color:var(--sc-accent)]"
+                    />
+                    <span className="leading-snug text-muted-foreground">{t('consent.body')}</span>
+                </label>
+            </div>
         </div>
     )
 }

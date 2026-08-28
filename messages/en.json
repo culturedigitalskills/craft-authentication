@@ -46,10 +46,13 @@
       "nameRequired": "Name is required",
       "emailInvalid": "Please enter a valid email address",
       "passwordMin": "Password must be at least 8 characters",
-      "passwordMismatch": "Passwords do not match"
+      "passwordMismatch": "Passwords do not match",
+      "acceptTermsRequired": "Please accept the Terms of Service and Privacy Policy to continue."
     },
     "orDivider": "or",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "acceptTerms": "I agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>.",
+    "oauthTermsNotice": "By continuing with Google you agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>."
   },
   "about": {
     "title": "About SustainableCrafting",
@@ -188,7 +191,8 @@
       "publishFailed": "We couldn't publish your story. Please try again.",
       "emptyStory": "Add at least one written answer, recording, or workshop photo before publishing.",
       "filmRequired": "Create your film before publishing your story.",
-      "conflict": "Your story was updated in another window. Reload this page to see the latest version."
+      "conflict": "Your story was updated in another window. Reload this page to see the latest version.",
+      "consentRequired": "Please confirm the consent above before publishing."
     },
     "banner": {
       "startTitle": "Share Your Craft Story",
@@ -314,6 +318,10 @@
       "imageTooLarge": "Image is too large. Maximum size is {max} MB.",
       "videoTooLarge": "Video is too large. Maximum size is {max} MB.",
       "sizeHint": "Images up to {imageMax} MB (large photos are resized automatically), video up to {videoMax} MB."
+    },
+    "consent": {
+      "title": "Consent to publish",
+      "body": "I confirm this story is mine to share, and I agree to it being published on this site, including my recordings, my name and any location I chose to add. I can unpublish it at any time."
     }
   },
   "profile": {

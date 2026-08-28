@@ -46,10 +46,13 @@
       "nameRequired": "Name ist erforderlich",
       "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       "passwordMin": "Das Passwort muss mindestens 8 Zeichen lang sein",
-      "passwordMismatch": "Passwörter stimmen nicht überein"
+      "passwordMismatch": "Passwörter stimmen nicht überein",
+      "acceptTermsRequired": "Bitte akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
     },
     "orDivider": "oder",
-    "continueWithGoogle": "Weiter mit Google"
+    "continueWithGoogle": "Weiter mit Google",
+    "acceptTerms": "Ich stimme den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
+    "oauthTermsNotice": "Wenn du mit Google fortfährst, stimmst du den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu."
   },
   "about": {
     "title": "Über SustainableCrafting",
@@ -186,7 +189,8 @@
       "publishFailed": "Wir konnten deine Geschichte nicht veröffentlichen. Bitte versuche es erneut.",
       "emptyStory": "Füge mindestens eine schriftliche Antwort, eine Aufnahme oder ein Werkstattfoto hinzu, bevor du veröffentlichst.",
       "filmRequired": "Erstelle deinen Film, bevor du deine Geschichte veröffentlichst.",
-      "conflict": "Deine Geschichte wurde in einem anderen Fenster aktualisiert. Lade diese Seite neu, um die neueste Version zu sehen."
+      "conflict": "Deine Geschichte wurde in einem anderen Fenster aktualisiert. Lade diese Seite neu, um die neueste Version zu sehen.",
+      "consentRequired": "Bitte bestätige die Einwilligung, bevor du veröffentlichst."
     },
     "banner": {
       "startTitle": "Teile die Geschichte deines Handwerks",
@@ -314,7 +318,11 @@
       "sizeHint": "Bilder bis {imageMax} MB (große Fotos werden automatisch verkleinert), Videos bis {videoMax} MB."
     },
     "wizardTitle": "Meine Geschichte",
-    "wizardHelper": "Erzähle die Geschichte deines Handwerks in deinen eigenen Worten."
+    "wizardHelper": "Erzähle die Geschichte deines Handwerks in deinen eigenen Worten.",
+    "consent": {
+      "title": "Einwilligung zur Veröffentlichung",
+      "body": "Ich bestätige, dass diese Geschichte mir gehört und ich sie teilen darf, und ich stimme ihrer Veröffentlichung auf dieser Website zu, einschließlich meiner Aufnahmen, meines Namens und jedes Ortes, den ich hinzugefügt habe. Ich kann die Veröffentlichung jederzeit zurücknehmen."
+    }
   },
   "profile": {
     "title": "Handwerkerprofil",

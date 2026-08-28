@@ -46,10 +46,13 @@
       "nameRequired": "Ad gereklidir",
       "emailInvalid": "Lütfen geçerli bir e-posta adresi girin",
       "passwordMin": "Parola en az 8 karakter olmalıdır",
-      "passwordMismatch": "Parolalar eşleşmiyor"
+      "passwordMismatch": "Parolalar eşleşmiyor",
+      "acceptTermsRequired": "Devam etmek için lütfen Hizmet Koşulları ve Gizlilik Politikası’nı kabul et."
     },
     "orDivider": "veya",
-    "continueWithGoogle": "Google ile devam et"
+    "continueWithGoogle": "Google ile devam et",
+    "acceptTerms": "<terms>Hizmet Koşulları</terms> ve <privacy>Gizlilik Politikası</privacy>’nı kabul ediyorum.",
+    "oauthTermsNotice": "Google ile devam ederek <terms>Hizmet Koşulları</terms> ve <privacy>Gizlilik Politikası</privacy>’nı kabul etmiş olursun."
   },
   "about": {
     "title": "SustainableCrafting Hakkında",
@@ -188,7 +191,8 @@
       "publishFailed": "Hikâyeni yayınlayamadık. Lütfen tekrar dene.",
       "emptyStory": "Yayınlamadan önce en az bir yazılı cevap, kayıt veya atölye fotoğrafı ekle.",
       "filmRequired": "Hikâyeni yayımlamadan önce filmini oluştur.",
-      "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle."
+      "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle.",
+      "consentRequired": "Yayımlamadan önce lütfen yukarıdaki onayı işaretle."
     },
     "banner": {
       "startTitle": "Zanaat Hikâyeni Paylaş",
@@ -314,6 +318,10 @@
       "imageTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
       "videoTooLarge": "Video çok büyük. Maksimum boyut {max} MB.",
       "sizeHint": "Görseller en fazla {imageMax} MB (büyük fotoğraflar otomatik küçültülür), videolar en fazla {videoMax} MB."
+    },
+    "consent": {
+      "title": "Yayımlama onayı",
+      "body": "Bu hikâyenin bana ait olduğunu ve paylaşma hakkım olduğunu onaylıyorum; kayıtlarım, adım ve eklediğim konum dahil olmak üzere bu sitede yayımlanmasını kabul ediyorum. Yayımdan istediğim zaman kaldırabilirim."
     }
   },
   "profile": {
