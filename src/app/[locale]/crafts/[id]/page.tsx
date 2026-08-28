@@ -13,6 +13,7 @@ import { notFound } from 'next/navigation'
 import { ScMedia } from '@/components/sc/ScMedia'
 import { PortraitFallback } from '@/components/sc/fallbacks'
 import { SectionHeader } from '@/components/sc/SectionHeader'
+import { ConsentedMap } from '@/components/shared/ConsentedMap'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -318,12 +319,11 @@ function RenderOneCraftPage({ craft, imageIds, videoFileIds, currentPageUrl, isO
                     {craft.place && <p className="mb-2 text-sm font-medium" style={{ color: 'var(--sc-text)' }}>{craft.place}</p>}
                     {hasMap && mapSrc && (
                       <>
-                        <iframe
-                          title={t('crafts.details.createdWhere')}
+                        <ConsentedMap
                           src={mapSrc}
-                          className="h-56 w-full rounded-[var(--sc-r-btn)]"
-                          style={{ border: '1px solid var(--sc-border)' }}
-                          loading="lazy"
+                          title={t('crafts.details.createdWhere')}
+                          loadLabel={t('crafts.details.loadMap')}
+                          noticeLabel={t('crafts.details.loadMapNotice')}
                         />
                         <a href={mapLink!} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs hover:underline" style={{ color: 'var(--sc-accent)' }}>
                           {t('crafts.details.viewLargerMap')}

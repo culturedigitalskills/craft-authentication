@@ -1,3 +1,50 @@
+# v0.15.0 -> v0.16.0
+
+### Legal Policies and Recorded Consent
+
+Added Terms of Service and Privacy Policy pages, and the site now records when an account accepted the
+terms and when an artisan consented to their story being published. Consent is the legal basis for
+publishing recordings of identifiable people, and that has to be demonstrable, so both are stored rather
+than being a checkbox that leaves nothing behind.
+
+**Schema Changes**:
+
+- Added `termsAcceptedAt` datetime column to the `User` table (nullable). Stamped by the Better Auth
+  create hook, so it covers both email signup and Google.
+- Added `consentedAt` datetime column to the `CraftStory` table (nullable). Set when a story is first
+  published.
+
+Both columns are nullable and additive, and a null is read as predating the feature. Accounts created
+before this are not locked out, and stories already published stay published and are never asked to
+consent retroactively.
+
+**New pages**: `/terms` and `/privacy`, linked from the footer in all locales.
+
+**Configuration Changes**: none. No new environment variables and no new dependencies.
+
+**Migration Steps**:
+
+1. Apply the schema migration. Locally `pnpm db:migrate`; on staging/production the app container runs
+   `prisma migrate deploy` automatically on startup.
+2. Verify: open `/terms` and `/privacy`, register a new account and confirm the terms checkbox gates both
+   the form and the Google button, then publish a story and confirm `consentedAt` is set.
+
+### Workshop Media Ordering and Film Preview
+
+Artisans can now arrange their workshop media in the story wizard, and see a storyboard of the film that
+order produces without waiting for a render. Long clips also contribute varied footage instead of
+replaying their opening on every appearance.
+
+**New API endpoint**:
+
+- `PATCH /api/media/attachments` — reorder a story's workshop media. Takes the full intended sequence and
+  renumbers `displayOrder` in one transaction.
+
+`GET /api/artisans/me/story/transcripts` now returns `segments` alongside `statuses`. The addition is
+backward compatible.
+
+No schema changes and no migration steps.
+
 # v0.14.0 -> v0.15.0
 
 ### My Story Auto-Captions (Groq Whisper)
