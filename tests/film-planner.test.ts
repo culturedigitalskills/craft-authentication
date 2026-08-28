@@ -2,12 +2,12 @@ import { describe, it, expect } from 'vitest'
 import {
     validateIngredients,
     buildFilmPlan,
-    computeInputsHash,
     escapeDrawtext,
     type FilmInputs,
     type FilmChapterInput,
     type FilmVisual,
 } from '@/lib/film/planner'
+import { computeInputsHash } from '@/lib/film/hash'
 import type { TranscriptSegment } from '@/lib/vtt'
 
 // Evenly spaced segments (each `step` seconds long) covering `count` steps.
