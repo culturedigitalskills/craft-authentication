@@ -467,7 +467,9 @@
       "copyLink": "Copiar enlace",
       "linkCopied": "¡Copiado!",
       "visible": "Público",
-      "notvisible": "Privado"
+      "notvisible": "Privado",
+      "loadMap": "Mostrar mapa",
+      "loadMapNotice": "Carga un mapa de OpenStreetMap."
     },
     "mycrafts": {
       "noCraftsYet": "Aún no has agregado ninguna artesanía."

@@ -467,7 +467,9 @@
       "updatedOn": "Aktualisiert am",
       "backToCrafts": "Zurück zu den Handwerken",
       "noDescription": "Keine Beschreibung verfügbar",
-      "qrCodeDescription": "Teile dieses Handwerk."
+      "qrCodeDescription": "Teile dieses Handwerk.",
+      "loadMap": "Karte anzeigen",
+      "loadMapNotice": "Lädt eine Karte von OpenStreetMap."
     },
     "mycrafts": {
       "noCraftsYet": "Sie haben noch keine Handwerke hinzugefügt."

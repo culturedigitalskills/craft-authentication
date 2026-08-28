@@ -467,7 +467,9 @@
       "copyLink": "Bağlantıyı kopyala",
       "linkCopied": "Kopyalandı!",
       "visible": "Herkese Açık",
-      "notvisible": "Özel"
+      "notvisible": "Özel",
+      "loadMap": "Haritayı göster",
+      "loadMapNotice": "OpenStreetMap üzerinden bir harita yükler."
     },
     "mycrafts": {
       "noCraftsYet": "Henüz hiç zanaat eklemediniz."

@@ -467,7 +467,9 @@
       "copyLink": "نسخ الرابط",
       "linkCopied": "تم النسخ!",
       "visible": "عام",
-      "notvisible": "خاص"
+      "notvisible": "خاص",
+      "loadMap": "عرض الخريطة",
+      "loadMapNotice": "يحمّل خريطة من OpenStreetMap."
     },
     "mycrafts": {
       "noCraftsYet": "لم تُضف أي حِرف بعد."

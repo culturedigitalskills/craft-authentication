@@ -467,7 +467,9 @@
       "copyLink": "लिंक कॉपी करें",
       "linkCopied": "कॉपी हो गया!",
       "visible": "सार्वजनिक",
-      "notvisible": "निजी"
+      "notvisible": "निजी",
+      "loadMap": "मानचित्र दिखाएँ",
+      "loadMapNotice": "OpenStreetMap से एक मानचित्र लोड करता है।"
     },
     "mycrafts": {
       "noCraftsYet": "आपने अभी तक कोई शिल्प नहीं जोड़ा।"

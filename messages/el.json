@@ -467,7 +467,9 @@
       "copyLink": "Αντιγραφή συνδέσμου",
       "linkCopied": "Αντιγράφηκε!",
       "visible": "Δημόσιο",
-      "notvisible": "Ιδιωτικό"
+      "notvisible": "Ιδιωτικό",
+      "loadMap": "Εμφάνιση χάρτη",
+      "loadMapNotice": "Φορτώνει έναν χάρτη από το OpenStreetMap."
     },
     "mycrafts": {
       "noCraftsYet": "Δεν έχετε προσθέσει ακόμη καμία χειροτεχνία."

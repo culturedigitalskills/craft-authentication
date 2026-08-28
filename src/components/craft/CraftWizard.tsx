@@ -32,7 +32,8 @@ import {
 import { FaYoutube } from 'react-icons/fa6'
 import { StepDots } from '@/components/shared/StepDots'
 import { parseApiError } from '@/lib/api-error'
-import { extractYouTubeId, youtubeThumbnailUrl } from '@/lib/youtube'
+import { extractYouTubeId } from '@/lib/youtube'
+import { YouTubeTile } from '@/components/shared/YouTubeTile'
 import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
 import { uploadWithProgress } from '@/lib/upload'
 
@@ -882,17 +883,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                 key={id}
                                                 className="group relative aspect-video overflow-hidden rounded-lg border border-border bg-muted"
                                             >
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={youtubeThumbnailUrl(id)}
-                                                    alt={t('videosLabel')}
-                                                    className="absolute inset-0 h-full w-full object-cover"
-                                                />
-                                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                                                    <div className="rounded-full bg-black/60 p-2">
-                                                        <Play className="h-5 w-5 fill-white text-white" />
-                                                    </div>
-                                                </div>
+                                                <YouTubeTile size="md" />
                                                 <button
                                                     type="button"
                                                     onClick={() =>

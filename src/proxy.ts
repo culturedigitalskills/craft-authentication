@@ -20,9 +20,9 @@ function generateCsp(nonce: string) {
         isDev
             ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
             : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "img-src 'self' blob: data: https://*.wikimedia.org https://img.youtube.com",
-        "font-src 'self' https://fonts.gstatic.com",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' blob: data: https://*.wikimedia.org",
+        "font-src 'self'",
         isDev
             ? "connect-src 'self' ws://localhost:*"
             : "connect-src 'self'",
@@ -30,7 +30,7 @@ function generateCsp(nonce: string) {
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
-        "frame-src 'self' https://www.youtube.com https://www.openstreetmap.org",
+        "frame-src 'self' https://www.youtube-nocookie.com https://www.openstreetmap.org",
         "frame-ancestors 'none'",
         isDev ? '' : 'upgrade-insecure-requests',
     ].filter(Boolean).join('; ')
