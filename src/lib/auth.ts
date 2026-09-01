@@ -63,19 +63,31 @@ export const betterAuthInstance = betterAuth({
                 defaultValue: true,
                 input: false,
             },
+            // Stamped by the create hook below, never accepted from the client.
+            termsAcceptedAt: {
+                type: 'date',
+                required: false,
+                input: false,
+            },
         },
     },
     databaseHooks: {
         user: {
             create: {
                 before: async (user) => {
+                    // Both sign-up routes gate on accepting the terms before they
+                    // reach this point, so record when that acceptance happened.
+                    const data = { ...user, termsAcceptedAt: new Date() }
+
                     // Bootstrap: the very first account on a fresh install becomes ADMIN.
                     // Not guarded against two truly concurrent first signups — acceptable
                     // for a single-operator bootstrap.
                     const userCount = await prisma.user.count()
                     if (userCount === 0) {
-                        return { data: { ...user, role: 'ADMIN' } }
+                        return { data: { ...data, role: 'ADMIN' } }
                     }
+
+                    return { data }
                 },
             },
         },

@@ -12,9 +12,9 @@ import { mediaKind } from '@/lib/media-kind'
 import { ANSWER_KEYS } from '@/lib/validations/craftStory'
 import type { TranscriptSegment } from '@/lib/vtt'
 import enMessages from '../../../messages/en.json'
+import { computeInputsHash } from './hash'
 import {
     buildFilmPlan,
-    computeInputsHash,
     validateIngredients,
     FILM_WIDTH,
     FILM_HEIGHT,
@@ -138,7 +138,12 @@ async function renderImageShot(
 // to 16:9 so any aspect ratio fills the frame. `-stream_loop -1` + an output `-t`
 // guarantee the shot fills durationSec even when the source clip is shorter (a
 // short clip would otherwise leave the body shorter than the voiceover).
-async function renderVideoShot(videoPath: string, durationSec: number, outPath: string): Promise<void> {
+async function renderVideoShot(
+    videoPath: string,
+    durationSec: number,
+    outPath: string,
+    startSec = 0,
+): Promise<void> {
     const filter =
         `[0:v]split[a][b];` +
         `[a]scale=${FILM_WIDTH}:${FILM_HEIGHT}:force_original_aspect_ratio=increase,crop=${FILM_WIDTH}:${FILM_HEIGHT},boxblur=20:2[bg];` +
@@ -146,6 +151,8 @@ async function renderVideoShot(videoPath: string, durationSec: number, outPath: 
         `[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1,format=yuv420p[v]`
     await runFfmpeg([
         '-stream_loop', '-1',
+        // Input-side seek: fast, keyframe accurate, which is fine for B-roll.
+        ...(startSec > 0 ? ['-ss', startSec.toFixed(3)] : []),
         '-i', videoPath,
         '-filter_complex', filter,
         '-map', '[v]',
@@ -368,6 +375,29 @@ async function renderTimeline(
 ): Promise<string> {
     const units: string[] = []
 
+    // A clip dealt to several shots used to replay its opening every time, so a
+    // long upload showed the same few seconds over and over while the rest was
+    // never seen. Walk through each clip instead, one shot's worth at a time,
+    // starting over once the end is reached.
+    const clipLength = new Map<string, number>()
+    const clipCursor = new Map<string, number>()
+
+    async function nextClipStart(mediaId: string, src: string, shotSec: number): Promise<number> {
+        let total = clipLength.get(mediaId)
+        if (total === undefined) {
+            total = await probeDuration(src).catch(() => 0)
+            clipLength.set(mediaId, total)
+        }
+        // A clip no longer than the shot already loops to fill it; seeking into
+        // one would only skip past the footage there is.
+        if (total <= shotSec) return 0
+
+        let start = clipCursor.get(mediaId) ?? 0
+        if (start + shotSec > total) start = 0
+        clipCursor.set(mediaId, start + shotSec)
+        return start
+    }
+
     // Intro name card.
     const introPath = path.join(tmpDir, 'unit-intro.mp4')
     await renderCard({
@@ -404,7 +434,8 @@ async function renderTimeline(
                 if (src && shot.source.type === 'image') {
                     await renderImageShot(src, shot.durationSec, shot.source.panDirection, shotPath)
                 } else if (src) {
-                    await renderVideoShot(src, shot.durationSec, shotPath)
+                    const start = await nextClipStart(shot.source.mediaId, src, shot.durationSec)
+                    await renderVideoShot(src, shot.durationSec, shotPath, start)
                 } else {
                     await renderBlankShot(shot.durationSec, shotPath)
                 }

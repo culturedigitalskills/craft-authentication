@@ -2,7 +2,7 @@
 
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { useTranslations } from 'next-intl'
-import { ImagePlus, Loader2, Trash2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
 import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
@@ -40,6 +40,11 @@ export function StoryWorkshopUpload({
     const [isUploading, setIsUploading] = useState(false)
     const [progress, setProgress] = useState(0)
     const [error, setError] = useState<string | null>(null)
+    // Reorder bookkeeping: the order the artisan last asked for, the order the
+    // server has confirmed, and whether a request is currently out.
+    const latestOrderRef = useRef<string[] | null>(null)
+    const serverOrderRef = useRef<string[]>(items.map((i) => i.attachmentId))
+    const reorderInFlightRef = useRef(false)
 
     async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
         const files = Array.from(e.target.files ?? [])
@@ -101,7 +106,15 @@ export function StoryWorkshopUpload({
             )
 
             const uploaded = results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []))
-            if (uploaded.length > 0) onItemsChange((prev) => [...prev, ...uploaded])
+            if (uploaded.length > 0) {
+                onItemsChange((prev) => [...prev, ...uploaded])
+                // The server appended these at the end, so record them as part
+                // of the confirmed order; a later reorder rollback keeps them.
+                serverOrderRef.current = [
+                    ...serverOrderRef.current,
+                    ...uploaded.map((u) => u.attachmentId),
+                ]
+            }
 
             const firstFailure = results.find((r) => r.status === 'rejected')
             if (firstFailure && firstFailure.status === 'rejected') {
@@ -112,6 +125,70 @@ export function StoryWorkshopUpload({
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
             onUploaded?.()
+        }
+    }
+
+    /**
+     * Move an item one place earlier or later.
+     *
+     * The grid updates immediately and the whole new sequence is sent, so the
+     * server never sees a half-applied order. Requests are single-flight with
+     * last-wins: firing one per click let two quick clicks arrive out of order
+     * and leave the database in an arrangement the grid never showed.
+     */
+    function handleMove(index: number, direction: -1 | 1) {
+        const target = index + direction
+        if (target < 0 || target >= items.length) return
+
+        const reordered = [...items]
+        ;[reordered[index], reordered[target]] = [reordered[target], reordered[index]]
+        onItemsChange(reordered)
+        setError(null)
+
+        latestOrderRef.current = reordered.map((i) => i.attachmentId)
+        void syncOrder()
+    }
+
+    async function syncOrder() {
+        if (reorderInFlightRef.current) return
+        reorderInFlightRef.current = true
+        try {
+            // Re-check after each round trip: clicks made while a request was in
+            // flight collapse into a single trailing request for the final order.
+            while (
+                latestOrderRef.current &&
+                latestOrderRef.current.join() !== serverOrderRef.current.join()
+            ) {
+                const attempt = latestOrderRef.current
+                const res = await fetch('/api/media/attachments', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        entityType: 'CraftStory',
+                        entityId: storyId,
+                        orderedAttachmentIds: attempt,
+                    }),
+                })
+                if (!res.ok) throw new Error('Reorder failed')
+                serverOrderRef.current = attempt
+            }
+        } catch {
+            // Fall back to the last order the server confirmed. Rebuilt from the
+            // current items rather than a snapshot, so anything uploaded while
+            // the request was in flight survives the rollback.
+            const confirmed = serverOrderRef.current
+            onItemsChange((current) => {
+                const rank = new Map(confirmed.map((id, i) => [id, i]))
+                return [...current].sort(
+                    (a, b) =>
+                        (rank.get(a.attachmentId) ?? Number.MAX_SAFE_INTEGER) -
+                        (rank.get(b.attachmentId) ?? Number.MAX_SAFE_INTEGER),
+                )
+            })
+            latestOrderRef.current = null
+            setError(t('reorderFailed'))
+        } finally {
+            reorderInFlightRef.current = false
         }
     }
 
@@ -128,7 +205,7 @@ export function StoryWorkshopUpload({
     return (
         <div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {items.map((item) => (
+                {items.map((item, index) => (
                     <div
                         key={item.mediaId}
                         className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted/30"
@@ -162,6 +239,40 @@ export function StoryWorkshopUpload({
                         >
                             <Trash2 className="h-3.5 w-3.5" />
                         </button>
+
+                        {/* Order controls stay visible rather than revealing on
+                            hover: this is the primary way to arrange the film,
+                            and touch devices have no hover. */}
+                        {items.length > 1 && (
+                            <>
+                                <span
+                                    className="absolute left-1.5 top-1.5 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white"
+                                    aria-label={t('position', { index: index + 1, count: items.length })}
+                                >
+                                    {index + 1}
+                                </span>
+                                <div className="absolute inset-x-1.5 bottom-1.5 flex justify-between">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleMove(index, -1)}
+                                        disabled={index === 0}
+                                        className="rounded-full bg-black/60 p-1.5 text-white transition-opacity disabled:opacity-30"
+                                        aria-label={t('moveEarlier')}
+                                    >
+                                        <ChevronLeft className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleMove(index, 1)}
+                                        disabled={index === items.length - 1}
+                                        className="rounded-full bg-black/60 p-1.5 text-white transition-opacity disabled:opacity-30"
+                                        aria-label={t('moveLater')}
+                                    >
+                                        <ChevronRight className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 ))}
 

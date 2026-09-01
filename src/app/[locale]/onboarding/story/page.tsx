@@ -57,6 +57,7 @@ export default async function OnboardingStoryPage() {
               answerChallengesText: story.answerChallengesText,
               answerChallengesMediaId: story.answerChallengesMediaId,
               summaryText: story.summaryText,
+              consentedAt: story.consentedAt?.toISOString() ?? null,
           }
         : null
 

@@ -46,10 +46,13 @@
       "nameRequired": "El nombre es obligatorio",
       "emailInvalid": "Por favor, introduce una dirección de correo electrónico válida",
       "passwordMin": "La contraseña debe tener al menos 8 caracteres",
-      "passwordMismatch": "Las contraseñas no coinciden"
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "acceptTermsRequired": "Acepta los Términos del servicio y la Política de privacidad para continuar."
     },
     "orDivider": "o",
-    "continueWithGoogle": "Continuar con Google"
+    "continueWithGoogle": "Continuar con Google",
+    "acceptTerms": "Acepto los <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
+    "oauthTermsNotice": "Al continuar con Google aceptas los <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>."
   },
   "about": {
     "title": "Acerca de SustainableCrafting",
@@ -61,7 +64,9 @@
     "contact": "Contacto"
   },
   "footer": {
-    "description": "El sitio web del proyecto ha sido producido y es gestionado por la Universidad de Brighton. Este proyecto está financiado por el Consejo de Investigación en Artes y Humanidades del Reino Unido dentro de la investigación India-Reino Unido sobre industrias creativas y patrimonio cultural, con el título: Forjando un Futuro Sostenible: Empoderando las Artesanías Indias en las Industrias Creativas. (Subvención No. OPP080)."
+    "description": "El sitio web del proyecto ha sido producido y es gestionado por la Universidad de Brighton. Este proyecto está financiado por el Consejo de Investigación en Artes y Humanidades del Reino Unido dentro de la investigación India-Reino Unido sobre industrias creativas y patrimonio cultural, con el título: Forjando un Futuro Sostenible: Empoderando las Artesanías Indias en las Industrias Creativas. (Subvención No. OPP080).",
+    "terms": "Términos del servicio",
+    "privacy": "Política de privacidad"
   },
   "socialmedia": {
     "title": "Síguenos",
@@ -161,6 +166,8 @@
       "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones.",
       "retry": "Intentar de nuevo"
     },
+    "wizardTitle": "Mi historia",
+    "wizardHelper": "Comparte la historia de tu artesanía con tus propias palabras.",
     "stepLabel": "Paso {current} de {total}",
     "back": "Atrás",
     "next": "Siguiente",
@@ -184,7 +191,8 @@
       "publishFailed": "No pudimos publicar tu historia. Inténtalo de nuevo.",
       "emptyStory": "Añade al menos una respuesta escrita, una grabación o una foto del taller antes de publicar.",
       "filmRequired": "Crea tu película antes de publicar tu historia.",
-      "conflict": "Tu historia se actualizó en otra ventana. Recarga esta página para ver la versión más reciente."
+      "conflict": "Tu historia se actualizó en otra ventana. Recarga esta página para ver la versión más reciente.",
+      "consentRequired": "Confirma el consentimiento antes de publicar."
     },
     "banner": {
       "startTitle": "Comparte la historia de tu artesanía",
@@ -253,7 +261,8 @@
       "uploading": "Subiendo...",
       "uploadFailed": "Error al subir. Inténtalo de nuevo.",
       "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es {max} MB.",
-      "hint": "MP3, WAV, MP4 o WebM. Hasta {max} MB."
+      "hint": "MP3, WAV, MP4 o WebM. Hasta {max} MB.",
+      "unsupportedType": "Ese tipo de archivo no es compatible. Prueba con MP3, WAV, M4A, MP4 o WebM."
     },
     "recorder": {
       "recordAudio": "Grabar audio",
@@ -309,7 +318,21 @@
       "deleteFailed": "No se pudo eliminar ese archivo. Inténtalo de nuevo.",
       "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo es {max} MB.",
       "videoTooLarge": "El vídeo es demasiado grande. El tamaño máximo es {max} MB.",
-      "sizeHint": "Imágenes hasta {imageMax} MB (las fotos grandes se redimensionan automáticamente), vídeo hasta {videoMax} MB."
+      "sizeHint": "Imágenes hasta {imageMax} MB (las fotos grandes se redimensionan automáticamente), vídeo hasta {videoMax} MB.",
+      "position": "Elemento {index} de {count}",
+      "moveEarlier": "Mover antes",
+      "moveLater": "Mover después",
+      "reorderFailed": "No se pudo guardar el nuevo orden. Inténtalo de nuevo."
+    },
+    "consent": {
+      "title": "Consentimiento para publicar",
+      "body": "Confirmo que esta historia es mía y puedo compartirla, y acepto que se publique en este sitio, incluidas mis grabaciones, mi nombre y cualquier ubicación que haya añadido. Puedo dejar de publicarla en cualquier momento."
+    },
+    "storyboard": {
+      "title": "Vista previa del film",
+      "total": "Unos {duration} de duración",
+      "approxHint": "Los tiempos se ajustan cuando terminen los subtítulos.",
+      "measuring": "Calculando la duración de cada grabación..."
     }
   },
   "profile": {
@@ -455,7 +478,9 @@
       "copyLink": "Copiar enlace",
       "linkCopied": "¡Copiado!",
       "visible": "Público",
-      "notvisible": "Privado"
+      "notvisible": "Privado",
+      "loadMap": "Mostrar mapa",
+      "loadMapNotice": "Carga un mapa de OpenStreetMap."
     },
     "mycrafts": {
       "noCraftsYet": "Aún no has agregado ninguna artesanía."
@@ -740,5 +765,8 @@
       "point3": "Respaldada por una credencial a prueba de manipulaciones",
       "cta": "Descubre cómo funciona"
     }
+  },
+  "legal": {
+    "eyebrow": "Legal"
   }
 }

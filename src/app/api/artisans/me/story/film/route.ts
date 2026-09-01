@@ -9,7 +9,8 @@ import {
     UpdateStoryFilmSchema,
 } from '@/lib/validations/craftStory'
 import { mediaKind } from '@/lib/media-kind'
-import { computeInputsHash, type FilmInputs } from '@/lib/film/planner'
+import type { FilmInputs } from '@/lib/film/planner'
+import { computeInputsHash } from '@/lib/film/hash'
 import { canMakeFilm } from '@/lib/film/eligibility'
 import { enqueueFilm } from '@/lib/film/jobs'
 

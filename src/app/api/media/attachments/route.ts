@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { CreateMediaAttachmentSchema } from '@/lib/validations/media'
+import { CreateMediaAttachmentSchema, ReorderMediaAttachmentsSchema } from '@/lib/validations/media'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
@@ -125,5 +125,64 @@ export async function POST(request: NextRequest) {
         }
         console.error('Error creating media attachment:', error)
         return errorResponse('Failed to create media attachment', 500)
+    }
+}
+
+/**
+ * Reorder a story's workshop media. The body carries the full intended
+ * sequence, which is renumbered into displayOrder in one transaction, so a
+ * request either applies completely or not at all.
+ *
+ * Order is not cosmetic here: the public story page lists workshop media by
+ * displayOrder, and the film planner deals visuals to shots in that order, so
+ * this is how an artisan decides what opens their film.
+ */
+export async function PATCH(request: NextRequest) {
+    const { session, unauthorized } = await requireAuth()
+    if (unauthorized) return unauthorized
+
+    try {
+        const { entityId, orderedAttachmentIds } = ReorderMediaAttachmentsSchema.parse(
+            await request.json(),
+        )
+
+        const story = await prisma.craftStory.findUnique({
+            where: { id: entityId },
+            select: { artisan: { select: { userId: true } } },
+        })
+        if (!story) return errorResponse('Story not found', 404)
+        if (story.artisan.userId !== session!.user.id && session!.user.role !== 'ADMIN') {
+            return errorResponse('Forbidden', 403)
+        }
+
+        // The request must account for every workshop attachment exactly once,
+        // otherwise a stale client could silently drop items out of the order.
+        const existing = await prisma.mediaAttachment.findMany({
+            where: { entityType: 'CraftStory', entityId, attachmentType: 'PROCESS' },
+            select: { id: true },
+        })
+        const existingIds = new Set(existing.map(a => a.id))
+        const requestedIds = new Set(orderedAttachmentIds)
+        const matches =
+            requestedIds.size === orderedAttachmentIds.length &&
+            existingIds.size === requestedIds.size &&
+            orderedAttachmentIds.every(id => existingIds.has(id))
+        if (!matches) {
+            return errorResponse('Order must list every workshop attachment exactly once', 400)
+        }
+
+        await prisma.$transaction(
+            orderedAttachmentIds.map((id, displayOrder) =>
+                prisma.mediaAttachment.update({ where: { id }, data: { displayOrder } }),
+            ),
+        )
+
+        return NextResponse.json({ orderedAttachmentIds })
+    } catch (error) {
+        if (error instanceof ZodError) {
+            return handleValidationError(error)
+        }
+        console.error('Error reordering media attachments:', error)
+        return errorResponse('Failed to reorder media attachments', 500)
     }
 }

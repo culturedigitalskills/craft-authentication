@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -13,7 +13,10 @@ import { StepDots } from '@/components/shared/StepDots'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { StoryFilmPanel } from './StoryFilmPanel'
+import { FilmStoryboard, type StoryboardAnswer } from './FilmStoryboard'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
+import { mediaKind } from '@/lib/media-kind'
+import type { TranscriptSegment } from '@/lib/vtt'
 
 export type CraftStoryDraft = {
     id: string
@@ -33,6 +36,7 @@ export type CraftStoryDraft = {
     answerChallengesText: string | null
     answerChallengesMediaId: string | null
     summaryText: string | null
+    consentedAt: string | null
 }
 
 interface CraftStoryWizardProps {
@@ -60,6 +64,9 @@ export function CraftStoryWizard({
     const [saving, setSaving] = useState(false)
     const [publishing, setPublishing] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    // Publication consent. A story consented to on an earlier publish keeps it,
+    // so re-publishing an edit does not ask again.
+    const [consented, setConsented] = useState(Boolean(initialStory?.consentedAt))
     // True while editing a single step reached by clicking a section on the
     // review screen — lets us offer a direct "back to review" action.
     const [returnToReview, setReturnToReview] = useState(false)
@@ -72,12 +79,29 @@ export function CraftStoryWizard({
     // as new recordings upload, so a revisited video answer still renders as video.
     const [answerMimeTypes, setAnswerMimeTypes] = useState<Record<string, string>>(answerMediaMimeTypes)
 
+    // Timed caption segments per media id, used by the film storyboard to snap
+    // its preview cuts to the same speech beats the renderer will use.
+    const [captionSegments, setCaptionSegments] = useState<Record<string, TranscriptSegment[]>>({})
+
+    // Spoken answers drive the film's chapters and its length. Text-only answers
+    // contribute nothing to the timeline, so they are left out.
+    const storyboardAnswers: StoryboardAnswer[] = useMemo(() => {
+        return ANSWER_KEYS.flatMap(key => {
+            const mediaId = story[`answer${key}MediaId` as const] as string | null | undefined
+            if (!mediaId) return []
+            const kind = mediaKind(answerMimeTypes[mediaId])
+            if (kind !== 'audio' && kind !== 'video') return []
+            return [{ key, mediaId, kind }]
+        })
+    }, [story, answerMimeTypes])
+
     const refreshCaptionStatuses = useCallback(async () => {
         try {
             const res = await fetch('/api/artisans/me/story/transcripts')
             if (!res.ok) return
             const data = await res.json()
             setCaptionStatuses(data.statuses ?? {})
+            setCaptionSegments(data.segments ?? {})
         } catch {
             // Chips are informational only — never surface fetch failures.
         }
@@ -223,7 +247,11 @@ export function CraftStoryWizard({
                 setPublishing(false)
                 return
             }
-            const res = await fetch('/api/artisans/me/story/publish', { method: 'POST' })
+            const res = await fetch('/api/artisans/me/story/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ consent: consented }),
+            })
             if (!res.ok) {
                 let body: { error?: string; message?: string } | null = null
                 try { body = await res.json() } catch { /* ignore */ }
@@ -231,6 +259,8 @@ export function CraftStoryWizard({
                     setError(t('errors.emptyStory'))
                 } else if (body?.error === 'FILM_REQUIRED') {
                     setError(t('errors.filmRequired'))
+                } else if (body?.error === 'CONSENT_REQUIRED') {
+                    setError(t('errors.consentRequired'))
                 } else {
                     setError(t('errors.publishFailed'))
                 }
@@ -303,6 +333,8 @@ export function CraftStoryWizard({
                                 onItemsChange={setWorkshopMedia}
                                 captionStatuses={captionStatuses}
                                 onUploaded={refreshCaptionStatuses}
+                                storyboardAnswers={storyboardAnswers}
+                                captionSegments={captionSegments}
                             />
                         )}
 
@@ -321,6 +353,8 @@ export function CraftStoryWizard({
                                 }}
                                 onPersistSummary={() => { void save(step) }}
                                 onRetryCaptions={retryCaptions}
+                                consented={consented}
+                                onConsentChange={setConsented}
                             />
                         )}
 
@@ -374,7 +408,7 @@ export function CraftStoryWizard({
                                     <ArrowRight className="ml-1.5 h-4 w-4" />
                                 </Button>
                             ) : (
-                                <Button type="button" onClick={handlePublish} disabled={saving || publishing} className="w-full sm:w-auto">
+                                <Button type="button" onClick={handlePublish} disabled={saving || publishing || !consented} className="w-full sm:w-auto">
                                     {publishing ? (
                                         <>
                                             <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
@@ -530,12 +564,16 @@ function WorkshopStep({
     onItemsChange,
     captionStatuses,
     onUploaded,
+    storyboardAnswers,
+    captionSegments,
 }: {
     storyId: string | null
     items: WorkshopMedia[]
     onItemsChange: Dispatch<SetStateAction<WorkshopMedia[]>>
     captionStatuses: Record<string, string>
     onUploaded: () => void
+    storyboardAnswers: StoryboardAnswer[]
+    captionSegments: Record<string, TranscriptSegment[]>
 }) {
     const t = useTranslations('craftStory.step7')
     return (
@@ -543,13 +581,22 @@ function WorkshopStep({
             <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
             <p className="mb-6 text-base text-muted-foreground">{t('prompt')}</p>
             {storyId ? (
-                <StoryWorkshopUpload
-                    storyId={storyId}
-                    items={items}
-                    onItemsChange={onItemsChange}
-                    captionStatuses={captionStatuses}
-                    onUploaded={onUploaded}
-                />
+                <>
+                    <StoryWorkshopUpload
+                        storyId={storyId}
+                        items={items}
+                        onItemsChange={onItemsChange}
+                        captionStatuses={captionStatuses}
+                        onUploaded={onUploaded}
+                    />
+                    {/* Sits directly under the grid so a reorder and its effect
+                        on the film are visible in one glance. */}
+                    <FilmStoryboard
+                        answers={storyboardAnswers}
+                        workshopMedia={items}
+                        segments={captionSegments}
+                    />
+                </>
             ) : (
                 <p className="text-sm text-muted-foreground">{t('saveFirst')}</p>
             )}
@@ -566,6 +613,8 @@ function ReviewStep({
     onSummaryChange,
     onPersistSummary,
     onRetryCaptions,
+    consented,
+    onConsentChange,
 }: {
     story: Partial<CraftStoryDraft>
     workshopCount: number
@@ -575,6 +624,8 @@ function ReviewStep({
     onSummaryChange: (value: string) => void
     onPersistSummary: () => void
     onRetryCaptions: () => void
+    consented: boolean
+    onConsentChange: (value: boolean) => void
 }) {
     const t = useTranslations('craftStory')
     const statusValues = Object.values(captionStatuses)
@@ -652,6 +703,22 @@ function ReviewStep({
                     </Button>
                 </div>
             )}
+
+            {/* Publishing puts the artisan's face, voice and chosen location in
+                public, so it is confirmed explicitly rather than implied by the
+                Publish button. */}
+            <div className="mt-8 rounded-lg border border-border bg-muted/30 p-4">
+                <h2 className="mb-2 text-sm font-semibold">{t('consent.title')}</h2>
+                <label className="flex items-start gap-3 text-sm">
+                    <input
+                        type="checkbox"
+                        checked={consented}
+                        onChange={e => onConsentChange(e.target.checked)}
+                        className="mt-1 h-4 w-4 shrink-0 accent-[color:var(--sc-accent)]"
+                    />
+                    <span className="leading-snug text-muted-foreground">{t('consent.body')}</span>
+                </label>
+            </div>
         </div>
     )
 }

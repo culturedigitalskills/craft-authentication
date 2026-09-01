@@ -162,6 +162,23 @@ export function LoginForm() {
                         </svg>
                         {t('continueWithGoogle')}
                     </Button>
+                    {/* Google sign-in creates an account when there is no
+                        matching one yet, so the terms have to be surfaced here
+                        as well as on the register form. */}
+                    <p className="text-center text-xs text-muted-foreground">
+                        {t.rich('oauthTermsNotice', {
+                            terms: (chunks) => (
+                                <Link href="/terms" className="text-warm hover:underline">
+                                    {chunks}
+                                </Link>
+                            ),
+                            privacy: (chunks) => (
+                                <Link href="/privacy" className="text-warm hover:underline">
+                                    {chunks}
+                                </Link>
+                            ),
+                        })}
+                    </p>
                     <p className="text-center text-sm text-muted-foreground">
                         {t('noAccount')}{' '}
                         <Link
