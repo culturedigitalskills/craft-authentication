@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { ArtisanProfileForm } from '@/components/profile/ArtisanProfileForm'
+import { siteBaseUrl } from '@/lib/site-url'
 
 export default async function ProfilePage() {
     const session = await auth()
@@ -95,9 +96,9 @@ export default async function ProfilePage() {
           }
         : { state: 'none', progress: 0, slug: artisan?.slug ?? null }
 
-    // Built server-side from the same base URL the craft QR uses, so both codes
-    // point at the same origin.
-    const profileUrl = artisan ? `${process.env.AUTH_URL}/artisans/${artisan.slug}` : null
+    // Built from the shared base URL, which falls back rather than yielding
+    // "undefined/..." in a code someone is about to print onto their work.
+    const profileUrl = artisan ? `${siteBaseUrl()}/artisans/${artisan.slug}` : null
 
     return (
         <ArtisanProfileForm

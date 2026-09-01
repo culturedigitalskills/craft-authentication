@@ -390,15 +390,6 @@ export function ArtisanProfileForm({
                     </section>
                 )}
 
-                {/* ── Your QR code ── */}
-                {profileUrl && (
-                    <section className="bg-background pb-6">
-                        <div className="mx-auto max-w-3xl px-4">
-                            <ArtisanQRCard profileUrl={profileUrl} />
-                        </div>
-                    </section>
-                )}
-
                 {/* ── About Section ── */}
                 {artisan.bio && (
                     <section className="bg-muted/40 py-10">
@@ -487,6 +478,15 @@ export function ArtisanProfileForm({
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* ── Your QR code ── */}
+                {profileUrl && (
+                    <section className="bg-background py-10">
+                        <div className="mx-auto max-w-3xl px-4">
+                            <ArtisanQRCard profileUrl={profileUrl} />
                         </div>
                     </section>
                 )}
