@@ -12,6 +12,8 @@ import {
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { enqueueTranscription } from '@/lib/transcription'
 import { mediaKind } from '@/lib/media-kind'
+import { PLAYABLE_FILM_MIME_TYPES } from '@/lib/validations/media'
+import { siteBaseUrl } from '@/lib/site-url'
 import type { FilmInputs } from '@/lib/film/planner'
 import { computeInputsHash } from '@/lib/film/hash'
 import { canMakeFilm } from '@/lib/film/eligibility'
@@ -33,14 +35,6 @@ async function loadStory(userId: string): Promise<StoryWithArtisan | null> {
     const story = await prisma.craftStory.findUnique({ where: { artisanId: artisan.id } })
     if (!story) return null
     return { ...story, artisan }
-}
-
-function serverBaseUrl(): string {
-    return (
-        process.env.NEXT_PUBLIC_SERVER_URL ||
-        process.env.AUTH_URL ||
-        'https://www.sustainablecrafting.org'
-    )
 }
 
 /**
@@ -91,7 +85,7 @@ async function collectMeta(story: StoryWithArtisan) {
 
     const hashInputs: FilmInputs = {
         artisanName: `${story.artisan.firstName} ${story.artisan.lastName}`.trim(),
-        profileUrl: `${serverBaseUrl()}/artisans/${story.artisan.slug}`,
+        profileUrl: `${siteBaseUrl()}/artisans/${story.artisan.slug}`,
         chapters,
         visuals,
         templateVersion: FILM_TEMPLATE_VERSION,
@@ -207,8 +201,17 @@ export async function PUT(request: NextRequest) {
         if (media.uploaderId !== session!.user.id && session!.user.role !== 'ADMIN') {
             return errorResponse('Forbidden', 403)
         }
-        if (mediaKind(media.mimeType) !== 'video') {
-            return errorResponse('A story film must be a video', 400)
+        // Not just any video: the file is played back as-is on the public page,
+        // so a container browsers cannot decode would leave a blank player.
+        if (!PLAYABLE_FILM_MIME_TYPES.includes(media.mimeType)) {
+            return NextResponse.json(
+                {
+                    error: 'UNPLAYABLE_FORMAT',
+                    message:
+                        'Web browsers cannot play this kind of video, so it would show as a blank player on your public story. Convert it to MP4 and upload it again.',
+                },
+                { status: 400 },
+            )
         }
 
         const existing = await prisma.storyFilm.findUnique({
@@ -268,7 +271,9 @@ export async function PUT(request: NextRequest) {
             console.error('Caption enqueue failed for uploaded film', mediaId, transcriptionError)
         }
 
-        return NextResponse.json({ film })
+        // inputsHash is an internal render detail; GET strips it too.
+        const { inputsHash: _inputsHash, ...filmView } = film
+        return NextResponse.json({ film: filmView })
     } catch (error) {
         if (error instanceof ZodError) return handleValidationError(error)
         console.error('Error saving uploaded story film:', error)
