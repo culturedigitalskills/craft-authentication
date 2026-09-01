@@ -1,7 +1,8 @@
 "use client"
 import { useState } from 'react'
 import { Play } from 'lucide-react'
-import { youtubeThumbnailUrl, youtubeEmbedUrl } from '@/lib/youtube'
+import { youtubeEmbedUrl } from '@/lib/youtube'
+import { YouTubeTile } from '@/components/shared/YouTubeTile'
 
 type GalleryImage = {
   url: string
@@ -34,21 +35,7 @@ export default function Gallery({ images, videos = [], videoFiles = [] }: Galler
   const current = items[selected]
   const renderTile = (item: GalleryItem) => {
     if (item.kind === 'video') {
-      return (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={youtubeThumbnailUrl(item.youtubeId)}
-            alt={item.alt ?? 'video thumbnail'}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="rounded-full bg-black/60 p-3">
-              <Play className="h-6 w-6 fill-white text-white" />
-            </div>
-          </div>
-        </>
-      )
+      return <YouTubeTile size="lg" />
     }
     if (item.kind === 'videofile') {
       return (
@@ -103,19 +90,7 @@ export default function Gallery({ images, videos = [], videoFiles = [] }: Galler
                   }`}
               >
                 {item.kind === 'video' ? (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={youtubeThumbnailUrl(item.youtubeId)}
-                      alt={`thumbnail ${index}`}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                      <div className="rounded-full bg-black/60 p-1">
-                        <Play className="h-3 w-3 fill-white text-white" />
-                      </div>
-                    </div>
-                  </>
+                  <YouTubeTile size="sm" />
                 ) : item.kind === 'videofile' ? (
                   <>
                     <video

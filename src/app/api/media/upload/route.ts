@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import s3Client, { BUCKET_NAME, initGarage } from '@/lib/object-store'
 import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { randomUUID } from 'crypto'
-import { fileUploadSchema } from '@/lib/validations/media'
+import { fileUploadSchema, resolveMimeType } from '@/lib/validations/media'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
@@ -34,11 +34,14 @@ export async function POST(request: NextRequest) {
         const fileId = randomUUID()
         const fileExtension = `.${file.name.split('.').pop()}`
         const objectKey = `${fileId}${fileExtension}`
+        // Falls back to the extension when the browser reported no usable type,
+        // so the stored row is never classified as an image by default.
+        const mimeType = resolveMimeType(file.name, file.type)
 
         let uploadBuffer = Buffer.from(await file.arrayBuffer()) as Buffer
         let fileSize = file.size
 
-        if (file.type.startsWith('image/')) {
+        if (mimeType.startsWith('image/')) {
             try {
                 const manifestResult = await C2PAService.inspectManifest(uploadBuffer)
                 if (manifestResult.hasManifest) {
@@ -63,7 +66,7 @@ export async function POST(request: NextRequest) {
                         const signedBuffer = await C2PAService.initializeManifest(
                             session!.user.id,
                             uploadBuffer,
-                            file.type
+                            mimeType
                         )
                         uploadBuffer = signedBuffer
                         fileSize = signedBuffer.byteLength
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest) {
             Bucket: BUCKET_NAME,
             Key: objectKey,
             Body: uploadBuffer,
-            ContentType: file.type,
+            ContentType: mimeType,
             Metadata: {
                 'original-name': file.name,
             },
@@ -103,7 +106,7 @@ export async function POST(request: NextRequest) {
                     id: fileId,
                     filename: objectKey,
                     originalName: file.name,
-                    mimeType: file.type,
+                    mimeType,
                     size: fileSize,
                     bucket: BUCKET_NAME,
                     objectKey,

@@ -46,10 +46,13 @@
       "nameRequired": "Name is required",
       "emailInvalid": "Please enter a valid email address",
       "passwordMin": "Password must be at least 8 characters",
-      "passwordMismatch": "Passwords do not match"
+      "passwordMismatch": "Passwords do not match",
+      "acceptTermsRequired": "Please accept the Terms of Service and Privacy Policy to continue."
     },
     "orDivider": "or",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "acceptTerms": "I agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>.",
+    "oauthTermsNotice": "By continuing with Google you agree to the <terms>Terms of Service</terms> and the <privacy>Privacy Policy</privacy>."
   },
   "about": {
     "title": "About SustainableCrafting",
@@ -61,7 +64,9 @@
     "contact": "Contact"
   },
   "footer": {
-    "description": "The project website has been produced and is managed by the University of Brighton. This project is funded by the UK's Arts and Humanities Research Council under the India-UK research into creative industries and cultural heritage with the title: Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries. (Grant No. OPP080)."
+    "description": "The project website has been produced and is managed by the University of Brighton. This project is funded by the UK's Arts and Humanities Research Council under the India-UK research into creative industries and cultural heritage with the title: Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries. (Grant No. OPP080).",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
   },
   "socialmedia": {
     "title": "Follow Us",
@@ -186,7 +191,8 @@
       "publishFailed": "We couldn't publish your story. Please try again.",
       "emptyStory": "Add at least one written answer, recording, or workshop photo before publishing.",
       "filmRequired": "Create your film before publishing your story.",
-      "conflict": "Your story was updated in another window. Reload this page to see the latest version."
+      "conflict": "Your story was updated in another window. Reload this page to see the latest version.",
+      "consentRequired": "Please confirm the consent above before publishing."
     },
     "banner": {
       "startTitle": "Share Your Craft Story",
@@ -255,7 +261,8 @@
       "uploading": "Uploading...",
       "uploadFailed": "Upload failed. Please try again.",
       "fileTooLarge": "File is too large. Maximum size is {max} MB.",
-      "hint": "MP3, WAV, MP4 or WebM. Up to {max} MB."
+      "hint": "MP3, WAV, MP4 or WebM. Up to {max} MB.",
+      "unsupportedType": "That file type is not supported. Try MP3, WAV, M4A, MP4 or WebM."
     },
     "recorder": {
       "recordAudio": "Record audio",
@@ -311,7 +318,21 @@
       "deleteFailed": "Could not delete that file. Please try again.",
       "imageTooLarge": "Image is too large. Maximum size is {max} MB.",
       "videoTooLarge": "Video is too large. Maximum size is {max} MB.",
-      "sizeHint": "Images up to {imageMax} MB (large photos are resized automatically), video up to {videoMax} MB."
+      "sizeHint": "Images up to {imageMax} MB (large photos are resized automatically), video up to {videoMax} MB.",
+      "position": "Item {index} of {count}",
+      "moveEarlier": "Move earlier",
+      "moveLater": "Move later",
+      "reorderFailed": "Could not save the new order. Please try again."
+    },
+    "consent": {
+      "title": "Consent to publish",
+      "body": "I confirm this story is mine to share, and I agree to it being published on this site, including my recordings, my name and any location I chose to add. I can unpublish it at any time."
+    },
+    "storyboard": {
+      "title": "Film preview",
+      "total": "About {duration} long",
+      "approxHint": "Timings settle once captions finish.",
+      "measuring": "Working out how long each recording runs..."
     }
   },
   "profile": {
@@ -457,7 +478,9 @@
       "copyLink": "Copy link",
       "linkCopied": "Copied!",
       "visible": "Public",
-      "notvisible": "Private"
+      "notvisible": "Private",
+      "loadMap": "Show map",
+      "loadMapNotice": "Loads a map from OpenStreetMap."
     },
     "mycrafts": {
       "noCraftsYet": "You haven't added any crafts yet."
@@ -742,5 +765,126 @@
       "point3": "Backed by a tamper-evident credential",
       "cta": "See how it works"
     }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: 28 August 2026",
+    "intro": "This policy explains what personal information Sustainable Crafting collects, why we collect it, and what rights you have over it. It applies to this website and to the accounts, artisan profiles, craft records and story films created through it.",
+    "sections": [
+      {
+        "heading": "Who we are",
+        "body": "Sustainable Crafting is a research project website produced and managed by the University of Brighton. The project is funded by the UK’s Arts and Humanities Research Council under the India-UK research into creative industries and cultural heritage, grant number OPP080.\n\nFor the purposes of UK data protection law, the University of Brighton is the data controller for personal information processed through this website."
+      },
+      {
+        "heading": "How to contact us",
+        "body": "If you have a question about this policy, or you want to exercise any of the rights described below, write to us at privacy@PLACEHOLDER.invalid."
+      },
+      {
+        "heading": "The information we collect",
+        "body": "Account information. When you create an account we store your name, your email address and a hash of your password. If you sign in with Google we store the account identifier, name, email address and profile image that Google provides. We never receive or store your Google password.\n\nArtisan profile. If you create an artisan profile we store the first and last name, country and region you enter, together with anything else you choose to add: a biography, years of experience, how you learned your craft, a website, social media handles and hashtags. You may also record the approximate latitude and longitude of where you work.\n\nCraft records. Titles, descriptions, materials, techniques, measurements, photographs and videos of the pieces you document, and optionally the place where a piece was made.\n\nMy Story. Your written answers to the story questions, the audio and video you record or upload, photographs and videos of your workshop, tools, materials and process, and the short summary that introduces your story. From this material we generate English captions, a transcript and an assembled story film.\n\nCommunities. Your membership of any community on the site, and the role you hold in it.\n\nTechnical information. A session cookie that keeps you signed in, a cookie that remembers your language choice, and ordinary server logs recording requests made to the site."
+      },
+      {
+        "heading": "Recordings and sensitive information",
+        "body": "Story recordings carry your face and your voice, and they often describe your family, your community, your traditions and your beliefs. Depending on what you choose to say, a recording may reveal information that data protection law treats as a special category, such as ethnic origin or religious belief.\n\nWe process this material only because you have chosen to provide it and have consented to it being published. You can withdraw that consent at any time by unpublishing your story or by asking us to delete it."
+      },
+      {
+        "heading": "Why we process your information",
+        "body": "To provide your account and the service you asked for, we process your account and profile information because it is necessary to perform our agreement with you.\n\nTo publish your craft records, your story and your film, we rely on your consent, which you give when you choose to publish. Published material is visible to anyone who visits the site.\n\nTo generate captions, transcripts and draft summaries from your recordings, we rely on your consent, which you give when you choose to record or upload.\n\nTo keep the site secure and working, including rate limiting and error logging, we rely on our legitimate interest in operating a safe service.\n\nAs a research project we may report anonymous or aggregated statistics about how the site is used. That material does not identify you."
+      },
+      {
+        "heading": "Who we share it with",
+        "body": "We do not sell your personal information and we do not use it for advertising.\n\nAutomated transcription. Audio and video from your story recordings is sent to Groq, a service provider in the United States, which produces the English captions and transcripts and drafts summary text. Only the media needed for that task is sent.\n\nSign in with Google. If you choose this option, Google processes the sign in under its own privacy policy.\n\nMaps and embedded video. Craft pages can show a map from OpenStreetMap and video embedded from YouTube. Neither loads until you choose to open it. When you do, that provider receives your IP address and may set its own cookies. Some pages also display images hosted by Wikimedia.\n\nHosting. The site, its database and its media storage are operated for the project rather than on a public cloud bucket."
+      },
+      {
+        "heading": "Information leaving the UK",
+        "body": "Groq processes recordings in the United States. Where personal information leaves the UK we rely on the safeguards required by UK data protection law, including the International Data Transfer Agreement or Addendum where these apply."
+      },
+      {
+        "heading": "How long we keep it",
+        "body": "Account and profile information is kept for as long as your account is open. Deleting your artisan profile deletes the crafts and the story attached to it. Deleting a media file removes both the database record and the stored file.\n\nUnpublished drafts stay in your account until you delete them. Server logs are kept only for as long as they are needed to operate and secure the site."
+      },
+      {
+        "heading": "Access to what you upload",
+        "body": "Published material is public by design and can be seen by anyone visiting the site.\n\nMaterial you have not published is not listed anywhere public and is not linked from any page. Media files are served from an address containing a long random identifier, and anyone holding that address can open the file. Please treat an unpublished upload as unlisted rather than as private, and do not upload anything you would not want seen if its address were shared."
+      },
+      {
+        "heading": "Security",
+        "body": "Passwords are stored only as hashes and never in a readable form. The keys held in the credential vault are encrypted before they are stored. Content credentials are signed with certificates issued for your artisan identity, so a file can be checked for alteration after signing.\n\nNo website can promise perfect security. If a breach affects your rights we will tell you and the Information Commissioner’s Office as the law requires."
+      },
+      {
+        "heading": "Your rights",
+        "body": "Under UK data protection law you can ask for a copy of the personal information we hold about you, ask us to correct information that is wrong, ask us to delete information, ask us to restrict or stop using it, and ask to receive certain information in a portable form. Where we rely on your consent, you can withdraw it at any time.\n\nTo exercise any of these rights, write to privacy@PLACEHOLDER.invalid. If you are unhappy with our response you can complain to the Information Commissioner’s Office at ico.org.uk."
+      },
+      {
+        "heading": "Cookies",
+        "body": "This site sets only the cookies it needs in order to work. There are no analytics cookies, no advertising cookies and no third party tracking on the site.\n\nA session cookie is set when you sign in. It identifies your session so that you stay signed in, and it is cleared when you sign out.\n\nA language cookie records the language you selected, so the site appears in that language when you return.\n\nBecause both are strictly necessary for functions you have asked for, we do not ask for consent before setting them. You can clear cookies in your browser at any time, though the site cannot keep you signed in without the session cookie."
+      },
+      {
+        "heading": "Children",
+        "body": "This site is intended for adults. If you are under 18, please use it only with the involvement of a parent or guardian."
+      },
+      {
+        "heading": "Changes to this policy",
+        "body": "If we change this policy we will update the date shown at the top of this page. Where a change materially affects how we use your information, we will bring it to your attention when you next sign in."
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: 28 August 2026",
+    "intro": "These terms govern your use of Sustainable Crafting. By creating an account or using the site, you agree to them.",
+    "sections": [
+      {
+        "heading": "About this service",
+        "body": "Sustainable Crafting is a research project website produced and managed by the University of Brighton, funded by the UK’s Arts and Humanities Research Council under grant OPP080. It gives artisans a place to document their craft, record their story, and publish both with content credentials that record how the material was made."
+      },
+      {
+        "heading": "Your account",
+        "body": "You must provide accurate registration details and keep your password confidential. You are responsible for what happens through your account, so tell us promptly if you think someone else has gained access to it.\n\nYou must be 18 or over to create an account, or have the involvement of a parent or guardian."
+      },
+      {
+        "heading": "Your content stays yours",
+        "body": "You keep ownership of everything you upload: your photographs, your videos, your recordings, your written answers and your craft records.\n\nBy publishing material on the site you grant the University of Brighton a non-exclusive, worldwide, royalty free licence to store, reproduce, translate, adapt for captions and subtitles, and display that material, for the purpose of operating and presenting this website and describing the research project. This licence exists so that we can host your work, generate captions and assemble your story film. It ends for future use when you unpublish or delete the material, although we cannot recall copies that other people have already taken.\n\nYou confirm that you have the right to publish what you upload, that it is your own work or that you have permission to use it, and that anyone identifiable in a photograph or a recording has agreed to appear."
+      },
+      {
+        "heading": "Publishing and consent",
+        "body": "Material stays unpublished until you choose to publish it. When you publish a story, that story and its film become visible to anyone who visits the site, including your name, your recordings and any location you chose to share. You can unpublish at any time."
+      },
+      {
+        "heading": "Acceptable use",
+        "body": "Do not use this site to publish material that is unlawful, that misleads people about the origin of a craft, that is abusive, or that infringes anyone else’s rights. Do not try to gain unauthorised access to the site, to other accounts or to the systems behind it. Do not use automated means to extract material from the site at scale.\n\nWe may remove material or suspend an account that breaches these terms."
+      },
+      {
+        "heading": "Content credentials",
+        "body": "The site signs media with C2PA content credentials and issues verifiable credentials for craft records. These record what was created on this site and by which account, and they let anyone check that a file has not been altered since it was signed.\n\nThey are not an independent verification that your description is true. We do not inspect or certify claims about materials, technique, origin or age."
+      },
+      {
+        "heading": "Availability",
+        "body": "This is a research project and the site is provided as it is. We cannot promise uninterrupted availability, and features may change or be withdrawn as the research continues. Please keep your own copies of anything that matters to you."
+      },
+      {
+        "heading": "Liability",
+        "body": "Nothing in these terms limits liability for death or personal injury caused by negligence, for fraud, or for anything else that cannot lawfully be limited.\n\nSubject to that, the University of Brighton is not liable for indirect or consequential loss, for loss of profit or opportunity, or for the loss of material of which you did not keep your own copy."
+      },
+      {
+        "heading": "Ending your use of the site",
+        "body": "You can stop using the site and delete your account at any time. Deleting your artisan profile deletes the crafts and the story attached to it. We may suspend or end access where these terms are breached."
+      },
+      {
+        "heading": "Changes to these terms",
+        "body": "We may update these terms as the project develops. The date at the top of this page shows when they last changed. Continuing to use the site after a change means you accept the updated terms."
+      },
+      {
+        "heading": "Governing law",
+        "body": "These terms are governed by the law of England and Wales, and the courts of England and Wales have jurisdiction over any dispute arising from them."
+      },
+      {
+        "heading": "Contact",
+        "body": "Questions about these terms can be sent to legal@PLACEHOLDER.invalid."
+      }
+    ]
+  },
+  "legal": {
+    "eyebrow": "Legal"
   }
 }

@@ -72,6 +72,9 @@ model User {
     image         String?
     role          Role                   @default(ARTISAN)
     isActive      Boolean                @default(true)
+    // When this account accepted the Terms of Service. Null for accounts
+    // created before terms acceptance was introduced.
+    termsAcceptedAt DateTime?
     masterKeyHash     String?                @map("master_key_hash")
     c2paAutoRenew     Boolean                @default(false) @map("c2pa_auto_renew")
     c2paCertExpiresAt DateTime?              @map("c2pa_cert_expires_at")
@@ -267,6 +270,9 @@ model CraftStory {
     answerChallengesMediaId String?
     summaryText             String?
     publishedAt             DateTime?
+    // When the artisan consented to this story being published. Null for
+    // stories published before consent was recorded, which stay published.
+    consentedAt             DateTime?
     createdAt               DateTime         @default(now())
     updatedAt               DateTime         @updatedAt
     artisan                 Artisan          @relation(fields: [artisanId], references: [id], onDelete: Cascade)

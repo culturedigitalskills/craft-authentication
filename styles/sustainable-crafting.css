@@ -6,10 +6,10 @@
    themes can be retuned in one place.
    ============================================================ */
 
-/* ---- Fonts (load in <head>) -------------------------------
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Hanken+Grotesque:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+/* ---- Fonts ------------------------------------------------
+   Spectral is self-hosted through next/font in src/app/[locale]/layout.tsx,
+   which exposes it as --font-spectral. Nothing is fetched from Google at
+   runtime, so no visitor IP reaches a third party just to read a page.
 ------------------------------------------------------------ */
 
 :root {
@@ -49,9 +49,12 @@
   --sc-border-on-dark: rgba(255, 248, 238, 0.16);
 
   /* — Type families — */
-  --sc-font-display: "Spectral", Georgia, serif;        /* headings, numbers */
+  --sc-font-display: var(--font-spectral), "Spectral", Georgia, serif;  /* headings, numbers */
+  /* "Hanken Grotesque" is not a real Google Fonts family (it is "Hanken
+     Grotesk"), so this has always resolved to system-ui. Left as it is on
+     purpose: correcting it would restyle every page of body text. */
   --sc-font-body:    "Hanken Grotesque", system-ui, sans-serif;
-  --sc-font-hand:    "Caveat", cursive;                  /* quotes, captions, accents */
+  --sc-font-hand:    var(--font-caveat), "Caveat", cursive;   /* quotes, captions, accents */
 
   /* — Type scale — */
   --sc-text-eyebrow: 12px;   /* 700, letter-spacing 2px, UPPERCASE, accent */

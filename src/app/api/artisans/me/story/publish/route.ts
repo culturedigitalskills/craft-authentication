@@ -5,11 +5,16 @@ import { errorResponse } from '@/lib/validations/types'
 import { ANSWER_MEDIA_FIELDS, ANSWER_TEXT_FIELDS } from '@/lib/validations/craftStory'
 import { canMakeFilm, getFilmIngredients } from '@/lib/film/eligibility'
 
-export async function POST() {
+export async function POST(request: Request) {
     const { session, unauthorized } = await requireAuth()
     if (unauthorized) return unauthorized
 
     try {
+        // The wizard sends { consent: true } from its consent checkbox. Older
+        // clients send no body at all, which parses to an empty object.
+        const body = await request.json().catch(() => ({}))
+        const consentGiven = (body as { consent?: unknown }).consent === true
+
         const artisan = await prisma.artisan.findUnique({
             where: { userId: session!.user.id },
             select: { id: true },
@@ -40,6 +45,19 @@ export async function POST() {
             )
         }
 
+        // Publishing puts the artisan's face, voice and chosen location in
+        // public, so it needs their explicit consent. Stories consented to
+        // earlier keep that consent and are not asked again.
+        if (!story.consentedAt && !consentGiven) {
+            return NextResponse.json(
+                {
+                    error: 'CONSENT_REQUIRED',
+                    message: 'Confirm the publication consent before publishing your story.',
+                },
+                { status: 400 }
+            )
+        }
+
         // If this story has the raw material for a film, require a finished one
         // before publishing (the film is the story's headline). A story that
         // can't make a film publishes as the written page, and a FAILED render
@@ -62,7 +80,11 @@ export async function POST() {
 
         const updated = await prisma.craftStory.update({
             where: { artisanId: artisan.id },
-            data: { status: 'PUBLISHED', publishedAt: new Date() },
+            data: {
+                status: 'PUBLISHED',
+                publishedAt: new Date(),
+                ...(story.consentedAt ? {} : { consentedAt: new Date() }),
+            },
         })
 
         // A rendered, READY film becomes the story's public hero. The artisan has

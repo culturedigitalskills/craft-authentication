@@ -21,7 +21,11 @@ import Link from 'next/link'
 import { registerRequestSchema } from '@/lib/validations/auth'
 
 const registerFormSchema = registerRequestSchema
-    .extend({ confirmPassword: z.string().min(1) })
+    .extend({
+        confirmPassword: z.string().min(1),
+        // Must be ticked; the message is rendered from the catalog, not from here.
+        acceptTerms: z.literal(true),
+    })
     .refine((data) => data.password === data.confirmPassword, {
         path: ['confirmPassword'],
     })
@@ -43,11 +47,16 @@ export function RegisterForm() {
     const {
         register,
         handleSubmit,
+        watch,
         formState: { errors, isSubmitting },
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerFormSchema),
         mode: 'onBlur',
     })
+
+    // Signing up with Google creates an account just as the form does, so it has
+    // to wait for the same acceptance rather than slipping past the checkbox.
+    const acceptedTerms = watch('acceptTerms') === true
 
     async function onSubmit(data: RegisterFormData) {
         setServerError(null)
@@ -169,6 +178,36 @@ export function RegisterForm() {
                             </p>
                         )}
                     </div>
+                    <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                            <input
+                                id="acceptTerms"
+                                type="checkbox"
+                                className="mt-1 h-4 w-4 shrink-0 accent-[color:var(--sc-accent)]"
+                                aria-invalid={!!errors.acceptTerms}
+                                {...register('acceptTerms')}
+                            />
+                            <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug">
+                                {t.rich('acceptTerms', {
+                                    terms: (chunks) => (
+                                        <Link href="/terms" className="text-warm hover:underline">
+                                            {chunks}
+                                        </Link>
+                                    ),
+                                    privacy: (chunks) => (
+                                        <Link href="/privacy" className="text-warm hover:underline">
+                                            {chunks}
+                                        </Link>
+                                    ),
+                                })}
+                            </Label>
+                        </div>
+                        {errors.acceptTerms && (
+                            <p className="text-sm text-red-500">
+                                {t('validation.acceptTermsRequired')}
+                            </p>
+                        )}
+                    </div>
                     <Button
                         type="submit"
                         className="w-full"
@@ -191,7 +230,7 @@ export function RegisterForm() {
                         type="button"
                         variant="outline"
                         className="w-full"
-                        disabled={busy || googleLoading}
+                        disabled={busy || googleLoading || !acceptedTerms}
                         onClick={() => {
                             setGoogleLoading(true)
                             void signIn('google', { callbackUrl: '/auth/redirect' })
