@@ -23,8 +23,7 @@
     "createGroup": "Neue Gemeinschaft hinzufügen",
     "contentCredentials": "Inhaltsnachweise",
     "generationWorkspace": "Bildgenerierung",
-    "seecrafts": "Galerie",
-    "howItWorks": "So funktioniert es"
+    "seecrafts": "Galerie"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -240,7 +239,9 @@
       "formatText": "Geschriebener Text",
       "formatAudio": "Audioaufnahme",
       "formatVideo": "Videoaufnahme",
-      "encouragement": "Bitte antworte in deinen eigenen Worten, so als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte."
+      "encouragement": "Bitte antworte in deinen eigenen Worten, so als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte.",
+      "alreadyHaveFilmTitle": "Hast du schon einen eigenen Film?",
+      "alreadyHaveFilmBody": "Lade ihn hoch, dann wird er zu deinem Geschichtsfilm. Eine kurze Zusammenfassung kannst du danach noch ergänzen, und wir fügen englische Untertitel hinzu."
     },
     "step1": {
       "title": "Über dich",
@@ -330,9 +331,10 @@
       "uploadedBadge": "Das ist dein eigener Film, von dir hochgeladen.",
       "generateInstead": "Stattdessen aus meinen Antworten erstellen",
       "uploadFailed": "Der Film konnte nicht gespeichert werden. Bitte versuche es erneut.",
-      "uploadWrongType": "Diese Datei ist kein Video. Versuche MP4 oder WebM.",
+      "uploadWrongType": "Browser können diese Art von Video nicht abspielen, auf deiner Geschichte erschiene nur ein leerer Player. Wandle es in MP4 um und versuche es erneut. MP4, MOV, WebM und MKV funktionieren.",
       "uploadTooLarge": "Dieser Film ist zu groß. Maximal {max} MB.",
-      "uploadRenderBusy": "Gerade wird ein Film erstellt. Warte, bis er fertig ist, und lade dann deinen hoch."
+      "uploadRenderBusy": "Gerade wird ein Film erstellt. Warte, bis er fertig ist, und lade dann deinen hoch.",
+      "generateFailedKeptUpload": "Wir konnten aus deinen Antworten keinen Film erstellen, dein eigener Film ist weiterhin da."
     },
     "summary": {
       "label": "Kurze Zusammenfassung (etwa 100 Wörter)",
@@ -444,7 +446,7 @@
     "qr": {
       "title": "Dein QR-Code",
       "guidance": "Drucke ihn aus und bringe ihn an deiner Arbeit an. Wer ihn scannt, landet auf deinem öffentlichen Profil und deiner Geschichte.",
-      "download": "SVG herunterladen",
+      "download": "Bild herunterladen",
       "copyLink": "Link kopieren",
       "linkCopied": "Kopiert!"
     }
@@ -767,8 +769,7 @@
       "subcopy": "Hinter jedem Stück steht ein echter Mensch, ein echter Ort und eine über Generationen weitergegebene Tradition. Lerne die Macher und die Geschichten in ihrer Arbeit kennen.",
       "ctaMakers": "Die Macher kennenlernen",
       "ctaCrafts": "Handwerk entdecken",
-      "chipKicker": "Vorgestellter Macher",
-      "ctaHow": "So funktioniert es"
+      "chipKicker": "Vorgestellter Macher"
     },
     "trust": {
       "rooted": {

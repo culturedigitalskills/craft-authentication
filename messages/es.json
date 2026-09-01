@@ -23,8 +23,7 @@
     "completeProfile": "Completa tu perfil",
     "mediaGallery": "Galería multimedia",
     "contentCredentials": "Credenciales de Contenido",
-    "generationWorkspace": "Generación de Imágenes",
-    "howItWorks": "Cómo funciona"
+    "generationWorkspace": "Generación de Imágenes"
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
@@ -242,7 +241,9 @@
       "formatText": "Texto escrito",
       "formatAudio": "Grabación de audio",
       "formatVideo": "Grabación de vídeo",
-      "encouragement": "Responde con tus propias palabras, como si le contaras tu historia a alguien que quiere entender tu artesanía."
+      "encouragement": "Responde con tus propias palabras, como si le contaras tu historia a alguien que quiere entender tu artesanía.",
+      "alreadyHaveFilmTitle": "¿Ya tienes un film propio?",
+      "alreadyHaveFilmBody": "Súbelo y será el film de tu historia. Después podrás añadir un resumen breve, y nosotros añadiremos subtítulos en inglés."
     },
     "step1": {
       "title": "Sobre ti",
@@ -332,9 +333,10 @@
       "uploadedBadge": "Este es tu propio film, subido por ti.",
       "generateInstead": "Crear uno con mis respuestas",
       "uploadFailed": "No pudimos guardar ese film. Inténtalo de nuevo.",
-      "uploadWrongType": "Ese archivo no es un vídeo. Prueba con MP4 o WebM.",
+      "uploadWrongType": "Los navegadores no pueden reproducir este tipo de vídeo, así que en tu historia aparecería un reproductor vacío. Conviértelo a MP4 e inténtalo de nuevo. MP4, MOV, WebM y MKV funcionan.",
       "uploadTooLarge": "Ese film es demasiado grande. El máximo es {max} MB.",
-      "uploadRenderBusy": "Se está creando un film ahora mismo. Espera a que termine y sube el tuyo."
+      "uploadRenderBusy": "Se está creando un film ahora mismo. Espera a que termine y sube el tuyo.",
+      "generateFailedKeptUpload": "No pudimos crear un film con tus respuestas, así que tu propio film sigue aquí."
     },
     "summary": {
       "label": "Resumen breve (unas 100 palabras)",
@@ -444,7 +446,7 @@
     "qr": {
       "title": "Tu código QR",
       "guidance": "Imprímelo y ponlo en tu trabajo. Quien lo escanee llegará a tu perfil público y a tu historia.",
-      "download": "Descargar SVG",
+      "download": "Descargar imagen",
       "copyLink": "Copiar enlace",
       "linkCopied": "¡Copiado!"
     }
@@ -767,8 +769,7 @@
       "subcopy": "Detrás de cada pieza hay una persona real, un lugar real y una tradición transmitida por generaciones. Conoce a quienes crean y las historias tejidas en su trabajo.",
       "ctaMakers": "Conoce a los artesanos",
       "ctaCrafts": "Explora las artesanías",
-      "chipKicker": "Artesano destacado",
-      "ctaHow": "Cómo funciona"
+      "chipKicker": "Artesano destacado"
     },
     "trust": {
       "rooted": {

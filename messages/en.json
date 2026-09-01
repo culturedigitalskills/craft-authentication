@@ -23,8 +23,7 @@
     "completeProfile": "Complete your profile",
     "mediaGallery": "Media Gallery",
     "contentCredentials": "Content Credentials",
-    "generationWorkspace": "Image Generation",
-    "howItWorks": "How it works"
+    "generationWorkspace": "Image Generation"
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -242,7 +241,9 @@
       "formatText": "Written text",
       "formatAudio": "Audio recording",
       "formatVideo": "Video recording",
-      "encouragement": "Please answer in your own words, like you are telling your story to someone who wants to understand your craft."
+      "encouragement": "Please answer in your own words, like you are telling your story to someone who wants to understand your craft.",
+      "alreadyHaveFilmTitle": "Already have a film of your own?",
+      "alreadyHaveFilmBody": "Upload it and it becomes your story film. You can still add a short summary afterwards, and we will add English captions."
     },
     "step1": {
       "title": "About Yourself",
@@ -332,9 +333,10 @@
       "uploadedBadge": "This is your own film, uploaded by you.",
       "generateInstead": "Create one from my answers instead",
       "uploadFailed": "We could not save that film. Please try again.",
-      "uploadWrongType": "That file is not a video. Try MP4 or WebM.",
+      "uploadWrongType": "Browsers cannot play this kind of video, so it would show as an empty player on your story. Convert it to MP4 and try again. MP4, MOV, WebM and MKV all work.",
       "uploadTooLarge": "That film is too large. Maximum size is {max} MB.",
-      "uploadRenderBusy": "A film is being created right now. Wait for it to finish, then upload yours."
+      "uploadRenderBusy": "A film is being created right now. Wait for it to finish, then upload yours.",
+      "generateFailedKeptUpload": "We could not create a film from your answers, so your own film is still here."
     },
     "summary": {
       "label": "Short summary (about 100 words)",
@@ -444,7 +446,7 @@
     "qr": {
       "title": "Your QR code",
       "guidance": "Print this and attach it to your work. Anyone who scans it lands on your public profile and your story.",
-      "download": "Download SVG",
+      "download": "Download image",
       "copyLink": "Copy link",
       "linkCopied": "Copied!"
     }
@@ -767,8 +769,7 @@
       "subcopy": "Behind every piece is a real person, a real place, and a tradition passed down through generations. Meet the makers and the stories woven into their work.",
       "ctaMakers": "Meet the makers",
       "ctaCrafts": "Browse the crafts",
-      "chipKicker": "Featured maker",
-      "ctaHow": "How it works"
+      "chipKicker": "Featured maker"
     },
     "trust": {
       "rooted": {

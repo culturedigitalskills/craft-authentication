@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Menu, X } from 'lucide-react'
 import { NavbarAuth } from './NavbarAuth'
 import { LanguageSelect } from '@/components/shared/LanguageSelect'
@@ -30,7 +30,6 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
     const navLinks = [
         { href: '/', label: t('navbar.home') },
-        { href: '/how-it-works', label: t('navbar.howItWorks') },
         { href: '/about', label: t('navbar.about') },
         { href: '/crafts', label: t('navbar.crafts') },
         { href: '/artisans', label: t('navbar.artisans') },
@@ -46,6 +45,52 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
         if (standaloneSubroutes.some(route => pathname.startsWith(route))) return false
         return pathname.startsWith(href)
     }
+
+    // The underline is a single element that travels between links, so it needs
+    // the active link's position. Measured from the DOM rather than computed,
+    // because the labels are translated and their widths vary by locale.
+    const navRef = useRef<HTMLElement>(null)
+    const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
+    const [indicator, setIndicator] = useState<{ left: number; width: number; top: number } | null>(
+        null,
+    )
+    // Skips the travel animation for the very first placement, so the underline
+    // appears under the current page instead of sliding in from the edge.
+    const [ready, setReady] = useState(false)
+
+    const measure = useCallback(() => {
+        const active = navLinks.find(link => isActive(link.href))
+        const el = active ? linkRefs.current[active.href] : null
+        const nav = navRef.current
+        if (!el || !nav) {
+            setIndicator(null)
+            return
+        }
+        const navBox = nav.getBoundingClientRect()
+        const linkBox = el.getBoundingClientRect()
+        setIndicator({
+            left: linkBox.left - navBox.left,
+            width: linkBox.width,
+            // Sits just under the label itself. Taking this from the link rather
+            // than the nav keeps it there whatever else shares the bar.
+            top: linkBox.bottom - navBox.top + 5,
+        })
+    }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        measure()
+        // Web fonts and a language change both resize the labels after the
+        // first paint, which would leave the underline the wrong width.
+        const observer = new ResizeObserver(measure)
+        if (navRef.current) observer.observe(navRef.current)
+        window.addEventListener('resize', measure)
+        const raf = requestAnimationFrame(() => setReady(true))
+        return () => {
+            observer.disconnect()
+            window.removeEventListener('resize', measure)
+            cancelAnimationFrame(raf)
+        }
+    }, [measure])
 
     return (
         <>
@@ -78,16 +123,30 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                     </Link>
 
                     {/* Desktop nav */}
-                    <nav className="relative hidden items-center gap-6 md:flex">
+                    <nav ref={navRef} className="relative hidden items-center gap-6 md:flex">
                         {navLinks.map(link => (
                             <Link
                                 key={link.href}
                                 href={link.href}
+                                ref={el => {
+                                    linkRefs.current[link.href] = el
+                                }}
                                 className={`sc-nav__link${isActive(link.href) ? ' sc-nav__link--active' : ''}`}
                             >
                                 {link.label}
                             </Link>
                         ))}
+
+                        <span
+                            aria-hidden
+                            className={`sc-nav__indicator${ready ? '' : ' sc-nav__indicator--idle'}`}
+                            style={{
+                                width: indicator?.width ?? 0,
+                                top: indicator?.top ?? 0,
+                                transform: `translateX(${indicator?.left ?? 0}px)`,
+                                opacity: indicator ? 1 : 0,
+                            }}
+                        />
 
                         {/* Separator */}
                         <div className="mx-1 h-5 w-px" style={{ background: 'var(--sc-border-strong)' }} />

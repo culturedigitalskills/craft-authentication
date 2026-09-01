@@ -23,8 +23,7 @@
     "completeProfile": "Profilini tamamla",
     "mediaGallery": "Medya Galerisi",
     "contentCredentials": "İçerik Bilgileri",
-    "generationWorkspace": "Resim Oluşturma",
-    "howItWorks": "Nasıl çalışır"
+    "generationWorkspace": "Resim Oluşturma"
   },
   "auth": {
     "loginTitle": "Giriş Yap",
@@ -242,7 +241,9 @@
       "formatText": "Yazılı metin",
       "formatAudio": "Ses kaydı",
       "formatVideo": "Video kaydı",
-      "encouragement": "Lütfen kendi sözlerinle, zanaatını anlamak isteyen birine hikâyeni anlatır gibi cevap ver."
+      "encouragement": "Lütfen kendi sözlerinle, zanaatını anlamak isteyen birine hikâyeni anlatır gibi cevap ver.",
+      "alreadyHaveFilmTitle": "Zaten kendi filmin var mı?",
+      "alreadyHaveFilmBody": "Onu yükle, hikâye filmin o olsun. Sonrasında kısa bir özet ekleyebilirsin, İngilizce altyazıyı da biz ekleriz."
     },
     "step1": {
       "title": "Kendin Hakkında",
@@ -332,9 +333,10 @@
       "uploadedBadge": "Bu senin kendi filmin, senin yüklediğin.",
       "generateInstead": "Bunun yerine cevaplarımdan oluştur",
       "uploadFailed": "Bu filmi kaydedemedik. Lütfen tekrar dene.",
-      "uploadWrongType": "Bu dosya bir video değil. MP4 veya WebM dene.",
+      "uploadWrongType": "Tarayıcılar bu tür videoyu oynatamaz, hikâyende boş bir oynatıcı görünür. MP4 biçimine dönüştürüp tekrar dene. MP4, MOV, WebM ve MKV çalışır.",
       "uploadTooLarge": "Bu film çok büyük. En fazla {max} MB.",
-      "uploadRenderBusy": "Şu anda bir film oluşturuluyor. Bitmesini bekle, sonra kendi filmini yükle."
+      "uploadRenderBusy": "Şu anda bir film oluşturuluyor. Bitmesini bekle, sonra kendi filmini yükle.",
+      "generateFailedKeptUpload": "Cevaplarından film oluşturamadık, bu yüzden kendi filmin hâlâ burada."
     },
     "summary": {
       "label": "Kısa özet (yaklaşık 100 kelime)",
@@ -444,7 +446,7 @@
     "qr": {
       "title": "QR kodun",
       "guidance": "Bunu yazdır ve işine iliştir. Okutan kişi genel profiline ve hikâyene ulaşır.",
-      "download": "SVG indir",
+      "download": "Görseli indir",
       "copyLink": "Bağlantıyı kopyala",
       "linkCopied": "Kopyalandı!"
     }
@@ -767,8 +769,7 @@
       "subcopy": "Her parçanın ardında gerçek bir insan, gerçek bir yer ve nesilden nesile aktarılan bir gelenek vardır. Üreticilerle ve işlerine işlenen hikâyelerle tanışın.",
       "ctaMakers": "Üreticilerle tanışın",
       "ctaCrafts": "El sanatlarına göz atın",
-      "chipKicker": "Öne çıkan üretici",
-      "ctaHow": "Nasıl çalışır"
+      "chipKicker": "Öne çıkan üretici"
     },
     "trust": {
       "rooted": {
