@@ -330,7 +330,7 @@ export default async function Home() {
                                 </li>
                             ))}
                         </ul>
-                        <Link href="/crafts" className="sc-btn sc-btn--ghost mt-7">
+                        <Link href="/how-it-works" className="sc-btn sc-btn--ghost mt-7">
                             {t('provenance.cta')}
                             <ArrowRight className="h-4 w-4" />
                         </Link>

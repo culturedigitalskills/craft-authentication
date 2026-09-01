@@ -539,6 +539,9 @@ export async function renderStoryFilm(storyId: string): Promise<void> {
                 where: { storyId },
                 data: {
                     status: 'READY',
+                    // Rendering over a film the artisan uploaded returns
+                    // ownership of the row to the generator.
+                    source: 'RENDERED',
                     outputMediaId: output.id,
                     durationSec,
                     inputsHash: computeInputsHash(gathered.inputs),
@@ -554,7 +557,21 @@ export async function renderStoryFilm(storyId: string): Promise<void> {
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown film render error'
         console.error(`Film render failed for story ${storyId}:`, error)
-        await setFilmStatus(storyId, 'FAILED', { error: message })
+
+        // Generating over a film the artisan uploaded must not cost them that
+        // film. The row still points at their video, so a failure here leaves it
+        // READY and merely records why the generation did not happen. Marking it
+        // FAILED would hide their own film from the panel and from their
+        // published page, with no way back to it.
+        const current = await prisma.storyFilm.findUnique({
+            where: { storyId },
+            select: { source: true, outputMediaId: true },
+        })
+        if (current?.source === 'UPLOADED' && current.outputMediaId) {
+            await setFilmStatus(storyId, 'READY', { error: message })
+        } else {
+            await setFilmStatus(storyId, 'FAILED', { error: message })
+        }
     } finally {
         await fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(() => {})
     }
