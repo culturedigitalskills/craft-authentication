@@ -14,6 +14,7 @@ import { ProfilePhotoUpload } from './ProfilePhotoUpload'
 import { CoverPhotoUpload } from './CoverPhotoUpload'
 import { LocationSelect } from './LocationSelect'
 import { CraftStoryBanner, type CraftStoryBannerProps } from './CraftStoryBanner'
+import { ArtisanQRCard } from './ArtisanQRCard'
 import {
     ArrowLeft,
     MapPin,
@@ -64,6 +65,8 @@ interface ArtisanProfileFormProps {
     coverUrl: string | null
     myGroups?: MyGroup[]
     storyBanner?: CraftStoryBannerProps
+    // Public profile URL for the artisan's QR code; null before a profile exists.
+    profileUrl?: string | null
 }
 
 export function ArtisanProfileForm({
@@ -72,6 +75,7 @@ export function ArtisanProfileForm({
     coverUrl,
     myGroups = [],
     storyBanner,
+    profileUrl,
 }: ArtisanProfileFormProps) {
     const t = useTranslations('profile')
     const router = useRouter()
@@ -382,6 +386,15 @@ export function ArtisanProfileForm({
                     <section className="bg-background py-6">
                         <div className="mx-auto max-w-3xl px-4">
                             <CraftStoryBanner {...storyBanner} />
+                        </div>
+                    </section>
+                )}
+
+                {/* ── Your QR code ── */}
+                {profileUrl && (
+                    <section className="bg-background pb-6">
+                        <div className="mx-auto max-w-3xl px-4">
+                            <ArtisanQRCard profileUrl={profileUrl} />
                         </div>
                     </section>
                 )}

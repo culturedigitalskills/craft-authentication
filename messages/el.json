@@ -430,7 +430,14 @@
     "socialYoutube": "YouTube",
     "socialWebsite": "Ιστότοπος",
     "hashtags": "Hashtags",
-    "addHashtag": "Προσθήκη hashtag"
+    "addHashtag": "Προσθήκη hashtag",
+    "qr": {
+      "title": "Ο κωδικός QR σας",
+      "guidance": "Εκτυπώστε τον και τοποθετήστε τον στη δουλειά σας. Όποιος τον σαρώσει φτάνει στο δημόσιο προφίλ και την ιστορία σας.",
+      "download": "Λήψη SVG",
+      "copyLink": "Αντιγραφή συνδέσμου",
+      "linkCopied": "Αντιγράφηκε!"
+    }
   },
   "artisans": {
     "title": "Τεχνίτες",

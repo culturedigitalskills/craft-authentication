@@ -430,7 +430,14 @@
     "socialYoutube": "YouTube",
     "socialWebsite": "Web Sitesi",
     "hashtags": "Hashtagler",
-    "addHashtag": "Hashtag ekle"
+    "addHashtag": "Hashtag ekle",
+    "qr": {
+      "title": "QR kodun",
+      "guidance": "Bunu yazdır ve işine iliştir. Okutan kişi genel profiline ve hikâyene ulaşır.",
+      "download": "SVG indir",
+      "copyLink": "Bağlantıyı kopyala",
+      "linkCopied": "Kopyalandı!"
+    }
   },
   "artisans": {
     "title": "Zanaatkârlar",

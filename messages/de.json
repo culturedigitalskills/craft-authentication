@@ -430,7 +430,14 @@
     "socialYoutube": "YouTube",
     "socialWebsite": "Website",
     "hashtags": "Hashtags",
-    "addHashtag": "Hashtag hinzufügen"
+    "addHashtag": "Hashtag hinzufügen",
+    "qr": {
+      "title": "Dein QR-Code",
+      "guidance": "Drucke ihn aus und bringe ihn an deiner Arbeit an. Wer ihn scannt, landet auf deinem öffentlichen Profil und deiner Geschichte.",
+      "download": "SVG herunterladen",
+      "copyLink": "Link kopieren",
+      "linkCopied": "Kopiert!"
+    }
   },
   "artisanProfile": {
     "about": "Über",

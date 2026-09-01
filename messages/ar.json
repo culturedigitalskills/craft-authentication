@@ -430,7 +430,14 @@
     "socialYoutube": "يوتيوب",
     "socialWebsite": "الموقع الإلكتروني",
     "hashtags": "الوسوم",
-    "addHashtag": "إضافة وسم"
+    "addHashtag": "إضافة وسم",
+    "qr": {
+      "title": "رمز QR الخاص بك",
+      "guidance": "اطبعه وضعه على عملك. من يمسحه يصل إلى ملفك العام وقصتك.",
+      "download": "تنزيل SVG",
+      "copyLink": "نسخ الرابط",
+      "linkCopied": "تم النسخ!"
+    }
   },
   "artisans": {
     "title": "الحرفيون",

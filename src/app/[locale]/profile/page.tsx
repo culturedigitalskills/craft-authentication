@@ -95,6 +95,10 @@ export default async function ProfilePage() {
           }
         : { state: 'none', progress: 0, slug: artisan?.slug ?? null }
 
+    // Built server-side from the same base URL the craft QR uses, so both codes
+    // point at the same origin.
+    const profileUrl = artisan ? `${process.env.AUTH_URL}/artisans/${artisan.slug}` : null
+
     return (
         <ArtisanProfileForm
             artisan={artisan}
@@ -102,6 +106,7 @@ export default async function ProfilePage() {
             coverUrl={coverUrl}
             myGroups={myGroups}
             storyBanner={storyBanner}
+            profileUrl={profileUrl}
         />
     )
 }

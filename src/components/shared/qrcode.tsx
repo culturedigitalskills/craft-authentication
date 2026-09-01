@@ -10,6 +10,10 @@ export type QRCodeProps = HTMLAttributes<HTMLDivElement> & {
   foreground?: string;
   background?: string;
   robustness?: 'L' | 'M' | 'Q' | 'H';
+  /** Translated label for the download link. Falls back to English. */
+  downloadLabel?: string;
+  /** Filename for the downloaded SVG, without the extension. */
+  downloadName?: string;
 };
 
 const oklchRegex = /oklch\(([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\)/;
@@ -29,11 +33,13 @@ const getOklch = (color: string, fallback: [number, number, number]) => {
 };
 
 
-export const QRCode = ({data, 
-  foreground, 
-  background, 
-  margin, 
-  robustness = 'L', 
+export const QRCode = ({data,
+  foreground,
+  background,
+  margin,
+  robustness = 'L',
+  downloadLabel = 'Download SVG',
+  downloadName = 'qrcode',
   className,  ...props }: QRCodeProps) => {
     const [svg, setSVG] = useState<string | null>(null);
     useEffect(() => {
@@ -91,8 +97,8 @@ export const QRCode = ({data,
   return (
     <div className="flex flex-col items-center gap-4">
       <img src={stringsvg} alt="QR code" />
-      <a href={stringsvg} download="qrcode.svg" className="sc-btn sc-btn--primary justify-center">
-        Download SVG
+      <a href={stringsvg} download={`${downloadName}.svg`} className="sc-btn sc-btn--primary justify-center">
+        {downloadLabel}
       </a>
     </div>
   );
