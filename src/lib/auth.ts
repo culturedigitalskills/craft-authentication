@@ -9,6 +9,9 @@ import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { C2PAService } from '@/lib/c2pa-service'
 
+const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.AUTH_GOOGLE_ID
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.AUTH_GOOGLE_SECRET
+
 export const betterAuthInstance = betterAuth({
     database: prismaAdapter(prisma, {
         provider: 'postgresql',
@@ -21,15 +24,30 @@ export const betterAuthInstance = betterAuth({
     },
     // Only register Google when credentials are configured — otherwise Better Auth
     // warns about the missing clientId/clientSecret on every startup.
+    // AUTH_GOOGLE_* are the NextAuth-era names still present in the deployed
+    // environments; accept both so a rename is not required to sign in.
     socialProviders: {
-        ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+        ...(googleClientId && googleClientSecret
             ? {
                   google: {
-                      clientId: process.env.GOOGLE_CLIENT_ID,
-                      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                      clientId: googleClientId,
+                      clientSecret: googleClientSecret,
                   },
               }
             : {}),
+    },
+    account: {
+        accountLinking: {
+            enabled: true,
+            trustedProviders: ['google'],
+            // Defaults to true, which requires the *local* User.emailVerified to
+            // be set before a social account may link. Nothing in this app ever
+            // verifies an address, so every row is false and linking could never
+            // succeed. Google itself vouches for the address (see
+            // trustedProviders). Restore the default once signup sends a
+            // verification email.
+            requireLocalEmailVerified: false,
+        },
     },
     user: {
         additionalFields: {
