@@ -23,7 +23,8 @@
     "completeProfile": "Complete your profile",
     "mediaGallery": "Media Gallery",
     "contentCredentials": "Content Credentials",
-    "generationWorkspace": "Image Generation"
+    "generationWorkspace": "Image Generation",
+    "howItWorks": "How it works"
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -99,25 +100,53 @@
     }
   },
   "howItWorks": {
-    "title": "How It Works",
-    "subtitle": "Artisans across the world have the means to connect with customers through a few simple steps:",
-    "steps": {
-      "record": {
-        "title": "Record",
-        "description": "Artisans document their work with our mobile app during the crafting process."
-      },
-      "generate": {
-        "title": "Generate QR",
-        "description": "The system creates a unique signature linking to artisan profile and creation process."
-      },
-      "scan": {
-        "title": "Scan & Verify",
-        "description": "Customers scan QR code to verify authenticity and learn the product's story."
-      },
-      "access": {
-        "title": "Global Access",
-        "description": "Audiences learn about the processes and stories of artisans worldwide."
-      }
+    "title": "How it works",
+    "subtitle": "Every craft on this site carries the story of the person who made it, and a signature that lets anyone check where it came from.",
+    "visitors": {
+      "heading": "If you are here to look",
+      "lead": "You may have arrived by scanning a code on a piece of work, or simply by browsing. Either way, here is what you can find out.",
+      "steps": [
+        {
+          "title": "Meet the maker",
+          "body": "Every craft is linked to the artisan who made it. Their profile carries their story in their own words, often in their own voice, with the workshop and tools behind the work."
+        },
+        {
+          "title": "Watch the story",
+          "body": "Many artisans record a short film about their craft: where they learned it, what it means to them, and how a piece is made. English captions are generated automatically, whatever language they speak."
+        },
+        {
+          "title": "Check the credential",
+          "body": "Photographs and videos are signed with content credentials as they are uploaded, and each documented craft is issued a verifiable credential. Together these record what was created here and by which account."
+        },
+        {
+          "title": "Verify it yourself",
+          "body": "You do not have to take our word for it. Paste a credential into the verification page and check the signature independently. It will tell you whether the file has been altered since it was signed."
+        }
+      ],
+      "cta": "Verify a credential"
+    },
+    "artisans": {
+      "heading": "If you make things",
+      "lead": "The site is built for artisans to document their own work, in their own language, without needing to be a photographer or a writer.",
+      "steps": [
+        {
+          "title": "Create your profile",
+          "body": "Tell people who you are, where you work, and how you learned your craft. You choose what to share, including whether to show the area you work in."
+        },
+        {
+          "title": "Record your story",
+          "body": "Answer six questions by speaking or writing, whichever is easier. Add photographs and video of your workshop, tools and process, and we assemble them into a short film. If you already have a film of your own, upload it instead."
+        },
+        {
+          "title": "Document your crafts",
+          "body": "Add each piece with its materials, technique and measurements. Every craft receives a credential automatically, so its origin travels with it."
+        },
+        {
+          "title": "Put your code on your work",
+          "body": "Your profile has its own QR code. Print it, attach it to a label or a card, and anyone who scans it lands on your story rather than on a marketplace listing."
+        }
+      ],
+      "cta": "Create an account"
     }
   },
   "tradition": {
@@ -721,7 +750,8 @@
       "subcopy": "Behind every piece is a real person, a real place, and a tradition passed down through generations. Meet the makers and the stories woven into their work.",
       "ctaMakers": "Meet the makers",
       "ctaCrafts": "Browse the crafts",
-      "chipKicker": "Featured maker"
+      "chipKicker": "Featured maker",
+      "ctaHow": "How it works"
     },
     "trust": {
       "rooted": {

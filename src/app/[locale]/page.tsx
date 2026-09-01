@@ -119,6 +119,9 @@ export default async function Home() {
                         <Link href="/crafts" className="sc-btn sc-btn--ghost">
                             {t('hero.ctaCrafts')}
                         </Link>
+                        <Link href="/how-it-works" className="sc-btn sc-btn--ghost">
+                            {t('hero.ctaHow')}
+                        </Link>
                     </div>
                 </div>
 

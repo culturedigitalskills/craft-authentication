@@ -23,7 +23,8 @@
     "completeProfile": "Profilini tamamla",
     "mediaGallery": "Medya Galerisi",
     "contentCredentials": "İçerik Bilgileri",
-    "generationWorkspace": "Resim Oluşturma"
+    "generationWorkspace": "Resim Oluşturma",
+    "howItWorks": "Nasıl çalışır"
   },
   "auth": {
     "loginTitle": "Giriş Yap",
@@ -99,25 +100,53 @@
     }
   },
   "howItWorks": {
-    "title": "Nasıl Çalışır",
-    "subtitle": "Dünyanın dört bir yanındaki zanaatkârlar, birkaç basit adımla müşterilerle bağlantı kurma olanağına sahiptir:",
-    "steps": {
-      "record": {
-        "title": "Kaydet",
-        "description": "Zanaatkârlar, üretim sürecinde çalışmalarını mobil uygulamamızla belgeler."
-      },
-      "generate": {
-        "title": "QR Oluştur",
-        "description": "Sistem, zanaatkâr profiline ve üretim sürecine bağlanan benzersiz bir imza oluşturur."
-      },
-      "scan": {
-        "title": "Tara ve Doğrula",
-        "description": "Müşteriler, özgünlüğü doğrulamak ve ürünün hikâyesini öğrenmek için QR kodu tarar."
-      },
-      "access": {
-        "title": "Küresel Erişim",
-        "description": "İzleyiciler, dünya genelindeki zanaatkârların süreçlerini ve hikâyelerini öğrenir."
-      }
+    "title": "Nasıl çalışır",
+    "subtitle": "Bu sitedeki her zanaat, onu yapan kişinin hikâyesini ve kaynağını herkesin doğrulayabileceği bir imzayı taşır.",
+    "visitors": {
+      "heading": "Bakmaya geldiysen",
+      "lead": "Bir işin üzerindeki kodu okutarak gelmiş olabilirsin ya da öylece geziniyor olabilirsin. Her iki durumda da şunları öğrenebilirsin.",
+      "steps": [
+        {
+          "title": "Yapanla tanış",
+          "body": "Her zanaat, onu yapan kişiye bağlıdır. Profili, hikâyesini kendi sözleriyle, çoğu zaman kendi sesiyle, atölyesi ve aletleriyle birlikte anlatır."
+        },
+        {
+          "title": "Hikâyeyi izle",
+          "body": "Pek çok zanaatkâr işi hakkında kısa bir film kaydeder: nerede öğrendiğini, kendisi için ne anlama geldiğini, bir parçanın nasıl yapıldığını. Hangi dilde konuşurlarsa konuşsunlar, İngilizce altyazılar kendiliğinden oluşur."
+        },
+        {
+          "title": "Belgeyi kontrol et",
+          "body": "Fotoğraflar ve videolar yüklenirken içerik kimlik bilgileriyle imzalanır, belgelenen her zanaat de doğrulanabilir bir belge alır. Birlikte, burada neyin ve hangi hesapla oluşturulduğunu kaydederler."
+        },
+        {
+          "title": "Kendin doğrula",
+          "body": "Bize inanmak zorunda değilsin. Bir belgeyi doğrulama sayfasına yapıştır ve imzayı bağımsız olarak kontrol et. Dosyanın imzalandıktan sonra değişip değişmediğini söyler."
+        }
+      ],
+      "cta": "Bir belgeyi doğrula"
+    },
+    "artisans": {
+      "heading": "Bir şeyler üretiyorsan",
+      "lead": "Site, zanaatkârların kendi işlerini kendi dillerinde belgelemesi için kuruldu; fotoğrafçı ya da yazar olmana gerek yok.",
+      "steps": [
+        {
+          "title": "Profilini oluştur",
+          "body": "Kim olduğunu, nerede çalıştığını ve zanaatını nasıl öğrendiğini anlat. Neyi paylaşacağına sen karar verirsin, çalıştığın bölgeyi gösterip göstermemek dahil."
+        },
+        {
+          "title": "Hikâyeni kaydet",
+          "body": "Altı soruyu konuşarak ya da yazarak yanıtla, hangisi kolaysa. Atölyenden, aletlerinden ve yapım sürecinden fotoğraf ve video ekle, biz bunları kısa bir filme dönüştürelim. Zaten kendi filmin varsa onu yükle."
+        },
+        {
+          "title": "Zanaatlarını belgele",
+          "body": "Her parçayı malzemesi, tekniği ve ölçüleriyle ekle. Her zanaat kendiliğinden bir belge alır, böylece kaynağı onunla birlikte yolculuk eder."
+        },
+        {
+          "title": "Kodunu işine koy",
+          "body": "Profilinin kendi QR kodu var. Yazdır, bir etikete ya da karta iliştir; okutan kişi bir pazar ilanına değil senin hikâyene ulaşsın."
+        }
+      ],
+      "cta": "Hesap oluştur"
     }
   },
   "tradition": {
@@ -721,7 +750,8 @@
       "subcopy": "Her parçanın ardında gerçek bir insan, gerçek bir yer ve nesilden nesile aktarılan bir gelenek vardır. Üreticilerle ve işlerine işlenen hikâyelerle tanışın.",
       "ctaMakers": "Üreticilerle tanışın",
       "ctaCrafts": "El sanatlarına göz atın",
-      "chipKicker": "Öne çıkan üretici"
+      "chipKicker": "Öne çıkan üretici",
+      "ctaHow": "Nasıl çalışır"
     },
     "trust": {
       "rooted": {

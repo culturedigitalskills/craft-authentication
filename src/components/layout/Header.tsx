@@ -30,6 +30,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
     const navLinks = [
         { href: '/', label: t('navbar.home') },
+        { href: '/how-it-works', label: t('navbar.howItWorks') },
         { href: '/about', label: t('navbar.about') },
         { href: '/crafts', label: t('navbar.crafts') },
         { href: '/artisans', label: t('navbar.artisans') },

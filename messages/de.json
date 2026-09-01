@@ -23,7 +23,8 @@
     "createGroup": "Neue Gemeinschaft hinzufügen",
     "contentCredentials": "Inhaltsnachweise",
     "generationWorkspace": "Bildgenerierung",
-    "seecrafts": "Galerie"
+    "seecrafts": "Galerie",
+    "howItWorks": "So funktioniert es"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -100,24 +101,52 @@
   },
   "howItWorks": {
     "title": "So funktioniert es",
-    "subtitle": "Kunsthandwerker auf der ganzen Welt können sich über wenige einfache Schritte mit Kunden verbinden:",
-    "steps": {
-      "record": {
-        "title": "Dokumentieren",
-        "description": "Kunsthandwerker dokumentieren ihre Arbeit während des Herstellungsprozesses mit unserer mobilen App."
-      },
-      "generate": {
-        "title": "QR-Code generieren",
-        "description": "Das System erstellt eine einzigartige Signatur, die mit dem Profil des Kunsthandwerkers und dem Herstellungsprozess verknüpft ist."
-      },
-      "scan": {
-        "title": "Scannen & Überprüfen",
-        "description": "Kunden scannen den QR-Code, um die Echtheit zu überprüfen und die Geschichte des Produkts kennenzulernen."
-      },
-      "access": {
-        "title": "Globaler Zugang",
-        "description": "Interessierte erfahren mehr über die Prozesse und Geschichten von Kunsthandwerkern weltweit."
-      }
+    "subtitle": "Jedes Handwerk auf dieser Seite trägt die Geschichte der Person, die es gemacht hat, und eine Signatur, mit der jeder die Herkunft prüfen kann.",
+    "visitors": {
+      "heading": "Wenn du dich umsehen möchtest",
+      "lead": "Vielleicht bist du über einen Code auf einem Werkstück hier gelandet, vielleicht einfach beim Stöbern. So oder so kannst du Folgendes herausfinden.",
+      "steps": [
+        {
+          "title": "Lerne die Person kennen",
+          "body": "Jedes Handwerk ist mit dem Menschen verknüpft, der es gemacht hat. Das Profil erzählt seine Geschichte in eigenen Worten, oft mit eigener Stimme, samt Werkstatt und Werkzeug."
+        },
+        {
+          "title": "Sieh die Geschichte",
+          "body": "Viele Handwerkerinnen und Handwerker nehmen einen kurzen Film auf: wo sie das Handwerk gelernt haben, was es ihnen bedeutet und wie ein Stück entsteht. Englische Untertitel entstehen automatisch, egal welche Sprache gesprochen wird."
+        },
+        {
+          "title": "Prüfe die Signatur",
+          "body": "Fotos und Videos werden beim Hochladen mit Content Credentials signiert, und jedes dokumentierte Handwerk erhält einen überprüfbaren Nachweis. Zusammen halten sie fest, was hier entstanden ist und von welchem Konto."
+        },
+        {
+          "title": "Überzeuge dich selbst",
+          "body": "Du musst uns nicht glauben. Füge einen Nachweis auf der Prüfseite ein und kontrolliere die Signatur unabhängig. Sie zeigt dir, ob die Datei seit der Signierung verändert wurde."
+        }
+      ],
+      "cta": "Nachweis prüfen"
+    },
+    "artisans": {
+      "heading": "Wenn du selbst etwas herstellst",
+      "lead": "Die Seite ist dafür gebaut, dass Handwerkerinnen und Handwerker ihre Arbeit selbst dokumentieren, in ihrer eigenen Sprache, ohne Fotografin oder Autor sein zu müssen.",
+      "steps": [
+        {
+          "title": "Lege dein Profil an",
+          "body": "Erzähle, wer du bist, wo du arbeitest und wie du dein Handwerk gelernt hast. Du entscheidest, was du teilst, auch ob du deine Region zeigst."
+        },
+        {
+          "title": "Nimm deine Geschichte auf",
+          "body": "Beantworte sechs Fragen gesprochen oder geschrieben, wie es dir leichter fällt. Füge Fotos und Videos von Werkstatt, Werkzeug und Arbeitsweise hinzu, und wir setzen daraus einen kurzen Film zusammen. Hast du schon einen eigenen Film, lade ihn stattdessen hoch."
+        },
+        {
+          "title": "Dokumentiere deine Arbeiten",
+          "body": "Trage jedes Stück mit Material, Technik und Maßen ein. Jedes Handwerk bekommt automatisch einen Nachweis, sodass seine Herkunft mitreist."
+        },
+        {
+          "title": "Bring deinen Code an deiner Arbeit an",
+          "body": "Dein Profil hat einen eigenen QR-Code. Drucke ihn, befestige ihn an einem Etikett oder einer Karte, und wer ihn scannt, landet bei deiner Geschichte statt bei einem Marktplatzeintrag."
+        }
+      ],
+      "cta": "Konto erstellen"
     }
   },
   "tradition": {
@@ -721,7 +750,8 @@
       "subcopy": "Hinter jedem Stück steht ein echter Mensch, ein echter Ort und eine über Generationen weitergegebene Tradition. Lerne die Macher und die Geschichten in ihrer Arbeit kennen.",
       "ctaMakers": "Die Macher kennenlernen",
       "ctaCrafts": "Handwerk entdecken",
-      "chipKicker": "Vorgestellter Macher"
+      "chipKicker": "Vorgestellter Macher",
+      "ctaHow": "So funktioniert es"
     },
     "trust": {
       "rooted": {

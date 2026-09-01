@@ -23,7 +23,8 @@
     "completeProfile": "Completa tu perfil",
     "mediaGallery": "Galería multimedia",
     "contentCredentials": "Credenciales de Contenido",
-    "generationWorkspace": "Generación de Imágenes"
+    "generationWorkspace": "Generación de Imágenes",
+    "howItWorks": "Cómo funciona"
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
@@ -100,24 +101,52 @@
   },
   "howItWorks": {
     "title": "Cómo funciona",
-    "subtitle": "Artesanos de todo el mundo pueden conectarse con clientes mediante unos sencillos pasos:",
-    "steps": {
-      "record": {
-        "title": "Registrar",
-        "description": "Los artesanos documentan su trabajo con nuestra aplicación móvil durante el proceso de creación."
-      },
-      "generate": {
-        "title": "Generar QR",
-        "description": "El sistema crea una firma única que enlaza con el perfil del artesano y el proceso de creación."
-      },
-      "scan": {
-        "title": "Escanear y verificar",
-        "description": "Los clientes escanean el código QR para verificar la autenticidad y conocer la historia del producto."
-      },
-      "access": {
-        "title": "Acceso global",
-        "description": "El público puede conocer los procesos y las historias de artesanos de todo el mundo."
-      }
+    "subtitle": "Cada artesanía de este sitio lleva la historia de quien la hizo, y una firma que permite a cualquiera comprobar su origen.",
+    "visitors": {
+      "heading": "Si has venido a mirar",
+      "lead": "Puede que hayas llegado escaneando un código en una pieza, o simplemente navegando. En cualquier caso, esto es lo que puedes descubrir.",
+      "steps": [
+        {
+          "title": "Conoce a quien la hizo",
+          "body": "Cada artesanía está vinculada a la persona que la creó. Su perfil cuenta su historia con sus propias palabras, a menudo con su propia voz, junto al taller y las herramientas."
+        },
+        {
+          "title": "Mira la historia",
+          "body": "Muchas personas artesanas graban un film corto sobre su oficio: dónde lo aprendieron, qué significa para ellas y cómo se hace una pieza. Los subtítulos en inglés se generan automáticamente, sea cual sea el idioma."
+        },
+        {
+          "title": "Comprueba la credencial",
+          "body": "Las fotografías y vídeos se firman con credenciales de contenido al subirlos, y cada artesanía documentada recibe una credencial verificable. Juntas registran qué se creó aquí y desde qué cuenta."
+        },
+        {
+          "title": "Verifícalo tú",
+          "body": "No hace falta que nos creas. Pega una credencial en la página de verificación y comprueba la firma de forma independiente. Te dirá si el archivo ha sido alterado desde que se firmó."
+        }
+      ],
+      "cta": "Verificar una credencial"
+    },
+    "artisans": {
+      "heading": "Si tú creas cosas",
+      "lead": "El sitio está hecho para que las personas artesanas documenten su propio trabajo, en su idioma, sin necesidad de ser fotógrafas ni escritoras.",
+      "steps": [
+        {
+          "title": "Crea tu perfil",
+          "body": "Cuenta quién eres, dónde trabajas y cómo aprendiste tu oficio. Tú eliges qué compartir, incluso si quieres mostrar la zona donde trabajas."
+        },
+        {
+          "title": "Graba tu historia",
+          "body": "Responde a seis preguntas hablando o escribiendo, como te resulte más fácil. Añade fotos y vídeo de tu taller, tus herramientas y tu proceso, y nosotros montamos un film corto. Si ya tienes un film propio, súbelo en su lugar."
+        },
+        {
+          "title": "Documenta tus artesanías",
+          "body": "Añade cada pieza con sus materiales, técnica y medidas. Cada artesanía recibe una credencial automáticamente, para que su origen viaje con ella."
+        },
+        {
+          "title": "Pon tu código en tu trabajo",
+          "body": "Tu perfil tiene su propio código QR. Imprímelo, ponlo en una etiqueta o una tarjeta, y quien lo escanee llegará a tu historia y no a un anuncio de mercado."
+        }
+      ],
+      "cta": "Crear una cuenta"
     }
   },
   "tradition": {
@@ -721,7 +750,8 @@
       "subcopy": "Detrás de cada pieza hay una persona real, un lugar real y una tradición transmitida por generaciones. Conoce a quienes crean y las historias tejidas en su trabajo.",
       "ctaMakers": "Conoce a los artesanos",
       "ctaCrafts": "Explora las artesanías",
-      "chipKicker": "Artesano destacado"
+      "chipKicker": "Artesano destacado",
+      "ctaHow": "Cómo funciona"
     },
     "trust": {
       "rooted": {
