@@ -324,7 +324,17 @@
       "download": "İndir",
       "publish": "Herkese açık hikâyemde göster",
       "unpublish": "Hikâyemden gizle",
-      "insufficientInputs": "Önce en az bir sözlü yanıt (ses veya video) ve bir fotoğraf veya video ekle."
+      "insufficientInputs": "Önce en az bir sözlü yanıt (ses veya video) ve bir fotoğraf veya video ekle.",
+      "uploadOwn": "Kendi filmimi yükle",
+      "uploadReplace": "Kendi filmimle değiştir",
+      "uploadProgress": "Yükleniyor {percent}%",
+      "uploadHint": "Zaten kendi filmin var mı? Onu yükle, İngilizce altyazıyı biz ekleyelim.",
+      "uploadedBadge": "Bu senin kendi filmin, senin yüklediğin.",
+      "generateInstead": "Bunun yerine cevaplarımdan oluştur",
+      "uploadFailed": "Bu filmi kaydedemedik. Lütfen tekrar dene.",
+      "uploadWrongType": "Bu dosya bir video değil. MP4 veya WebM dene.",
+      "uploadTooLarge": "Bu film çok büyük. En fazla {max} MB.",
+      "uploadRenderBusy": "Şu anda bir film oluşturuluyor. Bitmesini bekle, sonra kendi filmini yükle."
     },
     "summary": {
       "label": "Kısa özet (yaklaşık 100 kelime)",

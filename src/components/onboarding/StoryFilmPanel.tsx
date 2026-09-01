@@ -11,12 +11,17 @@ import {
     DialogDescription,
 } from '@/components/ui/dialog'
 import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
-import { AlertCircle, Clapperboard, Download, Loader2, RefreshCw } from 'lucide-react'
+import { AlertCircle, Clapperboard, Download, Loader2, RefreshCw, Upload } from 'lucide-react'
+import { prepareFileForUpload, MAX_VIDEO_MB } from '@/lib/media-limits'
+import { uploadWithProgress } from '@/lib/upload'
+import { measureMediaDuration } from '@/lib/media-duration'
 
 type FilmStatus = 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED'
+type FilmSource = 'RENDERED' | 'UPLOADED'
 
 interface FilmView {
     status: FilmStatus
+    source: FilmSource
     isPublic: boolean
     outputMediaId: string | null
     durationSec: number | null
@@ -33,6 +38,9 @@ export function StoryFilmPanel() {
     const [busy, setBusy] = useState(false)
     const [notice, setNotice] = useState<string | null>(null)
     const [open, setOpen] = useState(false)
+    const [uploading, setUploading] = useState(false)
+    const [progress, setProgress] = useState(0)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const refresh = useCallback(async () => {
         try {
@@ -85,6 +93,63 @@ export function StoryFilmPanel() {
         }
     }
 
+    /**
+     * Adopt a video the artisan already has as their film. The file goes through
+     * the same upload endpoint as everything else, then PUT points the story's
+     * film row at it.
+     */
+    async function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0]
+        if (fileInputRef.current) fileInputRef.current.value = ''
+        if (!file) return
+
+        setNotice(null)
+
+        const prepared = await prepareFileForUpload(file)
+        if (!prepared.ok) {
+            setNotice(t('uploadTooLarge', { max: MAX_VIDEO_MB }))
+            return
+        }
+
+        setUploading(true)
+        setProgress(0)
+        try {
+            const outcome = await uploadWithProgress(prepared.file, setProgress)
+            if (!outcome.ok) {
+                setNotice(outcome.status === 400 ? t('uploadWrongType') : t('uploadFailed'))
+                return
+            }
+
+            // Display only; the server bounds it and computes nothing from it.
+            const durationSec = await measureMediaDuration(
+                'video',
+                `/api/media/${outcome.media.id}`,
+            )
+
+            const res = await fetch('/api/artisans/me/story/film', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mediaId: outcome.media.id,
+                    ...(durationSec > 0 ? { durationSec } : {}),
+                }),
+            })
+            if (res.status === 409) {
+                setNotice(t('uploadRenderBusy'))
+                return
+            }
+            if (!res.ok) {
+                setNotice(t('uploadFailed'))
+                return
+            }
+            await refresh()
+        } catch {
+            setNotice(t('uploadFailed'))
+        } finally {
+            setUploading(false)
+        }
+    }
+
     async function togglePublish() {
         if (!film) return
         setBusy(true)
@@ -105,6 +170,39 @@ export function StoryFilmPanel() {
 
     const isProcessing = film?.status === 'PENDING' || film?.status === 'PROCESSING'
     const isReady = film?.status === 'READY' && film.outputMediaId
+    const isUploaded = film?.source === 'UPLOADED'
+
+    // Offered whenever a render is not in flight: as an alternative to creating
+    // a film, and afterwards as a way to replace one.
+    const uploadControl = !isProcessing && (
+        <>
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*"
+                className="hidden"
+                onChange={handleUpload}
+            />
+            <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={busy || uploading}
+            >
+                {uploading ? (
+                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                ) : (
+                    <Upload className="mr-1.5 h-4 w-4" />
+                )}
+                {uploading
+                    ? t('uploadProgress', { percent: progress })
+                    : isReady
+                      ? t('uploadReplace')
+                      : t('uploadOwn')}
+            </Button>
+        </>
+    )
 
     return (
         <div className="rounded-lg border border-border bg-muted/20 p-4">
@@ -127,10 +225,15 @@ export function StoryFilmPanel() {
                         <AlertCircle className="h-4 w-4" />
                         {t('failed')}
                     </p>
-                    <Button type="button" size="sm" variant="outline" onClick={() => void startRender(false)} disabled={busy}>
-                        <RefreshCw className="mr-1.5 h-4 w-4" />
-                        {t('retry')}
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(false)} disabled={busy || uploading}>
+                            <RefreshCw className="mr-1.5 h-4 w-4" />
+                            {t('retry')}
+                        </Button>
+                        {/* A render that keeps failing should not trap the
+                            artisan: their own film is a way through. */}
+                        {uploadControl}
+                    </div>
                 </div>
             )}
 
@@ -141,18 +244,22 @@ export function StoryFilmPanel() {
                             <Clapperboard className="mr-1.5 h-4 w-4" />
                             {t('watch')}
                         </Button>
-                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(true)} disabled={busy}>
+                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(true)} disabled={busy || uploading}>
                             {busy ? (
                                 <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
                             ) : (
                                 <RefreshCw className="mr-1.5 h-4 w-4" />
                             )}
-                            {t('regenerate')}
+                            {isUploaded ? t('generateInstead') : t('regenerate')}
                         </Button>
+                        {uploadControl}
                         {film.isPublic && (
                             <span className="text-xs font-medium text-warm">{t('published')}</span>
                         )}
                     </div>
+                    {isUploaded && (
+                        <p className="text-xs text-muted-foreground">{t('uploadedBadge')}</p>
+                    )}
                     {!film.isPublic && (
                         <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
                     )}
@@ -166,10 +273,16 @@ export function StoryFilmPanel() {
             )}
 
             {!film && !isProcessing && (
-                <Button type="button" size="sm" onClick={() => void startRender(false)} disabled={busy}>
-                    {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Clapperboard className="mr-1.5 h-4 w-4" />}
-                    {t('create')}
-                </Button>
+                <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button type="button" size="sm" onClick={() => void startRender(false)} disabled={busy || uploading}>
+                            {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Clapperboard className="mr-1.5 h-4 w-4" />}
+                            {t('create')}
+                        </Button>
+                        {uploadControl}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{t('uploadHint')}</p>
+                </div>
             )}
 
             {notice && <p className="mt-2 text-sm text-muted-foreground">{notice}</p>}

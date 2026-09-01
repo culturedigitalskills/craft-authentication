@@ -322,7 +322,17 @@
       "download": "Herunterladen",
       "publish": "In meiner öffentlichen Geschichte zeigen",
       "unpublish": "Aus meiner Geschichte ausblenden",
-      "insufficientInputs": "Füge zuerst mindestens eine gesprochene Antwort (Audio oder Video) und ein Foto oder Video hinzu."
+      "insufficientInputs": "Füge zuerst mindestens eine gesprochene Antwort (Audio oder Video) und ein Foto oder Video hinzu.",
+      "uploadOwn": "Eigenen Film hochladen",
+      "uploadReplace": "Durch eigenen Film ersetzen",
+      "uploadProgress": "Hochladen {percent}%",
+      "uploadHint": "Du hast schon einen eigenen Film? Lade ihn hoch, wir ergänzen englische Untertitel.",
+      "uploadedBadge": "Das ist dein eigener Film, von dir hochgeladen.",
+      "generateInstead": "Stattdessen aus meinen Antworten erstellen",
+      "uploadFailed": "Der Film konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "uploadWrongType": "Diese Datei ist kein Video. Versuche MP4 oder WebM.",
+      "uploadTooLarge": "Dieser Film ist zu groß. Maximal {max} MB.",
+      "uploadRenderBusy": "Gerade wird ein Film erstellt. Warte, bis er fertig ist, und lade dann deinen hoch."
     },
     "summary": {
       "label": "Kurze Zusammenfassung (etwa 100 Wörter)",

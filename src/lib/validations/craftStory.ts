@@ -42,3 +42,12 @@ export const UpdateStoryFilmSchema = z.object({
     isPublic: z.boolean(),
 })
 export type UpdateStoryFilm = z.infer<typeof UpdateStoryFilmSchema>
+
+// PUT /api/artisans/me/story/film — adopt an already uploaded video as the film.
+// durationSec is measured in the browser and used only for display, so it is
+// bounded here rather than trusted: the route never computes anything from it.
+export const UploadStoryFilmSchema = z.object({
+    mediaId: z.uuid(),
+    durationSec: z.number().positive().max(86400).optional(),
+})
+export type UploadStoryFilm = z.infer<typeof UploadStoryFilmSchema>

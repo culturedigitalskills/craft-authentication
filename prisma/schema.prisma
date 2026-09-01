@@ -61,6 +61,11 @@ enum FilmStatus {
     FAILED
 }
 
+enum FilmSource {
+    RENDERED
+    UPLOADED
+}
+
 // Auth Models
 
 model User {
@@ -286,6 +291,9 @@ model StoryFilm {
     id              String     @id @default(uuid())
     storyId         String     @unique
     status          FilmStatus @default(PENDING)
+    // Whether we assembled this film or the artisan supplied their own. An
+    // uploaded film has no inputsHash and is never reported as stale.
+    source          FilmSource @default(RENDERED)
     isPublic        Boolean    @default(false)
     outputMediaId   String?    @unique
     templateVersion Int        @default(1)

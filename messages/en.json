@@ -324,7 +324,17 @@
       "download": "Download",
       "publish": "Show on my public story",
       "unpublish": "Hide from my story",
-      "insufficientInputs": "Add at least one spoken answer (audio or video) and one photo or video first."
+      "insufficientInputs": "Add at least one spoken answer (audio or video) and one photo or video first.",
+      "uploadOwn": "Upload my own film",
+      "uploadReplace": "Replace with my own film",
+      "uploadProgress": "Uploading {percent}%",
+      "uploadHint": "Already have a film of your own? Upload it instead and we will add English captions to it.",
+      "uploadedBadge": "This is your own film, uploaded by you.",
+      "generateInstead": "Create one from my answers instead",
+      "uploadFailed": "We could not save that film. Please try again.",
+      "uploadWrongType": "That file is not a video. Try MP4 or WebM.",
+      "uploadTooLarge": "That film is too large. Maximum size is {max} MB.",
+      "uploadRenderBusy": "A film is being created right now. Wait for it to finish, then upload yours."
     },
     "summary": {
       "label": "Short summary (about 100 words)",

@@ -539,6 +539,9 @@ export async function renderStoryFilm(storyId: string): Promise<void> {
                 where: { storyId },
                 data: {
                     status: 'READY',
+                    // Rendering over a film the artisan uploaded returns
+                    // ownership of the row to the generator.
+                    source: 'RENDERED',
                     outputMediaId: output.id,
                     durationSec,
                     inputsHash: computeInputsHash(gathered.inputs),

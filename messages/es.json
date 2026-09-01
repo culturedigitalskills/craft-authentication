@@ -324,7 +324,17 @@
       "download": "Descargar",
       "publish": "Mostrar en mi historia pública",
       "unpublish": "Ocultar de mi historia",
-      "insufficientInputs": "Añade primero al menos una respuesta hablada (audio o vídeo) y una foto o vídeo."
+      "insufficientInputs": "Añade primero al menos una respuesta hablada (audio o vídeo) y una foto o vídeo.",
+      "uploadOwn": "Subir mi propio film",
+      "uploadReplace": "Sustituir por mi propio film",
+      "uploadProgress": "Subiendo {percent}%",
+      "uploadHint": "¿Ya tienes un film propio? Súbelo y le añadiremos subtítulos en inglés.",
+      "uploadedBadge": "Este es tu propio film, subido por ti.",
+      "generateInstead": "Crear uno con mis respuestas",
+      "uploadFailed": "No pudimos guardar ese film. Inténtalo de nuevo.",
+      "uploadWrongType": "Ese archivo no es un vídeo. Prueba con MP4 o WebM.",
+      "uploadTooLarge": "Ese film es demasiado grande. El máximo es {max} MB.",
+      "uploadRenderBusy": "Se está creando un film ahora mismo. Espera a que termine y sube el tuyo."
     },
     "summary": {
       "label": "Resumen breve (unas 100 palabras)",
