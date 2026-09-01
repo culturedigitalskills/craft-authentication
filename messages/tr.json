@@ -46,10 +46,13 @@
       "nameRequired": "Ad gereklidir",
       "emailInvalid": "Lütfen geçerli bir e-posta adresi girin",
       "passwordMin": "Parola en az 8 karakter olmalıdır",
-      "passwordMismatch": "Parolalar eşleşmiyor"
+      "passwordMismatch": "Parolalar eşleşmiyor",
+      "acceptTermsRequired": "Devam etmek için lütfen Hizmet Koşulları ve Gizlilik Politikası’nı kabul et."
     },
     "orDivider": "veya",
-    "continueWithGoogle": "Google ile devam et"
+    "continueWithGoogle": "Google ile devam et",
+    "acceptTerms": "<terms>Hizmet Koşulları</terms> ve <privacy>Gizlilik Politikası</privacy>’nı kabul ediyorum.",
+    "oauthTermsNotice": "Google ile devam ederek <terms>Hizmet Koşulları</terms> ve <privacy>Gizlilik Politikası</privacy>’nı kabul etmiş olursun."
   },
   "about": {
     "title": "SustainableCrafting Hakkında",
@@ -61,7 +64,9 @@
     "contact": "İletişim"
   },
   "footer": {
-    "description": "Proje web sitesi Brighton Üniversitesi tarafından üretilmiş ve yönetilmektedir. Bu proje, Birleşik Krallık Sanat ve Beşeri Bilimler Araştırma Konseyi tarafından, Hindistan-Birleşik Krallık yaratıcı endüstriler ve kültürel miras araştırması kapsamında şu başlıkla finanse edilmektedir: Sürdürülebilir Bir Gelecek Yaratmak: Yaratıcı Endüstrilerde Hint El Sanatlarını Güçlendirmek. (Hibe No. OPP080)."
+    "description": "Proje web sitesi Brighton Üniversitesi tarafından üretilmiş ve yönetilmektedir. Bu proje, Birleşik Krallık Sanat ve Beşeri Bilimler Araştırma Konseyi tarafından, Hindistan-Birleşik Krallık yaratıcı endüstriler ve kültürel miras araştırması kapsamında şu başlıkla finanse edilmektedir: Sürdürülebilir Bir Gelecek Yaratmak: Yaratıcı Endüstrilerde Hint El Sanatlarını Güçlendirmek. (Hibe No. OPP080).",
+    "terms": "Hizmet Koşulları",
+    "privacy": "Gizlilik Politikası"
   },
   "socialmedia": {
     "title": "Bizi Takip Edin",
@@ -161,6 +166,8 @@
       "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı.",
       "retry": "Tekrar dene"
     },
+    "wizardTitle": "Benim Hikâyem",
+    "wizardHelper": "Zanaatının hikâyesini kendi sözlerinle paylaş.",
     "stepLabel": "Adım {current} / {total}",
     "back": "Geri",
     "next": "İleri",
@@ -184,7 +191,8 @@
       "publishFailed": "Hikâyeni yayınlayamadık. Lütfen tekrar dene.",
       "emptyStory": "Yayınlamadan önce en az bir yazılı cevap, kayıt veya atölye fotoğrafı ekle.",
       "filmRequired": "Hikâyeni yayımlamadan önce filmini oluştur.",
-      "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle."
+      "conflict": "Hikâyen başka bir pencerede güncellendi. En son sürümü görmek için bu sayfayı yeniden yükle.",
+      "consentRequired": "Yayımlamadan önce lütfen yukarıdaki onayı işaretle."
     },
     "banner": {
       "startTitle": "Zanaat Hikâyeni Paylaş",
@@ -253,7 +261,8 @@
       "uploading": "Yükleniyor...",
       "uploadFailed": "Yükleme başarısız. Lütfen tekrar dene.",
       "fileTooLarge": "Dosya çok büyük. Maksimum boyut {max} MB.",
-      "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB."
+      "hint": "MP3, WAV, MP4 veya WebM. En fazla {max} MB.",
+      "unsupportedType": "Bu dosya türü desteklenmiyor. MP3, WAV, M4A, MP4 veya WebM dene."
     },
     "recorder": {
       "recordAudio": "Ses kaydet",
@@ -309,7 +318,21 @@
       "deleteFailed": "Bu dosya silinemedi. Lütfen tekrar dene.",
       "imageTooLarge": "Görsel çok büyük. Maksimum boyut {max} MB.",
       "videoTooLarge": "Video çok büyük. Maksimum boyut {max} MB.",
-      "sizeHint": "Görseller en fazla {imageMax} MB (büyük fotoğraflar otomatik küçültülür), videolar en fazla {videoMax} MB."
+      "sizeHint": "Görseller en fazla {imageMax} MB (büyük fotoğraflar otomatik küçültülür), videolar en fazla {videoMax} MB.",
+      "position": "{count} ögeden {index}.",
+      "moveEarlier": "Öne al",
+      "moveLater": "Sona al",
+      "reorderFailed": "Yeni sıra kaydedilemedi. Lütfen tekrar dene."
+    },
+    "consent": {
+      "title": "Yayımlama onayı",
+      "body": "Bu hikâyenin bana ait olduğunu ve paylaşma hakkım olduğunu onaylıyorum; kayıtlarım, adım ve eklediğim konum dahil olmak üzere bu sitede yayımlanmasını kabul ediyorum. Yayımdan istediğim zaman kaldırabilirim."
+    },
+    "storyboard": {
+      "title": "Film önizlemesi",
+      "total": "Yaklaşık {duration} uzunluğunda",
+      "approxHint": "Altyazılar bitince süreler kesinleşir.",
+      "measuring": "Her kaydın süresi hesaplanıyor..."
     }
   },
   "profile": {
@@ -455,7 +478,9 @@
       "copyLink": "Bağlantıyı kopyala",
       "linkCopied": "Kopyalandı!",
       "visible": "Herkese Açık",
-      "notvisible": "Özel"
+      "notvisible": "Özel",
+      "loadMap": "Haritayı göster",
+      "loadMapNotice": "OpenStreetMap üzerinden bir harita yükler."
     },
     "mycrafts": {
       "noCraftsYet": "Henüz hiç zanaat eklemediniz."
@@ -740,5 +765,8 @@
       "point3": "Kurcalamaya karşı korumalı bir kimlik bilgisiyle desteklenir",
       "cta": "Nasıl çalıştığını görün"
     }
+  },
+  "legal": {
+    "eyebrow": "Yasal"
   }
 }

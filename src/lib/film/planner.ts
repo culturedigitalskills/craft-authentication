@@ -1,11 +1,12 @@
-import { createHash } from 'crypto'
 import type { TranscriptSegment } from '@/lib/vtt'
 import type { AnswerKey } from '@/lib/validations/craftStory'
 
 // Pure timeline planner for the story film. No I/O, no ffmpeg — it turns the
 // resolved ingredients (spoken answers + a visual pool) into a deterministic
 // FilmPlan the renderer executes, plus the film-global caption track. Kept
-// side-effect free so it can be unit-tested in isolation.
+// side-effect free so it can be unit-tested in isolation, and free of node
+// built-ins so the wizard can run it in the browser to preview a film before
+// anything is rendered (computeInputsHash lives in ./hash for that reason).
 
 export const FILM_WIDTH = 1280
 export const FILM_HEIGHT = 720
@@ -218,26 +219,6 @@ export function buildFilmPlan(inputs: FilmInputs): FilmPlan {
         captionSegments,
         totalDurationSec: clock,
     }
-}
-
-/**
- * Stable fingerprint of the ingredients that affect the rendered output. When
- * this changes, a previously rendered film is stale and should be regenerated.
- * Order-insensitive fields (the answer set) are normalised; order-sensitive
- * ones (visual sequence) are kept as-is.
- */
-export function computeInputsHash(inputs: FilmInputs): string {
-    const canonical = {
-        templateVersion: inputs.templateVersion,
-        name: inputs.artisanName,
-        profileUrl: inputs.profileUrl,
-        answers: inputs.chapters
-            .filter(c => c.voiceMediaId)
-            .map(c => `${c.key}:${c.voiceMediaId}`)
-            .sort(),
-        visuals: inputs.visuals.map(v => v.mediaId),
-    }
-    return createHash('sha256').update(JSON.stringify(canonical)).digest('hex')
 }
 
 // Escape text for an ffmpeg drawtext `text='...'` value. The renderer prefers

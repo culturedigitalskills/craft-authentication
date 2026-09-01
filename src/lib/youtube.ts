@@ -30,10 +30,9 @@ export function extractYouTubeId(input: string): string | null {
     return null
 }
 
-export function youtubeThumbnailUrl(id: string): string {
-    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`
-}
-
+// youtube-nocookie.com does not set its tracking cookies until playback starts,
+// and the embed is only mounted once the viewer opens the video, so nothing
+// reaches Google from simply looking at a craft page.
 export function youtubeEmbedUrl(id: string): string {
-    return `https://www.youtube.com/embed/${id}`
+    return `https://www.youtube-nocookie.com/embed/${id}`
 }

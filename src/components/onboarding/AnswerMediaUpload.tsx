@@ -63,7 +63,15 @@ export function AnswerMediaUpload({
         setProgress(0)
         try {
             const outcome = await uploadWithProgress(file, setProgress)
-            if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+            if (!outcome.ok) {
+                // A 400 means the file itself was refused, which retrying can
+                // never fix, so say so. The server's own wording is English and
+                // path-prefixed, so it is not shown to the artisan. Size is
+                // already caught client-side above, leaving the type as the
+                // realistic cause.
+                setError(outcome.status === 400 ? t('unsupportedType') : t('uploadFailed'))
+                return
+            }
             const resolvedMime = outcome.media.mimeType ?? file.type
             setMimeType(resolvedMime)
             onChange(outcome.media.id, resolvedMime)

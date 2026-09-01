@@ -46,10 +46,13 @@
       "nameRequired": "Name ist erforderlich",
       "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       "passwordMin": "Das Passwort muss mindestens 8 Zeichen lang sein",
-      "passwordMismatch": "Passwörter stimmen nicht überein"
+      "passwordMismatch": "Passwörter stimmen nicht überein",
+      "acceptTermsRequired": "Bitte akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
     },
     "orDivider": "oder",
-    "continueWithGoogle": "Weiter mit Google"
+    "continueWithGoogle": "Weiter mit Google",
+    "acceptTerms": "Ich stimme den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
+    "oauthTermsNotice": "Wenn du mit Google fortfährst, stimmst du den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu."
   },
   "about": {
     "title": "Über SustainableCrafting",
@@ -61,7 +64,9 @@
     "contact": "Kontakt"
   },
   "footer": {
-    "description": "Die Projektwebsite wurde von der University of Brighton erstellt und wird von ihr verwaltet. Dieses Projekt wird vom Arts and Humanities Research Council des Vereinigten Königreichs im Rahmen der Indien–UK-Forschung zu kreativen Industrien und kulturellem Erbe mit dem Titel „Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries“ finanziert. (Fördernummer OPP080)."
+    "description": "Die Projektwebsite wurde von der University of Brighton erstellt und wird von ihr verwaltet. Dieses Projekt wird vom Arts and Humanities Research Council des Vereinigten Königreichs im Rahmen der Indien–UK-Forschung zu kreativen Industrien und kulturellem Erbe mit dem Titel „Crafting a Sustainable Future: Empowering Indian Crafts in the Creative Industries“ finanziert. (Fördernummer OPP080).",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzerklärung"
   },
   "socialmedia": {
     "title": "Folge uns",
@@ -184,7 +189,8 @@
       "publishFailed": "Wir konnten deine Geschichte nicht veröffentlichen. Bitte versuche es erneut.",
       "emptyStory": "Füge mindestens eine schriftliche Antwort, eine Aufnahme oder ein Werkstattfoto hinzu, bevor du veröffentlichst.",
       "filmRequired": "Erstelle deinen Film, bevor du deine Geschichte veröffentlichst.",
-      "conflict": "Deine Geschichte wurde in einem anderen Fenster aktualisiert. Lade diese Seite neu, um die neueste Version zu sehen."
+      "conflict": "Deine Geschichte wurde in einem anderen Fenster aktualisiert. Lade diese Seite neu, um die neueste Version zu sehen.",
+      "consentRequired": "Bitte bestätige die Einwilligung, bevor du veröffentlichst."
     },
     "banner": {
       "startTitle": "Teile die Geschichte deines Handwerks",
@@ -253,7 +259,8 @@
       "uploading": "Hochladen...",
       "uploadFailed": "Hochladen fehlgeschlagen. Bitte versuche es erneut.",
       "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist {max} MB.",
-      "hint": "MP3, WAV, MP4 oder WebM. Bis zu {max} MB."
+      "hint": "MP3, WAV, MP4 oder WebM. Bis zu {max} MB.",
+      "unsupportedType": "Dieser Dateityp wird nicht unterstützt. Versuche MP3, WAV, M4A, MP4 oder WebM."
     },
     "recorder": {
       "recordAudio": "Audio aufnehmen",
@@ -309,7 +316,23 @@
       "deleteFailed": "Diese Datei konnte nicht gelöscht werden. Bitte versuche es erneut.",
       "imageTooLarge": "Das Bild ist zu groß. Maximale Größe ist {max} MB.",
       "videoTooLarge": "Das Video ist zu groß. Maximale Größe ist {max} MB.",
-      "sizeHint": "Bilder bis {imageMax} MB (große Fotos werden automatisch verkleinert), Videos bis {videoMax} MB."
+      "sizeHint": "Bilder bis {imageMax} MB (große Fotos werden automatisch verkleinert), Videos bis {videoMax} MB.",
+      "position": "Element {index} von {count}",
+      "moveEarlier": "Nach vorne verschieben",
+      "moveLater": "Nach hinten verschieben",
+      "reorderFailed": "Die neue Reihenfolge konnte nicht gespeichert werden. Bitte versuche es erneut."
+    },
+    "wizardTitle": "Meine Geschichte",
+    "wizardHelper": "Erzähle die Geschichte deines Handwerks in deinen eigenen Worten.",
+    "consent": {
+      "title": "Einwilligung zur Veröffentlichung",
+      "body": "Ich bestätige, dass diese Geschichte mir gehört und ich sie teilen darf, und ich stimme ihrer Veröffentlichung auf dieser Website zu, einschließlich meiner Aufnahmen, meines Namens und jedes Ortes, den ich hinzugefügt habe. Ich kann die Veröffentlichung jederzeit zurücknehmen."
+    },
+    "storyboard": {
+      "title": "Filmvorschau",
+      "total": "Etwa {duration} lang",
+      "approxHint": "Die Zeiten stehen fest, sobald die Untertitel fertig sind.",
+      "measuring": "Die Länge der Aufnahmen wird ermittelt..."
     }
   },
   "profile": {
@@ -455,7 +478,9 @@
       "updatedOn": "Aktualisiert am",
       "backToCrafts": "Zurück zu den Handwerken",
       "noDescription": "Keine Beschreibung verfügbar",
-      "qrCodeDescription": "Teile dieses Handwerk."
+      "qrCodeDescription": "Teile dieses Handwerk.",
+      "loadMap": "Karte anzeigen",
+      "loadMapNotice": "Lädt eine Karte von OpenStreetMap."
     },
     "mycrafts": {
       "noCraftsYet": "Sie haben noch keine Handwerke hinzugefügt."
@@ -740,5 +765,8 @@
       "point3": "Abgesichert durch einen fälschungssicheren Nachweis",
       "cta": "So funktioniert es"
     }
+  },
+  "legal": {
+    "eyebrow": "Rechtliches"
   }
 }
