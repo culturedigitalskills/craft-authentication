@@ -7,8 +7,13 @@ import {
     ANSWER_KEYS,
     CreateStoryFilmSchema,
     UpdateStoryFilmSchema,
+    UploadStoryFilmSchema,
 } from '@/lib/validations/craftStory'
+import { deleteMediaFiles } from '@/lib/media-delete'
+import { enqueueTranscription } from '@/lib/transcription'
 import { mediaKind } from '@/lib/media-kind'
+import { PLAYABLE_FILM_MIME_TYPES } from '@/lib/validations/media'
+import { siteBaseUrl } from '@/lib/site-url'
 import type { FilmInputs } from '@/lib/film/planner'
 import { computeInputsHash } from '@/lib/film/hash'
 import { canMakeFilm } from '@/lib/film/eligibility'
@@ -30,14 +35,6 @@ async function loadStory(userId: string): Promise<StoryWithArtisan | null> {
     const story = await prisma.craftStory.findUnique({ where: { artisanId: artisan.id } })
     if (!story) return null
     return { ...story, artisan }
-}
-
-function serverBaseUrl(): string {
-    return (
-        process.env.NEXT_PUBLIC_SERVER_URL ||
-        process.env.AUTH_URL ||
-        'https://www.sustainablecrafting.org'
-    )
 }
 
 /**
@@ -88,7 +85,7 @@ async function collectMeta(story: StoryWithArtisan) {
 
     const hashInputs: FilmInputs = {
         artisanName: `${story.artisan.firstName} ${story.artisan.lastName}`.trim(),
-        profileUrl: `${serverBaseUrl()}/artisans/${story.artisan.slug}`,
+        profileUrl: `${siteBaseUrl()}/artisans/${story.artisan.slug}`,
         chapters,
         visuals,
         templateVersion: FILM_TEMPLATE_VERSION,
@@ -142,6 +139,7 @@ export async function GET() {
             where: { storyId: story.id },
             select: {
                 status: true,
+                source: true,
                 isPublic: true,
                 outputMediaId: true,
                 durationSec: true,
@@ -152,8 +150,12 @@ export async function GET() {
         })
         if (!film) return NextResponse.json({ film: null, stale: false })
 
+        // Staleness compares a render against the inputs it was built from, so
+        // it means nothing for a film the artisan supplied: their film does not
+        // go out of date when they edit an answer, and nagging them to
+        // regenerate would offer to replace it with a generated one.
         let stale = false
-        if (film.status === 'READY') {
+        if (film.status === 'READY' && film.source === 'RENDERED') {
             const { hashInputs } = await collectMeta(story)
             stale = film.inputsHash !== computeInputsHash(hashInputs)
         }
@@ -163,6 +165,119 @@ export async function GET() {
     } catch (error) {
         console.error('Error fetching story film:', error)
         return errorResponse('Failed to fetch film', 500)
+    }
+}
+
+// A render that claimed the row this recently is presumed alive; the same
+// window film/jobs.ts uses before it reclaims an abandoned PROCESSING row.
+const ACTIVE_RENDER_MS = 30 * 60 * 1000
+
+/**
+ * PUT — adopt a video the artisan already uploaded as their story film, instead
+ * of assembling one from their answers. For artisans who arrive with a film
+ * someone already made for them, the wizard's record-and-assemble flow is work
+ * they have no reason to repeat.
+ *
+ * The media must already exist (uploaded through /api/media/upload, which does
+ * the type and size validation) and must belong to the caller.
+ */
+export async function PUT(request: NextRequest) {
+    const { session, unauthorized } = await requireAuth()
+    if (unauthorized) return unauthorized
+
+    try {
+        const story = await loadStory(session!.user.id)
+        if (!story) return errorResponse('No story to film', 404)
+
+        const { mediaId, durationSec } = UploadStoryFilmSchema.parse(await request.json())
+
+        // Ownership and kind are read from the stored row, never from the
+        // client: mimeType was assigned server-side at upload.
+        const media = await prisma.mediaFile.findUnique({
+            where: { id: mediaId },
+            select: { id: true, mimeType: true, uploaderId: true },
+        })
+        if (!media) return errorResponse('Media file not found', 404)
+        if (media.uploaderId !== session!.user.id && session!.user.role !== 'ADMIN') {
+            return errorResponse('Forbidden', 403)
+        }
+        // Not just any video: the file is played back as-is on the public page,
+        // so a container browsers cannot decode would leave a blank player.
+        if (!PLAYABLE_FILM_MIME_TYPES.includes(media.mimeType)) {
+            return NextResponse.json(
+                {
+                    error: 'UNPLAYABLE_FORMAT',
+                    message:
+                        'Web browsers cannot play this kind of video, so it would show as a blank player on your public story. Convert it to MP4 and upload it again.',
+                },
+                { status: 400 },
+            )
+        }
+
+        const existing = await prisma.storyFilm.findUnique({
+            where: { storyId: story.id },
+            select: { outputMediaId: true, status: true, updatedAt: true },
+        })
+
+        // Never overwrite a render that is still running: it holds this row and
+        // would report READY over the uploaded film when it finished.
+        const renderActive =
+            existing?.status === 'PROCESSING' &&
+            Date.now() - existing.updatedAt.getTime() < ACTIVE_RENDER_MS
+        if (renderActive) {
+            return NextResponse.json(
+                {
+                    error: 'RENDER_IN_PROGRESS',
+                    message: 'A film is being created right now. Wait for it to finish, then upload yours.',
+                },
+                { status: 409 },
+            )
+        }
+
+        // isPublic is deliberately left alone, so replacing the film on an
+        // already published story keeps the story live.
+        const film = await prisma.storyFilm.upsert({
+            where: { storyId: story.id },
+            create: {
+                storyId: story.id,
+                status: 'READY',
+                source: 'UPLOADED',
+                outputMediaId: mediaId,
+                durationSec: durationSec ?? null,
+            },
+            update: {
+                status: 'READY',
+                source: 'UPLOADED',
+                outputMediaId: mediaId,
+                durationSec: durationSec ?? null,
+                // An uploaded film was never planned, so there is nothing to
+                // compare against and it can never be stale.
+                inputsHash: null,
+                error: null,
+            },
+        })
+
+        // The film it replaced is now unreferenced, along with its captions.
+        if (existing?.outputMediaId && existing.outputMediaId !== mediaId) {
+            await deleteMediaFiles([existing.outputMediaId])
+        }
+
+        // Captions are generated the same way as for a rendered film, so
+        // /api/media/[id]/subtitles serves them once Groq finishes. Non-fatal:
+        // the film is already usable without them.
+        try {
+            await enqueueTranscription(mediaId)
+        } catch (transcriptionError) {
+            console.error('Caption enqueue failed for uploaded film', mediaId, transcriptionError)
+        }
+
+        // inputsHash is an internal render detail; GET strips it too.
+        const { inputsHash: _inputsHash, ...filmView } = film
+        return NextResponse.json({ film: filmView })
+    } catch (error) {
+        if (error instanceof ZodError) return handleValidationError(error)
+        console.error('Error saving uploaded story film:', error)
+        return errorResponse('Failed to save uploaded film', 500)
     }
 }
 

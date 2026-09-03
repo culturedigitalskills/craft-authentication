@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,11 +12,14 @@ import {
 } from '@/components/ui/dialog'
 import { CaptionedVideo } from '@/components/shared/CaptionedVideo'
 import { AlertCircle, Clapperboard, Download, Loader2, RefreshCw } from 'lucide-react'
+import { StoryFilmUploadButton } from './StoryFilmUploadButton'
 
 type FilmStatus = 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED'
+type FilmSource = 'RENDERED' | 'UPLOADED'
 
 interface FilmView {
     status: FilmStatus
+    source: FilmSource
     isPublic: boolean
     outputMediaId: string | null
     durationSec: number | null
@@ -105,6 +108,17 @@ export function StoryFilmPanel() {
 
     const isProcessing = film?.status === 'PENDING' || film?.status === 'PROCESSING'
     const isReady = film?.status === 'READY' && film.outputMediaId
+    const isUploaded = film?.source === 'UPLOADED'
+
+    // Offered whenever a render is not in flight: as an alternative to creating
+    // a film, and afterwards as a way to replace one.
+    const uploadControl = !isProcessing && (
+        <StoryFilmUploadButton
+            label={isReady ? t('uploadReplace') : t('uploadOwn')}
+            disabled={busy}
+            onUploaded={refresh}
+        />
+    )
 
     return (
         <div className="rounded-lg border border-border bg-muted/20 p-4">
@@ -127,10 +141,15 @@ export function StoryFilmPanel() {
                         <AlertCircle className="h-4 w-4" />
                         {t('failed')}
                     </p>
-                    <Button type="button" size="sm" variant="outline" onClick={() => void startRender(false)} disabled={busy}>
-                        <RefreshCw className="mr-1.5 h-4 w-4" />
-                        {t('retry')}
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(false)} disabled={busy}>
+                            <RefreshCw className="mr-1.5 h-4 w-4" />
+                            {t('retry')}
+                        </Button>
+                        {/* A render that keeps failing should not trap the
+                            artisan: their own film is a way through. */}
+                        {uploadControl}
+                    </div>
                 </div>
             )}
 
@@ -147,12 +166,25 @@ export function StoryFilmPanel() {
                             ) : (
                                 <RefreshCw className="mr-1.5 h-4 w-4" />
                             )}
-                            {t('regenerate')}
+                            {isUploaded ? t('generateInstead') : t('regenerate')}
                         </Button>
+                        {uploadControl}
                         {film.isPublic && (
                             <span className="text-xs font-medium text-warm">{t('published')}</span>
                         )}
                     </div>
+                    {isUploaded && (
+                        <p className="text-xs text-muted-foreground">{t('uploadedBadge')}</p>
+                    )}
+                    {/* A generation that failed over an uploaded film leaves the
+                        film in place and records why, so say so rather than
+                        letting the attempt look successful. */}
+                    {isUploaded && film.error && (
+                        <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            {t('generateFailedKeptUpload')}
+                        </p>
+                    )}
                     {!film.isPublic && (
                         <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
                     )}
@@ -166,10 +198,16 @@ export function StoryFilmPanel() {
             )}
 
             {!film && !isProcessing && (
-                <Button type="button" size="sm" onClick={() => void startRender(false)} disabled={busy}>
-                    {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Clapperboard className="mr-1.5 h-4 w-4" />}
-                    {t('create')}
-                </Button>
+                <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button type="button" size="sm" onClick={() => void startRender(false)} disabled={busy}>
+                            {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Clapperboard className="mr-1.5 h-4 w-4" />}
+                            {t('create')}
+                        </Button>
+                        {uploadControl}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{t('uploadHint')}</p>
+                </div>
             )}
 
             {notice && <p className="mt-2 text-sm text-muted-foreground">{notice}</p>}

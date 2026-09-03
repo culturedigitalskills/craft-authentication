@@ -14,6 +14,7 @@ import { ScMedia } from '@/components/sc/ScMedia'
 import { PortraitFallback } from '@/components/sc/fallbacks'
 import { SectionHeader } from '@/components/sc/SectionHeader'
 import { ConsentedMap } from '@/components/shared/ConsentedMap'
+import { siteBaseUrl } from '@/lib/site-url'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -29,7 +30,7 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
     const { from } = await searchParams
     const fromMyCrafts = from === 'mycrafts'
     const backHref = fromMyCrafts ? '/crafts/mycrafts' : '/crafts'
-    const currentPageUrl = `${process.env.AUTH_URL}/crafts/${id}`
+    const currentPageUrl = `${siteBaseUrl()}/crafts/${id}`
 
     const craft = await prisma.craft.findFirst({
         where: { id, deletedAt: null },

@@ -10,6 +10,10 @@ export type QRCodeProps = HTMLAttributes<HTMLDivElement> & {
   foreground?: string;
   background?: string;
   robustness?: 'L' | 'M' | 'Q' | 'H';
+  /** Translated label for the download link. Falls back to English. */
+  downloadLabel?: string;
+  /** Filename for the downloaded SVG, without the extension. */
+  downloadName?: string;
 };
 
 const oklchRegex = /oklch\(([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\)/;
@@ -28,14 +32,31 @@ const getOklch = (color: string, fallback: [number, number, number]) => {
   };
 };
 
+/**
+ * Resolve a caller-supplied colour to a hex string.
+ *
+ * Callers pass plain hex (the navy/paper palette), while the CSS custom
+ * properties this falls back to are authored in oklch. Running hex through the
+ * oklch parser silently discarded it and drew every code in the default
+ * near-black on near-white.
+ */
+const toHex = (color: string, fallback: [number, number, number]) => {
+  const trimmed = color.trim();
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed)) return trimmed;
+  return formatHex(oklch({ mode: 'oklch', ...getOklch(trimmed, fallback) }));
+};
 
-export const QRCode = ({data, 
-  foreground, 
-  background, 
-  margin, 
-  robustness = 'L', 
+
+export const QRCode = ({data,
+  foreground,
+  background,
+  margin,
+  robustness = 'L',
+  downloadLabel = 'Download PNG',
+  downloadName = 'qrcode',
   className,  ...props }: QRCodeProps) => {
     const [svg, setSVG] = useState<string | null>(null);
+    const [png, setPNG] = useState<string | null>(null);
     useEffect(() => {
   
     const generateQR = async () => {
@@ -48,27 +69,36 @@ export const QRCode = ({data,
             background ?? styles.getPropertyValue('--background');
 
 
-        const foregroundOklch = getOklch(
-            foregroundColor,
-            [0.21, 0.006, 285.885]
-        );
-        const backgroundOklch = getOklch(
-            backgroundColor, 
-            [0.985, 0, 0]
-        );
+        const color = {
+            dark: toHex(foregroundColor, [0.21, 0.006, 285.885]),
+            light: toHex(backgroundColor, [0.985, 0, 0]),
+        };
 
+        // On screen: SVG, so the code stays crisp at any size.
         const newSvg = await QR.toString(
             data, {
             type: 'svg',
-            color: {
-            dark: formatHex(oklch({ mode: 'oklch', ...foregroundOklch })),
-            light: formatHex(oklch({ mode: 'oklch', ...backgroundOklch })),
-            },
+            color,
             width: 200,
             errorCorrectionLevel: robustness,
             margin: margin,
             }
         );
+
+        // To download: PNG at print resolution. PNG rather than JPEG because
+        // JPEG is lossy and rings around the hard edges a QR code is made of,
+        // which costs scan reliability at exactly the small printed sizes this
+        // is meant for. 1024px stays sharp on a label or a card.
+        const newPng = await QR.toDataURL(
+            data, {
+            type: 'image/png',
+            color,
+            width: 1024,
+            errorCorrectionLevel: robustness,
+            margin: margin,
+            }
+        );
+        setPNG(newPng);
 
 
 
@@ -82,7 +112,7 @@ export const QRCode = ({data,
     };
 
     generateQR();
-    }, [data, foreground, background, robustness]);
+    }, [data, foreground, background, robustness, margin]);
 
   if (!svg) {
     return null;
@@ -91,9 +121,11 @@ export const QRCode = ({data,
   return (
     <div className="flex flex-col items-center gap-4">
       <img src={stringsvg} alt="QR code" />
-      <a href={stringsvg} download="qrcode.svg" className="sc-btn sc-btn--primary justify-center">
-        Download SVG
-      </a>
+      {png && (
+        <a href={png} download={`${downloadName}.png`} className="sc-btn sc-btn--primary justify-center">
+          {downloadLabel}
+        </a>
+      )}
     </div>
   );
 };
