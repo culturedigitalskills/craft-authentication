@@ -27,6 +27,23 @@ const ALLOWED_MIME_TYPES = [
 // one. Rather than rejecting those, the type is derived from the extension.
 const UNSPECIFIED_MIME_TYPES = ['', 'application/octet-stream']
 
+// Uploads accept a wide range of containers, but a story film is played back
+// directly in a <video> element on a public page with no transcode step, so it
+// is held to what browsers can actually decode. avi, wmv and flv cannot be
+// played by any of them and would leave a blank player on a public page.
+//
+// mov is here because it is what phones produce. mkv is here as a deliberate
+// compromise: it is a container rather than a codec, and the H.264 inside most
+// of them plays in Chrome and Edge, though Safari and Firefox generally will
+// not. Transcoding on upload would remove the caveat entirely.
+export const PLAYABLE_FILM_MIME_TYPES = [
+    'video/mp4',
+    'video/x-m4v',
+    'video/webm',
+    'video/quicktime',
+    'video/x-matroska',
+]
+
 const MIME_BY_EXTENSION: Record<string, string> = {
     jpeg: 'image/jpeg', jpg: 'image/jpeg', png: 'image/png',
     gif: 'image/gif', webp: 'image/webp',

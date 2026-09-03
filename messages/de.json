@@ -100,24 +100,52 @@
   },
   "howItWorks": {
     "title": "So funktioniert es",
-    "subtitle": "Kunsthandwerker auf der ganzen Welt können sich über wenige einfache Schritte mit Kunden verbinden:",
-    "steps": {
-      "record": {
-        "title": "Dokumentieren",
-        "description": "Kunsthandwerker dokumentieren ihre Arbeit während des Herstellungsprozesses mit unserer mobilen App."
-      },
-      "generate": {
-        "title": "QR-Code generieren",
-        "description": "Das System erstellt eine einzigartige Signatur, die mit dem Profil des Kunsthandwerkers und dem Herstellungsprozess verknüpft ist."
-      },
-      "scan": {
-        "title": "Scannen & Überprüfen",
-        "description": "Kunden scannen den QR-Code, um die Echtheit zu überprüfen und die Geschichte des Produkts kennenzulernen."
-      },
-      "access": {
-        "title": "Globaler Zugang",
-        "description": "Interessierte erfahren mehr über die Prozesse und Geschichten von Kunsthandwerkern weltweit."
-      }
+    "subtitle": "Jedes Handwerk auf dieser Seite trägt die Geschichte der Person, die es gemacht hat, und eine Signatur, mit der jeder die Herkunft prüfen kann.",
+    "visitors": {
+      "heading": "Wenn du dich umsehen möchtest",
+      "lead": "Vielleicht bist du über einen Code auf einem Werkstück hier gelandet, vielleicht einfach beim Stöbern. So oder so kannst du Folgendes herausfinden.",
+      "steps": [
+        {
+          "title": "Lerne die Person kennen",
+          "body": "Jedes Handwerk ist mit dem Menschen verknüpft, der es gemacht hat. Das Profil erzählt seine Geschichte in eigenen Worten, oft mit eigener Stimme, samt Werkstatt und Werkzeug."
+        },
+        {
+          "title": "Sieh die Geschichte",
+          "body": "Viele Handwerkerinnen und Handwerker nehmen einen kurzen Film auf: wo sie das Handwerk gelernt haben, was es ihnen bedeutet und wie ein Stück entsteht. Englische Untertitel entstehen automatisch, egal welche Sprache gesprochen wird."
+        },
+        {
+          "title": "Prüfe die Signatur",
+          "body": "Fotos und Videos werden beim Hochladen mit Content Credentials signiert, und jedes dokumentierte Handwerk erhält einen überprüfbaren Nachweis. Zusammen halten sie fest, was hier entstanden ist und von welchem Konto."
+        },
+        {
+          "title": "Überzeuge dich selbst",
+          "body": "Du musst uns nicht glauben. Füge einen Nachweis auf der Prüfseite ein und kontrolliere die Signatur unabhängig. Sie zeigt dir, ob die Datei seit der Signierung verändert wurde."
+        }
+      ],
+      "cta": "Nachweis prüfen"
+    },
+    "artisans": {
+      "heading": "Wenn du selbst etwas herstellst",
+      "lead": "Die Seite ist dafür gebaut, dass Handwerkerinnen und Handwerker ihre Arbeit selbst dokumentieren, in ihrer eigenen Sprache, ohne Fotografin oder Autor sein zu müssen.",
+      "steps": [
+        {
+          "title": "Lege dein Profil an",
+          "body": "Erzähle, wer du bist, wo du arbeitest und wie du dein Handwerk gelernt hast. Du entscheidest, was du teilst, auch ob du deine Region zeigst."
+        },
+        {
+          "title": "Nimm deine Geschichte auf",
+          "body": "Beantworte sechs Fragen gesprochen oder geschrieben, wie es dir leichter fällt. Füge Fotos und Videos von Werkstatt, Werkzeug und Arbeitsweise hinzu, und wir setzen daraus einen kurzen Film zusammen. Hast du schon einen eigenen Film, lade ihn stattdessen hoch."
+        },
+        {
+          "title": "Dokumentiere deine Arbeiten",
+          "body": "Trage jedes Stück mit Material, Technik und Maßen ein. Jedes Handwerk bekommt automatisch einen Nachweis, sodass seine Herkunft mitreist."
+        },
+        {
+          "title": "Bring deinen Code an deiner Arbeit an",
+          "body": "Dein Profil hat einen eigenen QR-Code. Drucke ihn, befestige ihn an einem Etikett oder einer Karte, und wer ihn scannt, landet bei deiner Geschichte statt bei einem Marktplatzeintrag."
+        }
+      ],
+      "cta": "Konto erstellen"
     }
   },
   "tradition": {
@@ -211,7 +239,9 @@
       "formatText": "Geschriebener Text",
       "formatAudio": "Audioaufnahme",
       "formatVideo": "Videoaufnahme",
-      "encouragement": "Bitte antworte in deinen eigenen Worten, so als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte."
+      "encouragement": "Bitte antworte in deinen eigenen Worten, so als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte.",
+      "alreadyHaveFilmTitle": "Hast du schon einen eigenen Film?",
+      "alreadyHaveFilmBody": "Lade ihn hoch, dann wird er zu deinem Geschichtsfilm. Eine kurze Zusammenfassung kannst du danach noch ergänzen, und wir fügen englische Untertitel hinzu."
     },
     "step1": {
       "title": "Über dich",
@@ -293,7 +323,18 @@
       "download": "Herunterladen",
       "publish": "In meiner öffentlichen Geschichte zeigen",
       "unpublish": "Aus meiner Geschichte ausblenden",
-      "insufficientInputs": "Füge zuerst mindestens eine gesprochene Antwort (Audio oder Video) und ein Foto oder Video hinzu."
+      "insufficientInputs": "Füge zuerst mindestens eine gesprochene Antwort (Audio oder Video) und ein Foto oder Video hinzu.",
+      "uploadOwn": "Eigenen Film hochladen",
+      "uploadReplace": "Durch eigenen Film ersetzen",
+      "uploadProgress": "Hochladen {percent}%",
+      "uploadHint": "Du hast schon einen eigenen Film? Lade ihn hoch, wir ergänzen englische Untertitel.",
+      "uploadedBadge": "Das ist dein eigener Film, von dir hochgeladen.",
+      "generateInstead": "Stattdessen aus meinen Antworten erstellen",
+      "uploadFailed": "Der Film konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "uploadWrongType": "Browser können diese Art von Video nicht abspielen, auf deiner Geschichte erschiene nur ein leerer Player. Wandle es in MP4 um und versuche es erneut. MP4, MOV, WebM und MKV funktionieren.",
+      "uploadTooLarge": "Dieser Film ist zu groß. Maximal {max} MB.",
+      "uploadRenderBusy": "Gerade wird ein Film erstellt. Warte, bis er fertig ist, und lade dann deinen hoch.",
+      "generateFailedKeptUpload": "Wir konnten aus deinen Antworten keinen Film erstellen, dein eigener Film ist weiterhin da."
     },
     "summary": {
       "label": "Kurze Zusammenfassung (etwa 100 Wörter)",
@@ -401,7 +442,14 @@
     "socialYoutube": "YouTube",
     "socialWebsite": "Website",
     "hashtags": "Hashtags",
-    "addHashtag": "Hashtag hinzufügen"
+    "addHashtag": "Hashtag hinzufügen",
+    "qr": {
+      "title": "Dein QR-Code",
+      "guidance": "Drucke ihn aus und bringe ihn an deiner Arbeit an. Wer ihn scannt, landet auf deinem öffentlichen Profil und deiner Geschichte.",
+      "download": "Bild herunterladen",
+      "copyLink": "Link kopieren",
+      "linkCopied": "Kopiert!"
+    }
   },
   "artisanProfile": {
     "about": "Über",

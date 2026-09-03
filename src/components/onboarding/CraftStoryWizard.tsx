@@ -13,6 +13,7 @@ import { StepDots } from '@/components/shared/StepDots'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { StoryFilmPanel } from './StoryFilmPanel'
+import { StoryFilmUploadButton } from './StoryFilmUploadButton'
 import { FilmStoryboard, type StoryboardAnswer } from './FilmStoryboard'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
 import { mediaKind } from '@/lib/media-kind'
@@ -311,7 +312,21 @@ export function CraftStoryWizard({
                     </p>
 
                     <div key={step} className="animate-in fade-in-50 slide-in-from-right-4 duration-300">
-                        {step === 0 && <IntroStep />}
+                        {step === 0 && (
+                            <IntroStep
+                                // The film needs a story to belong to, and at
+                                // this point there may not be one saved yet.
+                                onEnsureStory={() => queueSave(0)}
+                                // Their film is done, so the work that remains
+                                // is the summary and publishing: skip to review.
+                                // Persist that jump, or a reload would drop them
+                                // back at the intro with no sign of their film.
+                                onFilmUploaded={() => {
+                                    setStep(TOTAL_STEPS - 1)
+                                    void queueSave(TOTAL_STEPS - 1)
+                                }}
+                            />
+                        )}
 
                         {isQuestion && currentKey && (
                             <QuestionStep
@@ -430,8 +445,15 @@ export function CraftStoryWizard({
     )
 }
 
-function IntroStep() {
+function IntroStep({
+    onEnsureStory,
+    onFilmUploaded,
+}: {
+    onEnsureStory: () => Promise<boolean>
+    onFilmUploaded: () => void
+}) {
     const t = useTranslations('craftStory.intro')
+    const tFilm = useTranslations('craftStory.film')
     return (
         <div>
             <h1 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
@@ -444,7 +466,19 @@ function IntroStep() {
                     <li>{t('formatVideo')}</li>
                 </ul>
             </div>
-            <p className="text-sm text-muted-foreground">{t('encouragement')}</p>
+            <p className="mb-6 text-sm text-muted-foreground">{t('encouragement')}</p>
+
+            {/* The alternative to the whole wizard, offered before the artisan
+                starts rather than after they have answered everything. */}
+            <div className="rounded-lg border border-border p-4">
+                <p className="mb-1 text-sm font-medium">{t('alreadyHaveFilmTitle')}</p>
+                <p className="mb-3 text-sm text-muted-foreground">{t('alreadyHaveFilmBody')}</p>
+                <StoryFilmUploadButton
+                    label={tFilm('uploadOwn')}
+                    onBeforeUpload={onEnsureStory}
+                    onUploaded={onFilmUploaded}
+                />
+            </div>
         </div>
     )
 }

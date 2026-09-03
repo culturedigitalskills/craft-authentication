@@ -99,25 +99,53 @@
     }
   },
   "howItWorks": {
-    "title": "Nasıl Çalışır",
-    "subtitle": "Dünyanın dört bir yanındaki zanaatkârlar, birkaç basit adımla müşterilerle bağlantı kurma olanağına sahiptir:",
-    "steps": {
-      "record": {
-        "title": "Kaydet",
-        "description": "Zanaatkârlar, üretim sürecinde çalışmalarını mobil uygulamamızla belgeler."
-      },
-      "generate": {
-        "title": "QR Oluştur",
-        "description": "Sistem, zanaatkâr profiline ve üretim sürecine bağlanan benzersiz bir imza oluşturur."
-      },
-      "scan": {
-        "title": "Tara ve Doğrula",
-        "description": "Müşteriler, özgünlüğü doğrulamak ve ürünün hikâyesini öğrenmek için QR kodu tarar."
-      },
-      "access": {
-        "title": "Küresel Erişim",
-        "description": "İzleyiciler, dünya genelindeki zanaatkârların süreçlerini ve hikâyelerini öğrenir."
-      }
+    "title": "Nasıl çalışır",
+    "subtitle": "Bu sitedeki her zanaat, onu yapan kişinin hikâyesini ve kaynağını herkesin doğrulayabileceği bir imzayı taşır.",
+    "visitors": {
+      "heading": "Bakmaya geldiysen",
+      "lead": "Bir işin üzerindeki kodu okutarak gelmiş olabilirsin ya da öylece geziniyor olabilirsin. Her iki durumda da şunları öğrenebilirsin.",
+      "steps": [
+        {
+          "title": "Yapanla tanış",
+          "body": "Her zanaat, onu yapan kişiye bağlıdır. Profili, hikâyesini kendi sözleriyle, çoğu zaman kendi sesiyle, atölyesi ve aletleriyle birlikte anlatır."
+        },
+        {
+          "title": "Hikâyeyi izle",
+          "body": "Pek çok zanaatkâr işi hakkında kısa bir film kaydeder: nerede öğrendiğini, kendisi için ne anlama geldiğini, bir parçanın nasıl yapıldığını. Hangi dilde konuşurlarsa konuşsunlar, İngilizce altyazılar kendiliğinden oluşur."
+        },
+        {
+          "title": "Belgeyi kontrol et",
+          "body": "Fotoğraflar ve videolar yüklenirken içerik kimlik bilgileriyle imzalanır, belgelenen her zanaat de doğrulanabilir bir belge alır. Birlikte, burada neyin ve hangi hesapla oluşturulduğunu kaydederler."
+        },
+        {
+          "title": "Kendin doğrula",
+          "body": "Bize inanmak zorunda değilsin. Bir belgeyi doğrulama sayfasına yapıştır ve imzayı bağımsız olarak kontrol et. Dosyanın imzalandıktan sonra değişip değişmediğini söyler."
+        }
+      ],
+      "cta": "Bir belgeyi doğrula"
+    },
+    "artisans": {
+      "heading": "Bir şeyler üretiyorsan",
+      "lead": "Site, zanaatkârların kendi işlerini kendi dillerinde belgelemesi için kuruldu; fotoğrafçı ya da yazar olmana gerek yok.",
+      "steps": [
+        {
+          "title": "Profilini oluştur",
+          "body": "Kim olduğunu, nerede çalıştığını ve zanaatını nasıl öğrendiğini anlat. Neyi paylaşacağına sen karar verirsin, çalıştığın bölgeyi gösterip göstermemek dahil."
+        },
+        {
+          "title": "Hikâyeni kaydet",
+          "body": "Altı soruyu konuşarak ya da yazarak yanıtla, hangisi kolaysa. Atölyenden, aletlerinden ve yapım sürecinden fotoğraf ve video ekle, biz bunları kısa bir filme dönüştürelim. Zaten kendi filmin varsa onu yükle."
+        },
+        {
+          "title": "Zanaatlarını belgele",
+          "body": "Her parçayı malzemesi, tekniği ve ölçüleriyle ekle. Her zanaat kendiliğinden bir belge alır, böylece kaynağı onunla birlikte yolculuk eder."
+        },
+        {
+          "title": "Kodunu işine koy",
+          "body": "Profilinin kendi QR kodu var. Yazdır, bir etikete ya da karta iliştir; okutan kişi bir pazar ilanına değil senin hikâyene ulaşsın."
+        }
+      ],
+      "cta": "Hesap oluştur"
     }
   },
   "tradition": {
@@ -213,7 +241,9 @@
       "formatText": "Yazılı metin",
       "formatAudio": "Ses kaydı",
       "formatVideo": "Video kaydı",
-      "encouragement": "Lütfen kendi sözlerinle, zanaatını anlamak isteyen birine hikâyeni anlatır gibi cevap ver."
+      "encouragement": "Lütfen kendi sözlerinle, zanaatını anlamak isteyen birine hikâyeni anlatır gibi cevap ver.",
+      "alreadyHaveFilmTitle": "Zaten kendi filmin var mı?",
+      "alreadyHaveFilmBody": "Onu yükle, hikâye filmin o olsun. Sonrasında kısa bir özet ekleyebilirsin, İngilizce altyazıyı da biz ekleriz."
     },
     "step1": {
       "title": "Kendin Hakkında",
@@ -295,7 +325,18 @@
       "download": "İndir",
       "publish": "Herkese açık hikâyemde göster",
       "unpublish": "Hikâyemden gizle",
-      "insufficientInputs": "Önce en az bir sözlü yanıt (ses veya video) ve bir fotoğraf veya video ekle."
+      "insufficientInputs": "Önce en az bir sözlü yanıt (ses veya video) ve bir fotoğraf veya video ekle.",
+      "uploadOwn": "Kendi filmimi yükle",
+      "uploadReplace": "Kendi filmimle değiştir",
+      "uploadProgress": "Yükleniyor {percent}%",
+      "uploadHint": "Zaten kendi filmin var mı? Onu yükle, İngilizce altyazıyı biz ekleyelim.",
+      "uploadedBadge": "Bu senin kendi filmin, senin yüklediğin.",
+      "generateInstead": "Bunun yerine cevaplarımdan oluştur",
+      "uploadFailed": "Bu filmi kaydedemedik. Lütfen tekrar dene.",
+      "uploadWrongType": "Tarayıcılar bu tür videoyu oynatamaz, hikâyende boş bir oynatıcı görünür. MP4 biçimine dönüştürüp tekrar dene. MP4, MOV, WebM ve MKV çalışır.",
+      "uploadTooLarge": "Bu film çok büyük. En fazla {max} MB.",
+      "uploadRenderBusy": "Şu anda bir film oluşturuluyor. Bitmesini bekle, sonra kendi filmini yükle.",
+      "generateFailedKeptUpload": "Cevaplarından film oluşturamadık, bu yüzden kendi filmin hâlâ burada."
     },
     "summary": {
       "label": "Kısa özet (yaklaşık 100 kelime)",
@@ -401,7 +442,14 @@
     "socialYoutube": "YouTube",
     "socialWebsite": "Web Sitesi",
     "hashtags": "Hashtagler",
-    "addHashtag": "Hashtag ekle"
+    "addHashtag": "Hashtag ekle",
+    "qr": {
+      "title": "QR kodun",
+      "guidance": "Bunu yazdır ve işine iliştir. Okutan kişi genel profiline ve hikâyene ulaşır.",
+      "download": "Görseli indir",
+      "copyLink": "Bağlantıyı kopyala",
+      "linkCopied": "Kopyalandı!"
+    }
   },
   "artisans": {
     "title": "Zanaatkârlar",

@@ -386,15 +386,37 @@ a.sc-card:hover,
   position: relative;
 }
 
-.sc-nav__link--active::after {
-  content: "";
+/* One underline shared by the whole nav rather than a marker on each link, so
+   it can travel between them. Position and width are measured from the active
+   link and set inline; everything else lives here. */
+.sc-nav__indicator {
   position: absolute;
+  /* `top` is set inline from the active link's own box. Anchoring to the nav's
+     bottom instead would sit it against the bar's edge, because the nav is as
+     tall as the buttons beside the links rather than as tall as the text. */
+  top: 0;
   left: 0;
-  right: 0;
-  bottom: -19px;
   height: 3px;
   border-radius: 3px;
   background: var(--sc-accent);
+  transition:
+    transform var(--sc-dur) var(--sc-ease),
+    width var(--sc-dur) var(--sc-ease),
+    top var(--sc-dur) var(--sc-ease),
+    opacity 160ms ease;
+  pointer-events: none;
+}
+
+/* Before the first measurement, and whenever no nav item is active, the
+   underline should not fly in from the left edge. */
+.sc-nav__indicator--idle {
+  transition: opacity 160ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-nav__indicator {
+    transition: opacity 160ms ease;
+  }
 }
 
 /* ---- Responsive ------------------------------------------- */

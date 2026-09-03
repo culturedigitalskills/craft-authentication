@@ -33,7 +33,14 @@ export async function POST(request: Request) {
         const workshopCount = await prisma.mediaAttachment.count({
             where: { entityType: 'CraftStory', entityId: story.id },
         })
-        const hasContent = hasTextAnswer || hasAnswerMedia || workshopCount > 0
+        // An uploaded film is a story in itself: an artisan who arrives with a
+        // finished film has something to publish even with no answers recorded.
+        const uploadedFilm = await prisma.storyFilm.findFirst({
+            where: { storyId: story.id, source: 'UPLOADED', status: 'READY' },
+            select: { id: true },
+        })
+        const hasContent =
+            hasTextAnswer || hasAnswerMedia || workshopCount > 0 || Boolean(uploadedFilm)
 
         if (!hasContent) {
             return NextResponse.json(

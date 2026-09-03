@@ -7,6 +7,7 @@ import { Film, Play } from 'lucide-react'
 import { buildFilmPlan, validateIngredients, type FilmInputs } from '@/lib/film/planner'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
 import type { TranscriptSegment } from '@/lib/vtt'
+import { measureMediaDuration, formatDuration } from '@/lib/media-duration'
 import type { WorkshopMedia } from './StoryWorkshopUpload'
 
 export interface StoryboardAnswer {
@@ -194,73 +195,4 @@ export function FilmStoryboard({
             </div>
         </section>
     )
-}
-
-// Give up on a recording that never reports a length, rather than leaving the
-// panel waiting on it. The transcript fallback covers whatever lands here.
-const MEASURE_TIMEOUT_MS = 5000
-
-/**
- * Resolve a recording's length in the browser, resolving 0 when it cannot be
- * determined. Never rejects, so a single unreadable file cannot stall the rest.
- *
- * In-browser recordings are written by MediaRecorder without a container
- * duration header, so the browser reports Infinity until it has seen the end of
- * the stream. Seeking far past the end makes it work the length out. This is the
- * client-side counterpart of the decode-to-null fallback that probeDuration uses
- * on the server (see lib/ffmpeg.ts).
- */
-function measureMediaDuration(kind: 'audio' | 'video', src: string): Promise<number> {
-    return new Promise(resolve => {
-        const el = document.createElement(kind === 'video' ? 'video' : 'audio')
-        el.preload = 'metadata'
-
-        let settled = false
-        const finish = (value: number) => {
-            if (settled) return
-            settled = true
-            clearTimeout(timer)
-            el.removeEventListener('loadedmetadata', onLoaded)
-            el.removeEventListener('durationchange', onProgress)
-            el.removeEventListener('timeupdate', onProgress)
-            el.removeEventListener('error', onError)
-            // Drop the source so the browser stops buffering the file.
-            el.removeAttribute('src')
-            el.load()
-            resolve(value)
-        }
-
-        const hasLength = () => Number.isFinite(el.duration) && el.duration > 0
-        const onProgress = () => {
-            if (hasLength()) finish(el.duration)
-        }
-        const onError = () => finish(0)
-        const onLoaded = () => {
-            if (hasLength()) {
-                finish(el.duration)
-                return
-            }
-            // Some browsers report the resolved length through timeupdate after
-            // the seek rather than through durationchange.
-            el.addEventListener('durationchange', onProgress)
-            el.addEventListener('timeupdate', onProgress)
-            try {
-                el.currentTime = 1e101
-            } catch {
-                finish(0)
-            }
-        }
-
-        const timer = setTimeout(() => finish(0), MEASURE_TIMEOUT_MS)
-        el.addEventListener('loadedmetadata', onLoaded)
-        el.addEventListener('error', onError)
-        el.src = src
-    })
-}
-
-function formatDuration(seconds: number): string {
-    const total = Math.round(seconds)
-    const m = Math.floor(total / 60)
-    const s = total % 60
-    return `${m}:${String(s).padStart(2, '0')}`
 }
