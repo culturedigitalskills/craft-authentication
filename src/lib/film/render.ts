@@ -9,16 +9,19 @@ import { runFfmpeg, probeDuration } from '@/lib/ffmpeg'
 import { downloadObjectToFile, createMediaFileFromBuffer } from '@/lib/media-io'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { mediaKind } from '@/lib/media-kind'
+import { siteBaseUrl } from '@/lib/site-url'
 import { ANSWER_KEYS } from '@/lib/validations/craftStory'
 import type { TranscriptSegment } from '@/lib/vtt'
 import enMessages from '../../../messages/en.json'
 import { computeInputsHash } from './hash'
+import { mixMusicBed } from './music'
 import {
     buildFilmPlan,
     validateIngredients,
     FILM_WIDTH,
     FILM_HEIGHT,
     FILM_FPS,
+    FILM_TEMPLATE_VERSION,
     type FilmInputs,
     type FilmChapterInput,
     type FilmVisual,
@@ -27,14 +30,6 @@ import {
 } from './planner'
 
 const CARD_BG = '0x1b1b1b'
-
-function serverBaseUrl(): string {
-    return (
-        process.env.NEXT_PUBLIC_SERVER_URL ||
-        process.env.AUTH_URL ||
-        'https://www.sustainablecrafting.org'
-    )
-}
 
 // Pick a Noto family (selected via fontconfig at render time) that can shape the
 // given text — names can be any script even in an English-only film, so the
@@ -389,10 +384,10 @@ async function gatherInputs(
     const name = `${story.artisan.firstName} ${story.artisan.lastName}`.trim()
     const inputs: FilmInputs = {
         artisanName: name,
-        profileUrl: `${serverBaseUrl()}/artisans/${story.artisan.slug}`,
+        profileUrl: `${siteBaseUrl()}/artisans/${story.artisan.slug}`,
         chapters,
         visuals,
-        templateVersion: 1,
+        templateVersion: FILM_TEMPLATE_VERSION,
     }
     return { inputs, localPath, uploaderId: story.artisan.userId }
 }
@@ -502,9 +497,20 @@ async function renderTimeline(
     })
     units.push(outroPath)
 
-    const finalPath = path.join(tmpDir, 'film.mp4')
-    await finalConcat(units, finalPath)
-    return finalPath
+    const voiceOnlyPath = path.join(tmpDir, 'film-voice.mp4')
+    await finalConcat(units, voiceOnlyPath)
+
+    // The bed goes on last, over the assembled film, so it can duck against the
+    // finished voice track and fade out on the real running time. A film without
+    // its music is still the artisan's story, so a failure here costs the music
+    // rather than the render.
+    const scoredPath = path.join(tmpDir, 'film.mp4')
+    try {
+        if (await mixMusicBed(voiceOnlyPath, scoredPath)) return scoredPath
+    } catch (err) {
+        console.error('Music bed failed, keeping the film without it:', err)
+    }
+    return voiceOnlyPath
 }
 
 /**

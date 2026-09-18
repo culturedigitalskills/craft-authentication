@@ -14,12 +14,10 @@ import { enqueueTranscription } from '@/lib/transcription'
 import { mediaKind } from '@/lib/media-kind'
 import { PLAYABLE_FILM_MIME_TYPES } from '@/lib/validations/media'
 import { siteBaseUrl } from '@/lib/site-url'
-import type { FilmInputs } from '@/lib/film/planner'
+import { FILM_TEMPLATE_VERSION, type FilmInputs } from '@/lib/film/planner'
 import { computeInputsHash } from '@/lib/film/hash'
 import { canMakeFilm } from '@/lib/film/eligibility'
 import { enqueueFilm } from '@/lib/film/jobs'
-
-const FILM_TEMPLATE_VERSION = 1
 
 type StoryWithArtisan = {
     id: string

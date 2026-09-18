@@ -320,7 +320,7 @@
       "retry": "Intentar de nuevo",
       "watch": "Ver película",
       "published": "Se muestra en tu historia pública",
-      "stale": "Tu historia cambió desde que se creó esta película. Vuelve a generarla para actualizarla.",
+      "stale": "Esta película está desactualizada. Vuelve a generarla para actualizarla.",
       "premiereTitle": "Tu película de historia",
       "regenerate": "Regenerar",
       "download": "Descargar",

@@ -4,7 +4,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Film, Play } from 'lucide-react'
-import { buildFilmPlan, validateIngredients, type FilmInputs } from '@/lib/film/planner'
+import {
+    buildFilmPlan,
+    validateIngredients,
+    FILM_TEMPLATE_VERSION,
+    type FilmInputs,
+} from '@/lib/film/planner'
 import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
 import type { TranscriptSegment } from '@/lib/vtt'
 import { measureMediaDuration, formatDuration } from '@/lib/media-duration'
@@ -104,7 +109,7 @@ export function FilmStoryboard({
                 mediaId: m.mediaId,
                 kind: m.isVideo ? ('video' as const) : ('image' as const),
             })),
-            templateVersion: 1,
+            templateVersion: FILM_TEMPLATE_VERSION,
         }
 
         if (!validateIngredients(inputs).ok) return null
