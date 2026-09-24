@@ -12,6 +12,15 @@ export const FILM_WIDTH = 1280
 export const FILM_HEIGHT = 720
 export const FILM_FPS = 30
 
+// Bumped whenever the recipe changes in a way that dates existing films. It
+// feeds the inputs hash, so a bump reports every film rendered under an earlier
+// version as stale and offers its artisan a regenerate. Lives here, beside the
+// rest of the film's shape, because the renderer and the staleness check must
+// read the same number or a fresh film reports itself out of date.
+//   1: original silent-card assembly.
+//   2: music bed under the whole film.
+export const FILM_TEMPLATE_VERSION = 2
+
 const INTRO_CARD_SEC = 3.0
 const TITLE_CARD_SEC = 2.6
 const OUTRO_CARD_SEC = 4.0

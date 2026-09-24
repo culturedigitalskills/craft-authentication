@@ -318,7 +318,7 @@
       "retry": "Erneut versuchen",
       "watch": "Film ansehen",
       "published": "Wird in deiner öffentlichen Geschichte gezeigt",
-      "stale": "Deine Geschichte hat sich seit der Erstellung dieses Films geändert. Erstelle ihn neu, um ihn zu aktualisieren.",
+      "stale": "Dieser Film ist nicht mehr aktuell. Erstelle ihn neu, um ihn zu aktualisieren.",
       "premiereTitle": "Dein Geschichtsfilm",
       "regenerate": "Neu erstellen",
       "download": "Herunterladen",

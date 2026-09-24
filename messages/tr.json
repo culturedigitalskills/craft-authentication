@@ -320,7 +320,7 @@
       "retry": "Tekrar dene",
       "watch": "Filmi izle",
       "published": "Herkese açık hikâyende gösteriliyor",
-      "stale": "Bu film oluşturulduktan sonra hikâyen değişti. Güncellemek için yeniden oluştur.",
+      "stale": "Bu film güncel değil. Güncellemek için yeniden oluştur.",
       "premiereTitle": "Hikâye filmin",
       "regenerate": "Yeniden oluştur",
       "download": "İndir",
