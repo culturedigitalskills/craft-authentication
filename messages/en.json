@@ -320,7 +320,7 @@
       "retry": "Try again",
       "watch": "Watch film",
       "published": "Showing on your public story",
-      "stale": "Your story changed since this film was made. Regenerate to update it.",
+      "stale": "This film is out of date. Regenerate to update it.",
       "premiereTitle": "Your Story film",
       "regenerate": "Regenerate",
       "download": "Download",
