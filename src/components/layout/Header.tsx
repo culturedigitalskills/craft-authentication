@@ -123,7 +123,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                     </Link>
 
                     {/* Desktop nav */}
-                    <nav ref={navRef} className="relative hidden items-center gap-6 md:flex">
+                    <nav ref={navRef} className="relative hidden items-center gap-4 lg:flex xl:gap-6">
                         {navLinks.map(link => (
                             <Link
                                 key={link.href}
@@ -161,7 +161,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                     <button
                         type="button"
                         onClick={() => setMenuOpen(true)}
-                        className="inline-flex items-center justify-center rounded-[10px] p-2 transition-colors md:hidden"
+                        className="inline-flex items-center justify-center rounded-[10px] p-2 transition-colors lg:hidden"
                         style={{ color: 'var(--sc-ink)' }}
                         aria-label="Open menu"
                     >
@@ -173,7 +173,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
             {/* Mobile slide-over menu */}
             {/* Backdrop */}
             <div
-                className={`fixed inset-0 z-50 transition-opacity duration-300 md:hidden ${
+                className={`fixed inset-0 z-50 transition-opacity duration-300 lg:hidden ${
                     menuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
                 style={{ backgroundColor: 'rgba(26, 39, 48, 0.45)' }}
@@ -182,7 +182,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
             {/* Drawer */}
             <div
-                className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-full max-w-xs flex-col overflow-y-auto shadow-xl transition-transform duration-300 ease-in-out md:hidden ${
+                className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-full max-w-xs flex-col overflow-y-auto shadow-xl transition-transform duration-300 ease-in-out lg:hidden ${
                     menuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
                 style={{ background: 'var(--sc-surface)' }}

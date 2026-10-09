@@ -378,6 +378,7 @@ a.sc-card:hover,
   text-decoration: none;
   font-size: 14.5px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .sc-nav__link--active {

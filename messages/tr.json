@@ -8,15 +8,15 @@
   "navbar": {
     "home": "Ana Sayfa",
     "about": "Hakkında",
-    "crafts": "Zanaatlar",
+    "crafts": "El Yapımı Ürünler",
     "artisans": "Ustalar",
     "groups": "Topluluklar",
     "seecrafts": "Galeri",
-    "addcraft": "Yeni Zanaat Ekle",
+    "addcraft": "Yeni El Yapımı Ürün Ekle",
     "login": "Giriş Yap",
     "logout": "Çıkış Yap",
     "profile": "Profil",
-    "myitems": "Zanaatlarım",
+    "myitems": "El Yapımı Ürünlerim",
     "mygroups": "Topluluklarım",
     "createGroup": "Yeni Topluluk Ekle",
     "mystory": "Hikâyem",
@@ -71,9 +71,10 @@
   "socialmedia": {
     "title": "Bizi Takip Edin",
     "instagram": "Instagram",
-    "twitter": "Twitter",
+    "website": "Web sitesi",
     "facebook": "Facebook",
-    "email": "E-posta"
+    "email": "E-posta",
+    "bluesky": "Bluesky"
   },
   "landing": {
     "description": "Dünyanın dört bir yanındaki yetenekli zanaatkârlarla doğrudan bağlantı kurun. Ustalıkla tasarlanmış her ürün; o yere, tarihine ve onu yaratan insanlara dair özgün bir hikâye anlatır. Yenilikçi QR kod sistemimiz aracılığıyla özgünlüklerini doğrulayın.",
@@ -100,14 +101,14 @@
   },
   "howItWorks": {
     "title": "Nasıl çalışır",
-    "subtitle": "Bu sitedeki her zanaat, onu yapan kişinin hikâyesini ve kaynağını herkesin doğrulayabileceği bir imzayı taşır.",
+    "subtitle": "Bu sitedeki her el yapımı ürün, onu yapan kişinin hikâyesini ve kaynağını herkesin doğrulayabileceği bir imzayı taşır.",
     "visitors": {
       "heading": "Bakmaya geldiysen",
       "lead": "Bir işin üzerindeki kodu okutarak gelmiş olabilirsin ya da öylece geziniyor olabilirsin. Her iki durumda da şunları öğrenebilirsin.",
       "steps": [
         {
           "title": "Yapanla tanış",
-          "body": "Her zanaat, onu yapan kişiye bağlıdır. Profili, hikâyesini kendi sözleriyle, çoğu zaman kendi sesiyle, atölyesi ve aletleriyle birlikte anlatır."
+          "body": "Her el yapımı ürün, onu yapan kişiye bağlıdır. Profili, hikâyesini kendi sözleriyle, çoğu zaman kendi sesiyle, atölyesi ve aletleriyle birlikte anlatır."
         },
         {
           "title": "Hikâyeyi izle",
@@ -115,7 +116,7 @@
         },
         {
           "title": "Belgeyi kontrol et",
-          "body": "Fotoğraflar ve videolar yüklenirken içerik kimlik bilgileriyle imzalanır, belgelenen her zanaat de doğrulanabilir bir belge alır. Birlikte, burada neyin ve hangi hesapla oluşturulduğunu kaydederler."
+          "body": "Fotoğraflar ve videolar yüklenirken içerik kimlik bilgileriyle imzalanır, belgelenen her el yapımı ürün de doğrulanabilir bir belge alır. Birlikte, burada neyin ve hangi hesapla oluşturulduğunu kaydederler."
         },
         {
           "title": "Kendin doğrula",
@@ -137,8 +138,8 @@
           "body": "Altı soruyu konuşarak ya da yazarak yanıtla, hangisi kolaysa. Atölyenden, aletlerinden ve yapım sürecinden fotoğraf ve video ekle, biz bunları kısa bir filme dönüştürelim. Zaten kendi filmin varsa onu yükle."
         },
         {
-          "title": "Zanaatlarını belgele",
-          "body": "Her parçayı malzemesi, tekniği ve ölçüleriyle ekle. Her zanaat kendiliğinden bir belge alır, böylece kaynağı onunla birlikte yolculuk eder."
+          "title": "El yapımı ürünlerini belgele",
+          "body": "Her parçayı malzemesi, tekniği ve ölçüleriyle ekle. Her el yapımı ürün kendiliğinden bir belge alır, böylece kaynağı onunla birlikte yolculuk eder."
         },
         {
           "title": "Kodunu işine koy",
@@ -150,10 +151,10 @@
   },
   "tradition": {
     "title": "Geleneği Teknolojiyle Buluşturmak",
-    "description": "QR kod sistemimiz, el yapımı zanaatlar ile onları yaratanlar arasında kopmaz bir bağ kurar. Her tarama, zanaatkârın hikâyesini, kullanılan malzemeleri ve her parçayı eşsiz ve değerli kılan geleneksel teknikleri ortaya çıkarır."
+    "description": "QR kod sistemimiz, el yapımı ürünler ile onları yaratanlar arasında kopmaz bir bağ kurar. Her tarama, zanaatkârın hikâyesini, kullanılan malzemeleri ve her parçayı eşsiz ve değerli kılan geleneksel teknikleri ortaya çıkarır."
   },
   "benefits": {
-    "certificates": "Her zanaat için değiştirilemez dijital sertifikalar",
+    "certificates": "Her el yapımı ürün için değiştirilemez dijital sertifikalar",
     "connection": "Zanaatkârlar ve müşteriler arasında doğrudan bağlantı",
     "supply": "Üretimden satışa şeffaf tedarik zinciri"
   },
@@ -452,7 +453,15 @@
       "download": "Görseli indir",
       "copyLink": "Bağlantıyı kopyala",
       "linkCopied": "Kopyalandı!"
-    }
+    },
+    "suggestedCountries": "Önerilenler",
+    "allCountries": "Tüm ülkeler",
+    "searchCountry": "Ülke ara…",
+    "noCountryFound": "Ülke bulunamadı.",
+    "searchRegion": "Bölge arayın veya yazın…",
+    "noRegionFound": "Bölge bulunamadı.",
+    "useRegion": "“{region}” kullan",
+    "enterRegion": "Bölgenizi girin"
   },
   "artisans": {
     "title": "Zanaatkârlar",
@@ -461,7 +470,7 @@
     "noResults": "Aramanızla eşleşen zanaatkâr yok.",
     "yearsExperience": "yıl deneyim",
     "viewProfile": "Profili Görüntüle",
-    "crafts": "Zanaatlar",
+    "crafts": "El Yapımı Ürünler",
     "searchPlaceholder": "Zanaatkâr ara...",
     "artisansCount": "zanaatkâr"
   },
@@ -474,29 +483,29 @@
     "gallery": "Galeri",
     "galleryEmpty": "Henüz galeri fotoğrafı yok",
     "groups": "Topluluklar",
-    "crafts": "Zanaatlar",
-    "noCrafts": "Henüz herkese açık zanaat yok.",
+    "crafts": "El Yapımı Ürünler",
+    "noCrafts": "Henüz herkese açık el yapımı ürün yok.",
     "connectWith": "Bağlan"
   },
   "crafts": {
     "notFound": {
-      "title": "Bu ürün mevcut değil",
-      "body": "Üreticisi tarafından kaldırılmış olabilir. Bunun yerine diğer ürünlere göz atın.",
-      "browse": "Ürünlere göz at"
+      "title": "Bu el yapımı ürün mevcut değil",
+      "body": "Üreticisi tarafından kaldırılmış olabilir. Bunun yerine diğer el yapımı ürünlere göz atın.",
+      "browse": "El yapımı ürünlere göz at"
     },
-    "welcomeTitle": "Zanaat Galerisi",
-    "description": "Dünyanın dört bir yanındaki yetenekli zanaatkârların özgün el yapımı zanaatlarını keşfedin. Her parça doğrulanmıştır ve gelenek ile ustalığın eşsiz bir hikâyesini anlatır.",
+    "welcomeTitle": "El Yapımı Ürün Galerisi",
+    "description": "Dünyanın dört bir yanındaki yetenekli zanaatkârların özgün el yapımı ürünlerini keşfedin. Her parça doğrulanmıştır ve gelenek ile ustalığın eşsiz bir hikâyesini anlatır.",
     "explore": {
       "noImageAvailable": "Görsel mevcut değil",
-      "craftDetails": "Zanaat Detayları",
+      "craftDetails": "El Yapımı Ürün Detayları",
       "artisan": "Zanaatkâr",
       "materials": "Malzemeler",
       "techniques": "Teknikler",
       "by": "Yapan",
-      "noCraftsFound": "Zanaat bulunamadı.",
-      "noResults": "Aramanızla eşleşen zanaat yok.",
-      "searchPlaceholder": "Zanaat ara...",
-      "craftsCount": "zanaat"
+      "noCraftsFound": "El yapımı ürün bulunamadı.",
+      "noResults": "Aramanızla eşleşen el yapımı ürün yok.",
+      "searchPlaceholder": "El yapımı ürün ara...",
+      "craftsCount": "el yapımı ürün"
     },
     "details": {
       "description": "Açıklama",
@@ -516,15 +525,15 @@
       "authenticity": "Özgünlük",
       "qrTitle": "Doğrulamak için tarayın",
       "certificateTitle": "Özgünlük Sertifikası",
-      "certificateDescription": "Bu zanaat için kurcalamaya karşı korumalı dijital sertifika.",
+      "certificateDescription": "Bu el yapımı ürün için kurcalamaya karşı korumalı dijital sertifika.",
       "createdBy": "Oluşturan",
       "createdWhere": "Oluşturulduğu yer",
       "createdOn": "Oluşturulma tarihi",
       "updatedOn": "Güncellenme tarihi",
-      "backToCrafts": "Zanaatlara Dön",
+      "backToCrafts": "El Yapımı Ürünlere Dön",
       "noDescription": "Açıklama mevcut değil",
       "qrCodeTitle": "Özgünlük Sertifikası",
-      "qrCodeDescription": "Bu zanaatı paylaşın.",
+      "qrCodeDescription": "Bu el yapımı ürünü paylaşın.",
       "qrScanGuidance": "Bu QR kodunu yazdırmak ve fiziksel ürününüze eklemek için indirin",
       "copyLink": "Bağlantıyı kopyala",
       "linkCopied": "Kopyalandı!",
@@ -534,24 +543,24 @@
       "loadMapNotice": "OpenStreetMap üzerinden bir harita yükler."
     },
     "mycrafts": {
-      "noCraftsYet": "Henüz hiç zanaat eklemediniz."
+      "noCraftsYet": "Henüz hiç el yapımı ürün eklemediniz."
     },
-    "welcomeTitleCraft": "Zanaat Detayları"
+    "welcomeTitleCraft": "El Yapımı Ürün Detayları"
   },
   "createCraft": {
-    "craftInfo": "Zanaat Bilgileri",
-    "craftTitle": "Zanaat Başlığı",
-    "craftDescription": "Zanaat Açıklaması",
-    "createCraftTitle": "Yeni Zanaat Oluştur",
-    "createCraftHelper": "Use this form to create a new craft. Provide a title and description to share your craft with the world.",
-    "createEdittHelper": "Use this form to edit your craft.",
-    "editCraftTitle": "Zanaatı Düzenle",
-    "saveCraft": "Zanaatı Kaydet",
+    "craftInfo": "El Yapımı Ürün Bilgileri",
+    "craftTitle": "El Yapımı Ürün Başlığı",
+    "craftDescription": "El Yapımı Ürün Açıklaması",
+    "createCraftTitle": "Yeni El Yapımı Ürün Oluştur",
+    "createCraftHelper": "El yapımı ürününüzü dünyayla paylaşın — bir başlık, açıklama ve fotoğraflar ekleyin.",
+    "createEdittHelper": "El yapımı ürününüzün ayrıntılarını aşağıdan güncelleyin.",
+    "editCraftTitle": "El Yapımı Ürünü Düzenle",
+    "saveCraft": "El Yapımı Ürünü Kaydet",
     "updateCraft": "Güncelle",
     "cancelEdit": "İptal",
     "deleteCraft": "Sil",
-    "createCraftName": "Title:",
-    "createCraftDescription": "Describe your craft in a few words:",
+    "createCraftName": "El yapımı ürün başlığı",
+    "createCraftDescription": "Açıklama",
     "createCraftMaterial": "Malzemeler",
     "createCraftMaterialsPlaceholder": "Kullanılan malzemeleri yazın – örn. el eğirmesi yün, bitkisel boyalar, meşe.",
     "createCraftTechnique": "Teknik",
@@ -569,14 +578,14 @@
     "createCraftInspirationPlaceholder": "Bu parçaya ne ilham verdi? Bir fikir, bir kişi, bir yer, bir gelenek…",
     "createCraftCareInstructions": "Bakım talimatları",
     "createCraftCareInstructionsPlaceholder": "Bu parça nasıl korunmalı ve saklanmalı?",
-    "createCraftPublic": "Bu zanaatı herkese açık yap",
+    "createCraftPublic": "Bu el yapımı ürünü herkese açık yap",
     "createCraftMakeLocationPublic": "Share my location",
-    "uploadImages": "Zanaatınızın görsellerini yükleyin",
+    "uploadImages": "El yapımı ürününüzün görsellerini yükleyin",
     "browse": "Dosyalara göz at",
     "imagesSelected": "görsel seçildi",
     "uploadTab": "Yeni yükle",
     "galleryTab": "Galeriden",
-    "galleryHint": "Bu ürüne eklemek için galerinizden görseller seçin.",
+    "galleryHint": "Bu el yapımı ürüne eklemek için galerinizden görseller seçin.",
     "galleryLoading": "Galeriniz yükleniyor…",
     "galleryLoadFailed": "Galeriniz yüklenemedi.",
     "galleryEmpty": "Medya galeriniz boş. Önce Galeri sayfasından görsel yükleyin.",
@@ -588,15 +597,15 @@
     "failed": "Başarısız",
     "saving": "Kaydediliyor...",
     "updating": "Güncelleniyor...",
-    "createFailed": "Zanaat kaydedilemedi. Lütfen tekrar deneyin.",
-    "updateFailed": "Zanaat güncellenemedi. Lütfen tekrar deneyin.",
-    "savingCraft": "Zanaat kaydediliyor...",
-    "updatingCraft": "Zanaat güncelleniyor...",
-    "craftCreateSuccess": "Zanaat başarıyla oluşturuldu!",
-    "craftUpdateSuccess": "Zanaat başarıyla güncellendi!",
-    "createCraftDescriptionPlaceholder": "Bu zanaatı özel kılan malzemeler, teknikler veya hikâye nedir?",
+    "createFailed": "El yapımı ürün kaydedilemedi. Lütfen tekrar deneyin.",
+    "updateFailed": "El yapımı ürün güncellenemedi. Lütfen tekrar deneyin.",
+    "savingCraft": "El yapımı ürün kaydediliyor...",
+    "updatingCraft": "El yapımı ürün güncelleniyor...",
+    "craftCreateSuccess": "El yapımı ürün başarıyla oluşturuldu!",
+    "craftUpdateSuccess": "El yapımı ürün başarıyla güncellendi!",
+    "createCraftDescriptionPlaceholder": "Bu el yapımı ürünü özel kılan malzemeler, teknikler veya hikâye nedir?",
     "selectMaterial": "Bir malzeme seçin...",
-    "deleteCraftConfirm": "Bu zanaat silinsin mi? Bu işlem geri alınamaz.",
+    "deleteCraftConfirm": "Bu el yapımı ürün silinsin mi? Bu işlem geri alınamaz.",
     "deleteImage": "Resmi kaldır",
     "deleteImageConfirm": "Bu resmi kaldırmak istiyor musunuz?",
     "deleteImageYes": "Kaldır",
@@ -613,7 +622,7 @@
       "next": "İleri",
       "backToReview": "Özete dön",
       "fixFields": "Lütfen işaretli alanları kontrol et.",
-      "locationFound": "Bu eser için konum alındı.",
+      "locationFound": "Bu el yapımı ürün için konum alındı.",
       "locationPending": "Tarayıcıdan konumun isteniyor...",
       "basics": {
         "title": "Temel bilgiler",
@@ -637,7 +646,7 @@
       },
       "visibility": {
         "title": "Görünürlük",
-        "hint": "Bu eseri kimlerin görebileceğini ve yapıldığı yerin paylaşılıp paylaşılmayacağını seç."
+        "hint": "Bu el yapımı ürünü kimlerin görebileceğini ve yapıldığı yerin paylaşılıp paylaşılmayacağını seç."
       },
       "review": {
         "title": "Gözden geçir ve kaydet",
@@ -767,17 +776,17 @@
   },
   "home": {
     "hero": {
-      "headlineLead": "Her el sanatı, onu yapan",
+      "headlineLead": "Her el yapımı ürün, onu yapan",
       "headlineEmphasis": "elleri taşır",
       "subcopy": "Her parçanın ardında gerçek bir insan, gerçek bir yer ve nesilden nesile aktarılan bir gelenek vardır. Üreticilerle ve işlerine işlenen hikâyelerle tanışın.",
       "ctaMakers": "Üreticilerle tanışın",
-      "ctaCrafts": "El sanatlarına göz atın",
+      "ctaCrafts": "El yapımı ürünlere göz atın",
       "chipKicker": "Öne çıkan üretici"
     },
     "trust": {
       "rooted": {
         "title": "Yerine bağlı",
-        "description": "Her el sanatı, geldiği bölgeye ve geleneklere bağlıdır."
+        "description": "Her el yapımı ürün, geldiği bölgeye ve geleneklere bağlıdır."
       },
       "named": {
         "title": "Adı bilinen bir usta tarafından",
@@ -803,14 +812,14 @@
     },
     "crafts": {
       "eyebrow": "İşler",
-      "title": "Öne çıkan el sanatları",
+      "title": "Öne çıkan el yapımı ürünler",
       "viewAll": "Koleksiyon",
       "by": "üretici:"
     },
     "provenance": {
       "eyebrow": "Özgünlük, dijital olarak doğrulanmış",
       "title": "Köken, üreticiye bağlı",
-      "body": "Önce hikâye gelir. Kanıt gerektiğinde her el sanatı; onu kimin, nerede ve ne zaman yaptığını doğrulayan bir sertifika ve QR kod taşır.",
+      "body": "Önce hikâye gelir. Kanıt gerektiğinde her el yapımı ürün; onu kimin, nerede ve ne zaman yaptığını doğrulayan bir sertifika ve QR kod taşır.",
       "point1": "Usta tarafından kriptografik olarak imzalandı",
       "point2": "Saniyeler içinde doğrulamak için QR kodu tarayın",
       "point3": "Kurcalamaya karşı korumalı bir kimlik bilgisiyle desteklenir",
@@ -819,5 +828,27 @@
   },
   "legal": {
     "eyebrow": "Yasal"
+  },
+  "verify": {
+    "title": "Bir belgeyi doğrula",
+    "description": "Bir el yapımı ürünün sertifika JSON'unu yapıştırın veya yükleyin ve özgünlüğünü doğrulayın — hesap gerekmez.",
+    "jsonTitle": "Belge JSON'u",
+    "jsonDescription": "İndirilmiş bir <code>credential-*.json</code> dosyasının içeriğini yapıştırın",
+    "verify": "Doğrula",
+    "verifying": "Doğrulanıyor…",
+    "uploadFile": "Dosya yükle",
+    "parseError": "JSON okunamadı. Belge dosyasının tüm içeriğini yapıştırın.",
+    "requestFailed": "Doğrulama isteği başarısız oldu.",
+    "missingFields": "Bu dosyada gerekli belge alanları eksik.",
+    "networkError": "Ağ hatası — lütfen tekrar deneyin",
+    "verified": "Belge doğrulandı",
+    "failed": "Doğrulama başarısız",
+    "product": "El yapımı ürün",
+    "descriptionLabel": "Açıklama",
+    "issued": "Düzenlenme tarihi: {date}",
+    "emptyState": "Özgünlüğünü kontrol etmek için yukarıya bir belge yapıştırın",
+    "invalidSignature": "İmza, belgenin içeriğiyle eşleşmiyor.",
+    "invalidIssuer": "Bu belge bu site tarafından düzenlenmemiş.",
+    "genericError": "Belge doğrulanamadı."
   }
 }

@@ -315,7 +315,7 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
 
     // Not logged in
     return (
-        <Link href="/login" onClick={onAction} className="sc-btn sc-btn--primary">
+        <Link href="/login" onClick={onAction} className="sc-btn sc-btn--primary whitespace-nowrap">
             {t('login')}
         </Link>
     )

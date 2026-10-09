@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
 import { Button } from '@/components/ui/button'
 import { BadgeCheck, ShieldAlert, ShieldOff, Upload, ClipboardPaste, Loader2, Calendar, User, Hash } from 'lucide-react'
@@ -23,7 +24,16 @@ function formatShortId(id: string): string {
     return last.length > 16 ? `${last.slice(0, 8)}…${last.slice(-8)}` : last
 }
 
+// The API reports failures in English. Map the ones it is known to send to
+// translation keys, and fall back to a generic message for anything else.
+const VERIFY_ERROR_KEYS: Record<string, string> = {
+    'Invalid signature': 'invalidSignature',
+    'Invalid issuer': 'invalidIssuer',
+}
+
 export default function VerifyPage() {
+    const t = useTranslations('verify')
+    const locale = useLocale()
     const [input, setInput] = useState('')
     const [result, setResult] = useState<VerifyResult | null>(null)
     const [loading, setLoading] = useState(false)
@@ -38,7 +48,7 @@ export default function VerifyPage() {
         try {
             parsed = JSON.parse(input.trim())
         } catch {
-            setParseError('Could not parse JSON. Paste the full credential file content.')
+            setParseError(t('parseError'))
             return
         }
 
@@ -51,12 +61,16 @@ export default function VerifyPage() {
             })
             const data = await res.json()
             if (!res.ok) {
-                setParseError(data.error ?? 'Verification request failed')
+                setParseError(
+                    String(data.error ?? '').startsWith('Missing required credential fields')
+                        ? t('missingFields')
+                        : t('requestFailed'),
+                )
             } else {
                 setResult(data as VerifyResult)
             }
         } catch {
-            setParseError('Network error — please try again')
+            setParseError(t('networkError'))
         } finally {
             setLoading(false)
         }
@@ -79,16 +93,20 @@ export default function VerifyPage() {
         <Container>
             <div className="mx-auto max-w-2xl space-y-8 py-8">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Verify a Credential</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
                     <p className="mt-2 text-muted-foreground">
-                        Paste or upload a craft certificate JSON to verify its authenticity — works offline, no account needed.
+                        {t('description')}
                     </p>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-base">Credential JSON</CardTitle>
-                        <CardDescription>Paste the contents of a downloaded <code className="text-xs">credential-*.json</code> file</CardDescription>
+                        <CardTitle className="text-base">{t('jsonTitle')}</CardTitle>
+                        <CardDescription>
+                            {t.rich('jsonDescription', {
+                                code: chunks => <code className="text-xs">{chunks}</code>,
+                            })}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <textarea
@@ -110,9 +128,9 @@ export default function VerifyPage() {
                         <div className="flex flex-wrap gap-2">
                             <Button onClick={handleVerify} disabled={!input.trim() || loading} className="flex-1 sm:flex-none">
                                 {loading ? (
-                                    <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> Verifying…</>
+                                    <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> {t('verifying')}</>
                                 ) : (
-                                    <><ClipboardPaste className="mr-1.5 h-4 w-4" /> Verify</>
+                                    <><ClipboardPaste className="mr-1.5 h-4 w-4" /> {t('verify')}</>
                                 )}
                             </Button>
 
@@ -122,7 +140,7 @@ export default function VerifyPage() {
                                 className="flex-1 sm:flex-none"
                             >
                                 <Upload className="mr-1.5 h-4 w-4" />
-                                Upload file
+                                {t('uploadFile')}
                             </Button>
                             <input
                                 ref={fileInputRef}
@@ -142,17 +160,19 @@ export default function VerifyPage() {
                                 {result.verified ? (
                                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-sm font-medium text-white">
                                         <BadgeCheck className="h-4 w-4" />
-                                        Credential verified
+                                        {t('verified')}
                                     </span>
                                 ) : (
                                     <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-sm font-medium text-white">
                                         <ShieldAlert className="h-4 w-4" />
-                                        Verification failed
+                                        {t('failed')}
                                     </span>
                                 )}
                             </CardTitle>
                             {!result.verified && result.error && (
-                                <CardDescription className="text-red-600">{result.error}</CardDescription>
+                                <CardDescription className="text-red-600">
+                                    {t(VERIFY_ERROR_KEYS[result.error] ?? 'genericError')}
+                                </CardDescription>
                             )}
                         </CardHeader>
 
@@ -161,20 +181,26 @@ export default function VerifyPage() {
                                 <dl className="space-y-3 text-sm">
                                     {!!result.credential.credentialSubject?.title && (
                                         <div>
-                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Craft</dt>
+                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t('product')}</dt>
                                             <dd className="mt-0.5 font-medium">{String(result.credential.credentialSubject.title)}</dd>
                                         </div>
                                     )}
                                     {!!result.credential.credentialSubject?.description && (
                                         <div>
-                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Description</dt>
+                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t('descriptionLabel')}</dt>
                                             <dd className="mt-0.5 text-foreground/80">{String(result.credential.credentialSubject.description)}</dd>
                                         </div>
                                     )}
                                     <div className="flex flex-wrap gap-x-8 gap-y-3 border-t border-border pt-3">
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             <Calendar className="h-3.5 w-3.5" />
-                                            Issued {new Date(result.credential.validFrom).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                            {t('issued', {
+                                                date: new Date(result.credential.validFrom).toLocaleDateString(locale, {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric',
+                                                }),
+                                            })}
                                         </div>
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             <User className="h-3.5 w-3.5" />
@@ -196,7 +222,7 @@ export default function VerifyPage() {
                 {!result && !loading && (
                     <div className="flex flex-col items-center gap-2 py-4 text-center text-muted-foreground">
                         <ShieldOff className="h-8 w-8 opacity-30" />
-                        <p className="text-sm">Paste a credential above to check its authenticity</p>
+                        <p className="text-sm">{t('emptyState')}</p>
                     </div>
                 )}
             </div>
