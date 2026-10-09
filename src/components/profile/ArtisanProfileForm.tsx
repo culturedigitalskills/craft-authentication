@@ -31,7 +31,7 @@ import {
     Hash,
     X,
 } from 'lucide-react'
-import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok, FaBluesky } from 'react-icons/fa6'
+import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
 import { normalizeWebsite } from '@/lib/validations/artisan'
 
 interface Artisan {
@@ -45,7 +45,6 @@ interface Artisan {
     country: string | null
     region: string | null
     socialInstagram: string | null
-    socialBluesky: string | null
     socialFacebook: string | null
     socialTwitter: string | null
     socialTiktok: string | null
@@ -103,7 +102,6 @@ export function ArtisanProfileForm({
     const [socialTwitter, setSocialTwitter] = useState(artisan?.socialTwitter ?? '')
     const [socialTiktok, setSocialTiktok] = useState(artisan?.socialTiktok ?? '')
     const [socialYoutube, setSocialYoutube] = useState(artisan?.socialYoutube ?? '')
-    const [socialBluesky, setSocialBluesky] = useState(artisan?.socialBluesky ?? '')
     const [website, setWebsite] = useState(artisan?.website ?? '')
     const [hashtags, setHashtags] = useState<string[]>(artisan?.hashtags ?? [])
     const [hashtagInput, setHashtagInput] = useState('')
@@ -142,7 +140,6 @@ export function ArtisanProfileForm({
         if (socialTwitter) data.socialTwitter = socialTwitter.replace(/^@/, '')
         if (socialTiktok) data.socialTiktok = socialTiktok.replace(/^@/, '')
         if (socialYoutube) data.socialYoutube = socialYoutube.replace(/^@/, '')
-        if (socialBluesky) data.socialBluesky = socialBluesky.replace(/^@/, '')
         if (normalizedWebsite) data.website = normalizedWebsite
         data.hashtags = hashtags
 
@@ -225,7 +222,6 @@ export function ArtisanProfileForm({
         setSocialTwitter(artisan?.socialTwitter ?? '')
         setSocialTiktok(artisan?.socialTiktok ?? '')
         setSocialYoutube(artisan?.socialYoutube ?? '')
-        setSocialBluesky(artisan?.socialBluesky ?? '')
         setWebsite(artisan?.website ?? '')
         setHashtags(artisan?.hashtags ?? [])
         setHashtagInput('')
@@ -671,14 +667,6 @@ export function ArtisanProfileForm({
                                         icon: FaInstagram,
                                         value: socialInstagram,
                                         setter: setSocialInstagram,
-                                        placeholder: 'yourhandle',
-                                    },
-                                    {
-                                        id: 'socialBlueSky',
-                                        label: t('socialBlueSky'),
-                                        icon: FaBluesky,
-                                        value: socialBluesky,
-                                        setter: setSocialBluesky,
                                         placeholder: 'yourhandle',
                                     },
                                     {
