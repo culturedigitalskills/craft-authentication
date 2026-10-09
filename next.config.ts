@@ -4,6 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const withNextIntl = createNextIntlPlugin('./src/i8n/requests.tsx')
 const nextConfig: NextConfig = {
     output: 'standalone',
+    allowedDevOrigins: ['192.168.0.43'],
     experimental: {
         serverActions: {
             bodySizeLimit: '110mb',

@@ -8,15 +8,15 @@
   "navbar": {
     "home": "Startseite",
     "about": "Über uns",
-    "crafts": "Handwerke",
+    "crafts": "Handgefertigte Produkte",
     "artisans": "Kunsthandwerker",
     "groups": "Gemeinschaften",
     "login": "Anmelden",
     "logout": "Abmelden",
     "profile": "Profil",
-    "myitems": "Meine Handwerke",
+    "myitems": "Meine handgefertigten Produkte",
     "mygroups": "Meine Gemeinschaften",
-    "addcraft": "Neues Handwerk hinzufügen",
+    "addcraft": "Neues handgefertigtes Produkt hinzufügen",
     "mystory": "Meine Geschichte",
     "completeProfile": "Profil vervollständigen",
     "mediaGallery": "Mediengalerie",
@@ -71,9 +71,10 @@
   "socialmedia": {
     "title": "Folge uns",
     "instagram": "Instagram",
-    "twitter": "Twitter",
+    "website": "Website",
     "facebook": "Facebook",
-    "email": "E-Mail"
+    "email": "E-Mail",
+    "bluesky": "Bluesky"
   },
   "landing": {
     "description": "Verbinde dich direkt mit erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes sorgfältig gestaltete Produkt erzählt eine authentische Geschichte über den Ort, seine Geschichte und die Menschen, die es herstellen. Überprüfe seine Echtheit durch unser innovatives QR-Code-System.",
@@ -100,14 +101,14 @@
   },
   "howItWorks": {
     "title": "So funktioniert es",
-    "subtitle": "Jedes Handwerk auf dieser Seite trägt die Geschichte der Person, die es gemacht hat, und eine Signatur, mit der jeder die Herkunft prüfen kann.",
+    "subtitle": "Jedes handgefertigte Produkt auf dieser Seite trägt die Geschichte der Person, die es gemacht hat, und eine Signatur, mit der jeder die Herkunft prüfen kann.",
     "visitors": {
       "heading": "Wenn du dich umsehen möchtest",
       "lead": "Vielleicht bist du über einen Code auf einem Werkstück hier gelandet, vielleicht einfach beim Stöbern. So oder so kannst du Folgendes herausfinden.",
       "steps": [
         {
           "title": "Lerne die Person kennen",
-          "body": "Jedes Handwerk ist mit dem Menschen verknüpft, der es gemacht hat. Das Profil erzählt seine Geschichte in eigenen Worten, oft mit eigener Stimme, samt Werkstatt und Werkzeug."
+          "body": "Jedes handgefertigte Produkt ist mit dem Menschen verknüpft, der es gemacht hat. Das Profil erzählt seine Geschichte in eigenen Worten, oft mit eigener Stimme, samt Werkstatt und Werkzeug."
         },
         {
           "title": "Sieh die Geschichte",
@@ -115,7 +116,7 @@
         },
         {
           "title": "Prüfe die Signatur",
-          "body": "Fotos und Videos werden beim Hochladen mit Content Credentials signiert, und jedes dokumentierte Handwerk erhält einen überprüfbaren Nachweis. Zusammen halten sie fest, was hier entstanden ist und von welchem Konto."
+          "body": "Fotos und Videos werden beim Hochladen mit Content Credentials signiert, und jedes dokumentierte handgefertigte Produkt erhält einen überprüfbaren Nachweis. Zusammen halten sie fest, was hier entstanden ist und von welchem Konto."
         },
         {
           "title": "Überzeuge dich selbst",
@@ -137,8 +138,8 @@
           "body": "Beantworte sechs Fragen gesprochen oder geschrieben, wie es dir leichter fällt. Füge Fotos und Videos von Werkstatt, Werkzeug und Arbeitsweise hinzu, und wir setzen daraus einen kurzen Film zusammen. Hast du schon einen eigenen Film, lade ihn stattdessen hoch."
         },
         {
-          "title": "Dokumentiere deine Arbeiten",
-          "body": "Trage jedes Stück mit Material, Technik und Maßen ein. Jedes Handwerk bekommt automatisch einen Nachweis, sodass seine Herkunft mitreist."
+          "title": "Dokumentiere deine handgefertigten Produkte",
+          "body": "Trage jedes Stück mit Material, Technik und Maßen ein. Jedes handgefertigte Produkt bekommt automatisch einen Nachweis, sodass seine Herkunft mitreist."
         },
         {
           "title": "Bring deinen Code an deiner Arbeit an",
@@ -153,7 +154,7 @@
     "description": "Unser QR-Code-System schafft eine untrennbare Verbindung zwischen handgefertigten Produkten und ihren Schöpfern. Jeder Scan offenbart die Geschichte des Kunsthandwerkers, die verwendeten Materialien und die traditionellen Techniken, die jedes Stück einzigartig und wertvoll machen."
   },
   "benefits": {
-    "certificates": "Unveränderliche digitale Zertifikate für jedes Handwerk",
+    "certificates": "Unveränderliche digitale Zertifikate für jedes handgefertigte Produkt",
     "connection": "Direkte Verbindung zwischen Kunsthandwerkern und Kunden",
     "supply": "Transparente Lieferkette von der Herstellung bis zum Verkauf"
   },
@@ -452,7 +453,15 @@
       "download": "Bild herunterladen",
       "copyLink": "Link kopieren",
       "linkCopied": "Kopiert!"
-    }
+    },
+    "suggestedCountries": "Vorschläge",
+    "allCountries": "Alle Länder",
+    "searchCountry": "Länder suchen…",
+    "noCountryFound": "Kein Land gefunden.",
+    "searchRegion": "Region suchen oder eingeben…",
+    "noRegionFound": "Keine Region gefunden.",
+    "useRegion": "„{region}“ verwenden",
+    "enterRegion": "Gib deine Region ein"
   },
   "artisanProfile": {
     "about": "Über",
@@ -463,8 +472,8 @@
     "gallery": "Galerie",
     "galleryEmpty": "Noch keine Galeriefotos",
     "groups": "Gemeinschaften",
-    "crafts": "Handwerke",
-    "noCrafts": "Noch keine öffentlichen Handwerke.",
+    "crafts": "Handgefertigte Produkte",
+    "noCrafts": "Noch keine öffentlichen handgefertigten Produkte.",
     "connectWith": "Verbinden"
   },
   "artisans": {
@@ -474,26 +483,26 @@
     "noResults": "Keine Kunsthandwerker entsprechen Ihrer Suche.",
     "yearsExperience": "J. Erfahrung",
     "viewProfile": "Profil ansehen",
-    "crafts": "Handwerke",
+    "crafts": "Handgefertigte Produkte",
     "searchPlaceholder": "Kunsthandwerker suchen...",
     "artisansCount": "Kunsthandwerker"
   },
   "crafts": {
     "notFound": {
-      "title": "Dieses Handwerk ist nicht verfügbar",
-      "body": "Es wurde möglicherweise von seinem Ersteller entfernt. Entdecke stattdessen andere Handwerke.",
-      "browse": "Handwerke entdecken"
+      "title": "Dieses handgefertigte Produkt ist nicht verfügbar",
+      "body": "Es wurde möglicherweise von seinem Ersteller entfernt. Entdecke stattdessen andere handgefertigte Produkte.",
+      "browse": "Handgefertigte Produkte entdecken"
     },
-    "welcomeTitle": "Handwerke entdecken",
+    "welcomeTitle": "Galerie handgefertigter Produkte",
     "description": "Entdecken Sie authentische handgefertigte Produkte von erfahrenen Kunsthandwerkern aus der ganzen Welt. Jedes Stück ist verifiziert und erzählt eine einzigartige Geschichte von Tradition und Handwerkskunst.",
     "explore": {
-      "noCraftsFound": "Keine Handwerke gefunden.",
-      "noResults": "Keine Handwerke entsprechen Ihrer Suche.",
-      "searchPlaceholder": "Handwerke suchen...",
-      "craftsCount": "Handwerke",
+      "noCraftsFound": "Keine handgefertigten Produkte gefunden.",
+      "noResults": "Keine handgefertigten Produkte entsprechen Ihrer Suche.",
+      "searchPlaceholder": "Handgefertigte Produkte suchen...",
+      "craftsCount": "handgefertigte Produkte",
       "noImageAvailable": "Kein Bild verfügbar",
       "by": "von",
-      "craftDetails": "Handwerksdetails",
+      "craftDetails": "Details zum handgefertigten Produkt",
       "artisan": "Kunsthandwerker",
       "materials": "Materialien",
       "techniques": "Techniken"
@@ -522,21 +531,21 @@
       "authenticity": "Echtheit",
       "qrTitle": "Zum Überprüfen scannen",
       "certificateTitle": "Echtheitszertifikat",
-      "certificateDescription": "Ein manipulationssicheres digitales Zertifikat für dieses Handwerk.",
+      "certificateDescription": "Ein manipulationssicheres digitales Zertifikat für dieses handgefertigte Produkt.",
       "createdBy": "Erstellt von",
       "createdWhere": "Erstellt in",
       "createdOn": "Erstellt am",
       "updatedOn": "Aktualisiert am",
-      "backToCrafts": "Zurück zu den Handwerken",
+      "backToCrafts": "Zurück zu den handgefertigten Produkten",
       "noDescription": "Keine Beschreibung verfügbar",
-      "qrCodeDescription": "Teile dieses Handwerk.",
+      "qrCodeDescription": "Teile dieses handgefertigte Produkt.",
       "loadMap": "Karte anzeigen",
       "loadMapNotice": "Lädt eine Karte von OpenStreetMap."
     },
     "mycrafts": {
-      "noCraftsYet": "Sie haben noch keine Handwerke hinzugefügt."
+      "noCraftsYet": "Sie haben noch keine handgefertigten Produkte hinzugefügt."
     },
-    "welcomeTitleCraft": "Handwerksdetails"
+    "welcomeTitleCraft": "Details zum handgefertigten Produkt"
   },
   "groups": {
     "title": "Handwerkergruppen",
@@ -605,9 +614,9 @@
     "noResults": "Keine Gemeinschaften entsprechen deiner Suche."
   },
   "createCraft": {
-    "createCraftName": "Titel des Handwerks",
+    "createCraftName": "Titel des handgefertigten Produkts",
     "createCraftDescription": "Beschreibung",
-    "createCraftDescriptionPlaceholder": "Was macht dieses Handwerk besonders – Materialien, Techniken oder eine Geschichte?",
+    "createCraftDescriptionPlaceholder": "Was macht dieses handgefertigte Produkt besonders – Materialien, Techniken oder eine Geschichte?",
     "createCraftMaterial": "Materialien",
     "createCraftMaterialsPlaceholder": "Liste die verwendeten Materialien auf – z. B. handgesponnene Wolle, Pflanzenfarben, Eiche.",
     "createCraftTechnique": "Technik",
@@ -626,10 +635,10 @@
     "createCraftCareInstructions": "Pflegehinweise",
     "createCraftCareInstructionsPlaceholder": "Wie sollte dieses Stück gepflegt und aufbewahrt werden?",
     "selectMaterial": "Material auswählen...",
-    "createCraftHelper": "Teile dein Handwerk mit der Welt — füge Titel, Beschreibung und Fotos hinzu.",
-    "createEdittHelper": "Aktualisiere die Details deines Handwerks.",
+    "createCraftHelper": "Teile dein handgefertigtes Produkt mit der Welt — füge Titel, Beschreibung und Fotos hinzu.",
+    "createEdittHelper": "Aktualisiere die Details deines handgefertigten Produkts.",
     "createCraftMakeLocationPublic": "Meinen ungefähren Standort mit Besuchern teilen",
-    "deleteCraftConfirm": "Dieses Handwerk löschen? Dies kann nicht rückgängig gemacht werden.",
+    "deleteCraftConfirm": "Dieses handgefertigte Produkt löschen? Dies kann nicht rückgängig gemacht werden.",
     "deleteImage": "Bild entfernen",
     "deleteImageConfirm": "Dieses Bild entfernen?",
     "deleteImageYes": "Entfernen",
@@ -640,22 +649,22 @@
     "addVideo": "Hinzufügen",
     "removeVideo": "Video entfernen",
     "invalidYoutubeUrl": "Konnte nicht als YouTube-Link erkannt werden.",
-    "craftInfo": "Handwerksinformationen",
-    "craftTitle": "Handwerkstitel",
-    "craftDescription": "Handwerksbeschreibung",
-    "createCraftTitle": "Neues Handwerk erstellen",
-    "editCraftTitle": "Handwerk bearbeiten",
-    "saveCraft": "Handwerk speichern",
+    "craftInfo": "Informationen zum handgefertigten Produkt",
+    "craftTitle": "Titel des handgefertigten Produkts",
+    "craftDescription": "Beschreibung des handgefertigten Produkts",
+    "createCraftTitle": "Neues handgefertigtes Produkt erstellen",
+    "editCraftTitle": "Handgefertigtes Produkt bearbeiten",
+    "saveCraft": "Handgefertigtes Produkt speichern",
     "updateCraft": "Aktualisieren",
     "cancelEdit": "Abbrechen",
     "deleteCraft": "Löschen",
-    "createCraftPublic": "Dieses Handwerk öffentlich machen",
-    "uploadImages": "Lade Bilder deines Handwerks hoch",
+    "createCraftPublic": "Dieses handgefertigte Produkt öffentlich machen",
+    "uploadImages": "Lade Bilder deines handgefertigten Produkts hoch",
     "browse": "Dateien durchsuchen",
     "imagesSelected": "Bild(er) ausgewählt",
     "uploadTab": "Neu hochladen",
     "galleryTab": "Aus Galerie",
-    "galleryHint": "Wähle Bilder aus deiner Galerie aus, um sie diesem Handwerk hinzuzufügen.",
+    "galleryHint": "Wähle Bilder aus deiner Galerie aus, um sie diesem handgefertigten Produkt hinzuzufügen.",
     "galleryLoading": "Galerie wird geladen…",
     "galleryLoadFailed": "Galerie konnte nicht geladen werden.",
     "galleryEmpty": "Deine Mediengalerie ist leer. Lade zuerst Bilder auf der Galerieseite hoch.",
@@ -667,19 +676,19 @@
     "failed": "Fehlgeschlagen",
     "saving": "Speichern...",
     "updating": "Wird aktualisiert...",
-    "createFailed": "Handwerk konnte nicht gespeichert werden. Bitte versuche es erneut.",
-    "updateFailed": "Handwerk konnte nicht aktualisiert werden. Bitte versuche es erneut.",
-    "savingCraft": "Handwerk wird gespeichert...",
-    "updatingCraft": "Handwerk wird aktualisiert...",
-    "craftCreateSuccess": "Handwerk erfolgreich erstellt!",
-    "craftUpdateSuccess": "Handwerk erfolgreich aktualisiert!",
+    "createFailed": "Handgefertigtes Produkt konnte nicht gespeichert werden. Bitte versuche es erneut.",
+    "updateFailed": "Handgefertigtes Produkt konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+    "savingCraft": "Handgefertigtes Produkt wird gespeichert...",
+    "updatingCraft": "Handgefertigtes Produkt wird aktualisiert...",
+    "craftCreateSuccess": "Handgefertigtes Produkt erfolgreich erstellt!",
+    "craftUpdateSuccess": "Handgefertigtes Produkt erfolgreich aktualisiert!",
     "wizard": {
       "stepLabel": "Schritt {current} von {total}",
       "back": "Zurück",
       "next": "Weiter",
       "backToReview": "Zurück zur Übersicht",
       "fixFields": "Bitte überprüfe die markierten Felder.",
-      "locationFound": "Standort für dieses Werk erfasst.",
+      "locationFound": "Standort für dieses handgefertigte Produkt erfasst.",
       "locationPending": "Standort wird beim Browser abgefragt...",
       "basics": {
         "title": "Die Grundlagen",
@@ -703,7 +712,7 @@
       },
       "visibility": {
         "title": "Sichtbarkeit",
-        "hint": "Lege fest, wer dieses Werk sehen darf und ob der Herstellungsort geteilt wird."
+        "hint": "Lege fest, wer dieses handgefertigte Produkt sehen darf und ob der Herstellungsort geteilt wird."
       },
       "review": {
         "title": "Prüfen und speichern",
@@ -767,17 +776,17 @@
   },
   "home": {
     "hero": {
-      "headlineLead": "Jedes Handwerk trägt die Hände, die es",
+      "headlineLead": "Jedes handgefertigte Produkt trägt die Hände, die es",
       "headlineEmphasis": "geschaffen haben",
       "subcopy": "Hinter jedem Stück steht ein echter Mensch, ein echter Ort und eine über Generationen weitergegebene Tradition. Lerne die Macher und die Geschichten in ihrer Arbeit kennen.",
       "ctaMakers": "Die Macher kennenlernen",
-      "ctaCrafts": "Handwerk entdecken",
+      "ctaCrafts": "Handgefertigte Produkte entdecken",
       "chipKicker": "Vorgestellter Macher"
     },
     "trust": {
       "rooted": {
         "title": "Im Ort verwurzelt",
-        "description": "Jedes Handwerk ist mit der Region und den Traditionen verbunden, aus denen es stammt."
+        "description": "Jedes handgefertigte Produkt ist mit der Region und den Traditionen verbunden, aus denen es stammt."
       },
       "named": {
         "title": "Von einem namentlich bekannten Macher",
@@ -803,14 +812,14 @@
     },
     "crafts": {
       "eyebrow": "Die Arbeit",
-      "title": "Ausgewählte Handwerke",
+      "title": "Ausgewählte handgefertigte Produkte",
       "viewAll": "Die Kollektion",
       "by": "von"
     },
     "provenance": {
       "eyebrow": "Authentizität, digital verifiziert",
       "title": "Herkunft, verbunden mit dem Macher",
-      "body": "Die Geschichte kommt zuerst. Wenn du einen Nachweis brauchst, trägt jedes Handwerk ein prüfbares Zertifikat und einen QR-Code, der bestätigt, wer es wo und wann gemacht hat.",
+      "body": "Die Geschichte kommt zuerst. Wenn du einen Nachweis brauchst, trägt jedes handgefertigte Produkt ein prüfbares Zertifikat und einen QR-Code, der bestätigt, wer es wo und wann gemacht hat.",
       "point1": "Kryptografisch vom Macher signiert",
       "point2": "QR-Code scannen und in Sekunden prüfen",
       "point3": "Abgesichert durch einen fälschungssicheren Nachweis",
@@ -819,5 +828,27 @@
   },
   "legal": {
     "eyebrow": "Rechtliches"
+  },
+  "verify": {
+    "title": "Nachweis prüfen",
+    "description": "Füge das JSON-Zertifikat eines handgefertigten Produkts ein oder lade es hoch, um seine Echtheit zu prüfen — kein Konto nötig.",
+    "jsonTitle": "Nachweis-JSON",
+    "jsonDescription": "Füge den Inhalt einer heruntergeladenen <code>credential-*.json</code>-Datei ein",
+    "verify": "Prüfen",
+    "verifying": "Wird geprüft…",
+    "uploadFile": "Datei hochladen",
+    "parseError": "JSON konnte nicht gelesen werden. Füge den vollständigen Inhalt der Nachweisdatei ein.",
+    "requestFailed": "Die Prüfanfrage ist fehlgeschlagen.",
+    "missingFields": "In dieser Datei fehlen erforderliche Felder des Nachweises.",
+    "networkError": "Netzwerkfehler — bitte versuche es erneut",
+    "verified": "Nachweis bestätigt",
+    "failed": "Prüfung fehlgeschlagen",
+    "product": "Handgefertigtes Produkt",
+    "descriptionLabel": "Beschreibung",
+    "issued": "Ausgestellt am {date}",
+    "emptyState": "Füge oben einen Nachweis ein, um seine Echtheit zu prüfen",
+    "invalidSignature": "Die Signatur passt nicht zum Inhalt des Nachweises.",
+    "invalidIssuer": "Dieser Nachweis wurde nicht von dieser Website ausgestellt.",
+    "genericError": "Der Nachweis konnte nicht geprüft werden."
   }
 }
