@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 import { UpdateGroupSchema } from '@/lib/validations/group'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
@@ -20,7 +21,7 @@ export async function GET(
             },
             include: {
                 memberships: {
-                    where: { leftDate: null },
+                    where: ACTIVE_MEMBERSHIP_WHERE,
                     include: {
                         artisan: {
                             select: {
@@ -37,7 +38,7 @@ export async function GET(
                         { joinedDate: 'asc' },
                     ],
                 },
-                _count: { select: { memberships: true } },
+                _count: { select: { memberships: { where: ACTIVE_MEMBERSHIP_WHERE } } },
             },
         })
 

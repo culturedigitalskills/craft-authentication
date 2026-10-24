@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -31,7 +32,7 @@ export default async function MyGroupsPage() {
               include: {
                   group: {
                       include: {
-                          _count: { select: { memberships: true } },
+                          _count: { select: { memberships: { where: ACTIVE_MEMBERSHIP_WHERE } } },
                       },
                   },
               },

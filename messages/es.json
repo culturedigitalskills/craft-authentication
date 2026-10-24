@@ -486,7 +486,19 @@
     "groups": "Comunidades",
     "crafts": "Productos artesanales",
     "noCrafts": "Aún no hay productos artesanales públicos.",
-    "connectWith": "Conectar"
+    "connectWith": "Conectar",
+    "adminActions": {
+      "title": "Administración",
+      "liveExplainer": "Al eliminar este perfil desaparece del sitio público, junto con sus artesanías y sus membresías de grupo. Puedes restaurarlo después.",
+      "removedExplainer": "Este perfil ha sido eliminado. Solo los administradores pueden verlo. Sus artesanías y membresías de grupo también están ocultas.",
+      "remove": "Eliminar perfil",
+      "restore": "Restaurar perfil",
+      "confirmTitle": "¿Eliminar a {name}?",
+      "confirmBody": "Su perfil, sus artesanías y sus membresías de grupo dejarán de aparecer en el sitio público. No se borra nada, y puedes restaurar el perfil desde esta misma página.",
+      "confirmRemove": "Eliminar perfil",
+      "cancel": "Cancelar",
+      "failed": "No se pudo completar. Inténtalo de nuevo."
+    }
   },
   "crafts": {
     "notFound": {

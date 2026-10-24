@@ -22,13 +22,24 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         const craft = await prisma.craft.findFirst({
             where: { id, deletedAt: null },
             include: {
-                artisan: { select: { userId: true, firstName: true, lastName: true, slug: true } },
+                artisan: {
+                    select: {
+                        userId: true,
+                        firstName: true,
+                        lastName: true,
+                        slug: true,
+                        deletedAt: true,
+                    },
+                },
             },
         })
         if (!craft) return errorResponse('Craft not found', 404)
 
-        // Private crafts are only visible to their owner or a site admin.
-        if (!craft.isPublic) {
+        // A private craft, or one whose maker has been removed, is visible only
+        // to its owner or a site admin. A removed artisan's work leaves public
+        // view with them, but the owner keeps their own copy reachable and an
+        // admin can still see what they are acting on.
+        if (!craft.isPublic || craft.artisan.deletedAt) {
             const session = await auth()
             const isOwner = session?.user?.id === craft.artisan.userId
             const isAdmin = session?.user?.role === 'ADMIN'

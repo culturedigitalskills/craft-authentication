@@ -486,7 +486,19 @@
     "groups": "Topluluklar",
     "crafts": "El Yapımı Ürünler",
     "noCrafts": "Henüz herkese açık el yapımı ürün yok.",
-    "connectWith": "Bağlan"
+    "connectWith": "Bağlan",
+    "adminActions": {
+      "title": "Yönetim",
+      "liveExplainer": "Bu profili kaldırdığınızda, ona bağlı zanaatlar ve grup üyelikleriyle birlikte herkese açık siteden kalkar. Daha sonra geri getirebilirsiniz.",
+      "removedExplainer": "Bu profil kaldırıldı. Yalnızca yöneticiler görebilir. Zanaatları ve grup üyelikleri de gizlendi.",
+      "remove": "Profili kaldır",
+      "restore": "Profili geri getir",
+      "confirmTitle": "{name} kaldırılsın mı?",
+      "confirmBody": "Profili, zanaatları ve grup üyelikleri herkese açık sitede görünmeyi bırakır. Hiçbir şey silinmez ve profili bu sayfadan geri getirebilirsiniz.",
+      "confirmRemove": "Profili kaldır",
+      "cancel": "İptal",
+      "failed": "Bu işlem gerçekleşmedi. Lütfen tekrar deneyin."
+    }
   },
   "crafts": {
     "notFound": {

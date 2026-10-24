@@ -9,6 +9,7 @@ import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
 import { StoryFilmHero } from '@/components/artisan/StoryFilmHero'
+import { AdminArtisanActions } from '@/components/artisan/AdminArtisanActions'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 import { getCraftPrimaryImageMap } from '@/lib/craft'
 import { ScMedia } from '@/components/sc/ScMedia'
@@ -66,12 +67,22 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     const { slug } = await params
     const t = await getTranslations('artisanProfile')
 
+    // Read before the profile is loaded, because an admin is allowed to see a
+    // removed one. Removal is reversible, and this page is where it is undone,
+    // so hiding it from an admin too would leave nothing able to restore it.
+    const session = await auth()
+    const isAdmin = session?.user?.role === 'ADMIN'
+
     const artisan = await prisma.artisan.findFirst({
-        where: { OR: [{ slug }, { previousSlugs: { has: slug } }], deletedAt: null },
+        where: {
+            OR: [{ slug }, { previousSlugs: { has: slug } }],
+            ...(isAdmin ? {} : { deletedAt: null }),
+        },
         select: {
             id: true,
             userId: true,
             slug: true,
+            deletedAt: true,
             firstName: true,
             lastName: true,
             bio: true,
@@ -166,7 +177,6 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
 
     // Only used to offer the owner a way through to their editable gallery; the
     // page itself renders the same for everyone.
-    const session = await auth()
     const isOwner = session?.user?.id === artisan.userId
 
     const publishedStory = await prisma.craftStory.findUnique({
@@ -241,6 +251,20 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
 
     return (
         <>
+            {/* Admin moderation sits above the profile rather than in a separate
+                console, so acting on an artisan happens where the admin found
+                them. Nobody else can see this, and for a removed artisan this
+                page is admin-only and the restore here is the only way back. */}
+            {isAdmin && (
+                <div className="sc-container pt-6">
+                    <AdminArtisanActions
+                        artisanId={artisan.id}
+                        artisanName={`${artisan.firstName} ${artisan.lastName}`.trim()}
+                        isRemoved={Boolean(artisan.deletedAt)}
+                    />
+                </div>
+            )}
+
             {/* ── Hero: cover band + overlapping portrait ── */}
             <section className="relative">
                 <div className="relative h-56 w-full overflow-hidden sm:h-72">

@@ -10,6 +10,7 @@ import {
     findUnownedMedia,
     getCraftPrimaryImageMap,
     getCraftMediaItems,
+    PUBLIC_CRAFT_WHERE,
 } from '@/lib/craft'
 
 export async function GET(request: NextRequest) {
@@ -20,8 +21,7 @@ export async function GET(request: NextRequest) {
         const skip = (page - 1) * limit
 
         const where = {
-            isPublic: true,
-            deletedAt: null,
+            ...PUBLIC_CRAFT_WHERE,
             ...(search ? { title: { contains: search, mode: 'insensitive' as const } } : {}),
         }
 

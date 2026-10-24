@@ -8,7 +8,8 @@ import type { Metadata } from 'next'
 import { ScMedia } from '@/components/sc/ScMedia'
 import { KraftMonogram, PortraitFallback, IndigoDotsCover, initialsFor, tintFor } from '@/components/sc/fallbacks'
 import { SectionHeader } from '@/components/sc/SectionHeader'
-import { getCraftPrimaryImageMap } from '@/lib/craft'
+import { getCraftPrimaryImageMap, PUBLIC_CRAFT_WHERE } from '@/lib/craft'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 
 interface PageProps {
     params: Promise<{ slug: string }>
@@ -19,7 +20,7 @@ async function getGroup(slug: string) {
         where: { OR: [{ slug }, { previousSlugs: { has: slug } }] },
         include: {
             memberships: {
-                where: { leftDate: null },
+                where: ACTIVE_MEMBERSHIP_WHERE,
                 include: {
                     artisan: {
                         select: {
@@ -115,7 +116,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
     // Collective crafts wall — recent public crafts from the group's members.
     const collectiveCraftRecords = artisanIds.length > 0
         ? await prisma.craft.findMany({
-            where: { artisanId: { in: artisanIds }, isPublic: true, deletedAt: null },
+            where: { artisanId: { in: artisanIds }, ...PUBLIC_CRAFT_WHERE },
             select: { id: true, title: true, artisan: { select: { firstName: true, lastName: true } } },
             orderBy: { createdAt: 'desc' },
             take: 8,
