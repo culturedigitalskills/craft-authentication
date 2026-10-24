@@ -241,6 +241,9 @@ export function StoryWorkshopUpload({
                                 fill
                                 sizes="(max-width: 768px) 50vw, 25vw"
                                 className="object-cover"
+                                // Owner-only media. Next's optimizer refetches server side with no
+                                // cookies, so an authorized file would 404 and the tile break.
+                                unoptimized
                             />
                         )}
                         <button

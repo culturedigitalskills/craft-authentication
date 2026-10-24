@@ -5,6 +5,8 @@ import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { errorResponse } from '@/lib/validations/types'
 import { requireActiveArtisan } from '@/lib/auth-guard'
 import { resolveEntityOwner } from '@/lib/media-ownership'
+import { resolveMediaAccess } from '@/lib/media-visibility'
+import { auth } from '@/lib/auth'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { parseRangeHeader } from '@/lib/http-range'
 
@@ -38,6 +40,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             return errorResponse('File not found', 404)
         }
 
+        // A file is served to anybody only while something public points at it.
+        // Otherwise it belongs to its owner, and to site admins.
+        const access = await resolveMediaAccess(id, fileData.uploaderId)
+        if (!access.isPublic) {
+            const session = await auth()
+            const isOwner =
+                Boolean(session?.user?.id) &&
+                (session!.user.id === fileData.uploaderId ||
+                    session!.user.id === access.ownerUserId)
+            if (!isOwner && session?.user?.role !== 'ADMIN') {
+                // 404 rather than 403: whether an id exists is itself private.
+                return errorResponse('File not found', 404)
+            }
+        }
+
         // Serve Range requests with 206 so browsers can fetch video in bounded
         // chunks (and seek) instead of holding whole-file downloads open.
         const range = parseRangeHeader(request.headers.get('range'), fileData.size)
@@ -69,9 +86,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             'Content-Disposition',
             `inline; filename="${headerSafeFilename(fileData.originalName)}"`,
         )
-        // This assumes, that the media files are immutable and allways public meaning that access
-        // is not restricted by authentication or other permission checks.
-        headers.set('Cache-Control', 'public, max-age=31536000')
+        // Media files are immutable per id, so a public one can be cached hard.
+        // A private one must not be: a shared cache would hand it to the next
+        // person asking, and a year of browser cache would outlive the removal
+        // or unpublishing that made it private in the first place.
+        headers.set(
+            'Cache-Control',
+            access.isPublic ? 'public, max-age=31536000' : 'private, no-store',
+        )
         headers.set('Accept-Ranges', 'bytes')
 
         if (range.kind === 'range') {

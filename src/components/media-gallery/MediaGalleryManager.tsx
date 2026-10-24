@@ -168,6 +168,9 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                     fill
                                     sizes="(max-width: 768px) 50vw, 25vw"
                                     className="object-cover transition-transform group-hover:scale-105"
+                                    // Owner-only media. Next's optimizer refetches server side with no
+                                    // cookies, so an authorized file would 404 and the tile break.
+                                    unoptimized
                                 />
                             )}
                             {kind === 'video' && (
