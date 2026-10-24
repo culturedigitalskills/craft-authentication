@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { ZodError } from 'zod'
 import { handleValidationError } from '@/lib/validations/types'
 import { resolveEntityOwner } from '@/lib/media-ownership'
+import { CRAFT_ENTITY_TYPE } from '@/lib/craft'
 import { deleteMediaFiles } from '@/lib/media-delete'
 
 const UpdateAttachmentSchema = z.object({
@@ -83,6 +84,18 @@ export async function DELETE(
         })
         if (!attachment) return errorResponse('Attachment not found', 404)
 
+        // Craft media is reconciled as a whole sequence by setCraftMedia, which
+        // promotes a new primary image, closes the gap in displayOrder and
+        // re-issues the craft's credential. Detaching one row here would skip
+        // all three and leave a signed credential describing an image that is
+        // no longer there, so craft images go through the craft update instead.
+        if (attachment.entityType === CRAFT_ENTITY_TYPE) {
+            return errorResponse(
+                'Craft images are changed by updating the craft, not detached individually',
+                400,
+            )
+        }
+
         if (session!.user.role !== 'ADMIN') {
             const ownerUserId = await resolveEntityOwner(
                 attachment.entityType,
@@ -98,8 +111,10 @@ export async function DELETE(
         // Reference-aware, and must run after the delete above has committed so
         // this attachment no longer counts as a reference. A file still used
         // elsewhere is kept; an orphaned one is removed along with any audio its
-        // captions extracted.
-        await deleteMediaFiles([attachment.mediaId])
+        // captions extracted. Not awaited, matching the craft media path: the
+        // cleanup is several Garage round trips and nothing in the response
+        // depends on it, so the tile should not wait for storage.
+        void deleteMediaFiles([attachment.mediaId])
 
         return NextResponse.json({ message: 'Attachment removed successfully' })
     } catch (error) {

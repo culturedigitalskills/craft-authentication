@@ -202,6 +202,13 @@ export function StoryWorkshopUpload({
             })
             if (!res.ok) throw new Error('Delete failed')
             onItemsChange((prev) => prev.filter((i) => i.mediaId !== item.mediaId))
+            // Drop it from the confirmed order too. Leaving it there makes the
+            // comparison in syncOrder permanently unequal, so every later move
+            // fires a request even when nothing changed, and a rollback would
+            // rebuild the order from a list holding an id no item has.
+            serverOrderRef.current = serverOrderRef.current.filter(
+                (attachmentId) => attachmentId !== item.attachmentId,
+            )
         } catch {
             setError(t('deleteFailed'))
         }
@@ -261,7 +268,7 @@ export function StoryWorkshopUpload({
                                         type="button"
                                         onClick={() => handleMove(index, -1)}
                                         disabled={index === 0}
-                                        className="rounded-full bg-black/60 p-2 text-white transition-opacity disabled:opacity-30"
+                                        className="rounded-full bg-black/60 p-2 text-white disabled:opacity-30"
                                         aria-label={t('moveEarlier')}
                                     >
                                         <ChevronLeft className="h-4 w-4" />
@@ -270,7 +277,7 @@ export function StoryWorkshopUpload({
                                         type="button"
                                         onClick={() => handleMove(index, 1)}
                                         disabled={index === items.length - 1}
-                                        className="rounded-full bg-black/60 p-2 text-white transition-opacity disabled:opacity-30"
+                                        className="rounded-full bg-black/60 p-2 text-white disabled:opacity-30"
                                         aria-label={t('moveLater')}
                                     >
                                         <ChevronRight className="h-4 w-4" />

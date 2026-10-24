@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 import { AddGroupMemberSchema } from '@/lib/validations/group'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
@@ -18,7 +19,7 @@ export async function GET(
         }
 
         const members = await prisma.artisanGroupMembership.findMany({
-            where: { groupId: id, leftDate: null },
+            where: { groupId: id, ...ACTIVE_MEMBERSHIP_WHERE },
             include: {
                 artisan: {
                     select: {

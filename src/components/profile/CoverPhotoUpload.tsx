@@ -114,7 +114,7 @@ export function CoverPhotoUpload({
                     // reads as a plain picture with nothing to press. The scrim
                     // deepens on hover as the pointer affordance, in CSS rather
                     // than mouse handlers, which a phone could not fire either.
-                    <div className="absolute inset-0 flex items-end justify-end bg-transparent p-3 transition-colors group-hover:bg-black/25">
+                    <div className="absolute inset-0 flex items-end justify-end p-3 transition-colors group-hover:bg-[oklch(0.08_0.01_250_/_0.3)]">
                         <span className="rounded-md bg-background/85 px-3 py-1.5 text-xs font-medium shadow-sm">
                             {t('changeCover')}
                         </span>

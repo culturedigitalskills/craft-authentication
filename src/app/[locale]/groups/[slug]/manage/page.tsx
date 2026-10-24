@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 import { auth } from '@/lib/auth'
 import { redirect, notFound } from 'next/navigation'
 import { GroupManageForm } from '@/components/groups/GroupManageForm'
@@ -16,7 +17,7 @@ export default async function GroupManagePage({ params }: PageProps) {
         where: { OR: [{ slug }, { previousSlugs: { has: slug } }] },
         include: {
             memberships: {
-                where: { leftDate: null },
+                where: ACTIVE_MEMBERSHIP_WHERE,
                 include: {
                     artisan: {
                         select: {

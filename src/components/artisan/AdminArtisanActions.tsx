@@ -115,6 +115,16 @@ export function AdminArtisanActions({
                         <DialogTitle>{t('confirmTitle', { name: artisanName })}</DialogTitle>
                         <DialogDescription>{t('confirmBody')}</DialogDescription>
                     </DialogHeader>
+                    {/* The failure has to be reported inside the dialog: the
+                        panel behind it is covered by the overlay, so an error
+                        rendered there would leave the admin pressing a button
+                        that silently does nothing. */}
+                    {error && (
+                        <p className="flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
+                            <AlertCircle className="h-4 w-4" />
+                            {error}
+                        </p>
+                    )}
                     <DialogFooter>
                         <Button
                             type="button"
