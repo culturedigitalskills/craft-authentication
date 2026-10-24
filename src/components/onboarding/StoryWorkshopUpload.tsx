@@ -194,7 +194,12 @@ export function StoryWorkshopUpload({
 
     async function handleRemove(item: WorkshopMedia) {
         try {
-            const res = await fetch(`/api/media/${item.mediaId}`, { method: 'DELETE' })
+            // Detach rather than destroy: a workshop photo can also live in the
+            // artisan's gallery or on a craft, and the server only deletes the
+            // file once nothing points at it.
+            const res = await fetch(`/api/media/attachments/${item.attachmentId}`, {
+                method: 'DELETE',
+            })
             if (!res.ok) throw new Error('Delete failed')
             onItemsChange((prev) => prev.filter((i) => i.mediaId !== item.mediaId))
         } catch {
@@ -234,7 +239,7 @@ export function StoryWorkshopUpload({
                         <button
                             type="button"
                             onClick={() => handleRemove(item)}
-                            className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                            className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-1 text-white"
                             aria-label={t('removeItem')}
                         >
                             <Trash2 className="h-3.5 w-3.5" />

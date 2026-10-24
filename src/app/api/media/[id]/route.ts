@@ -4,7 +4,7 @@ import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { errorResponse } from '@/lib/validations/types'
 import { requireAuth } from '@/lib/auth-guard'
-import { CRAFT_ENTITY_TYPE } from '@/lib/craft'
+import { resolveEntityOwner } from '@/lib/media-ownership'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { parseRangeHeader } from '@/lib/http-range'
 
@@ -27,36 +27,6 @@ function rangeNotSatisfiable(size: number) {
             headers: { 'Content-Range': `bytes */${size}`, 'Accept-Ranges': 'bytes' },
         },
     )
-}
-
-/**
- * Resolve the owning user of an attachment's entity. Returns null when
- * ownership cannot be established (e.g. Group attachments, unknown types) —
- * those are only deletable by site admins.
- */
-async function resolveEntityOwner(entityType: string, entityId: string): Promise<string | null> {
-    if (entityType === 'Artisan') {
-        const artisan = await prisma.artisan.findUnique({
-            where: { id: entityId },
-            select: { userId: true },
-        })
-        return artisan?.userId ?? null
-    }
-    if (entityType === CRAFT_ENTITY_TYPE) {
-        const craft = await prisma.craft.findUnique({
-            where: { id: entityId },
-            select: { artisan: { select: { userId: true } } },
-        })
-        return craft?.artisan.userId ?? null
-    }
-    if (entityType === 'CraftStory') {
-        const story = await prisma.craftStory.findUnique({
-            where: { id: entityId },
-            select: { artisan: { select: { userId: true } } },
-        })
-        return story?.artisan.userId ?? null
-    }
-    return null
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

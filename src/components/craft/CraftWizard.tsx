@@ -683,7 +683,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         type="button"
                                                         onClick={() => handleRemoveMedia(mediaId)}
                                                         aria-label={t('deleteImage')}
-                                                        className="absolute right-1 top-1 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                                                        className="absolute right-1 top-1 rounded-full p-1 text-white"
                                                         style={{
                                                             backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
                                                         }}
@@ -890,7 +890,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         setVideos((prev) => prev.filter((v) => v !== id))
                                                     }
                                                     aria-label={t('removeVideo')}
-                                                    className="absolute right-1 top-1 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                                                    className="absolute right-1 top-1 rounded-full p-1 text-white"
                                                     style={{
                                                         backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
                                                     }}

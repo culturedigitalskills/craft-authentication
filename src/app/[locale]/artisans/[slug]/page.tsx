@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Clock, GraduationCap, Users, Globe } from 'lucide-react'
@@ -162,6 +163,11 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         url: `/api/media/${a.mediaId}`,
         mimeType: a.media.mimeType,
     }))
+
+    // Only used to offer the owner a way through to their editable gallery; the
+    // page itself renders the same for everyone.
+    const session = await auth()
+    const isOwner = session?.user?.id === artisan.userId
 
     const publishedStory = await prisma.craftStory.findUnique({
         where: { artisanId: artisan.id },
@@ -347,7 +353,25 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         {/* Gallery (masonry) */}
                         {galleryImages.length > 0 && (
                             <div>
-                                <SectionHeader title={t('gallery')} className="mb-6" />
+                                {/* This page is read-only for everyone, including its
+                                    owner, so an artisan looking at their own gallery has
+                                    nothing to press. Point them at the page where they
+                                    can actually remove or hide an item. */}
+                                <SectionHeader
+                                    title={t('gallery')}
+                                    className="mb-6"
+                                    action={
+                                        isOwner ? (
+                                            <Link
+                                                href="/media-gallery"
+                                                className="text-sm font-medium"
+                                                style={{ color: 'var(--sc-accent)' }}
+                                            >
+                                                {t('manageGallery')}
+                                            </Link>
+                                        ) : undefined
+                                    }
+                                />
                                 <GalleryGrid images={galleryImages} artisanUserId={artisan.userId} />
                             </div>
                         )}

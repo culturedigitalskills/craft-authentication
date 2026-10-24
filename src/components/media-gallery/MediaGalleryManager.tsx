@@ -136,7 +136,11 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
         setBusy(item.mediaId)
         setError(null)
         try {
-            const res = await fetch(`/api/media/${item.mediaId}`, { method: 'DELETE' })
+            // Detach rather than destroy: the same file may also be shown on a
+            // craft, and the server only deletes it once nothing points at it.
+            const res = await fetch(`/api/media/attachments/${item.attachmentId}`, {
+                method: 'DELETE',
+            })
             if (!res.ok) throw new Error()
             setItems((prev) => prev.filter((i) => i.mediaId !== item.mediaId))
         } catch {
@@ -223,9 +227,11 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                     </div>
                                 </div>
                             ) : (
-                                /* Hover toolbar: visibility toggle + remove */
+                                /* Toolbar: visibility toggle + remove. Always visible rather
+                                   than revealed on hover, because touch devices have no hover
+                                   and this is the only way to remove or hide an item. */
                                 <div
-                                    className="absolute right-1.5 top-1.5 flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100"
+                                    className="absolute right-1.5 top-1.5 flex gap-1.5"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <button
