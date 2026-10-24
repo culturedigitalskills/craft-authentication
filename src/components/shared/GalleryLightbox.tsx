@@ -95,11 +95,18 @@ export function GalleryLightbox({
                     const kind = mediaKind(item.mimeType)
                     if (kind === 'video') {
                         return (
+                            // playsInline keeps playback inside the lightbox on
+                            // an iPhone instead of handing it to the fullscreen
+                            // system player. autoPlay stays unmuted and so is
+                            // refused by iOS, which costs one tap: muting it to
+                            // win the autoplay back would silence a video the
+                            // viewer deliberately opened.
                             <video
                                 key={item.mediaId}
                                 src={item.url}
                                 controls
                                 autoPlay
+                                playsInline
                                 className="max-h-[85vh] max-w-[90vw] rounded-lg"
                             />
                         )
