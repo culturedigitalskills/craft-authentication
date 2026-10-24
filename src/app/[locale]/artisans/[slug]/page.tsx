@@ -179,6 +179,12 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     // page itself renders the same for everyone.
     const isOwner = session?.user?.id === artisan.userId
 
+    // A removed artisan is visible to admins alone, and their media is served
+    // to admins alone too. Next's optimizer refetches without cookies, so it
+    // cannot load any of it: these have to be direct, credentialed requests or
+    // the page an admin restores from renders with every image broken.
+    const mediaNeedsCredentials = Boolean(artisan.deletedAt)
+
     const publishedStory = await prisma.craftStory.findUnique({
         where: { artisanId: artisan.id },
     })
@@ -274,6 +280,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         fallback={<IndigoDotsCover />}
                         sizes="100vw"
                         priority
+                        unoptimized={mediaNeedsCredentials}
                     />
                 </div>
 
@@ -289,6 +296,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                 fallback={<PortraitFallback name={`${artisan.firstName} ${artisan.lastName}`} />}
                                 sizes="160px"
                                 priority
+                                unoptimized={mediaNeedsCredentials}
                             />
                         </div>
                         <div className="sm:pt-24">
@@ -362,6 +370,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                                     alt={craft.name}
                                                     fallback={<IndigoDotsCover />}
                                                     sizes="(max-width: 768px) 50vw, 33vw"
+                                                    unoptimized={mediaNeedsCredentials}
                                                     className="transition-transform duration-300 group-hover:scale-105"
                                                 />
                                             </div>
@@ -396,7 +405,11 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                         ) : undefined
                                     }
                                 />
-                                <GalleryGrid images={galleryImages} artisanUserId={artisan.userId} />
+                                <GalleryGrid
+                                    images={galleryImages}
+                                    artisanUserId={artisan.userId}
+                                    unoptimized={mediaNeedsCredentials}
+                                />
                             </div>
                         )}
                     </div>
