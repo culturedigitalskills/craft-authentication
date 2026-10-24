@@ -85,7 +85,7 @@ export function CoverPhotoUpload({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="relative h-40 w-full overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/30 transition-all hover:border-primary/40 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="group relative h-40 w-full overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted/30 transition-all hover:border-primary/40 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
                 {previewUrl ? (
                     <Image
@@ -109,17 +109,13 @@ export function CoverPhotoUpload({
                     </div>
                 )}
                 {previewUrl && !isUploading && (
-                    <div
-                        className="absolute inset-0 flex items-center justify-center transition-colors"
-                        style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0)' }}
-                        onMouseEnter={(e) =>
-                            (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0.3)')
-                        }
-                        onMouseLeave={(e) =>
-                            (e.currentTarget.style.backgroundColor = 'oklch(0.08 0.01 250 / 0)')
-                        }
-                    >
-                        <span className="rounded-md bg-background/80 px-3 py-1.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100 hover:opacity-100">
+                    // The label stays visible instead of waiting for a hover,
+                    // because a touch device never hovers and the cover then
+                    // reads as a plain picture with nothing to press. The scrim
+                    // deepens on hover as the pointer affordance, in CSS rather
+                    // than mouse handlers, which a phone could not fire either.
+                    <div className="absolute inset-0 flex items-end justify-end bg-transparent p-3 transition-colors group-hover:bg-black/25">
+                        <span className="rounded-md bg-background/85 px-3 py-1.5 text-xs font-medium shadow-sm">
                             {t('changeCover')}
                         </span>
                     </div>

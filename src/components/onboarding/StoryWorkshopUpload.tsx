@@ -239,10 +239,10 @@ export function StoryWorkshopUpload({
                         <button
                             type="button"
                             onClick={() => handleRemove(item)}
-                            className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-1 text-white"
+                            className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-2 text-white"
                             aria-label={t('removeItem')}
                         >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                         </button>
 
                         {/* Order controls stay visible rather than revealing on
@@ -261,7 +261,7 @@ export function StoryWorkshopUpload({
                                         type="button"
                                         onClick={() => handleMove(index, -1)}
                                         disabled={index === 0}
-                                        className="rounded-full bg-black/60 p-1.5 text-white transition-opacity disabled:opacity-30"
+                                        className="rounded-full bg-black/60 p-2 text-white transition-opacity disabled:opacity-30"
                                         aria-label={t('moveEarlier')}
                                     >
                                         <ChevronLeft className="h-4 w-4" />
@@ -270,7 +270,7 @@ export function StoryWorkshopUpload({
                                         type="button"
                                         onClick={() => handleMove(index, 1)}
                                         disabled={index === items.length - 1}
-                                        className="rounded-full bg-black/60 p-1.5 text-white transition-opacity disabled:opacity-30"
+                                        className="rounded-full bg-black/60 p-2 text-white transition-opacity disabled:opacity-30"
                                         aria-label={t('moveLater')}
                                     >
                                         <ChevronRight className="h-4 w-4" />

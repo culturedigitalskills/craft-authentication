@@ -683,12 +683,12 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         type="button"
                                                         onClick={() => handleRemoveMedia(mediaId)}
                                                         aria-label={t('deleteImage')}
-                                                        className="absolute right-1 top-1 rounded-full p-1 text-white"
+                                                        className="absolute right-1 top-1 rounded-full p-2 text-white"
                                                         style={{
                                                             backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
                                                         }}
                                                     >
-                                                        <X className="h-3.5 w-3.5" />
+                                                        <X className="h-4 w-4" />
                                                     </button>
                                                 )}
                                             </div>
@@ -890,12 +890,12 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         setVideos((prev) => prev.filter((v) => v !== id))
                                                     }
                                                     aria-label={t('removeVideo')}
-                                                    className="absolute right-1 top-1 rounded-full p-1 text-white"
+                                                    className="absolute right-1 top-1 rounded-full p-2 text-white"
                                                     style={{
                                                         backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
                                                     }}
                                                 >
-                                                    <X className="h-3.5 w-3.5" />
+                                                    <X className="h-4 w-4" />
                                                 </button>
                                             </div>
                                         ))}

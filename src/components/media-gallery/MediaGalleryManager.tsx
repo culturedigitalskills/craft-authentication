@@ -240,7 +240,7 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                         onClick={() => toggleVisibility(item)}
                                         title={item.isPublic ? t('makePrivate') : t('makePublic')}
                                         aria-label={item.isPublic ? t('makePrivate') : t('makePublic')}
-                                        className="rounded-full p-1.5 text-white disabled:opacity-50"
+                                        className="rounded-full p-2 text-white disabled:opacity-50"
                                         style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
                                     >
                                         {busy === item.mediaId ? (
@@ -256,7 +256,7 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                         onClick={() => handleRemove(item)}
                                         title={t('remove')}
                                         aria-label={t('remove')}
-                                        className="rounded-full p-1.5 text-white"
+                                        className="rounded-full p-2 text-white"
                                         style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
                                     >
                                         <X className="h-4 w-4" />
