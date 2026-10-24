@@ -882,10 +882,14 @@
     "auditHint": "Was Administratoren mit den Konten und Werken anderer gemacht haben.",
     "auditEmpty": "Noch nichts.",
     "actions": {
-      "artisan.remove": "entfernte das Profil von",
-      "artisan.restore": "stellte das Profil wieder her von",
-      "user.promote": "ernannte zum Admin:",
-      "user.demote": "entzog die Adminrechte von"
+      "artisan": {
+        "remove": "entfernte das Profil von",
+        "restore": "stellte das Profil wieder her von"
+      },
+      "user": {
+        "promote": "ernannte zum Admin:",
+        "demote": "entzog die Adminrechte von"
+      }
     },
     "backToProfile": "Zurück zum Profil",
     "mediaFor": "Fotos und Videos von {name}",

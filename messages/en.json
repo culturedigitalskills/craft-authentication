@@ -1000,10 +1000,14 @@
     "auditHint": "What admins did to other people’s accounts and work.",
     "auditEmpty": "Nothing yet.",
     "actions": {
-      "artisan.remove": "removed the profile of",
-      "artisan.restore": "restored the profile of",
-      "user.promote": "made an admin:",
-      "user.demote": "withdrew admin from"
+      "artisan": {
+        "remove": "removed the profile of",
+        "restore": "restored the profile of"
+      },
+      "user": {
+        "promote": "made an admin:",
+        "demote": "withdrew admin from"
+      }
     },
     "backToProfile": "Back to the profile",
     "mediaFor": "Photos and video of {name}",

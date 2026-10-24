@@ -882,10 +882,14 @@
     "auditHint": "Yöneticilerin başkalarının hesap ve çalışmalarına yaptıkları.",
     "auditEmpty": "Henüz bir şey yok.",
     "actions": {
-      "artisan.remove": "şu kişinin profilini kaldırdı:",
-      "artisan.restore": "şu kişinin profilini geri getirdi:",
-      "user.promote": "yönetici yaptı:",
-      "user.demote": "şu kişinin yöneticiliğini geri aldı:"
+      "artisan": {
+        "remove": "şu kişinin profilini kaldırdı:",
+        "restore": "şu kişinin profilini geri getirdi:"
+      },
+      "user": {
+        "promote": "yönetici yaptı:",
+        "demote": "şu kişinin yöneticiliğini geri aldı:"
+      }
     },
     "backToProfile": "Profile dön",
     "mediaFor": "{name} kişisinin fotoğraf ve videoları",

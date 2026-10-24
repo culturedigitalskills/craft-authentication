@@ -882,10 +882,14 @@
     "auditHint": "Lo que los administradores hicieron con las cuentas y obras de otros.",
     "auditEmpty": "Todavía nada.",
     "actions": {
-      "artisan.remove": "eliminó el perfil de",
-      "artisan.restore": "restauró el perfil de",
-      "user.promote": "nombró administrador a:",
-      "user.demote": "retiró el rol de administrador a"
+      "artisan": {
+        "remove": "eliminó el perfil de",
+        "restore": "restauró el perfil de"
+      },
+      "user": {
+        "promote": "nombró administrador a:",
+        "demote": "retiró el rol de administrador a"
+      }
     },
     "backToProfile": "Volver al perfil",
     "mediaFor": "Fotos y vídeos de {name}",
