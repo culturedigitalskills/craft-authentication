@@ -10,12 +10,20 @@ export async function register() {
 
     const { recoverStaleTranscriptions } = await import('@/lib/transcription')
     const { recoverStaleFilms } = await import('@/lib/film/jobs')
+    const { C2PAService } = await import('@/lib/c2pa-service')
     const sweep = async () => {
         await recoverStaleTranscriptions().catch(err => {
             console.error('Transcription recovery sweep failed:', err)
         })
         await recoverStaleFilms().catch(err => {
             console.error('Film recovery sweep failed:', err)
+        })
+        // Certificates expire over months and renew inside a thirty day
+        // window, so hourly is ample. This used to run from auth() on every
+        // authenticated request instead, which is a page's worth of user
+        // lookups to discover that nothing is due.
+        await C2PAService.renewExpiringCertificates().catch(err => {
+            console.error('Certificate renewal sweep failed:', err)
         })
     }
 

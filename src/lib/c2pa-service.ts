@@ -18,6 +18,9 @@ import {
 } from '@contentauth/c2pa-node'
 import type { C2PAState } from '@/types/c2pa'
 
+// How close to expiry a certificate must be before the sweep renews it.
+const RENEWAL_WINDOW_DAYS = 30
+
 const secretsDir = join(process.cwd(), 'secrets')
 
 // CLI tool helper removed as we transitioned to @contentauth/c2pa-node
@@ -91,21 +94,38 @@ export interface C2PAManifestResult {
 
 export class C2PAService {
     /**
-     * Checks if the user's certificate expires in the next 30 days.
-     * If yes, and auto-renew is enabled, performs automatic renewal.
+     * Renew the certificate of everyone who asked for auto-renewal and whose
+     * certificate falls due inside the window.
+     *
+     * This used to run from auth(), fired per request for the signed-in user.
+     * That cost a user lookup on every authenticated request, before the early
+     * return could even be reached, and auth() runs twice for an API call: once
+     * in the proxy and once in the handler. A page showing ten of the owner's
+     * own images paid for it twenty times over, to learn twenty times that
+     * nothing was due.
+     *
+     * Certificates expire on a scale of months and the window is thirty days,
+     * so the hourly sweep that already reclaims orphaned jobs is ample, and one
+     * query now finds everybody due instead of one query per request finding
+     * almost nobody.
      */
-    static async checkAndAutoRenew(userId: string): Promise<void> {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { c2paAutoRenew: true, c2paCertExpiresAt: true },
+    static async renewExpiringCertificates(): Promise<void> {
+        const dueBy = new Date(Date.now() + RENEWAL_WINDOW_DAYS * 24 * 60 * 60 * 1000)
+        const due = await prisma.user.findMany({
+            where: {
+                c2paAutoRenew: true,
+                c2paCertExpiresAt: { not: null, lte: dueBy },
+            },
+            select: { id: true },
         })
 
-        if (!user || !user.c2paCertExpiresAt || !user.c2paAutoRenew) return
+        for (const user of due) {
+            await C2PAService.renewCertificate(user.id)
+        }
+    }
 
-        const daysRemaining =
-            (user.c2paCertExpiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-        if (daysRemaining > 30) return // Not in expiration window
-
+    /** One user's renewal. Never throws: one failure must not stop the sweep. */
+    private static async renewCertificate(userId: string): Promise<void> {
         try {
             const escrowRecord = await prisma.userWrappedVaultKeys.findFirst({
                 where: { userId, wrapMode: 'SSE_KMS' },
@@ -120,7 +140,7 @@ export class C2PAService {
             masterKey.fill(0) // Wipe from memory
             console.log(`Successfully auto-renewed C2PA certificate for user ${userId}`)
         } catch (error) {
-            console.error('Failed auto-renewing C2PA certificate:', error)
+            console.error(`Failed auto-renewing C2PA certificate for user ${userId}:`, error)
         }
     }
 

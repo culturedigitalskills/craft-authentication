@@ -7,7 +7,6 @@ import { createAuthMiddleware, APIError } from 'better-auth/api'
 import { hashPassword } from 'better-auth/crypto'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
-import { C2PAService } from '@/lib/c2pa-service'
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID || process.env.AUTH_GOOGLE_ID
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || process.env.AUTH_GOOGLE_SECRET
@@ -197,12 +196,11 @@ export async function auth() {
     })
     if (!sessionData) return null
 
-    // Background auto-renew check
-    // Run asynchronously in the background so it doesn't block the request path
-    C2PAService.checkAndAutoRenew(sessionData.user.id).catch((err) => {
-        console.error('Error in background C2PA auto-renew check:', err)
-    })
-
+    // Certificate renewal used to be fired from here, per request. It cost a
+    // user lookup every time, and this function runs twice for an API call:
+    // once in the proxy for rate limiting, once in the handler. It is a sweep
+    // in instrumentation.ts now. Keep this path to the session and nothing
+    // else — anything added here is paid for by every request on the site.
     return {
         user: {
             id: sessionData.user.id,
