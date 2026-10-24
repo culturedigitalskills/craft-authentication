@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+import { redirect, notFound } from 'next/navigation'
 
 export async function requireAuth() {
     const session = await auth()
@@ -77,6 +78,21 @@ export async function requireAdmin() {
         }
     }
     return { session, unauthorized: null }
+}
+
+/**
+ * The page equivalent of requireAdmin, for server components.
+ *
+ * requireAdmin answers with a NextResponse, which a page cannot return, so
+ * every admin page would otherwise repeat its own inline role check and one
+ * missed line is an open door. Redirects rather than showing a 403: an admin
+ * area should not confirm to a logged-in artisan that it is there.
+ */
+export async function requireAdminSession() {
+    const session = await auth()
+    if (!session?.user) redirect('/login')
+    if (session.user.role !== 'ADMIN') notFound()
+    return session
 }
 
 export async function requireGroupAdmin(groupId: string) {

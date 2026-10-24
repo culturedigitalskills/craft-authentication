@@ -4,7 +4,7 @@ import { useSession, signOut } from '@/lib/auth-client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image, Images, Sparkles } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image, Images, Sparkles  } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 interface NavbarAuthProps {
@@ -128,6 +128,12 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                         <Link href="/groups/create" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
                             <UserPlus className="h-4 w-4" />
                             {t('createGroup')}
+                        </Link>
+                    )}
+                    {isAdmin && (
+                        <Link href="/admin" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
+                            <ShieldCheck className="h-4 w-4" />
+                            {t('admin')}
                         </Link>
                     )}
 
@@ -281,6 +287,16 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                             >
                                 <UserPlus className="h-4 w-4" />
                                 <span className={isActive('/groups/create') ? activeUnderline : ''}>{t('createGroup')}</span>
+                            </Link>
+                        )}
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                onClick={() => { setDropdownOpen(false); onAction?.() }}
+                                className={`${rowBase} ${isActive('/admin') ? rowActive : rowIdle}`}
+                            >
+                                <ShieldCheck className="h-4 w-4" />
+                                <span className={isActive('/admin') ? activeUnderline : ''}>{t('admin')}</span>
                             </Link>
                         )}
                     </div>

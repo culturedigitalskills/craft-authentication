@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { AlertCircle, Loader2, ShieldAlert, Trash2, Undo2 } from 'lucide-react'
+import { AlertCircle, Images, Loader2, ShieldAlert, Trash2, Undo2 } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -98,6 +99,20 @@ export function AdminArtisanActions({
                     {t('remove')}
                 </Button>
             )}
+
+            {/* The other half of moderating somebody: their photos and video.
+                It opens the artisan's own gallery manager, which already
+                admits an admin on every endpoint it calls. */}
+            <p className="mt-3">
+                <Link
+                    href={`/admin/artisans/${artisanId}/media`}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium"
+                    style={{ color: 'var(--sc-accent)' }}
+                >
+                    <Images className="h-4 w-4" />
+                    {t('manageMedia')}
+                </Link>
+            </p>
 
             {error && (
                 <p className="mt-2 flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">

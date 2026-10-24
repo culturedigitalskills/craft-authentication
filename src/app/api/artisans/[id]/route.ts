@@ -5,6 +5,7 @@ import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireAuth, requireActiveArtisan } from '@/lib/auth-guard'
 import { generateUniqueSlug, rollSlugHistory } from '@/lib/slug'
+import { recordAdminAction } from '@/lib/admin-audit'
 
 export async function PUT(
     request: NextRequest,
@@ -87,7 +88,7 @@ export async function DELETE(
 
         const artisan = await prisma.artisan.findUnique({
             where: { id },
-            select: { id: true, userId: true, deletedAt: true },
+            select: { id: true, userId: true, deletedAt: true, firstName: true, lastName: true },
         })
         if (!artisan) return errorResponse('Artisan profile not found', 404)
 
@@ -108,6 +109,18 @@ export async function DELETE(
             data: { deletedAt: restore ? null : new Date() },
             select: { id: true, deletedAt: true },
         })
+
+        // Only an admin acting on somebody else is worth a record; an artisan
+        // removing their own profile is their business, not moderation.
+        if (isAdmin && !isOwner) {
+            await recordAdminAction({
+                actor: { id: session!.user.id, email: session!.user.email ?? '' },
+                action: restore ? 'artisan.restore' : 'artisan.remove',
+                entityType: 'Artisan',
+                entityId: artisan.id,
+                detail: { name: `${artisan.firstName} ${artisan.lastName}`.trim() },
+            })
+        }
 
         return NextResponse.json(updated)
     } catch (error) {
