@@ -4,7 +4,7 @@ import { useSession, signOut } from '@/lib/auth-client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
-import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image, Images, Sparkles  } from 'lucide-react'
+import { User, LogOut, FolderOpen, FolderUp, Users, UserPlus, BookOpen, ShieldCheck, Image, Images, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 interface NavbarAuthProps {
