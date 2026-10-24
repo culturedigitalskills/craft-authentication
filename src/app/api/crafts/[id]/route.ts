@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireActiveArtisan } from '@/lib/auth-guard'
 import { UpdateCraftSchema } from '@/lib/validations/craft'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { deleteMediaFiles } from '@/lib/media-delete'
@@ -55,7 +55,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {
@@ -141,7 +141,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

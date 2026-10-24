@@ -3,12 +3,12 @@ import { prisma } from '@/lib/prisma'
 import { CreateMediaAttachmentSchema, ReorderMediaAttachmentsSchema } from '@/lib/validations/media'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireActiveArtisan } from '@/lib/auth-guard'
 import { enqueueTranscription } from '@/lib/transcription'
 import { deleteMediaFiles } from '@/lib/media-delete'
 
 export async function POST(request: NextRequest) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
  * this is how an artisan decides what opens their film.
  */
 export async function PATCH(request: NextRequest) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

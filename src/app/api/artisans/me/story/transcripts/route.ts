@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireAuth, requireActiveArtisan } from '@/lib/auth-guard'
 import { errorResponse } from '@/lib/validations/types'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 import { enqueueTranscription } from '@/lib/transcription'
@@ -80,7 +80,7 @@ export async function GET() {
  * refreshed statuses.
  */
 export async function POST() {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

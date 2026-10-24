@@ -3,14 +3,14 @@ import { prisma } from '@/lib/prisma'
 import { UpdateArtisanSchema, DeleteArtisanSchema } from '@/lib/validations/artisan'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireAuth, requireActiveArtisan } from '@/lib/auth-guard'
 import { generateUniqueSlug, rollSlugHistory } from '@/lib/slug'
 
 export async function PUT(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

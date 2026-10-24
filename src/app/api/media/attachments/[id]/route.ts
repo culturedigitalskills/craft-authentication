@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { errorResponse } from '@/lib/validations/types'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireActiveArtisan } from '@/lib/auth-guard'
 import { z } from 'zod'
 import { ZodError } from 'zod'
 import { handleValidationError } from '@/lib/validations/types'
@@ -21,7 +21,7 @@ export async function PATCH(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
 ) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {
@@ -72,7 +72,7 @@ export async function DELETE(
     _request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
 ) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

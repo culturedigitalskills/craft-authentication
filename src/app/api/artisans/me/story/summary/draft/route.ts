@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireActiveArtisan } from '@/lib/auth-guard'
 import { errorResponse } from '@/lib/validations/types'
 import { summaryDraftLimiter } from '@/lib/rate-limiter'
 import { ANSWER_KEYS } from '@/lib/validations/craftStory'
@@ -27,7 +27,7 @@ function clip(text: string): string {
 }
 
 export async function POST() {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

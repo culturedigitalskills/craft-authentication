@@ -62,6 +62,54 @@ function walk(dir: string, acc: string[] = []): string[] {
     return acc
 }
 
+/**
+ * Hiding a removed artisan is only half of it: without this they stayed signed
+ * in and kept writing. Every handler that creates or changes content now goes
+ * through requireActiveArtisan, and a new one reaching for the plain guard is
+ * the way that quietly comes back.
+ *
+ * The exemptions are routes where a removed artisan still legitimately acts:
+ * their own keys and vault, the removal itself, and the two verification
+ * endpoints that take no session at all because anyone may check a credential.
+ */
+const PLAIN_AUTH_ALLOWED = new Set([
+    // Removing and restoring a profile has to work on a removed profile.
+    'artisans/[id]/route.ts',
+    // Personal key material and vault, not public content.
+    'c2pa/auto-renew/route.ts',
+    'c2pa/setup/route.ts',
+    'c2pa/sign/route.ts',
+    'vault/initialize/route.ts',
+    'vault/rotate-key/route.ts',
+    'vault/secrets/route.ts',
+    // Public credential verification; deliberately unauthenticated.
+    'c2pa/verify/route.ts',
+    'vc/verify/route.ts',
+])
+
+describe('write handlers', () => {
+    it('refuse a removed artisan unless explicitly exempt', () => {
+        const apiDir = path.resolve(__dirname, '../src/app/api')
+        const offenders: string[] = []
+
+        for (const file of walk(apiDir)) {
+            const rel = path.relative(apiDir, file).split(path.sep).join('/')
+            if (PLAIN_AUTH_ALLOWED.has(rel)) continue
+
+            const source = fs.readFileSync(file, 'utf8')
+            const lines = source.split(/\r?\n/)
+            lines.forEach((line, i) => {
+                if (!/export async function (POST|PUT|PATCH|DELETE)\b/.test(line)) return
+                const body = lines.slice(i, i + 10).join('\n')
+                // Anything stricter than requireAuth is fine; a bare one is not.
+                if (/requireAuth\(\)/.test(body)) offenders.push(rel)
+            })
+        }
+
+        expect([...new Set(offenders)]).toEqual([])
+    })
+})
+
 describe('membership queries', () => {
     it('uses the shared filter everywhere that is not explicitly exempt', () => {
         const appDir = path.resolve(__dirname, '../src/app')

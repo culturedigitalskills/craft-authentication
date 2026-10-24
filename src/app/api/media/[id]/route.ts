@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { errorResponse } from '@/lib/validations/types'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireActiveArtisan } from '@/lib/auth-guard'
 import { resolveEntityOwner } from '@/lib/media-ownership'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { parseRangeHeader } from '@/lib/http-range'
@@ -95,7 +95,7 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
 ) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {
