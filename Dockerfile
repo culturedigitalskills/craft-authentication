@@ -24,7 +24,7 @@ ENV AUTH_URL=http://localhost:3000
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm prisma generate
-RUN pnpm run build
+RUN pnpm exec next build
 
 FROM base AS runner
 WORKDIR /app
@@ -36,7 +36,7 @@ ENV FFMPEG_PATH=/usr/bin/ffmpeg
 # Install system dependencies (openssl for credentials generation, curl & jq for
 # healthchecks, ffmpeg for the My Story caption + film pipelines, fonts-noto-core
 # for the film's title/name cards incl. Arabic & Devanagari) and prisma CLI
-RUN apt-get update && apt-get install -y openssl curl jq ffmpeg fonts-noto-core && rm -rf /var/lib/apt/lists/* && npm install -g prisma@7
+RUN apt-get update && apt-get install -y openssl curl jq ffmpeg fonts-noto-core && rm -rf /var/lib/apt/lists/* && npm install -g npm@latest prisma@7.10.1
 
 # Application files
 COPY --from=builder /app/public ./public
