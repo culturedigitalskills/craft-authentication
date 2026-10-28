@@ -3,7 +3,8 @@ import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 import { ArrowRight, MapPin, UserRound, ShieldCheck, QrCode, ScanLine, BadgeCheck } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
-import { getCraftPrimaryImageMap } from '@/lib/craft'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
+import { getCraftPrimaryImageMap, PUBLIC_CRAFT_WHERE } from '@/lib/craft'
 import { ScMedia } from '@/components/sc/ScMedia'
 import { PortraitFallback, IndigoDotsCover, KraftMonogram, initialsFor, tintFor } from '@/components/sc/fallbacks'
 
@@ -24,12 +25,12 @@ export default async function Home() {
         }),
         prisma.group.findMany({
             where: { isActive: true },
-            include: { _count: { select: { memberships: true } } },
+            include: { _count: { select: { memberships: { where: ACTIVE_MEMBERSHIP_WHERE } } } },
             orderBy: { createdAt: 'desc' },
             take: 3,
         }),
         prisma.craft.findMany({
-            where: { isPublic: true, deletedAt: null },
+            where: PUBLIC_CRAFT_WHERE,
             select: { id: true, title: true, artisan: { select: { id: true, firstName: true, lastName: true, slug: true } } },
             orderBy: { createdAt: 'desc' },
             take: 4,
@@ -53,7 +54,7 @@ export default async function Home() {
             ? prisma.mediaAttachment.findMany({ where: { entityType: 'Group', entityId: { in: groupIds }, attachmentType: 'HERO', isPrimary: true }, select: { entityId: true, mediaId: true } })
             : [],
         groupIds.length
-            ? prisma.artisanGroupMembership.findMany({ where: { groupId: { in: groupIds }, leftDate: null }, select: { groupId: true, artisan: { select: { firstName: true, lastName: true } } }, orderBy: { joinedDate: 'asc' } })
+            ? prisma.artisanGroupMembership.findMany({ where: { groupId: { in: groupIds }, ...ACTIVE_MEMBERSHIP_WHERE }, select: { groupId: true, artisan: { select: { firstName: true, lastName: true } } }, orderBy: { joinedDate: 'asc' } })
             : [],
         getCraftPrimaryImageMap(craftRecords.map(c => c.id)),
     ])

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap } from 'lucide-react'
@@ -45,7 +46,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
             where: whereClause,
             orderBy: { name: 'asc' },
             include: {
-                _count: { select: { memberships: true } },
+                _count: { select: { memberships: { where: ACTIVE_MEMBERSHIP_WHERE } } },
             },
             skip,
             take: limit,
@@ -69,7 +70,7 @@ export default async function GroupsPage({ searchParams }: PageProps) {
     // A handful of member names per group for the overlapping avatar stack.
     const memberships = groupIds.length > 0
         ? await prisma.artisanGroupMembership.findMany({
-            where: { groupId: { in: groupIds }, leftDate: null },
+            where: { groupId: { in: groupIds }, ...ACTIVE_MEMBERSHIP_WHERE },
             select: { groupId: true, artisan: { select: { firstName: true, lastName: true } } },
             orderBy: { joinedDate: 'asc' },
         })

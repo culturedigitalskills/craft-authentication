@@ -18,9 +18,11 @@ interface GalleryImage {
 interface GalleryGridProps {
     images: GalleryImage[]
     artisanUserId?: string
+    /** See ScMedia: owner-only media cannot go through the optimizer. */
+    unoptimized?: boolean
 }
 
-export function GalleryGrid({ images, artisanUserId }: GalleryGridProps) {
+export function GalleryGrid({ images, artisanUserId, unoptimized }: GalleryGridProps) {
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
     const [c2paStates, setC2paStates] = useState<Record<string, C2PAState>>({})
 
@@ -68,6 +70,7 @@ export function GalleryGrid({ images, artisanUserId }: GalleryGridProps) {
                                 alt="Gallery photo"
                                 fill
                                 sizes="(max-width: 768px) 50vw, 25vw"
+                                unoptimized={unoptimized}
                                 className="object-cover transition-transform group-hover:scale-105"
                             />
                         )}

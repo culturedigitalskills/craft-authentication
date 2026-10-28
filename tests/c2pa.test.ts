@@ -216,8 +216,8 @@ describe('C2PA Content Credentials Integration Tests', () => {
         })
         expect(userDb?.c2paCertExpiresAt?.getTime()).toBe(nearExpiry.getTime())
 
-        // 2. Trigger auto-renew check
-        await C2PAService.checkAndAutoRenew(testUser1.id)
+        // 2. Run the renewal sweep, which finds everyone due
+        await C2PAService.renewExpiringCertificates()
 
         // 3. Verify certificate is successfully rotated (expiry date updated to ~365 days in future)
         userDb = await prisma.user.findUnique({
@@ -240,7 +240,7 @@ describe('C2PA Content Credentials Integration Tests', () => {
             }
         })
 
-        await C2PAService.checkAndAutoRenew(testUser1.id)
+        await C2PAService.renewExpiringCertificates()
 
         const userDb = await prisma.user.findUnique({
             where: { id: testUser1.id },

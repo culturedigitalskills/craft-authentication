@@ -439,6 +439,28 @@ model UserWrappedVaultKeys {
     @@index([credentialId])
 }
 
+// A record of what a site admin did to somebody else's account or work.
+//
+// Deliberately holds no foreign key to the actor, and copies their email at the
+// time of writing: an audit trail that cascades away with the account it
+// describes answers no question worth asking. Kept separate from TaskEvent,
+// which is image generation and has its own lifecycle and retention.
+model AdminAuditLog {
+    id          String   @id @default(uuid())
+    actorUserId String   @map("actor_user_id")
+    actorEmail  String   @map("actor_email")
+    // e.g. "artisan.remove", "artisan.restore", "user.promote", "user.demote"
+    action      String
+    entityType  String   @map("entity_type")
+    entityId    String   @map("entity_id")
+    // Whatever makes the entry readable later: the subject's name or email.
+    detail      Json?
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    @@index([createdAt])
+    @@index([entityType, entityId])
+}
+
 model TaskEvent {
     id           String    @id @default(uuid())
     userId       String    @map("user_id")

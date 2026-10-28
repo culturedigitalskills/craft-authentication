@@ -3,8 +3,10 @@ import { prisma } from '@/lib/prisma'
 import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { errorResponse } from '@/lib/validations/types'
-import { requireAuth } from '@/lib/auth-guard'
-import { CRAFT_ENTITY_TYPE } from '@/lib/craft'
+import { requireActiveArtisan } from '@/lib/auth-guard'
+import { resolveEntityOwner } from '@/lib/media-ownership'
+import { resolveMediaAccess } from '@/lib/media-visibility'
+import { auth } from '@/lib/auth'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { parseRangeHeader } from '@/lib/http-range'
 
@@ -29,36 +31,6 @@ function rangeNotSatisfiable(size: number) {
     )
 }
 
-/**
- * Resolve the owning user of an attachment's entity. Returns null when
- * ownership cannot be established (e.g. Group attachments, unknown types) —
- * those are only deletable by site admins.
- */
-async function resolveEntityOwner(entityType: string, entityId: string): Promise<string | null> {
-    if (entityType === 'Artisan') {
-        const artisan = await prisma.artisan.findUnique({
-            where: { id: entityId },
-            select: { userId: true },
-        })
-        return artisan?.userId ?? null
-    }
-    if (entityType === CRAFT_ENTITY_TYPE) {
-        const craft = await prisma.craft.findUnique({
-            where: { id: entityId },
-            select: { artisan: { select: { userId: true } } },
-        })
-        return craft?.artisan.userId ?? null
-    }
-    if (entityType === 'CraftStory') {
-        const story = await prisma.craftStory.findUnique({
-            where: { id: entityId },
-            select: { artisan: { select: { userId: true } } },
-        })
-        return story?.artisan.userId ?? null
-    }
-    return null
-}
-
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params
@@ -66,6 +38,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
         if (!fileData) {
             return errorResponse('File not found', 404)
+        }
+
+        // A file is served to anybody only while something public points at it.
+        // Otherwise it belongs to its owner, and to site admins.
+        const access = await resolveMediaAccess(id, fileData.uploaderId)
+        if (!access.isPublic) {
+            const session = await auth()
+            const isOwner =
+                Boolean(session?.user?.id) &&
+                (session!.user.id === fileData.uploaderId ||
+                    session!.user.id === access.ownerUserId)
+            if (!isOwner && session?.user?.role !== 'ADMIN') {
+                // 404 rather than 403: whether an id exists is itself private.
+                return errorResponse('File not found', 404)
+            }
         }
 
         // Serve Range requests with 206 so browsers can fetch video in bounded
@@ -99,9 +86,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             'Content-Disposition',
             `inline; filename="${headerSafeFilename(fileData.originalName)}"`,
         )
-        // This assumes, that the media files are immutable and allways public meaning that access
-        // is not restricted by authentication or other permission checks.
-        headers.set('Cache-Control', 'public, max-age=31536000')
+        // Media files are immutable per id, so a public one can be cached hard.
+        // A private one must not be: a shared cache would hand it to the next
+        // person asking, and a year of browser cache would outlive the removal
+        // or unpublishing that made it private in the first place.
+        headers.set(
+            'Cache-Control',
+            access.isPublic ? 'public, max-age=31536000' : 'private, no-store',
+        )
         headers.set('Accept-Ranges', 'bytes')
 
         if (range.kind === 'range') {
@@ -125,7 +117,7 @@ export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> },
 ) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

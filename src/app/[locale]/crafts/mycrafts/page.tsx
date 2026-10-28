@@ -109,6 +109,7 @@ function RenderMyCraftsPage({ crafts, pagination, currentPage, currentPageUrl, a
                                                 fill
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                 className="object-cover transition-transform duration-200 group-hover:scale-105"
+                                                unoptimized
                                             />
                                         ) : (
                                             <div className="flex h-full items-center justify-center bg-muted">

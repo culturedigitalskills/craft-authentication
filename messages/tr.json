@@ -23,7 +23,8 @@
     "completeProfile": "Profilini tamamla",
     "mediaGallery": "Medya Galerisi",
     "contentCredentials": "İçerik Bilgileri",
-    "generationWorkspace": "Resim Oluşturma"
+    "generationWorkspace": "Resim Oluşturma",
+    "admin": "Yönetim"
   },
   "auth": {
     "loginTitle": "Giriş Yap",
@@ -482,10 +483,24 @@
     "notFound": "Zanaatkâr bulunamadı",
     "gallery": "Galeri",
     "galleryEmpty": "Henüz galeri fotoğrafı yok",
+    "manageGallery": "Galeriyi yönet",
     "groups": "Topluluklar",
     "crafts": "El Yapımı Ürünler",
     "noCrafts": "Henüz herkese açık el yapımı ürün yok.",
-    "connectWith": "Bağlan"
+    "connectWith": "Bağlan",
+    "adminActions": {
+      "title": "Yönetim",
+      "liveExplainer": "Bu profili kaldırdığınızda, ona bağlı zanaatlar ve grup üyelikleriyle birlikte herkese açık siteden kalkar. Daha sonra geri getirebilirsiniz.",
+      "removedExplainer": "Bu profil kaldırıldı. Yalnızca yöneticiler görebilir. Zanaatları ve grup üyelikleri de gizlendi.",
+      "remove": "Profili kaldır",
+      "restore": "Profili geri getir",
+      "confirmTitle": "{name} kaldırılsın mı?",
+      "confirmBody": "Profili, zanaatları ve grup üyelikleri herkese açık sitede görünmeyi bırakır. Hiçbir şey silinmez ve profili bu sayfadan geri getirebilirsiniz.",
+      "confirmRemove": "Profili kaldır",
+      "cancel": "İptal",
+      "failed": "Bu işlem gerçekleşmedi. Lütfen tekrar deneyin.",
+      "manageMedia": "Fotoğraf ve videolarını yönet"
+    }
   },
   "crafts": {
     "notFound": {
@@ -850,5 +865,35 @@
     "invalidSignature": "İmza, belgenin içeriğiyle eşleşmiyor.",
     "invalidIssuer": "Bu belge bu site tarafından düzenlenmemiş.",
     "genericError": "Belge doğrulanamadı."
+  },
+  "admin": {
+    "title": "Yönetim",
+    "description": "Site yöneticiliği verin ve yöneticilerin yaptıklarını inceleyin.",
+    "accounts": "Hesaplar",
+    "accountsHint": "Yöneticiler herhangi bir zanaatkâr profilini kaldırabilir ve herkesin medyasını yönetebilir. Bir profili zanaatkârın kendi sayfasından kaldırın.",
+    "noProfile": "Zanaatkâr profili yok",
+    "profileRemoved": "profil kaldırıldı",
+    "you": "siz",
+    "makeAdmin": "Yönetici yap",
+    "withdrawAdmin": "Yöneticiliği geri al",
+    "lastAdmin": "Geriye kalan tek yönetici bu. Önce başka birini yönetici yapın.",
+    "roleFailed": "Bu işlem gerçekleşmedi. Lütfen tekrar deneyin.",
+    "auditTitle": "Son yönetici işlemleri",
+    "auditHint": "Yöneticilerin başkalarının hesap ve çalışmalarına yaptıkları.",
+    "auditEmpty": "Henüz bir şey yok.",
+    "actions": {
+      "artisan": {
+        "remove": "şu kişinin profilini kaldırdı:",
+        "restore": "şu kişinin profilini geri getirdi:"
+      },
+      "user": {
+        "promote": "yönetici yaptı:",
+        "demote": "şu kişinin yöneticiliğini geri aldı:"
+      }
+    },
+    "backToProfile": "Profile dön",
+    "mediaFor": "{name} kişisinin fotoğraf ve videoları",
+    "mediaHint": "Bu zanaatkârın galerisindeki her şeyi kaldırabilir veya gizleyebilirsiniz. Aynı ögeleri kendi galeri sayfasında görür.",
+    "mediaRemovedHint": "Bu profil kaldırıldı, dolayısıyla bunların hiçbiri herkese açık değil. Yine de ögeleri kalıcı olarak silebilirsiniz."
   }
 }

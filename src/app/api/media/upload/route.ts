@@ -6,12 +6,12 @@ import { randomUUID } from 'crypto'
 import { fileUploadSchema, resolveMimeType } from '@/lib/validations/media'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireActiveArtisan } from '@/lib/auth-guard'
 
 import { C2PAService } from '@/lib/c2pa-service'
 
 export async function POST(request: NextRequest) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

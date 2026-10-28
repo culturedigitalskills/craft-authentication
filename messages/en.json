@@ -23,7 +23,8 @@
     "completeProfile": "Complete your profile",
     "mediaGallery": "Media Gallery",
     "contentCredentials": "Content Credentials",
-    "generationWorkspace": "Image Generation"
+    "generationWorkspace": "Image Generation",
+    "admin": "Administration"
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -482,10 +483,24 @@
     "notFound": "Artisan not found",
     "gallery": "Gallery",
     "galleryEmpty": "No gallery photos yet",
+    "manageGallery": "Manage gallery",
     "groups": "Communities",
     "crafts": "Handcrafted Products",
     "noCrafts": "No public handcrafted products yet.",
-    "connectWith": "Connect"
+    "connectWith": "Connect",
+    "adminActions": {
+      "title": "Admin",
+      "liveExplainer": "Removing this profile takes it off the public site, along with the crafts and group memberships that go with it. You can put it back afterwards.",
+      "removedExplainer": "This profile has been removed. Only admins can see it. Its crafts and group memberships are hidden too.",
+      "remove": "Remove profile",
+      "restore": "Restore profile",
+      "confirmTitle": "Remove {name}?",
+      "confirmBody": "Their profile, crafts and group memberships stop appearing on the public site. Nothing is erased, and you can restore the profile from this same page.",
+      "confirmRemove": "Remove profile",
+      "cancel": "Cancel",
+      "failed": "That did not work. Please try again.",
+      "manageMedia": "Manage their photos and video"
+    }
   },
   "crafts": {
     "notFound": {
@@ -968,5 +983,35 @@
     "invalidSignature": "The signature does not match the credential's contents.",
     "invalidIssuer": "This credential was not issued by this site.",
     "genericError": "The credential could not be verified."
+  },
+  "admin": {
+    "title": "Administration",
+    "description": "Grant site admin, and review what admins have done.",
+    "accounts": "Accounts",
+    "accountsHint": "Site admins can remove any artisan profile and manage anyone’s media. Remove a profile from the artisan’s own page.",
+    "noProfile": "No artisan profile",
+    "profileRemoved": "profile removed",
+    "you": "you",
+    "makeAdmin": "Make admin",
+    "withdrawAdmin": "Withdraw admin",
+    "lastAdmin": "This is the only admin left. Promote somebody else first.",
+    "roleFailed": "That did not work. Please try again.",
+    "auditTitle": "Recent admin activity",
+    "auditHint": "What admins did to other people’s accounts and work.",
+    "auditEmpty": "Nothing yet.",
+    "actions": {
+      "artisan": {
+        "remove": "removed the profile of",
+        "restore": "restored the profile of"
+      },
+      "user": {
+        "promote": "made an admin:",
+        "demote": "withdrew admin from"
+      }
+    },
+    "backToProfile": "Back to the profile",
+    "mediaFor": "Photos and video of {name}",
+    "mediaHint": "Remove or hide anything on this artisan’s gallery. They see the same items on their own gallery page.",
+    "mediaRemovedHint": "This profile has been removed, so none of this is public. You can still take items down for good."
   }
 }

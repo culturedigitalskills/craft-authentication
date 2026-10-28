@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireAuth, requireActiveArtisan } from '@/lib/auth-guard'
 import { errorResponse, handleValidationError } from '@/lib/validations/types'
 import {
     ANSWER_KEYS,
@@ -94,7 +94,7 @@ async function collectMeta(story: StoryWithArtisan) {
 
 // POST — enqueue a render (force=true regenerates a READY film).
 export async function POST(request: NextRequest) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {
@@ -180,7 +180,7 @@ const ACTIVE_RENDER_MS = 30 * 60 * 1000
  * the type and size validation) and must belong to the caller.
  */
 export async function PUT(request: NextRequest) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {
@@ -281,7 +281,7 @@ export async function PUT(request: NextRequest) {
 
 // PATCH — publish/unpublish the rendered film.
 export async function PATCH(request: NextRequest) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

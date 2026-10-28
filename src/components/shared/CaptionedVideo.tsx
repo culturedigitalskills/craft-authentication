@@ -41,7 +41,18 @@ export function CaptionedVideo({
     }, [captionsSrc])
 
     return (
-        <video ref={videoRef} src={src} controls className={className} preload={preload}>
+        // playsInline is what keeps the film in the page on an iPhone. Without
+        // it iOS hands playback to the fullscreen system player, which throws
+        // away the layout the film sits in: the summary beside it, and the rest
+        // of the story below.
+        <video
+            ref={videoRef}
+            src={src}
+            controls
+            playsInline
+            className={className}
+            preload={preload}
+        >
             {captionsSrc && (
                 // Captions are English-only by design (see /api/media/[id]/subtitles).
                 <track kind="captions" srcLang="en" label={captionsLabel} src={captionsSrc} default />
