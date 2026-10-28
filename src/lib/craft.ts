@@ -9,6 +9,21 @@ import { DOMAIN } from '@/lib/did/config'
 export const CRAFT_ENTITY_TYPE = 'Craft'
 
 /**
+ * What a craft must satisfy to be shown to the public: it is published, it has
+ * not been removed, and the artisan who made it is still on the platform.
+ *
+ * Removing an artisan takes their work out of public view with them, so that
+ * nothing is left pointing at a profile that no longer resolves. Spread this
+ * into every public craft query rather than restating the clauses, because the
+ * failure mode of missing one is a removed artisan's work staying on the site.
+ */
+export const PUBLIC_CRAFT_WHERE = {
+    isPublic: true,
+    deletedAt: null,
+    artisan: { deletedAt: null },
+} as const
+
+/**
  * SHA-256 of a stored object's actual bytes, for the credential's imageHash
  * claim. Returns null when the row or the object cannot be read so a storage
  * blip costs us the claim rather than the whole credential. Reading the object

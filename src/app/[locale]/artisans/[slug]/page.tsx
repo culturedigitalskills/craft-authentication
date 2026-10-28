@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Clock, GraduationCap, Users, Globe } from 'lucide-react'
@@ -8,6 +9,7 @@ import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
 import { StoryFilmHero } from '@/components/artisan/StoryFilmHero'
+import { AdminArtisanActions } from '@/components/artisan/AdminArtisanActions'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 import { getCraftPrimaryImageMap } from '@/lib/craft'
 import { ScMedia } from '@/components/sc/ScMedia'
@@ -65,12 +67,22 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     const { slug } = await params
     const t = await getTranslations('artisanProfile')
 
+    // Read before the profile is loaded, because an admin is allowed to see a
+    // removed one. Removal is reversible, and this page is where it is undone,
+    // so hiding it from an admin too would leave nothing able to restore it.
+    const session = await auth()
+    const isAdmin = session?.user?.role === 'ADMIN'
+
     const artisan = await prisma.artisan.findFirst({
-        where: { OR: [{ slug }, { previousSlugs: { has: slug } }], deletedAt: null },
+        where: {
+            OR: [{ slug }, { previousSlugs: { has: slug } }],
+            ...(isAdmin ? {} : { deletedAt: null }),
+        },
         select: {
             id: true,
             userId: true,
             slug: true,
+            deletedAt: true,
             firstName: true,
             lastName: true,
             bio: true,
@@ -163,6 +175,16 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         mimeType: a.media.mimeType,
     }))
 
+    // Only used to offer the owner a way through to their editable gallery; the
+    // page itself renders the same for everyone.
+    const isOwner = session?.user?.id === artisan.userId
+
+    // A removed artisan is visible to admins alone, and their media is served
+    // to admins alone too. Next's optimizer refetches without cookies, so it
+    // cannot load any of it: these have to be direct, credentialed requests or
+    // the page an admin restores from renders with every image broken.
+    const mediaNeedsCredentials = Boolean(artisan.deletedAt)
+
     const publishedStory = await prisma.craftStory.findUnique({
         where: { artisanId: artisan.id },
     })
@@ -235,6 +257,20 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
 
     return (
         <>
+            {/* Admin moderation sits above the profile rather than in a separate
+                console, so acting on an artisan happens where the admin found
+                them. Nobody else can see this, and for a removed artisan this
+                page is admin-only and the restore here is the only way back. */}
+            {isAdmin && (
+                <div className="sc-container pt-6">
+                    <AdminArtisanActions
+                        artisanId={artisan.id}
+                        artisanName={`${artisan.firstName} ${artisan.lastName}`.trim()}
+                        isRemoved={Boolean(artisan.deletedAt)}
+                    />
+                </div>
+            )}
+
             {/* ── Hero: cover band + overlapping portrait ── */}
             <section className="relative">
                 <div className="relative h-56 w-full overflow-hidden sm:h-72">
@@ -244,6 +280,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         fallback={<IndigoDotsCover />}
                         sizes="100vw"
                         priority
+                        unoptimized={mediaNeedsCredentials}
                     />
                 </div>
 
@@ -259,6 +296,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                 fallback={<PortraitFallback name={`${artisan.firstName} ${artisan.lastName}`} />}
                                 sizes="160px"
                                 priority
+                                unoptimized={mediaNeedsCredentials}
                             />
                         </div>
                         <div className="sm:pt-24">
@@ -332,6 +370,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                                     alt={craft.name}
                                                     fallback={<IndigoDotsCover />}
                                                     sizes="(max-width: 768px) 50vw, 33vw"
+                                                    unoptimized={mediaNeedsCredentials}
                                                     className="transition-transform duration-300 group-hover:scale-105"
                                                 />
                                             </div>
@@ -347,8 +386,30 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         {/* Gallery (masonry) */}
                         {galleryImages.length > 0 && (
                             <div>
-                                <SectionHeader title={t('gallery')} className="mb-6" />
-                                <GalleryGrid images={galleryImages} artisanUserId={artisan.userId} />
+                                {/* This page is read-only for everyone, including its
+                                    owner, so an artisan looking at their own gallery has
+                                    nothing to press. Point them at the page where they
+                                    can actually remove or hide an item. */}
+                                <SectionHeader
+                                    title={t('gallery')}
+                                    className="mb-6"
+                                    action={
+                                        isOwner ? (
+                                            <Link
+                                                href="/media-gallery"
+                                                className="text-sm font-medium"
+                                                style={{ color: 'var(--sc-accent)' }}
+                                            >
+                                                {t('manageGallery')}
+                                            </Link>
+                                        ) : undefined
+                                    }
+                                />
+                                <GalleryGrid
+                                    images={galleryImages}
+                                    artisanUserId={artisan.userId}
+                                    unoptimized={mediaNeedsCredentials}
+                                />
                             </div>
                         )}
                     </div>

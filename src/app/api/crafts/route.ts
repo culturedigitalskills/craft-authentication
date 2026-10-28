@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { requireAuth } from '@/lib/auth-guard'
+import { requireActiveArtisan } from '@/lib/auth-guard'
 import { CreateCraftSchema, craftQuerySchema } from '@/lib/validations/craft'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import {
@@ -10,6 +10,7 @@ import {
     findUnownedMedia,
     getCraftPrimaryImageMap,
     getCraftMediaItems,
+    PUBLIC_CRAFT_WHERE,
 } from '@/lib/craft'
 
 export async function GET(request: NextRequest) {
@@ -20,8 +21,7 @@ export async function GET(request: NextRequest) {
         const skip = (page - 1) * limit
 
         const where = {
-            isPublic: true,
-            deletedAt: null,
+            ...PUBLIC_CRAFT_WHERE,
             ...(search ? { title: { contains: search, mode: 'insensitive' as const } } : {}),
         }
 
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    const { session, unauthorized } = await requireAuth()
+    const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {

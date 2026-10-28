@@ -23,7 +23,8 @@
     "createGroup": "Neue Gemeinschaft hinzufügen",
     "contentCredentials": "Inhaltsnachweise",
     "generationWorkspace": "Bildgenerierung",
-    "seecrafts": "Galerie"
+    "seecrafts": "Galerie",
+    "admin": "Verwaltung"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -471,10 +472,24 @@
     "notFound": "Handwerker nicht gefunden",
     "gallery": "Galerie",
     "galleryEmpty": "Noch keine Galeriefotos",
+    "manageGallery": "Galerie verwalten",
     "groups": "Gemeinschaften",
     "crafts": "Handgefertigte Produkte",
     "noCrafts": "Noch keine öffentlichen handgefertigten Produkte.",
-    "connectWith": "Verbinden"
+    "connectWith": "Verbinden",
+    "adminActions": {
+      "title": "Administration",
+      "liveExplainer": "Wenn du dieses Profil entfernst, verschwindet es von der öffentlichen Website, zusammen mit den zugehörigen Handwerken und Gruppenmitgliedschaften. Du kannst es später wiederherstellen.",
+      "removedExplainer": "Dieses Profil wurde entfernt. Nur Administratoren sehen es. Seine Handwerke und Gruppenmitgliedschaften sind ebenfalls ausgeblendet.",
+      "remove": "Profil entfernen",
+      "restore": "Profil wiederherstellen",
+      "confirmTitle": "{name} entfernen?",
+      "confirmBody": "Profil, Handwerke und Gruppenmitgliedschaften erscheinen nicht mehr auf der öffentlichen Website. Nichts wird gelöscht, und du kannst das Profil auf dieser Seite wiederherstellen.",
+      "confirmRemove": "Profil entfernen",
+      "cancel": "Abbrechen",
+      "failed": "Das hat nicht funktioniert. Bitte versuche es erneut.",
+      "manageMedia": "Fotos und Videos verwalten"
+    }
   },
   "artisans": {
     "title": "Kunsthandwerker",
@@ -850,5 +865,35 @@
     "invalidSignature": "Die Signatur passt nicht zum Inhalt des Nachweises.",
     "invalidIssuer": "Dieser Nachweis wurde nicht von dieser Website ausgestellt.",
     "genericError": "Der Nachweis konnte nicht geprüft werden."
+  },
+  "admin": {
+    "title": "Verwaltung",
+    "description": "Administratorrechte vergeben und Aktivitäten einsehen.",
+    "accounts": "Konten",
+    "accountsHint": "Administratoren können jedes Handwerkerprofil entfernen und alle Medien verwalten. Ein Profil entfernst du auf der Seite des Handwerkers.",
+    "noProfile": "Kein Handwerkerprofil",
+    "profileRemoved": "Profil entfernt",
+    "you": "du",
+    "makeAdmin": "Zum Admin machen",
+    "withdrawAdmin": "Adminrechte entziehen",
+    "lastAdmin": "Das ist der einzige verbleibende Admin. Ernenne zuerst jemand anderen.",
+    "roleFailed": "Das hat nicht funktioniert. Bitte versuche es erneut.",
+    "auditTitle": "Letzte Administratoraktivitäten",
+    "auditHint": "Was Administratoren mit den Konten und Werken anderer gemacht haben.",
+    "auditEmpty": "Noch nichts.",
+    "actions": {
+      "artisan": {
+        "remove": "entfernte das Profil von",
+        "restore": "stellte das Profil wieder her von"
+      },
+      "user": {
+        "promote": "ernannte zum Admin:",
+        "demote": "entzog die Adminrechte von"
+      }
+    },
+    "backToProfile": "Zurück zum Profil",
+    "mediaFor": "Fotos und Videos von {name}",
+    "mediaHint": "Entferne oder verbirg Inhalte aus der Galerie dieses Handwerkers. Er sieht dieselben Einträge auf seiner eigenen Galerieseite.",
+    "mediaRemovedHint": "Dieses Profil wurde entfernt, nichts davon ist öffentlich. Du kannst Einträge trotzdem endgültig löschen."
   }
 }

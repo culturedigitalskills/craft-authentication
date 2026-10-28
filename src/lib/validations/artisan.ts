@@ -50,5 +50,13 @@ export const UpdateArtisanSchema = z.object({
     ...socialFields,
 })
 
+// DELETE /api/artisans/:id — removes a profile, or puts a removed one back.
+// Restoring rides the same verb because it is the same decision reversed, and
+// the body is optional so a plain DELETE still means "remove".
+export const DeleteArtisanSchema = z.object({
+    restore: z.boolean().optional().default(false),
+})
+
 export type CreateArtisan = z.infer<typeof CreateArtisanSchema>
 export type UpdateArtisan = z.infer<typeof UpdateArtisanSchema>
+export type DeleteArtisan = z.infer<typeof DeleteArtisanSchema>

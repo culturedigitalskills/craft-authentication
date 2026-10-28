@@ -1,3 +1,76 @@
+# v0.16.0 -> v0.17.0
+
+### Site Administration
+
+Site admins can now be made, and have a page to work from: `/admin` for the account roster and recent
+admin activity, and `/admin/artisans/[id]/media` for an artisan's gallery. Both 404 for non-admins.
+Admin actions against somebody else's account or work are recorded.
+
+**Schema Changes**:
+
+- Added the `AdminAuditLog` table. No foreign key to the actor and the actor's email is copied rather
+  than joined, so an entry still names someone after that account is gone.
+
+**New API endpoint**:
+
+- `PATCH /api/admin/users/:id` — grant or withdraw site admin. Refuses to withdraw the last admin.
+
+**Configuration Changes**: none.
+
+**Migration Steps**:
+
+1. **Before deploying**, make sure an account exists for `nasim.dadizadeh@unitn.it`. The bootstrap
+   migration (`20261024120100_bootstrap_site_admin`) promotes that address and cannot create it. Only
+   the first account ever created is promoted automatically, so without this nobody can reach `/admin`.
+2. Apply the migrations. Locally `pnpm db:migrate`; staging and production run `prisma migrate deploy`
+   on startup.
+3. Check the deploy log (`pnpm prod:docker:logs`). The bootstrap announces its result rather than
+   failing silently: it either promoted the account, found it already an admin, or logs
+   `WARNING: ... no account exists for ...`. On that warning, create the account and add a follow-up
+   migration to promote it.
+
+Promoting anybody else is done from `/admin` and needs no deploy.
+
+### Artisan Profile Removal
+
+An artisan profile can be removed and restored. Removal is a soft delete: `Artisan` cascades to
+`Craft`, so dropping the row would void the credentials issued against that artisan's work.
+
+**Schema Changes**: none. `Artisan.deletedAt` already existed; this is the first release to write it.
+
+**New API endpoint**:
+
+- `DELETE /api/artisans/:id` — remove a profile (admin or owner), or restore with `{ "restore": true }`
+  (admin only).
+
+**Expect after deploying**:
+
+- **Group member counts will drop.** They were unfiltered and had been counting members who had left.
+  They now match the list beside them.
+- Removing an artisan also hides their crafts and their group memberships. A removed artisan stays
+  signed in but gets 403 on anything that writes: removal hides a profile, it does not lock the account.
+
+**Migration Steps**: none beyond the migrations above.
+
+### Media Authorization
+
+`GET /api/media/:id` served any file to whoever held the id, with a year of public cache. A file is now
+public only while something public points at it; anything else is served to its owner and to site
+admins, with `Cache-Control: private, no-store`. Captions follow the video they transcribe.
+
+**Schema Changes**: none. **Configuration Changes**: none.
+
+**Expect after deploying**:
+
+- Media belonging to unpublished or removed entities returns 404 to anonymous callers, including
+  attachments left pointing at entities a past hard delete removed. Nothing links to those, so no page
+  should break.
+- Anything already cached under the previous public header keeps it until it expires. This stops new
+  leaks; it cannot recall old ones.
+
+**Migration Steps**: none. Worth checking afterwards: the landing page, a public craft, a public artisan
+profile with a published story film, and your own gallery while signed in.
+
 # v0.15.0 -> v0.16.0
 
 ### Legal Policies and Recorded Consent

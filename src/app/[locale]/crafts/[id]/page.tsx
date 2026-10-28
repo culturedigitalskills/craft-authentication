@@ -44,6 +44,7 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
                     bio: true,
                     yearsOfExperience: true,
                     learningSource: true,
+                    deletedAt: true,
                 },
             },
         },
@@ -53,8 +54,11 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
     const isOwner = session?.user?.id === craft.artisan.userId
     const isAdmin = session?.user?.role === 'ADMIN'
 
-    // Private crafts are only visible to their owner or a site admin.
-    if (!craft.isPublic && !isOwner && !isAdmin) notFound()
+    // A private craft, or one whose maker has been removed, is visible only to
+    // its owner or a site admin. Otherwise this page would keep a removed
+    // artisan's name, photo and biography on the public web, linking to a
+    // profile that no longer resolves.
+    if ((!craft.isPublic || craft.artisan.deletedAt) && !isOwner && !isAdmin) notFound()
 
     const mediaItems = await getCraftMediaItems(id)
     const imageIds = mediaItems.filter(m => !m.mimeType?.startsWith('video/')).map(m => m.mediaId)

@@ -170,6 +170,7 @@ export function FilmStoryboard({
                                             fill
                                             sizes="96px"
                                             className="object-cover"
+                                            unoptimized
                                         />
                                     ) : (
                                         <>

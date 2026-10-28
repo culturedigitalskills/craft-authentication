@@ -194,9 +194,21 @@ export function StoryWorkshopUpload({
 
     async function handleRemove(item: WorkshopMedia) {
         try {
-            const res = await fetch(`/api/media/${item.mediaId}`, { method: 'DELETE' })
+            // Detach rather than destroy: a workshop photo can also live in the
+            // artisan's gallery or on a craft, and the server only deletes the
+            // file once nothing points at it.
+            const res = await fetch(`/api/media/attachments/${item.attachmentId}`, {
+                method: 'DELETE',
+            })
             if (!res.ok) throw new Error('Delete failed')
             onItemsChange((prev) => prev.filter((i) => i.mediaId !== item.mediaId))
+            // Drop it from the confirmed order too. Leaving it there makes the
+            // comparison in syncOrder permanently unequal, so every later move
+            // fires a request even when nothing changed, and a rollback would
+            // rebuild the order from a list holding an id no item has.
+            serverOrderRef.current = serverOrderRef.current.filter(
+                (attachmentId) => attachmentId !== item.attachmentId,
+            )
         } catch {
             setError(t('deleteFailed'))
         }
@@ -229,15 +241,18 @@ export function StoryWorkshopUpload({
                                 fill
                                 sizes="(max-width: 768px) 50vw, 25vw"
                                 className="object-cover"
+                                // Owner-only media. Next's optimizer refetches server side with no
+                                // cookies, so an authorized file would 404 and the tile break.
+                                unoptimized
                             />
                         )}
                         <button
                             type="button"
                             onClick={() => handleRemove(item)}
-                            className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                            className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-2 text-white"
                             aria-label={t('removeItem')}
                         >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                         </button>
 
                         {/* Order controls stay visible rather than revealing on
@@ -256,7 +271,7 @@ export function StoryWorkshopUpload({
                                         type="button"
                                         onClick={() => handleMove(index, -1)}
                                         disabled={index === 0}
-                                        className="rounded-full bg-black/60 p-1.5 text-white transition-opacity disabled:opacity-30"
+                                        className="rounded-full bg-black/60 p-2 text-white disabled:opacity-30"
                                         aria-label={t('moveEarlier')}
                                     >
                                         <ChevronLeft className="h-4 w-4" />
@@ -265,7 +280,7 @@ export function StoryWorkshopUpload({
                                         type="button"
                                         onClick={() => handleMove(index, 1)}
                                         disabled={index === items.length - 1}
-                                        className="rounded-full bg-black/60 p-1.5 text-white transition-opacity disabled:opacity-30"
+                                        className="rounded-full bg-black/60 p-2 text-white disabled:opacity-30"
                                         aria-label={t('moveLater')}
                                     >
                                         <ChevronRight className="h-4 w-4" />

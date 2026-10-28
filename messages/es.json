@@ -23,7 +23,8 @@
     "completeProfile": "Completa tu perfil",
     "mediaGallery": "Galería multimedia",
     "contentCredentials": "Credenciales de Contenido",
-    "generationWorkspace": "Generación de Imágenes"
+    "generationWorkspace": "Generación de Imágenes",
+    "admin": "Administración"
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
@@ -482,10 +483,24 @@
     "notFound": "Artesano no encontrado",
     "gallery": "Galería",
     "galleryEmpty": "Aún no hay fotos en la galería",
+    "manageGallery": "Gestionar galería",
     "groups": "Comunidades",
     "crafts": "Productos artesanales",
     "noCrafts": "Aún no hay productos artesanales públicos.",
-    "connectWith": "Conectar"
+    "connectWith": "Conectar",
+    "adminActions": {
+      "title": "Administración",
+      "liveExplainer": "Al eliminar este perfil desaparece del sitio público, junto con sus artesanías y sus membresías de grupo. Puedes restaurarlo después.",
+      "removedExplainer": "Este perfil ha sido eliminado. Solo los administradores pueden verlo. Sus artesanías y membresías de grupo también están ocultas.",
+      "remove": "Eliminar perfil",
+      "restore": "Restaurar perfil",
+      "confirmTitle": "¿Eliminar a {name}?",
+      "confirmBody": "Su perfil, sus artesanías y sus membresías de grupo dejarán de aparecer en el sitio público. No se borra nada, y puedes restaurar el perfil desde esta misma página.",
+      "confirmRemove": "Eliminar perfil",
+      "cancel": "Cancelar",
+      "failed": "No se pudo completar. Inténtalo de nuevo.",
+      "manageMedia": "Gestionar sus fotos y vídeos"
+    }
   },
   "crafts": {
     "notFound": {
@@ -850,5 +865,35 @@
     "invalidSignature": "La firma no coincide con el contenido de la credencial.",
     "invalidIssuer": "Esta credencial no fue emitida por este sitio.",
     "genericError": "No se pudo verificar la credencial."
+  },
+  "admin": {
+    "title": "Administración",
+    "description": "Conceder permisos de administrador y revisar su actividad.",
+    "accounts": "Cuentas",
+    "accountsHint": "Los administradores pueden eliminar cualquier perfil de artesano y gestionar los archivos de cualquiera. Elimina un perfil desde la página del artesano.",
+    "noProfile": "Sin perfil de artesano",
+    "profileRemoved": "perfil eliminado",
+    "you": "tú",
+    "makeAdmin": "Hacer administrador",
+    "withdrawAdmin": "Retirar administrador",
+    "lastAdmin": "Es el único administrador que queda. Nombra antes a otra persona.",
+    "roleFailed": "No se pudo completar. Inténtalo de nuevo.",
+    "auditTitle": "Actividad reciente de administración",
+    "auditHint": "Lo que los administradores hicieron con las cuentas y obras de otros.",
+    "auditEmpty": "Todavía nada.",
+    "actions": {
+      "artisan": {
+        "remove": "eliminó el perfil de",
+        "restore": "restauró el perfil de"
+      },
+      "user": {
+        "promote": "nombró administrador a:",
+        "demote": "retiró el rol de administrador a"
+      }
+    },
+    "backToProfile": "Volver al perfil",
+    "mediaFor": "Fotos y vídeos de {name}",
+    "mediaHint": "Elimina u oculta cualquier elemento de la galería de este artesano. Él ve los mismos elementos en su propia galería.",
+    "mediaRemovedHint": "Este perfil ha sido eliminado, así que nada de esto es público. Aun así puedes retirar elementos definitivamente."
   }
 }

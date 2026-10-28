@@ -649,6 +649,9 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         fill
                                                         sizes="(max-width: 768px) 33vw, 25vw"
                                                         className="object-cover"
+                                                        // Owner-only media. Next's optimizer refetches server side with no
+                                                        // cookies, so an authorized file would 404 and the tile break.
+                                                        unoptimized
                                                     />
                                                 )}
                                                 {confirmRemove === mediaId ? (
@@ -683,12 +686,12 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         type="button"
                                                         onClick={() => handleRemoveMedia(mediaId)}
                                                         aria-label={t('deleteImage')}
-                                                        className="absolute right-1 top-1 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                                                        className="absolute right-1 top-1 rounded-full p-2 text-white"
                                                         style={{
                                                             backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
                                                         }}
                                                     >
-                                                        <X className="h-3.5 w-3.5" />
+                                                        <X className="h-4 w-4" />
                                                     </button>
                                                 )}
                                             </div>
@@ -821,6 +824,9 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                                     fill
                                                                     sizes="(max-width: 768px) 33vw, 25vw"
                                                                     className="object-cover"
+                                                                    // Owner-only media. Next's optimizer refetches server side with no
+                                                                    // cookies, so an authorized file would 404 and the tile break.
+                                                                    unoptimized
                                                                 />
                                                             )}
                                                             {selected && (
@@ -890,12 +896,12 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         setVideos((prev) => prev.filter((v) => v !== id))
                                                     }
                                                     aria-label={t('removeVideo')}
-                                                    className="absolute right-1 top-1 rounded-full p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                                                    className="absolute right-1 top-1 rounded-full p-2 text-white"
                                                     style={{
                                                         backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
                                                     }}
                                                 >
-                                                    <X className="h-3.5 w-3.5" />
+                                                    <X className="h-4 w-4" />
                                                 </button>
                                             </div>
                                         ))}

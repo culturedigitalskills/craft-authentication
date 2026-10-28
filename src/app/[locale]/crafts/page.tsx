@@ -4,7 +4,7 @@ import { Calendar, User } from 'lucide-react'
 import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
 import { prisma } from '@/lib/prisma'
-import { getCraftPrimaryImageMap } from '@/lib/craft'
+import { getCraftPrimaryImageMap, PUBLIC_CRAFT_WHERE } from '@/lib/craft'
 import { SearchInput } from '@/components/shared/SearchInput'
 import { GalleryHeader } from '@/components/sc/SectionHeader'
 import { ScMedia } from '@/components/sc/ScMedia'
@@ -29,8 +29,7 @@ export default async function CraftsPage(
     const skip = (page - 1) * LIMIT
 
     const whereClause = {
-        isPublic: true,
-        deletedAt: null,
+        ...PUBLIC_CRAFT_WHERE,
         ...(q ? { title: { contains: q, mode: 'insensitive' as const } } : {}),
     }
 

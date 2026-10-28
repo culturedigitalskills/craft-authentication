@@ -13,6 +13,7 @@ export function ScMedia({
     sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
     className,
     priority,
+    unoptimized,
 }: {
     src?: string | null
     alt: string
@@ -20,6 +21,12 @@ export function ScMedia({
     sizes?: string
     className?: string
     priority?: boolean
+    /**
+     * Set when the photo is only served to the person viewing it. Next's
+     * optimizer refetches server side with no cookies, so authorized media
+     * 404s for it and the slot renders broken rather than falling back.
+     */
+    unoptimized?: boolean
 }) {
     if (!src) return <>{fallback}</>
     return (
@@ -29,6 +36,7 @@ export function ScMedia({
             fill
             priority={priority}
             sizes={sizes}
+            unoptimized={unoptimized}
             className={`object-cover ${className ?? ''}`}
         />
     )

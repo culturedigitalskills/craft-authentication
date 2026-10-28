@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 import { CreateGroupSchema } from '@/lib/validations/group'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
                 skip,
                 take: limit,
                 include: {
-                    _count: { select: { memberships: true } },
+                    _count: { select: { memberships: { where: ACTIVE_MEMBERSHIP_WHERE } } },
                 },
             }),
             prisma.group.count({ where }),

@@ -130,6 +130,12 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                             {t('createGroup')}
                         </Link>
                     )}
+                    {isAdmin && (
+                        <Link href="/admin" onClick={onAction} className={`${rowBase} ${rowIdle}`}>
+                            <ShieldCheck className="h-4 w-4" />
+                            {t('admin')}
+                        </Link>
+                    )}
 
                     <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
 
@@ -281,6 +287,16 @@ export function NavbarAuth({ onAction, variant = 'desktop', needsOnboarding = fa
                             >
                                 <UserPlus className="h-4 w-4" />
                                 <span className={isActive('/groups/create') ? activeUnderline : ''}>{t('createGroup')}</span>
+                            </Link>
+                        )}
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                onClick={() => { setDropdownOpen(false); onAction?.() }}
+                                className={`${rowBase} ${isActive('/admin') ? rowActive : rowIdle}`}
+                            >
+                                <ShieldCheck className="h-4 w-4" />
+                                <span className={isActive('/admin') ? activeUnderline : ''}>{t('admin')}</span>
                             </Link>
                         )}
                     </div>
