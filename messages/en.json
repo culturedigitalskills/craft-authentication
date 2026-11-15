@@ -1013,5 +1013,10 @@
     "mediaFor": "Photos and video of {name}",
     "mediaHint": "Remove or hide anything on this artisan’s gallery. They see the same items on their own gallery page.",
     "mediaRemovedHint": "This profile has been removed, so none of this is public. You can still take items down for good."
+  },
+  "languageSelector": {
+    "label": "Change language. Current language: {language}",
+    "menu": "Language",
+    "confirmChange": "Changing language reloads this page. Any unsaved changes, uploads or recordings may be lost. Change language?"
   }
 }

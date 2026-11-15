@@ -32,7 +32,8 @@
         "test-deploy": "pnpm build-info && pnpm prod:docker:down && pnpm docker:build && pnpm prod:docker:up",
         "test": "dotenv run -f .env.local -- vitest run",
         "test:watch": "dotenv run -f .env.local -- vitest",
-        "deps:update": "node scripts/update-deps.js"
+        "deps:update": "node scripts/update-deps.js",
+        "test:e2e:languages": "playwright test e2e/language-switch.spec.ts"
     },
     "dependencies": {
         "@atproto/api": "^0.29.4",
@@ -77,6 +78,7 @@
         "zod": "^4.6.7"
     },
     "devDependencies": {
+        "@playwright/test": "^1.65.1",
         "@tailwindcss/postcss": "^4.3.3",
         "@types/culori": "^4.0.1",
         "@types/node": "^24.19.2",

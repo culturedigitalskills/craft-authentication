@@ -1,6 +1,8 @@
 'use client'
 
-import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Check, ChevronDown, Languages, Loader2 } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -9,66 +11,74 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { routing } from '@/i8n/routing'
-// next-intl's navigation wrappers rather than next/navigation: passing an
-// explicit locale to replace() writes the NEXT_LOCALE cookie before navigating,
-// so the new locale is already in place when the request goes out.
-import { useRouter, usePathname } from '@/i8n/navigation'
+import { usePathname } from '@/i8n/navigation'
+import {
+    languageNames,
+    languageSwitchHref,
+    languageSwitchNeedsConfirmation,
+    type SiteLocale,
+} from '@/i8n/language-switch'
 
-export interface Language {
-    code: (typeof routing.locales)[number]
-    name: string
-}
-
-export const languages: Language[] = routing.locales.map((locale) => ({
-    code: locale,
-    name: locale.toUpperCase(),
-}))
-
-interface LanguageSelectProps {
-    isMobile: boolean
-    jsonlan: string
-}
-
-export function LanguageSelect({ isMobile, jsonlan }: LanguageSelectProps) {
-    const router = useRouter()
+export function LanguageSelect({ isMobile }: { isMobile: boolean }) {
+    const locale = useLocale() as SiteLocale
+    const t = useTranslations('languageSelector')
     const pathname = usePathname()
+    const [pending, setPending] = useState(false)
 
-    const handleLanguageChange = (lang: Language) => {
-        // localePrefix is 'never', so the locale lives in a cookie and the URL is
-        // identical before and after a switch. The client router cache is keyed by
-        // URL and knows nothing about that cookie, so without refresh() it can
-        // replay the page in the previous language. Most visible when switching
-        // back to a language already visited, or when switching rapidly.
-        router.replace(pathname, { locale: lang.code, scroll: false })
-        router.refresh()
+    useEffect(() => {
+        // Back/forward cache can restore this document with its pending state.
+        const restore = () => setPending(false)
+        window.addEventListener('pageshow', restore)
+        return () => window.removeEventListener('pageshow', restore)
+    }, [])
+
+    function changeLanguage(nextLocale: SiteLocale) {
+        if (nextLocale === locale || pending) return
+        if (languageSwitchNeedsConfirmation(pathname) && !window.confirm(t('confirmChange'))) return
+
+        // Read at selection time, including changes made by filters or anchors
+        // after this menu was rendered. No locale cookie is changed on cancel.
+        const href = languageSwitchHref(
+            pathname,
+            window.location.search,
+            window.location.hash,
+            nextLocale,
+        )
+        setPending(true)
+        window.location.assign(href)
     }
 
     return (
-        <div>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="outline"
-                        className={`flex items-center space-x-1 primary-foreground focus:ring-0 ${
-                            isMobile ? 'border border-gray-600' : ''
-                        }`}
+        <DropdownMenu dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    type="button"
+                    variant="outline"
+                    disabled={pending}
+                    aria-label={t('label', { language: languageNames[locale] })}
+                    aria-busy={pending}
+                    className={`min-h-11 gap-2 ${isMobile ? 'w-full justify-between' : 'px-3'}`}
+                >
+                    {pending
+                        ? <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                        : <Languages className="h-4 w-4" aria-hidden="true" />}
+                    <span lang={locale} dir="auto">{languageNames[locale]}</span>
+                    <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" aria-label={t('menu')}>
+                {routing.locales.map((code) => (
+                    <DropdownMenuItem
+                        key={code}
+                        onSelect={() => changeLanguage(code)}
+                        aria-current={code === locale ? 'true' : undefined}
+                        className="min-h-11 justify-between gap-6 px-3"
                     >
-                        {jsonlan.toUpperCase()}
-                        <ChevronDown className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="flex flex-col columns-4xs primary-foreground border-gray-200 text-center">
-                    {languages.map((lang) => (
-                        <DropdownMenuItem
-                            key={lang.code}
-                            onClick={() => handleLanguageChange(lang)}
-                            className="text-1xl text-inherit hover:text-neutral-400 text-center"
-                        >
-                            {lang.name}
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
+                        <span lang={code} dir="auto">{languageNames[code]}</span>
+                        {code === locale && <Check className="h-4 w-4" aria-hidden="true" />}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }

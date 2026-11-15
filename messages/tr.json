@@ -895,5 +895,10 @@
     "mediaFor": "{name} kişisinin fotoğraf ve videoları",
     "mediaHint": "Bu zanaatkârın galerisindeki her şeyi kaldırabilir veya gizleyebilirsiniz. Aynı ögeleri kendi galeri sayfasında görür.",
     "mediaRemovedHint": "Bu profil kaldırıldı, dolayısıyla bunların hiçbiri herkese açık değil. Yine de ögeleri kalıcı olarak silebilirsiniz."
+  },
+  "languageSelector": {
+    "label": "Dili değiştir. Geçerli dil: {language}",
+    "menu": "Dil",
+    "confirmChange": "Dil değiştirildiğinde bu sayfa yeniden yüklenir. Kaydedilmemiş değişiklikler, yüklemeler veya kayıtlar kaybolabilir. Dil değiştirilsin mi?"
   }
 }

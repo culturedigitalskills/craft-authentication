@@ -895,5 +895,10 @@
     "mediaFor": "Fotos und Videos von {name}",
     "mediaHint": "Entferne oder verbirg Inhalte aus der Galerie dieses Handwerkers. Er sieht dieselben Einträge auf seiner eigenen Galerieseite.",
     "mediaRemovedHint": "Dieses Profil wurde entfernt, nichts davon ist öffentlich. Du kannst Einträge trotzdem endgültig löschen."
+  },
+  "languageSelector": {
+    "label": "Sprache ändern. Aktuelle Sprache: {language}",
+    "menu": "Sprache",
+    "confirmChange": "Beim Sprachwechsel wird diese Seite neu geladen. Nicht gespeicherte Änderungen, Uploads oder Aufnahmen können verloren gehen. Sprache ändern?"
   }
 }

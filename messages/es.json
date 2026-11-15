@@ -895,5 +895,10 @@
     "mediaFor": "Fotos y vídeos de {name}",
     "mediaHint": "Elimina u oculta cualquier elemento de la galería de este artesano. Él ve los mismos elementos en su propia galería.",
     "mediaRemovedHint": "Este perfil ha sido eliminado, así que nada de esto es público. Aun así puedes retirar elementos definitivamente."
+  },
+  "languageSelector": {
+    "label": "Cambiar idioma. Idioma actual: {language}",
+    "menu": "Idioma",
+    "confirmChange": "Cambiar el idioma recargará esta página. Los cambios, las cargas o las grabaciones sin guardar podrían perderse. ¿Cambiar el idioma?"
   }
 }

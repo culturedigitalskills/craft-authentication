@@ -447,3 +447,17 @@ craft-authentication/
 ## License
 
 See [LICENSE](./LICENSE).
+
+
+## Language and SEO improvements
+
+The implementation sequence and release checks are in [the language and SEO plan](docs/LANGUAGE-AND-SEO-PLAN.md). Artisan content translation is deferred.
+
+### Language-switch browser tests
+
+Use Node/pnpm from package.json and install with `pnpm install --frozen-lockfile`.
+Prepare a private `.env.test.local` with `NODE_ENV=development` and both database URLs targeting a local `crafts_test` database, with the existing migrations applied. Never point these tests at production or the normal development database.
+
+Run `pnpm exec playwright install --with-deps chromium` once, then `pnpm test:e2e:languages`. The test server starts on localhost:20200, uses a separate `.next-e2e` build cache, and refuses to reuse an existing server. Tests create and clean up one synthetic local account and craft. External transcription/Google providers are disabled. Browser traces and screenshots stay under ignored `.local-dev/playwright-results`. No production configuration change is needed.
+
+Unit tests for the selector use the project's isolated test environment: `pnpm exec dotenv run -f .env.test.local -- vitest run tests/language-switch.test.ts`.

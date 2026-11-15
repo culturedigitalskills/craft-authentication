@@ -153,7 +153,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
                         <div className="flex items-center gap-3">
                             <NavbarAuth variant="desktop" needsOnboarding={needsOnboarding} />
-                            <LanguageSelect isMobile={false} jsonlan={t('locale')} />
+                            <LanguageSelect isMobile={false} />
                         </div>
                     </nav>
 
@@ -240,7 +240,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                 <div className="mt-auto border-t px-4 py-4" style={{ borderColor: 'var(--sc-border)' }}>
                     <NavbarAuth variant="mobile" needsOnboarding={needsOnboarding} onAction={() => setMenuOpen(false)} />
                     <div className="mt-4 flex items-center gap-3">
-                        <LanguageSelect isMobile={true} jsonlan={t('locale')} />
+                        <LanguageSelect isMobile={true} />
                     </div>
                 </div>
             </div>
