@@ -3,11 +3,16 @@ import { prisma } from '@/lib/prisma'
 import { hashPassword } from 'better-auth/crypto'
 import crypto from 'crypto'
 import { C2PAService } from '@/lib/c2pa-service'
-import { generateVaultSetup, asymmetricWrapMasterKey, generateVerificationToken } from '@/lib/crypto-vault'
+import {
+    generateVaultSetup,
+    asymmetricWrapMasterKey,
+    generateVerificationToken,
+} from '@/lib/crypto-vault'
 import { KMS } from '@/lib/kms'
 
 // Minimal 1x1 transparent PNG file hex
-const MINIMAL_PNG_HEX = '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c63000100000500010d0a2db40000000049454e44ae426082'
+const MINIMAL_PNG_HEX =
+    '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c63000100000500010d0a2db40000000049454e44ae426082'
 const minimalPngBuffer = Buffer.from(MINIMAL_PNG_HEX, 'hex')
 
 describe('C2PA Content Credentials Integration Tests', () => {
@@ -49,7 +54,7 @@ describe('C2PA Content Credentials Integration Tests', () => {
                 userId: testUser1.id,
                 wrapMode: 'SSE_KMS',
                 wrappedKey: wrappedKey1,
-            }
+            },
         })
 
         // Generate C2PA credentials for User 1
@@ -85,7 +90,7 @@ describe('C2PA Content Credentials Integration Tests', () => {
                 userId: testUser2.id,
                 wrapMode: 'SSE_KMS',
                 wrappedKey: wrappedKey2,
-            }
+            },
         })
 
         // Generate C2PA credentials for User 2
@@ -122,18 +127,27 @@ describe('C2PA Content Credentials Integration Tests', () => {
         expect(inspect.hasManifest).toBe(false)
     })
 
-    it('should inspect public/test/test_cr_with_manifest.png and report manifest contents', async () => {
+    it('rejects the legacy fixture with an untrusted signer and malformed creation action', async () => {
         const fs = require('fs')
         const path = require('path')
-        const buf = fs.readFileSync(path.join(__dirname, '../public/test/test_cr_with_manifest.png'))
+        const buf = fs.readFileSync(
+            path.join(__dirname, '../public/test/test_cr_with_manifest.png'),
+        )
         const inspect = await C2PAService.inspectManifest(buf)
+        // Preserve this historical fixture as a negative case. The current
+        // validator correctly rejects its missing digitalSourceType; its signer
+        // is also outside this installation's configured trust anchors.
         expect(inspect.hasManifest).toBe(true)
-        expect(inspect.authentic).toBe(true)
-        expect(inspect.untrusted).toBe(false)
+        expect(inspect.authentic).toBe(false)
+        expect(inspect.untrusted).toBe(true)
         expect(inspect.artisanName).toBe('Frank')
-        expect(inspect.creatorUserId).toBe('ad6ed879-1596-4296-9329-1d79e24dda69')
-        expect(inspect.issuer).toBe('Crafts C2PA Root CA')
-        expect(inspect.validationStatus).toEqual([])
+        expect(inspect.creatorUserId).toBeUndefined()
+        expect(inspect.validationStatus).toEqual(
+            expect.arrayContaining([
+                expect.stringContaining('assertion.action.malformed'),
+                expect.stringContaining('signingCredential.untrusted'),
+            ]),
+        )
         expect(inspect.assertions).toHaveLength(1)
         expect(inspect.assertions?.[0]?.action).toBe('c2pa.created')
     })
@@ -142,7 +156,7 @@ describe('C2PA Content Credentials Integration Tests', () => {
         const signedBuffer = await C2PAService.initializeManifest(
             testUser1.id,
             minimalPngBuffer,
-            'image/png'
+            'image/png',
         )
 
         expect(signedBuffer).toBeDefined()
@@ -154,20 +168,32 @@ describe('C2PA Content Credentials Integration Tests', () => {
         expect(inspect.creatorUserId).toBe(testUser1.id)
         expect(inspect.artisanName).toBe('Artisan Alice')
         expect(inspect.issuer).toBe('Crafts C2PA Root CA')
+        expect(inspect.untrusted).toBe(false)
+        expect(inspect.validationStatus).toEqual([])
+        expect(inspect.assertions?.map((action) => action.action)).toEqual([
+            'org.sustainablecrafting.uploaded',
+        ])
+        expect(inspect.assertions?.[0]?.digitalSourceType).toBeFalsy()
+        const active = inspect.manifest?.manifests?.[inspect.manifest.active_manifest]
+        const actions = active?.assertions?.find(
+            (item: any) => item.label === 'c2pa.actions' || item.label === 'c2pa.actions.v2',
+        )?.data?.actions
+        expect(actions?.[0]?.action).toBe('c2pa.opened')
+        expect(actions?.some((action: any) => action.action === 'c2pa.created')).toBe(false)
     })
 
     it('should add edit assertions to the signed media (addEditAssertion) and preserve the chain', async () => {
         const signedBuffer = await C2PAService.initializeManifest(
             testUser1.id,
             minimalPngBuffer,
-            'image/png'
+            'image/png',
         )
 
         const editedBuffer = await C2PAService.addEditAssertion(
             testUser1.id,
             signedBuffer,
             'image/png',
-            'Resized the canvas to 1x1'
+            'Resized the canvas to 1x1',
         )
 
         expect(editedBuffer).toBeDefined()
@@ -178,24 +204,100 @@ describe('C2PA Content Credentials Integration Tests', () => {
         expect(inspect.authentic).toBe(true)
         expect(inspect.creatorUserId).toBe(testUser1.id)
         expect(inspect.artisanName).toBe('Artisan Alice')
+        expect(inspect.untrusted).toBe(false)
+        expect(inspect.assertions?.map((action) => action.action)).toEqual([
+            'org.sustainablecrafting.uploaded',
+            'c2pa.edited',
+        ])
     })
 
     it('should throw an ownership mismatch error if User 2 tries to sign or modify User 1 assets', async () => {
         const signedByUser1 = await C2PAService.initializeManifest(
             testUser1.id,
             minimalPngBuffer,
-            'image/png'
+            'image/png',
         )
 
         // User 2 trying to re-initialize User 1's image should be rejected
         await expect(
-            C2PAService.initializeManifest(testUser2.id, signedByUser1, 'image/png')
+            C2PAService.initializeManifest(testUser2.id, signedByUser1, 'image/png'),
         ).rejects.toThrow('Cannot overwrite content credentials belonging to a different creator.')
 
         // User 2 trying to add edit assertion on User 1's image should be rejected
         await expect(
-            C2PAService.addEditAssertion(testUser2.id, signedByUser1, 'image/png', 'Malicious edit')
+            C2PAService.addEditAssertion(
+                testUser2.id,
+                signedByUser1,
+                'image/png',
+                'Malicious edit',
+            ),
         ).rejects.toThrow('Cannot modify content credentials belonging to a different creator.')
+    })
+
+    it('binds ownership to the active certificate, ignoring another account ID in signed metadata', async () => {
+        const signed = await C2PAService.initializeManifest(
+            testUser1.id,
+            minimalPngBuffer,
+            'image/png',
+            {
+                service: 'Test generator',
+                model: 'fixture',
+                size: '1x1',
+                prompt: 'An example mentioning urn:uuid:' + testUser2.id,
+            },
+        )
+        const inspected = await C2PAService.inspectManifest(signed)
+        expect(inspected.authentic).toBe(true)
+        expect(inspected.creatorUserId).toBe(testUser1.id)
+        expect(inspected.validationStatus).toEqual([])
+    })
+
+    it('uses the active commissioner rather than the earlier ingredient signer', async () => {
+        const generated = await C2PAService.initializeManifest(
+            testUser1.id,
+            minimalPngBuffer,
+            'image/png',
+            {
+                service: 'Test generator',
+                model: 'fixture',
+                size: '1x1',
+                prompt: 'Test fixture',
+            },
+        )
+        const commissioned = await C2PAService.addCommissionManifest(
+            testUser2.id,
+            generated,
+            'image/png',
+            {
+                service: 'Test generator',
+                model: 'fixture',
+                size: '1x1',
+                prompt: 'Test fixture',
+            },
+        )
+        const inspected = await C2PAService.inspectManifest(commissioned)
+        expect(inspected.authentic).toBe(true)
+        expect(inspected.creatorUserId).toBe(testUser2.id)
+        expect(inspected.untrusted).toBe(false)
+        expect(inspected.validationStatus).toEqual([])
+        expect(inspected.assertions?.map((action) => action.action)).toEqual([
+            'c2pa.created',
+            'c2pa.published',
+        ])
+    })
+
+    it('rejects a change to signed image bytes', async () => {
+        const signed = await C2PAService.initializeManifest(
+            testUser1.id,
+            minimalPngBuffer,
+            'image/png',
+        )
+        const changed = Buffer.from(signed)
+        const imageData = changed.indexOf(Buffer.from('IDAT'))
+        expect(imageData).toBeGreaterThan(0)
+        changed[imageData + 5] ^= 1
+        const inspected = await C2PAService.inspectManifest(changed)
+        expect(inspected.authentic).toBe(false)
     })
 
     it('should auto-renew the user certificate if auto-renew is enabled and within the 30-day window', async () => {
@@ -205,14 +307,14 @@ describe('C2PA Content Credentials Integration Tests', () => {
             where: { id: testUser1.id },
             data: {
                 c2paAutoRenew: true,
-                c2paCertExpiresAt: nearExpiry
-            }
+                c2paCertExpiresAt: nearExpiry,
+            },
         })
 
         // Verify pre-renewal status
         let userDb = await prisma.user.findUnique({
             where: { id: testUser1.id },
-            select: { c2paCertExpiresAt: true }
+            select: { c2paCertExpiresAt: true },
         })
         expect(userDb?.c2paCertExpiresAt?.getTime()).toBe(nearExpiry.getTime())
 
@@ -222,11 +324,12 @@ describe('C2PA Content Credentials Integration Tests', () => {
         // 3. Verify certificate is successfully rotated (expiry date updated to ~365 days in future)
         userDb = await prisma.user.findUnique({
             where: { id: testUser1.id },
-            select: { c2paCertExpiresAt: true }
+            select: { c2paCertExpiresAt: true },
         })
 
         expect(userDb?.c2paCertExpiresAt).toBeDefined()
-        const daysToExpiry = (userDb!.c2paCertExpiresAt!.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        const daysToExpiry =
+            (userDb!.c2paCertExpiresAt!.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
         expect(daysToExpiry).toBeGreaterThan(360) // Around 365 days
     })
 
@@ -236,15 +339,15 @@ describe('C2PA Content Credentials Integration Tests', () => {
             where: { id: testUser1.id },
             data: {
                 c2paAutoRenew: false,
-                c2paCertExpiresAt: nearExpiry
-            }
+                c2paCertExpiresAt: nearExpiry,
+            },
         })
 
         await C2PAService.renewExpiringCertificates()
 
         const userDb = await prisma.user.findUnique({
             where: { id: testUser1.id },
-            select: { c2paCertExpiresAt: true }
+            select: { c2paCertExpiresAt: true },
         })
         expect(userDb?.c2paCertExpiresAt?.getTime()).toBe(nearExpiry.getTime())
     })
@@ -254,6 +357,7 @@ describe('C2PA Content Credentials Integration Tests', () => {
         const hashedPassword = await hashPassword('SecurePassword3!')
         const customUser = await prisma.user.create({
             data: {
+                id: 'auth-user-' + crypto.randomUUID(),
                 email: customUserEmail,
                 name: 'Original Name',
                 role: 'ARTISAN',
@@ -279,21 +383,30 @@ describe('C2PA Content Credentials Integration Tests', () => {
                 userId: customUser.id,
                 wrapMode: 'SSE_KMS',
                 wrappedKey: wrappedKey,
-            }
+            },
         })
 
-        const customCN = 'Custom Artisan CN Name'
+        const customCN = 'حرفي $ENV::C2PA_TEST_SUBJECT_LITERAL / +'
+        process.env.C2PA_TEST_SUBJECT_LITERAL = 'must-not-expand'
         // Generate C2PA credentials with custom CN
         await C2PAService.generateAndStoreCredentials(customUser.id, rawMasterKey, customCN)
 
         // Sign minimal PNG
-        const signedBuffer = await C2PAService.initializeManifest(customUser.id, minimalPngBuffer, 'image/png')
+        const signedBuffer = await C2PAService.initializeManifest(
+            customUser.id,
+            minimalPngBuffer,
+            'image/png',
+        )
 
         // Inspect manifest and check CN
         const inspect = await C2PAService.inspectManifest(signedBuffer)
         expect(inspect.hasManifest).toBe(true)
         expect(inspect.authentic).toBe(true)
         expect(inspect.artisanName).toBe(customCN)
+        expect(inspect.creatorUserId).toBe(customUser.id)
+        expect(inspect.untrusted).toBe(false)
+        expect(inspect.validationStatus).toEqual([])
+        delete process.env.C2PA_TEST_SUBJECT_LITERAL
 
         // Cleanup
         await prisma.userWrappedVaultKeys.deleteMany({ where: { userId: customUser.id } })
@@ -307,7 +420,11 @@ describe('C2PA Content Credentials Integration Tests', () => {
         expect(stateNone).toBe('none')
 
         // 2. Sign with User 1 credentials
-        const signedBuffer = await C2PAService.initializeManifest(testUser1.id, minimalPngBuffer, 'image/png')
+        const signedBuffer = await C2PAService.initializeManifest(
+            testUser1.id,
+            minimalPngBuffer,
+            'image/png',
+        )
 
         // 3. Match against User 1 -> should return 'owned'
         const stateOwned = await C2PAService.getC2PAState(signedBuffer, testUser1.id)

@@ -1,39 +1,49 @@
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { GalleryHeader } from '@/components/sc/SectionHeader'
+import { publicContacts } from '@/lib/public-contacts'
 
 type Section = { heading: string; body: string }
 
-/**
- * Renders a policy document from a message namespace shaped as
- * `{ title, lastUpdated, intro, sections: [{ heading, body }] }`.
- *
- * The legal text is authored in English only; other locales fall back to it
- * through the merge in src/i8n/requests.tsx, so a translated site still shows a
- * complete policy rather than a raw key path.
- */
 export function LegalPage({ namespace }: { namespace: 'terms' | 'privacy' }) {
     const t = useTranslations(namespace)
-    const tLegal = useTranslations('legal')
+    const tui = useTranslations('interface')
+    const locale = useLocale()
+    const contacts = publicContacts()
     const sections = t.raw('sections') as Section[]
+
+    function body(text: string) {
+        return text.split(/(\{privacyContact\}|\{legalContact\})/g).map((part, i) => {
+            const contact =
+                part === '{privacyContact}'
+                    ? contacts.privacy
+                    : part === '{legalContact}'
+                      ? contacts.legal
+                      : null
+            return contact ? (
+                <a key={i} href={contact.href} className="underline underline-offset-4">
+                    {contact.label}
+                </a>
+            ) : (
+                part
+            )
+        })
+    }
 
     return (
         <div className="sc-container py-12">
-            <GalleryHeader
-                eyebrow={tLegal('eyebrow')}
-                title={t('title')}
-                description={t('intro')}
-            />
-
-            <div className="flex max-w-3xl flex-col gap-8">
-                <p className="sc-body text-sm opacity-70">{t('lastUpdated')}</p>
-
-                {sections.map((section) => (
-                    <section key={section.heading}>
-                        <h2 className="sc-h2 mb-3">{section.heading}</h2>
-                        <p className="sc-body whitespace-pre-line">{section.body}</p>
-                    </section>
-                ))}
-            </div>
+            {locale !== 'en' && <p className="sc-body mb-6">{tui('legalEnglishOnly')}</p>}
+            <article lang="en" dir="ltr">
+                <GalleryHeader title={t('title')} description={t('intro')} />
+                <div className="flex max-w-3xl flex-col gap-8">
+                    <p className="sc-body text-sm opacity-70">{t('lastUpdated')}</p>
+                    {sections.map((section) => (
+                        <section key={section.heading}>
+                            <h2 className="sc-h2 mb-3">{section.heading}</h2>
+                            <p className="sc-body whitespace-pre-line">{body(section.body)}</p>
+                        </section>
+                    ))}
+                </div>
+            </article>
         </div>
     )
 }

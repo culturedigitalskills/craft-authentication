@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { Layers } from 'lucide-react'
 import { EventItem } from './EventItem'
@@ -12,6 +13,8 @@ interface EventListProps {
 }
 
 export function EventList({ events, onShowDetail, onCancel, onRetry, onRemove }: EventListProps) {
+    const tui = useInterfaceTranslations('interface')
+
     if (events.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
@@ -19,14 +22,14 @@ export function EventList({ events, onShowDetail, onCancel, onRetry, onRemove }:
                     <Layers className="w-6 h-6 text-muted-foreground/60" />
                 </div>
                 <p className="text-sm text-muted-foreground max-w-[280px]">
-                    No generation events recorded. Specify a prompt on the left to start generating.
+                    {tui('noGenerationEventsRecordedSpecifyAPromptOnThe')}
                 </p>
             </div>
         )
     }
 
     return (
-        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+        <div className="space-y-4 max-h-[500px] overflow-y-auto pe-1">
             {events.map((event) => (
                 <EventItem
                     key={event.id}

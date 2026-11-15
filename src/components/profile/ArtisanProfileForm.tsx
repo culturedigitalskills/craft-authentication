@@ -1,10 +1,14 @@
 'use client'
 
+import { formatLocation } from '@/data/locations'
+import { normalizeHashtag, isValidHashtag } from '@/lib/validations/hashtag'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
+
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i8n/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -77,7 +81,10 @@ export function ArtisanProfileForm({
     storyBanner,
     profileUrl,
 }: ArtisanProfileFormProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('profile')
+    const displayLocale = useLocale()
     const router = useRouter()
     const [isEditing, setIsEditing] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -229,13 +236,8 @@ export function ArtisanProfileForm({
     }
 
     function addHashtag() {
-        const tag = hashtagInput.replace(/^#/, '').trim()
-        if (
-            tag &&
-            /^[A-Za-z0-9_]{1,50}$/.test(tag) &&
-            !hashtags.includes(tag) &&
-            hashtags.length < 20
-        ) {
+        const tag = normalizeHashtag(hashtagInput)
+        if (tag && isValidHashtag(tag) && !hashtags.includes(tag) && hashtags.length < 20) {
             setHashtags((prev) => [...prev, tag])
         }
         setHashtagInput('')
@@ -255,8 +257,7 @@ export function ArtisanProfileForm({
         }
     }
 
-    const locationText =
-        artisan?.region && artisan?.country ? `${artisan.region}, ${artisan.country}` : null
+    const locationText = formatLocation(artisan?.country, artisan?.region, displayLocale) || null
 
     // ── View mode — scroll sections layout ──
     if (!showForm && artisan) {
@@ -267,7 +268,7 @@ export function ArtisanProfileForm({
                     {coverUrl ? (
                         <Image
                             src={coverUrl}
-                            alt="Cover photo"
+                            alt={tui('coverPhoto')}
                             fill
                             sizes="100vw"
                             className="object-cover"
@@ -321,12 +322,12 @@ export function ArtisanProfileForm({
 
                         <div className="mt-4 flex flex-wrap justify-center gap-3">
                             <Button onClick={() => setIsEditing(true)}>
-                                <Pencil className="mr-2 h-4 w-4" />
+                                <Pencil className="me-2 h-4 w-4" />
                                 {t('edit')}
                             </Button>
                             <Button variant="outline" asChild>
                                 <Link href={`/artisans/${artisan.slug}`}>
-                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                    <ExternalLink className="me-2 h-4 w-4" />
                                     {t('publicProfileLink')}
                                 </Link>
                             </Button>
@@ -397,7 +398,7 @@ export function ArtisanProfileForm({
                             <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-warm">
                                 {t('bio')}
                             </h2>
-                            <div className="border-l-2 border-warm/30 pl-5">
+                            <div className="border-s-2 border-warm/30 ps-5">
                                 <p className="text-base leading-relaxed text-foreground/80">
                                     {artisan.bio}
                                 </p>
@@ -471,7 +472,7 @@ export function ArtisanProfileForm({
                                                 onClick={() => setConfirmLeave(g.membershipId)}
                                                 className="text-muted-foreground hover:text-destructive"
                                             >
-                                                <LogOut className="mr-1.5 h-4 w-4" />
+                                                <LogOut className="me-1.5 h-4 w-4" />
                                                 {t('leaveGroup')}
                                             </Button>
                                         )}
@@ -490,7 +491,6 @@ export function ArtisanProfileForm({
                         </div>
                     </section>
                 )}
-
             </div>
         )
     }
@@ -512,10 +512,10 @@ export function ArtisanProfileForm({
                             </button>
                         )}
                         <div>
-                            <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                            <h1 className="text-start text-2xl font-bold tracking-tight text-primary-foreground">
                                 {isCreateMode ? t('createTitle') : t('editTitle')}
                             </h1>
-                            <p className="text-left text-sm text-primary-foreground/70">
+                            <p className="text-start text-sm text-primary-foreground/70">
                                 {isCreateMode ? t('createHelper') : t('editHelper')}
                             </p>
                         </div>
@@ -523,283 +523,296 @@ export function ArtisanProfileForm({
                 </div>
 
                 <CardContent className="space-y-8 p-6">
-
-                {message && (
-                    <div
-                        className={`rounded-lg p-3 text-sm ${
-                            message.type === 'success'
-                                ? 'bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200'
-                                : 'bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200'
-                        }`}
-                    >
-                        {message.text}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-8">
-                    {/* Photos section */}
-                    <div className="rounded-lg border border-border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">{t('coverPhoto')}</h2>
-                        <div className="space-y-5">
-                            <CoverPhotoUpload
-                                artisanId={artisan?.id ?? null}
-                                currentCoverUrl={coverUrl}
-                                onCoverUploaded={setUploadedCoverId}
-                            />
-                            <ProfilePhotoUpload
-                                artisanId={artisan?.id ?? null}
-                                currentPhotoUrl={photoUrl}
-                                onPhotoUploaded={setUploadedPhotoId}
-                            />
+                    {message && (
+                        <div
+                            className={`rounded-lg p-3 text-sm ${
+                                message.type === 'success'
+                                    ? 'bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200'
+                                    : 'bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200'
+                            }`}
+                        >
+                            {message.text}
                         </div>
-                    </div>
+                    )}
 
-                    {/* Personal info section */}
-                    <div className="rounded-lg border border-border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">{t('personalInfo')}</h2>
-                        <div className="space-y-5">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Label
-                                        htmlFor="firstName"
-                                        className="mb-1.5 block text-sm font-medium"
-                                    >
-                                        {t('firstName')}
-                                    </Label>
-                                    <Input
-                                        id="firstName"
-                                        value={firstName}
-                                        onChange={(e) => setFirstName(e.target.value)}
-                                        pattern=".*\D.*"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label
-                                        htmlFor="lastName"
-                                        className="mb-1.5 block text-sm font-medium"
-                                    >
-                                        {t('lastName')}
-                                    </Label>
-                                    <Input
-                                        id="lastName"
-                                        value={lastName}
-                                        onChange={(e) => setLastName(e.target.value)}
-                                        pattern=".*\D.*"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <Label htmlFor="bio" className="mb-1.5 block text-sm font-medium">
-                                    {t('bio')}
-                                </Label>
-                                <Textarea
-                                    id="bio"
-                                    value={bio}
-                                    onChange={(e) => setBio(e.target.value)}
-                                    placeholder={t('bioPlaceholder')}
-                                    rows={4}
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        {/* Photos section */}
+                        <div className="rounded-lg border border-border bg-card p-6">
+                            <h2 className="mb-4 text-lg font-semibold">{t('coverPhoto')}</h2>
+                            <div className="space-y-5">
+                                <CoverPhotoUpload
+                                    artisanId={artisan?.id ?? null}
+                                    currentCoverUrl={coverUrl}
+                                    onCoverUploaded={setUploadedCoverId}
+                                />
+                                <ProfilePhotoUpload
+                                    artisanId={artisan?.id ?? null}
+                                    currentPhotoUrl={photoUrl}
+                                    onPhotoUploaded={setUploadedPhotoId}
                                 />
                             </div>
                         </div>
-                    </div>
 
-                    {/* Craft experience section */}
-                    <div className="rounded-lg border border-border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">{t('craftExperience')}</h2>
-                        <div className="space-y-5">
-                            <div>
-                                <Label
-                                    htmlFor="yearsOfExperience"
-                                    className="mb-1.5 block text-sm font-medium"
-                                >
-                                    {t('yearsOfExperience')}
-                                </Label>
-                                <Input
-                                    id="yearsOfExperience"
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    value={yearsOfExperience}
-                                    onChange={(e) => setYearsOfExperience(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <Label
-                                    htmlFor="learningSource"
-                                    className="mb-1.5 block text-sm font-medium"
-                                >
-                                    {t('learningSource')}
-                                </Label>
-                                <Input
-                                    id="learningSource"
-                                    value={learningSource}
-                                    onChange={(e) => setLearningSource(e.target.value)}
-                                    placeholder={t('learningSourcePlaceholder')}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Location section */}
-                    <div className="rounded-lg border border-border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">{t('location')}</h2>
-                        <LocationSelect
-                            initialCountry={artisan?.country ?? undefined}
-                            initialRegion={artisan?.region ?? undefined}
-                            onLocationChange={(c, r) => {
-                                setCountry(c)
-                                setRegion(r)
-                            }}
-                        />
-                    </div>
-
-                    {/* Social & Hashtags section */}
-                    <div className="rounded-lg border border-border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">{t('socialAndHashtags')}</h2>
-                        <div className="space-y-4">
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                {[
-                                    {
-                                        id: 'socialInstagram',
-                                        label: t('socialInstagram'),
-                                        icon: FaInstagram,
-                                        value: socialInstagram,
-                                        setter: setSocialInstagram,
-                                        placeholder: 'yourhandle',
-                                    },
-                                    {
-                                        id: 'socialFacebook',
-                                        label: t('socialFacebook'),
-                                        icon: FaFacebook,
-                                        value: socialFacebook,
-                                        setter: setSocialFacebook,
-                                        placeholder: 'yourhandle',
-                                    },
-                                    {
-                                        id: 'socialTwitter',
-                                        label: t('socialTwitter'),
-                                        icon: FaXTwitter,
-                                        value: socialTwitter,
-                                        setter: setSocialTwitter,
-                                        placeholder: 'yourhandle',
-                                    },
-                                    {
-                                        id: 'socialTiktok',
-                                        label: t('socialTiktok'),
-                                        icon: FaTiktok,
-                                        value: socialTiktok,
-                                        setter: setSocialTiktok,
-                                        placeholder: 'yourhandle',
-                                    },
-                                    {
-                                        id: 'socialYoutube',
-                                        label: t('socialYoutube'),
-                                        icon: FaYoutube,
-                                        value: socialYoutube,
-                                        setter: setSocialYoutube,
-                                        placeholder: 'yourchannel',
-                                    },
-                                    {
-                                        id: 'website',
-                                        label: t('socialWebsite'),
-                                        icon: Globe,
-                                        value: website,
-                                        setter: setWebsite,
-                                        placeholder: 'www.yoursite.com',
-                                    },
-                                ].map(({ id, label, icon: Icon, value, setter, placeholder }) => (
-                                    <div key={id}>
+                        {/* Personal info section */}
+                        <div className="rounded-lg border border-border bg-card p-6">
+                            <h2 className="mb-4 text-lg font-semibold">{t('personalInfo')}</h2>
+                            <div className="space-y-5">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
                                         <Label
-                                            htmlFor={id}
-                                            className="mb-1.5 flex items-center gap-1.5 text-sm font-medium"
+                                            htmlFor="firstName"
+                                            className="mb-1.5 block text-sm font-medium"
                                         >
-                                            <Icon className="h-4 w-4 text-muted-foreground" />
-                                            {label}
+                                            {t('firstName')}
                                         </Label>
                                         <Input
-                                            id={id}
-                                            value={value}
-                                            onChange={(e) => setter(e.target.value)}
-                                            onBlur={
-                                                id === 'website'
-                                                    ? () => setWebsite(normalizeWebsite(website))
-                                                    : undefined
-                                            }
-                                            placeholder={placeholder}
+                                            id="firstName"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                            pattern=".*\D.*"
+                                            required
                                         />
                                     </div>
-                                ))}
-                            </div>
-
-                            <div>
-                                <Label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
-                                    <Hash className="h-4 w-4 text-muted-foreground" />
-                                    {t('hashtags')}
-                                </Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        value={hashtagInput}
-                                        onChange={(e) => setHashtagInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault()
-                                                addHashtag()
-                                            }
-                                        }}
-                                        placeholder={t('addHashtag')}
-                                        className="flex-1"
-                                    />
-                                    <Button type="button" variant="outline" onClick={addHashtag}>
-                                        +
-                                    </Button>
-                                </div>
-                                {hashtags.length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-1.5">
-                                        {hashtags.map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
-                                            >
-                                                #{tag}
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setHashtags((prev) =>
-                                                            prev.filter((t) => t !== tag),
-                                                        )
-                                                    }
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            </span>
-                                        ))}
+                                    <div>
+                                        <Label
+                                            htmlFor="lastName"
+                                            className="mb-1.5 block text-sm font-medium"
+                                        >
+                                            {t('lastName')}
+                                        </Label>
+                                        <Input
+                                            id="lastName"
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
+                                            pattern=".*\D.*"
+                                            required
+                                        />
                                     </div>
-                                )}
+                                </div>
+                                <div>
+                                    <Label
+                                        htmlFor="bio"
+                                        className="mb-1.5 block text-sm font-medium"
+                                    >
+                                        {t('bio')}
+                                    </Label>
+                                    <Textarea
+                                        id="bio"
+                                        value={bio}
+                                        onChange={(e) => setBio(e.target.value)}
+                                        placeholder={t('bioPlaceholder')}
+                                        rows={4}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Action buttons */}
-                    <div className="flex justify-end gap-3">
-                        {isEditing && (
-                            <Button type="button" variant="outline" onClick={handleCancelEdit}>
-                                {t('cancelEdit')}
+                        {/* Craft experience section */}
+                        <div className="rounded-lg border border-border bg-card p-6">
+                            <h2 className="mb-4 text-lg font-semibold">{t('craftExperience')}</h2>
+                            <div className="space-y-5">
+                                <div>
+                                    <Label
+                                        htmlFor="yearsOfExperience"
+                                        className="mb-1.5 block text-sm font-medium"
+                                    >
+                                        {t('yearsOfExperience')}
+                                    </Label>
+                                    <Input
+                                        id="yearsOfExperience"
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={yearsOfExperience}
+                                        onChange={(e) => setYearsOfExperience(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <Label
+                                        htmlFor="learningSource"
+                                        className="mb-1.5 block text-sm font-medium"
+                                    >
+                                        {t('learningSource')}
+                                    </Label>
+                                    <Input
+                                        id="learningSource"
+                                        value={learningSource}
+                                        onChange={(e) => setLearningSource(e.target.value)}
+                                        placeholder={t('learningSourcePlaceholder')}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Location section */}
+                        <div className="rounded-lg border border-border bg-card p-6">
+                            <h2 className="mb-4 text-lg font-semibold">{t('location')}</h2>
+                            <LocationSelect
+                                initialCountry={artisan?.country ?? undefined}
+                                initialRegion={artisan?.region ?? undefined}
+                                onLocationChange={(c, r) => {
+                                    setCountry(c)
+                                    setRegion(r)
+                                }}
+                            />
+                        </div>
+
+                        {/* Social & Hashtags section */}
+                        <div className="rounded-lg border border-border bg-card p-6">
+                            <h2 className="mb-4 text-lg font-semibold">{t('socialAndHashtags')}</h2>
+                            <div className="space-y-4">
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    {[
+                                        {
+                                            id: 'socialInstagram',
+                                            label: t('socialInstagram'),
+                                            icon: FaInstagram,
+                                            value: socialInstagram,
+                                            setter: setSocialInstagram,
+                                            placeholder: 'yourhandle',
+                                        },
+                                        {
+                                            id: 'socialFacebook',
+                                            label: t('socialFacebook'),
+                                            icon: FaFacebook,
+                                            value: socialFacebook,
+                                            setter: setSocialFacebook,
+                                            placeholder: 'yourhandle',
+                                        },
+                                        {
+                                            id: 'socialTwitter',
+                                            label: t('socialTwitter'),
+                                            icon: FaXTwitter,
+                                            value: socialTwitter,
+                                            setter: setSocialTwitter,
+                                            placeholder: 'yourhandle',
+                                        },
+                                        {
+                                            id: 'socialTiktok',
+                                            label: t('socialTiktok'),
+                                            icon: FaTiktok,
+                                            value: socialTiktok,
+                                            setter: setSocialTiktok,
+                                            placeholder: 'yourhandle',
+                                        },
+                                        {
+                                            id: 'socialYoutube',
+                                            label: t('socialYoutube'),
+                                            icon: FaYoutube,
+                                            value: socialYoutube,
+                                            setter: setSocialYoutube,
+                                            placeholder: 'yourchannel',
+                                        },
+                                        {
+                                            id: 'website',
+                                            label: t('socialWebsite'),
+                                            icon: Globe,
+                                            value: website,
+                                            setter: setWebsite,
+                                            placeholder: 'www.yoursite.com',
+                                        },
+                                    ].map(
+                                        ({ id, label, icon: Icon, value, setter, placeholder }) => (
+                                            <div key={id}>
+                                                <Label
+                                                    htmlFor={id}
+                                                    className="mb-1.5 flex items-center gap-1.5 text-sm font-medium"
+                                                >
+                                                    <Icon className="h-4 w-4 text-muted-foreground" />
+                                                    {label}
+                                                </Label>
+                                                <Input
+                                                    id={id}
+                                                    value={value}
+                                                    onChange={(e) => setter(e.target.value)}
+                                                    onBlur={
+                                                        id === 'website'
+                                                            ? () =>
+                                                                  setWebsite(
+                                                                      normalizeWebsite(website),
+                                                                  )
+                                                            : undefined
+                                                    }
+                                                    placeholder={placeholder}
+                                                />
+                                            </div>
+                                        ),
+                                    )}
+                                </div>
+
+                                <div>
+                                    <Label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
+                                        <Hash className="h-4 w-4 text-muted-foreground" />
+                                        {t('hashtags')}
+                                    </Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            value={hashtagInput}
+                                            onChange={(e) => setHashtagInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault()
+                                                    addHashtag()
+                                                }
+                                            }}
+                                            placeholder={t('addHashtag')}
+                                            className="flex-1"
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={addHashtag}
+                                        >
+                                            +
+                                        </Button>
+                                    </div>
+                                    {hashtags.length > 0 && (
+                                        <div className="mt-2 flex flex-wrap gap-1.5">
+                                            {hashtags.map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                                                >
+                                                    #{tag}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setHashtags((prev) =>
+                                                                prev.filter((t) => t !== tag),
+                                                            )
+                                                        }
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex justify-end gap-3">
+                            {isEditing && (
+                                <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                                    {t('cancelEdit')}
+                                </Button>
+                            )}
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting && (
+                                    <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
+                                )}
+                                {isSubmitting
+                                    ? isCreateMode
+                                        ? t('saving')
+                                        : t('updating')
+                                    : isCreateMode
+                                      ? t('save')
+                                      : t('update')}
                             </Button>
-                        )}
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
-                            {isSubmitting
-                                ? isCreateMode
-                                    ? t('saving')
-                                    : t('updating')
-                                : isCreateMode
-                                  ? t('save')
-                                  : t('update')}
-                        </Button>
-                    </div>
-                </form>
+                        </div>
+                    </form>
                 </CardContent>
             </Card>
         </div>

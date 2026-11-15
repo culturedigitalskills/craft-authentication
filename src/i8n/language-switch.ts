@@ -14,13 +14,8 @@ export const languageNames: Record<SiteLocale, string> = {
 }
 
 /**
- * An explicit locale prefix lets the middleware set its locale cookie before
- * rendering. A document navigation avoids replaying the previous language from
- * Next's cache while localePrefix is "never". Reuse the routing API so this also
- * works when the planned stable locale URLs are enabled.
- *
- * Keep the browser's raw search string: parsing to an object loses repeated
- * parameters, and passing only pathname loses searches, pages and edit IDs.
+ * Build a stable locale URL, retaining repeated query parameters and fragments.
+ * Document navigation intentionally uses the unsaved-work confirmation below.
  */
 export function languageSwitchHref(
     pathname: string,
@@ -28,7 +23,7 @@ export function languageSwitchHref(
     hash: string,
     locale: SiteLocale,
 ): string {
-    return getPathname({ href: `${pathname}${search}${hash}`, locale, forcePrefix: true })
+    return getPathname({ href: `${pathname}${search}${hash}`, locale })
 }
 
 /**
@@ -48,6 +43,8 @@ export function languageSwitchNeedsConfirmation(pathname: string): boolean {
         '/content-credentials',
         '/generation-workspace',
     ]
-    return roots.some((root) => pathname === root || pathname.startsWith(`${root}/`)) ||
+    return (
+        roots.some((root) => pathname === root || pathname.startsWith(`${root}/`)) ||
         /^\/groups\/[^/]+\/manage(?:\/|$)/.test(pathname)
+    )
 }

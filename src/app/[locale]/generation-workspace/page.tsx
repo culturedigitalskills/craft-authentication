@@ -1,11 +1,12 @@
+import { getLocale } from 'next-intl/server'
 import { auth } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+import { redirect } from '@/i8n/navigation'
 import { GenerationWorkspaceClient } from '@/components/generation/GenerationWorkspaceClient'
 
 export default async function GenerationWorkspacePage() {
     const session = await auth()
     if (!session?.user) {
-        redirect('/login')
+        return redirect({ href: '/login', locale: await getLocale() })
     }
 
     return (

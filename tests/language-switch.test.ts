@@ -23,29 +23,55 @@ describe('language selection navigation', () => {
         expect(href).toBe('/tr/crafts/create?id=craft-123&q=blue%20cloth&tag=a&tag=b&page=2#review')
     })
 
-    it.each(routing.locales)('serves an explicit %s selection over the browser and previous cookie', (locale) => {
-        const href = languageSwitchHref('/crafts', '?q=cloth&page=2', '', locale)
-        const request = new NextRequest(`http://localhost:20200${href}`, {
-            headers: { cookie: 'NEXT_LOCALE=de', 'accept-language': 'en' },
-        })
-        const response = middleware(request)
+    it.each(routing.locales)(
+        'serves the URL-selected %s locale despite cookies and browser preferences',
+        (locale) => {
+            const href = languageSwitchHref('/crafts', '?q=cloth&page=2', '', locale)
+            const response = middleware(
+                new NextRequest('http://localhost:20200' + href, {
+                    headers: { cookie: 'NEXT_LOCALE=de', 'accept-language': 'ar' },
+                }),
+            )
+            expect(response.status).toBe(200)
+            expect(response.headers.get('location')).toBeNull()
+            const rewritten = new URL(
+                response.headers.get('x-middleware-rewrite') || 'http://localhost:20200' + href,
+            )
+            expect(rewritten.pathname).toBe('/' + locale + '/crafts')
+            expect(rewritten.searchParams.get('q')).toBe('cloth')
+            expect(rewritten.searchParams.get('page')).toBe('2')
+        },
+    )
+
+    it('normalizes legacy English prefixes without losing query parameters', () => {
+        const response = middleware(
+            new NextRequest('http://localhost:20200/en/crafts?id=123&tag=a&tag=b'),
+        )
         expect(response.status).toBe(307)
-        expect(new URL(response.headers.get('location')!).pathname).toBe('/crafts')
-        expect(new URL(response.headers.get('location')!).search).toBe('?q=cloth&page=2')
-        // If the selected locale already matches the cookie, a new cookie is unnecessary.
-        if (locale !== 'de') expect(response.cookies.get('NEXT_LOCALE')?.value).toBe(locale)
+        const target = new URL(response.headers.get('location')!)
+        expect(target.pathname).toBe('/crafts')
+        expect(target.searchParams.getAll('tag')).toEqual(['a', 'b'])
+        expect(target.searchParams.get('id')).toBe('123')
     })
 
     it.each([
-        '/crafts/create', '/profile', '/onboarding/story', '/groups/team/manage',
-        '/groups/create', '/register', '/login', '/media-gallery', '/content-credentials',
+        '/crafts/create',
+        '/profile',
+        '/onboarding/story',
+        '/groups/team/manage',
+        '/groups/create',
+        '/register',
+        '/login',
+        '/media-gallery',
+        '/content-credentials',
         '/generation-workspace',
     ])('protects possible unsaved work on %s', (path) => {
         expect(languageSwitchNeedsConfirmation(path)).toBe(true)
     })
 
     it.each(['/', '/crafts', '/crafts/mycrafts', '/artisans/someone', '/groups/team', '/about'])(
-        'does not interrupt browsing on %s', (path) => {
+        'does not interrupt browsing on %s',
+        (path) => {
             expect(languageSwitchNeedsConfirmation(path)).toBe(false)
         },
     )
@@ -58,7 +84,9 @@ describe('language selector messages', () => {
             locale,
             messages,
             namespace: 'languageSelector',
-            onError(error) { throw error },
+            onError(error) {
+                throw error
+            },
         })
         expect(t('label', { language: languageNames[locale] })).toContain(languageNames[locale])
         expect(t('menu')).toBeTruthy()

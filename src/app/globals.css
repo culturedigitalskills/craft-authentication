@@ -115,3 +115,18 @@
 .language-native-name[lang='hi'] {
     font-family: var(--font-devanagari), sans-serif;
 }
+
+.language-native-name[lang='ar'] { font-family: var(--font-arabic), sans-serif; }
+body:lang(ar) {
+    --sc-font-body: var(--font-arabic), sans-serif;
+    --sc-font-display: var(--font-arabic), sans-serif;
+    --sc-font-hand: var(--font-arabic), sans-serif;
+}
+body:lang(hi) {
+    --sc-font-body: var(--font-devanagari), sans-serif;
+    --sc-font-display: var(--font-devanagari), sans-serif;
+    --sc-font-hand: var(--font-devanagari), sans-serif;
+}
+body:lang(ar) .sc-eyebrow { letter-spacing: normal; }
+html[dir='rtl'] :is(.lucide-arrow-left, .lucide-arrow-right, .lucide-chevron-left, .lucide-chevron-right) { transform: scaleX(-1); }
+pre, code { direction: ltr; unicode-bidi: isolate; text-align: left; }

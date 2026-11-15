@@ -132,7 +132,11 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
 
     // Bind the live stream to the preview element whenever it is on screen.
     useEffect(() => {
-        if (mode === 'video' && (phase === 'ready' || phase === 'recording') && liveVideoRef.current) {
+        if (
+            mode === 'video' &&
+            (phase === 'ready' || phase === 'recording') &&
+            liveVideoRef.current
+        ) {
             liveVideoRef.current.srcObject = streamRef.current
         }
     }, [mode, phase])
@@ -146,7 +150,9 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
 
         let recorder: MediaRecorder
         try {
-            recorder = preferred ? new MediaRecorder(stream, { mimeType: preferred }) : new MediaRecorder(stream)
+            recorder = preferred
+                ? new MediaRecorder(stream, { mimeType: preferred })
+                : new MediaRecorder(stream)
         } catch {
             setErrorKey('notSupported')
             setPhase('error')
@@ -227,13 +233,18 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
                     </p>
                     <div className="flex justify-center gap-2">
                         {errorKey === 'permissionDenied' && (
-                            <Button type="button" variant="outline" size="sm" onClick={() => void acquire()}>
-                                <RotateCcw className="mr-1.5 h-4 w-4" />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => void acquire()}
+                            >
+                                <RotateCcw className="me-1.5 h-4 w-4" />
                                 {t('retake')}
                             </Button>
                         )}
                         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
-                            <X className="mr-1.5 h-4 w-4" />
+                            <X className="me-1.5 h-4 w-4" />
                             {t('cancel')}
                         </Button>
                     </div>
@@ -254,23 +265,32 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
                             ) : (
                                 <div
                                     className={`flex h-24 w-24 items-center justify-center rounded-full ${
-                                        phase === 'recording' ? 'animate-pulse bg-red-500/20' : 'bg-muted'
+                                        phase === 'recording'
+                                            ? 'animate-pulse bg-red-500/20'
+                                            : 'bg-muted'
                                     }`}
                                 >
-                                    <Mic className={`h-10 w-10 ${phase === 'recording' ? 'text-red-500' : 'text-muted-foreground'}`} />
+                                    <Mic
+                                        className={`h-10 w-10 ${phase === 'recording' ? 'text-red-500' : 'text-muted-foreground'}`}
+                                    />
                                 </div>
                             )}
                         </div>
                     )}
 
                     {/* Recorded clip playback */}
-                    {phase === 'preview' && recordedUrl && (
-                        mode === 'video' ? (
-                            <video src={recordedUrl} controls playsInline className="max-h-64 w-full rounded-md bg-black" />
+                    {phase === 'preview' &&
+                        recordedUrl &&
+                        (mode === 'video' ? (
+                            <video
+                                src={recordedUrl}
+                                controls
+                                playsInline
+                                className="max-h-64 w-full rounded-md bg-black"
+                            />
                         ) : (
                             <audio src={recordedUrl} controls className="w-full" />
-                        )
-                    )}
+                        ))}
 
                     {/* Recording timer */}
                     {phase === 'recording' && (
@@ -289,7 +309,9 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
                     )}
 
                     {errorKey && phase === 'preview' && (
-                        <p className="text-center text-sm text-red-600 dark:text-red-400">{t(errorKey)}</p>
+                        <p className="text-center text-sm text-red-600 dark:text-red-400">
+                            {t(errorKey)}
+                        </p>
                     )}
 
                     {/* Controls */}
@@ -304,7 +326,7 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
                         {phase === 'ready' && (
                             <>
                                 <Button type="button" size="sm" onClick={startRecording}>
-                                    <Circle className="mr-1.5 h-4 w-4 fill-current text-red-500" />
+                                    <Circle className="me-1.5 h-4 w-4 fill-current text-red-500" />
                                     {mode === 'video' ? t('recordVideo') : t('recordAudio')}
                                 </Button>
                                 <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
@@ -314,8 +336,13 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
                         )}
 
                         {phase === 'recording' && (
-                            <Button type="button" variant="destructive" size="sm" onClick={stopRecording}>
-                                <Square className="mr-1.5 h-4 w-4 fill-current" />
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={stopRecording}
+                            >
+                                <Square className="me-1.5 h-4 w-4 fill-current" />
                                 {t('stop')}
                             </Button>
                         )}
@@ -323,11 +350,11 @@ export function RecorderControl({ mode, onUploaded, onCancel }: RecorderControlP
                         {phase === 'preview' && (
                             <>
                                 <Button type="button" size="sm" onClick={() => void useRecording()}>
-                                    <Check className="mr-1.5 h-4 w-4" />
+                                    <Check className="me-1.5 h-4 w-4" />
                                     {t('use')}
                                 </Button>
                                 <Button type="button" variant="outline" size="sm" onClick={retake}>
-                                    <RotateCcw className="mr-1.5 h-4 w-4" />
+                                    <RotateCcw className="me-1.5 h-4 w-4" />
                                     {t('retake')}
                                 </Button>
                                 <Button type="button" variant="ghost" size="sm" onClick={onCancel}>

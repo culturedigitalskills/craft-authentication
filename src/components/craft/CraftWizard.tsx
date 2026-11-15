@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Link } from '@/i8n/navigation'
+import { useRouter } from '@/i8n/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -31,7 +31,7 @@ import {
 } from 'lucide-react'
 import { FaYoutube } from 'react-icons/fa6'
 import { StepDots } from '@/components/shared/StepDots'
-import { parseApiError } from '@/lib/api-error'
+import { parseApiError, httpErrorMessage, fieldIssueMessage } from '@/lib/api-error'
 import { extractYouTubeId } from '@/lib/youtube'
 import { YouTubeTile } from '@/components/shared/YouTubeTile'
 import { MAX_IMAGE_MB, MAX_VIDEO_MB, prepareFileForUpload } from '@/lib/media-limits'
@@ -110,6 +110,7 @@ const kindFromMime = (mime: string | null | undefined): 'image' | 'video' =>
     mime?.startsWith('video/') ? 'video' : 'image'
 
 export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
+    const tui = useTranslations('interface')
     const t = useTranslations('createCraft')
     const tw = useTranslations('createCraft.wizard')
     const router = useRouter()
@@ -273,7 +274,9 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
         const results = await Promise.all(
             files.map((file, i) =>
                 uploadWithProgress(file, (pct) =>
-                    setUploads((prev) => prev.map((u, j) => (j === i ? { ...u, progress: pct } : u))),
+                    setUploads((prev) =>
+                        prev.map((u, j) => (j === i ? { ...u, progress: pct } : u)),
+                    ),
                 ).then((outcome) => {
                     if (!outcome.ok) {
                         setUploads((prev) =>
@@ -379,13 +382,13 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                 const parsed = await parseApiError(res)
                 const errors: Record<string, string> = {}
                 for (const issue of parsed.issues) {
-                    errors[issue.path.split('.')[0]] = issue.message
+                    errors[issue.path.split('.')[0]] = fieldIssueMessage(issue, tui)
                 }
                 if (Object.keys(errors).length > 0) {
                     showFieldErrors(errors)
                     return
                 }
-                setError(parsed.error || t(isCreateMode ? 'createFailed' : 'updateFailed'))
+                setError(httpErrorMessage(parsed.status, tui))
                 setIsSubmitting(false)
                 return
             }
@@ -425,10 +428,10 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                     <div>
-                        <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                        <h1 className="text-start text-2xl font-bold tracking-tight text-primary-foreground">
                             {isCreateMode ? t('createCraftTitle') : t('editCraftTitle')}
                         </h1>
-                        <p className="text-left text-sm text-primary-foreground/70">
+                        <p className="text-start text-sm text-primary-foreground/70">
                             {isCreateMode ? t('createCraftHelper') : t('createEdittHelper')}
                         </p>
                     </div>
@@ -441,7 +444,10 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                     {tw('stepLabel', { current: step + 1, total: TOTAL_STEPS })}
                 </p>
 
-                <div key={step} className="animate-in fade-in-50 slide-in-from-right-4 duration-300">
+                <div
+                    key={step}
+                    className="animate-in fade-in-50 slide-in-from-right-4 duration-300"
+                >
                     {step === STEP_BASICS && (
                         <StepShell title={tw('basics.title')} hint={tw('basics.hint')}>
                             <div className="space-y-2">
@@ -658,7 +664,8 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                     <div
                                                         className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-1.5 text-center"
                                                         style={{
-                                                            backgroundColor: 'oklch(0.08 0.01 250 / 0.7)',
+                                                            backgroundColor:
+                                                                'oklch(0.08 0.01 250 / 0.7)',
                                                         }}
                                                     >
                                                         <p className="text-xs font-medium text-white">
@@ -667,14 +674,18 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         <div className="flex gap-1.5">
                                                             <button
                                                                 type="button"
-                                                                onClick={() => handleRemoveMedia(mediaId)}
+                                                                onClick={() =>
+                                                                    handleRemoveMedia(mediaId)
+                                                                }
                                                                 className="rounded-md bg-red-600 px-2 py-0.5 text-xs font-medium text-white hover:bg-red-700"
                                                             >
                                                                 {t('deleteImageYes')}
                                                             </button>
                                                             <button
                                                                 type="button"
-                                                                onClick={() => setConfirmRemove(null)}
+                                                                onClick={() =>
+                                                                    setConfirmRemove(null)
+                                                                }
                                                                 className="rounded-md bg-white/20 px-2 py-0.5 text-xs font-medium text-white hover:bg-white/30"
                                                             >
                                                                 {t('deleteImageNo')}
@@ -686,9 +697,10 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                         type="button"
                                                         onClick={() => handleRemoveMedia(mediaId)}
                                                         aria-label={t('deleteImage')}
-                                                        className="absolute right-1 top-1 rounded-full p-2 text-white"
+                                                        className="absolute end-1 top-1 rounded-full p-2 text-white"
                                                         style={{
-                                                            backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
+                                                            backgroundColor:
+                                                                'oklch(0.08 0.01 250 / 0.6)',
                                                         }}
                                                     >
                                                         <X className="h-4 w-4" />
@@ -738,7 +750,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                 }
                                             >
                                                 {isUploading && (
-                                                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                                    <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                                                 )}
                                                 {t('browse')}
                                             </Button>
@@ -779,11 +791,13 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                 {t('galleryLoadFailed')}
                                             </p>
                                         )}
-                                        {!galleryLoading && !galleryError && gallery?.length === 0 && (
-                                            <p className="text-sm text-muted-foreground">
-                                                {t('galleryEmpty')}
-                                            </p>
-                                        )}
+                                        {!galleryLoading &&
+                                            !galleryError &&
+                                            gallery?.length === 0 && (
+                                                <p className="text-sm text-muted-foreground">
+                                                    {t('galleryEmpty')}
+                                                </p>
+                                            )}
                                         {!galleryLoading && gallery && gallery.length > 0 && (
                                             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                                                 {gallery.map((item) => {
@@ -802,7 +816,8 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                                     : 'border-border'
                                                             }`}
                                                         >
-                                                            {kindFromMime(item.mimeType) === 'video' ? (
+                                                            {kindFromMime(item.mimeType) ===
+                                                            'video' ? (
                                                                 <>
                                                                     <video
                                                                         src={item.url}
@@ -830,7 +845,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                                 />
                                                             )}
                                                             {selected && (
-                                                                <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                                                <span className="absolute end-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
                                                                     <Check className="h-3.5 w-3.5" />
                                                                 </span>
                                                             )}
@@ -893,12 +908,15 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        setVideos((prev) => prev.filter((v) => v !== id))
+                                                        setVideos((prev) =>
+                                                            prev.filter((v) => v !== id),
+                                                        )
                                                     }
                                                     aria-label={t('removeVideo')}
-                                                    className="absolute right-1 top-1 rounded-full p-2 text-white"
+                                                    className="absolute end-1 top-1 rounded-full p-2 text-white"
                                                     style={{
-                                                        backgroundColor: 'oklch(0.08 0.01 250 / 0.6)',
+                                                        backgroundColor:
+                                                            'oklch(0.08 0.01 250 / 0.6)',
                                                     }}
                                                 >
                                                     <X className="h-4 w-4" />
@@ -922,7 +940,11 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                             }
                                         }}
                                     />
-                                    <Button type="button" variant="outline" onClick={handleAddVideo}>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={handleAddVideo}
+                                    >
                                         {t('addVideo')}
                                     </Button>
                                 </div>
@@ -1014,7 +1036,9 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                 />
                                 <ReviewRow
                                     label={tw('story.title')}
-                                    value={[inspiration, careInstructions].filter(Boolean).join(' / ')}
+                                    value={[inspiration, careInstructions]
+                                        .filter(Boolean)
+                                        .join(' / ')}
                                     empty={tw('review.notAdded')}
                                     editLabel={tw('review.edit')}
                                     onEdit={() => goToStep(STEP_STORY)}
@@ -1049,7 +1073,11 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                     >
                                         {t('cancelEdit')}
                                     </Button>
-                                    <Button type="button" variant="destructive" onClick={handleDelete}>
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        onClick={handleDelete}
+                                    >
                                         {t('deleteCraft')}
                                     </Button>
                                 </div>
@@ -1072,7 +1100,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                         disabled={step === STEP_BASICS || isSubmitting}
                         className="w-full sm:w-auto"
                     >
-                        <ArrowLeft className="mr-1.5 h-4 w-4" />
+                        <ArrowLeft className="me-1.5 h-4 w-4" />
                         {tw('back')}
                     </Button>
 
@@ -1086,7 +1114,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                 }}
                                 className="w-full sm:w-auto"
                             >
-                                <Check className="mr-1.5 h-4 w-4" />
+                                <Check className="me-1.5 h-4 w-4" />
                                 {tw('backToReview')}
                             </Button>
                         ) : step < STEP_REVIEW ? (
@@ -1097,7 +1125,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                 className="w-full sm:w-auto"
                             >
                                 {tw('next')}
-                                <ArrowRight className="ml-1.5 h-4 w-4" />
+                                <ArrowRight className="ms-1.5 h-4 w-4" />
                             </Button>
                         ) : (
                             <Button
@@ -1108,12 +1136,12 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                        <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                                         {isCreateMode ? t('savingCraft') : t('updatingCraft')}
                                     </>
                                 ) : (
                                     <>
-                                        <Check className="mr-1.5 h-4 w-4" />
+                                        <Check className="me-1.5 h-4 w-4" />
                                         {isCreateMode ? t('saveCraft') : t('updateCraft')}
                                     </>
                                 )}
@@ -1164,7 +1192,7 @@ function ReviewRow({
         <button
             type="button"
             onClick={onEdit}
-            className="flex w-full items-start gap-3 p-4 text-left transition-colors hover:bg-muted/50"
+            className="flex w-full items-start gap-3 p-4 text-start transition-colors hover:bg-muted/50"
         >
             <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

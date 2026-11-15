@@ -31,8 +31,10 @@ services:
         healthcheck:
             test:
                 [
-                    'CMD-SHELL',
-                    'curl -f http://localhost:${PORT:-3000}/health | jq -e ''.status == "healthy"'' > /dev/null',
+                    'CMD',
+                    'node',
+                    '-e',
+                    'fetch("http://127.0.0.1:" + (process.env.PORT || "3000") + "/health", {signal: AbortSignal.timeout(5000)}).then(async r => { if (!r.ok || (await r.json()).status !== "healthy") process.exit(1) }).catch(() => process.exit(1))',
                 ]
             interval: 30s
             timeout: 10s
@@ -70,7 +72,7 @@ services:
             - ./data/garage-data:/data
             - ./data/garage-meta:/meta
         healthcheck:
-            test: ['CMD', 'curl', '-f', 'http://localhost:3903/health']
+            test: ['CMD', '/garage', 'status']
             interval: 30s
             timeout: 5s
             retries: 3

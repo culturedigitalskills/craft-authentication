@@ -1,29 +1,30 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { signIn } from '@/lib/auth-client'
-import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i8n/navigation'
+import { useLocale, useTranslations } from 'next-intl'
+import { getPathname } from '@/i8n/navigation'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
-import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Link } from '@/i8n/navigation'
 import { loginRequestSchema } from '@/lib/validations/auth'
 
 type LoginFormData = z.infer<typeof loginRequestSchema>
 
 export function LoginForm() {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('auth')
+    const locale = useLocale()
+    const callbackUrl = getPathname({ href: '/auth/redirect', locale })
     const router = useRouter()
     const [serverError, setServerError] = useState<string | null>(null)
     const [showPassword, setShowPassword] = useState(false)
@@ -49,6 +50,7 @@ export function LoginForm() {
             email: data.email,
             password: data.password,
             redirect: false,
+            callbackUrl,
         })
 
         if (result?.error) {
@@ -83,9 +85,7 @@ export function LoginForm() {
                             {...register('email')}
                         />
                         {errors.email && (
-                            <p className="text-sm text-red-500">
-                                {t('validation.emailInvalid')}
-                            </p>
+                            <p className="text-sm text-red-500">{t('validation.emailInvalid')}</p>
                         )}
                     </div>
                     <div className="space-y-2">
@@ -95,30 +95,30 @@ export function LoginForm() {
                                 id="password"
                                 type={showPassword ? 'text' : 'password'}
                                 aria-invalid={!!errors.password}
-                                className="pr-10"
+                                className="pe-10"
                                 {...register('password')}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                aria-label={
+                                    showPassword ? tui('hidePassword') : tui('showPassword')
+                                }
                             >
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
                             </button>
                         </div>
                         {errors.password && (
-                            <p className="text-sm text-red-500">
-                                {t('validation.passwordMin')}
-                            </p>
+                            <p className="text-sm text-red-500">{t('validation.passwordMin')}</p>
                         )}
                     </div>
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={busy || googleLoading}
-                    >
-                        {busy && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                    <Button type="submit" className="w-full" disabled={busy || googleLoading}>
+                        {busy && <Loader2 className="me-1.5 h-4 w-4 animate-spin" />}
                         {busy ? t('signingIn') : t('login')}
                     </Button>
                     <div className="relative my-4">
@@ -136,13 +136,18 @@ export function LoginForm() {
                         variant="outline"
                         className="w-full"
                         disabled={busy || googleLoading}
-                        onClick={() => {
+                        onClick={async () => {
                             setGoogleLoading(true)
-                            void signIn('google', { callbackUrl: '/auth/redirect' })
+                            setServerError(null)
+                            const result = await signIn('google', { callbackUrl })
+                            if (result.error) {
+                                setServerError(tui('requestFailed'))
+                                setGoogleLoading(false)
+                            }
                         }}
                     >
-                        {googleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                        {googleLoading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+                        <svg className="me-2 h-4 w-4" viewBox="0 0 24 24">
                             <path
                                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
                                 fill="#4285F4"
@@ -181,10 +186,7 @@ export function LoginForm() {
                     </p>
                     <p className="text-center text-sm text-muted-foreground">
                         {t('noAccount')}{' '}
-                        <Link
-                            href="/register"
-                            className="text-warm hover:underline"
-                        >
+                        <Link href="/register" className="text-warm hover:underline">
                             {t('register')}
                         </Link>
                     </p>

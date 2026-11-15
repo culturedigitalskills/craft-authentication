@@ -1,7 +1,10 @@
+import { LocalizedCount } from '@/components/shared/LocalizedCount'
+import { LocalizedDate } from '@/components/shared/LocalizedDate'
+import { catalogMetadata } from '@/i8n/seo-server'
+import { pageNumber, firstSearchValue } from '@/i8n/seo'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { Calendar, User } from 'lucide-react'
-import { formatDateTime } from '@/components/shared/formatDateTime'
 import PaginationControls from '@/components/craft/PaginationControls'
 import { prisma } from '@/lib/prisma'
 import { getCraftPrimaryImageMap, PUBLIC_CRAFT_WHERE } from '@/lib/craft'
@@ -20,12 +23,14 @@ const CARD_RATIO = '1 / 1'
 
 const LIMIT = 21
 
-export default async function CraftsPage(
-    { searchParams }: { searchParams: Promise<{ page?: string; q?: string }> }
-) {
+export default async function CraftsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>
+}) {
     const params = await searchParams
-    const page = params.page ? Math.max(1, parseInt(params.page)) : 1
-    const q = params.q?.trim() ?? ''
+    const page = pageNumber(params.page)
+    const q = firstSearchValue(params.q).trim()
     const skip = (page - 1) * LIMIT
 
     const whereClause = {
@@ -34,7 +39,13 @@ export default async function CraftsPage(
     }
 
     let craftsWithNames: any[] = []
-    let pagination = { currentPage: page, totalPages: 1, totalCount: 0, hasNext: false, hasPrev: false }
+    let pagination = {
+        currentPage: page,
+        totalPages: 1,
+        totalCount: 0,
+        hasNext: false,
+        hasPrev: false,
+    }
 
     try {
         const [craftRecords, totalCount] = await Promise.all([
@@ -53,9 +64,9 @@ export default async function CraftsPage(
             prisma.craft.count({ where: whereClause }),
         ])
 
-        const imageMap = await getCraftPrimaryImageMap(craftRecords.map(c => c.id))
+        const imageMap = await getCraftPrimaryImageMap(craftRecords.map((c) => c.id))
 
-        craftsWithNames = craftRecords.map(record => ({
+        craftsWithNames = craftRecords.map((record) => ({
             id: record.id,
             title: record.title,
             createdOn: record.createdAt,
@@ -65,16 +76,36 @@ export default async function CraftsPage(
         }))
 
         const totalPages = Math.max(1, Math.ceil(totalCount / LIMIT))
-        pagination = { currentPage: page, totalPages, totalCount, hasNext: page < totalPages, hasPrev: page > 1 }
+        pagination = {
+            currentPage: page,
+            totalPages,
+            totalCount,
+            hasNext: page < totalPages,
+            hasPrev: page > 1,
+        }
     } catch (error) {
         console.error('Error loading crafts:', error)
     }
 
-    const currentPageUrl = `${process.env.AUTH_URL}/crafts`
-    return <RenderCraftsPage crafts={craftsWithNames} pagination={pagination} currentPage={page} currentPageUrl={currentPageUrl} q={q} />
+    const currentPageUrl = '/crafts'
+    return (
+        <RenderCraftsPage
+            crafts={craftsWithNames}
+            pagination={pagination}
+            currentPage={page}
+            currentPageUrl={currentPageUrl}
+            q={q}
+        />
+    )
 }
 
-function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }: {
+function RenderCraftsPage({
+    crafts,
+    pagination,
+    currentPage,
+    currentPageUrl,
+    q,
+}: {
     crafts: any[]
     pagination: any
     currentPage: number
@@ -95,7 +126,7 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                 <SearchInput placeholder={t('crafts.explore.searchPlaceholder')} />
                 {pagination.totalCount > 0 && (
                     <p className="sc-meta shrink-0">
-                        {pagination.totalCount} {t('crafts.explore.craftsCount')}
+                        <LocalizedCount kind="craftCount" count={pagination.totalCount} />
                     </p>
                 )}
             </div>
@@ -103,11 +134,8 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
             {crafts.length > 0 ? (
                 <div className="grid grid-cols-1 gap-[var(--sc-grid-gap)] sm:grid-cols-2 lg:grid-cols-3">
                     {crafts.map((craft) => (
-                        <div
-                            key={craft.id}
-                            className="sc-card sc-card--hover group flex flex-col"
-                        >
-                            <Link href={`crafts/${craft.id}`} className="block">
+                        <div key={craft.id} className="sc-card sc-card--hover group flex flex-col">
+                            <Link href={`/crafts/${craft.id}`} className="block">
                                 <div
                                     className="relative w-full overflow-hidden"
                                     style={{ aspectRatio: CARD_RATIO }}
@@ -122,18 +150,29 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                             </Link>
 
                             <div className="p-5">
-                                <Link href={`crafts/${craft.id}`} className="block">
-                                    <h2 className="sc-h2 line-clamp-2 transition-colors group-hover:text-[color:var(--sc-accent)]" style={{ fontSize: '21px' }}>
+                                <Link href={`/crafts/${craft.id}`} className="block">
+                                    <h2
+                                        className="sc-h2 line-clamp-2 transition-colors group-hover:text-[color:var(--sc-accent)]"
+                                        style={{ fontSize: '21px' }}
+                                    >
                                         {craft.title}
                                     </h2>
                                 </Link>
 
                                 {craft.artisanName && (
-                                    <p className="mt-2 flex items-center gap-1.5 text-sm" style={{ color: 'var(--sc-text-soft)' }}>
-                                        <User className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--sc-text-muted)' }} />
-                                        <span style={{ color: 'var(--sc-text-muted)' }}>{t('crafts.explore.by')}</span>
+                                    <p
+                                        className="mt-2 flex items-center gap-1.5 text-sm"
+                                        style={{ color: 'var(--sc-text-soft)' }}
+                                    >
+                                        <User
+                                            className="h-3.5 w-3.5 shrink-0"
+                                            style={{ color: 'var(--sc-text-muted)' }}
+                                        />
+                                        <span style={{ color: 'var(--sc-text-muted)' }}>
+                                            {t('crafts.explore.by')}
+                                        </span>
                                         <Link
-                                            href={`artisans/${craft.artisanSlug}`}
+                                            href={`/artisans/${craft.artisanSlug}`}
                                             className="font-medium hover:text-[color:var(--sc-accent)]"
                                             style={{ color: 'var(--sc-text)' }}
                                         >
@@ -141,9 +180,14 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                                         </Link>
                                     </p>
                                 )}
-                                <p className="mt-1.5 flex items-center gap-1.5 text-sm" style={{ color: 'var(--sc-text-muted)' }}>
+                                <p
+                                    className="mt-1.5 flex items-center gap-1.5 text-sm"
+                                    style={{ color: 'var(--sc-text-muted)' }}
+                                >
                                     <Calendar className="h-3.5 w-3.5 shrink-0" />
-                                    <span>{formatDateTime(craft.createdOn)}</span>
+                                    <span>
+                                        <LocalizedDate value={craft.createdOn} />
+                                    </span>
                                 </p>
                             </div>
                         </div>
@@ -154,7 +198,10 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                     className="rounded-[var(--sc-r-card)] border border-dashed p-12 text-center"
                     style={{ borderColor: 'var(--sc-border-strong)' }}
                 >
-                    <User className="mx-auto mb-3 h-10 w-10" style={{ color: 'var(--sc-text-muted)' }} />
+                    <User
+                        className="mx-auto mb-3 h-10 w-10"
+                        style={{ color: 'var(--sc-text-muted)' }}
+                    />
                     <p className="sc-body">
                         {q ? t('crafts.explore.noResults') : t('crafts.explore.noCraftsFound')}
                     </p>
@@ -167,5 +214,18 @@ function RenderCraftsPage({ crafts, pagination, currentPage, currentPageUrl, q }
                 currentPageUrl={currentPageUrl}
             />
         </div>
+    )
+}
+
+export async function generateMetadata({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>
+}) {
+    return catalogMetadata(
+        '/crafts',
+        'crafts.welcomeTitle',
+        'crafts.description',
+        await searchParams,
     )
 }

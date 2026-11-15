@@ -1,22 +1,30 @@
+import { getTranslations as getInterfaceTranslations } from 'next-intl/server'
+import { getLocale } from 'next-intl/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import { redirect } from '@/i8n/navigation'
+import { Link } from '@/i8n/navigation'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
-import { Users, MapPin, Globe, Award, BookOpen, DoorOpen, GraduationCap, Pencil } from 'lucide-react'
+import {
+    Users,
+    MapPin,
+    Globe,
+    Award,
+    BookOpen,
+    DoorOpen,
+    GraduationCap,
+    Pencil,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = {
-    title: 'My Groups — Sustainable Crafting',
-    description: 'Groups you belong to.',
-}
-
 export default async function MyGroupsPage() {
+    const tui = await getInterfaceTranslations('interface')
+
     const session = await auth()
-    if (!session?.user) redirect('/login')
+    if (!session?.user) return redirect({ href: '/login', locale: await getLocale() })
 
     const t = await getTranslations('groups')
     const nt = await getTranslations('navbar')
@@ -81,99 +89,102 @@ export default async function MyGroupsPage() {
                             className="group relative rounded-lg border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
                         >
                             <Link href={`/groups/${group.slug}`} className="block p-6">
-                            <div className="flex items-center gap-3">
-                                {logoMap.get(group.id) ? (
-                                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
-                                        <Image
-                                            src={logoMap.get(group.id)!}
-                                            alt={group.name}
-                                            fill
-                                            sizes="40px"
-                                            className="object-cover"
-                                        />
+                                <div className="flex items-center gap-3">
+                                    {logoMap.get(group.id) ? (
+                                        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+                                            <Image
+                                                src={logoMap.get(group.id)!}
+                                                alt={group.name}
+                                                fill
+                                                sizes="40px"
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                                            <Users className="h-5 w-5 text-muted-foreground" />
+                                        </div>
+                                    )}
+                                    <div className="min-w-0">
+                                        <h2 className="truncate text-lg font-semibold transition-colors group-hover:text-warm">
+                                            {group.name}
+                                        </h2>
+                                        <span className="inline-block rounded-full bg-warm/10 px-2 py-0.5 text-xs font-medium text-warm">
+                                            {group.memberRole === 'ADMIN'
+                                                ? t('admin')
+                                                : t('member')}
+                                        </span>
                                     </div>
-                                ) : (
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                                        <Users className="h-5 w-5 text-muted-foreground" />
-                                    </div>
-                                )}
-                                <div className="min-w-0">
-                                    <h2 className="truncate text-lg font-semibold transition-colors group-hover:text-warm">
-                                        {group.name}
-                                    </h2>
-                                    <span className="inline-block rounded-full bg-warm/10 px-2 py-0.5 text-xs font-medium text-warm">
-                                        {group.memberRole === 'ADMIN' ? t('admin') : t('member')}
-                                    </span>
                                 </div>
-                            </div>
 
-                            {group.description && (
-                                <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                                    {group.description}
-                                </p>
-                            )}
+                                {group.description && (
+                                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                                        {group.description}
+                                    </p>
+                                )}
 
-                            <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                                <span className="inline-flex items-center gap-1">
-                                    <Users className="h-3.5 w-3.5" />
-                                    {group._count.memberships} {t('members')}
-                                </span>
-                                {group.location && (
+                                <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                     <span className="inline-flex items-center gap-1">
-                                        <MapPin className="h-3.5 w-3.5" />
-                                        {group.location}
+                                        <Users className="h-3.5 w-3.5" />
+                                        {group._count.memberships} {t('members')}
                                     </span>
-                                )}
-                                {group.website && (
-                                    <span className="inline-flex items-center gap-1">
-                                        <Globe className="h-3.5 w-3.5" />
-                                        Website
-                                    </span>
-                                )}
-                            </div>
+                                    {group.location && (
+                                        <span className="inline-flex items-center gap-1">
+                                            <MapPin className="h-3.5 w-3.5" />
+                                            {group.location}
+                                        </span>
+                                    )}
+                                    {group.website && (
+                                        <span className="inline-flex items-center gap-1">
+                                            <Globe className="h-3.5 w-3.5" />
+                                            {tui('website')}
+                                        </span>
+                                    )}
+                                </div>
 
-                            <div className="mt-3 flex flex-wrap gap-2">
-                                {group.organizationType && group.organizationType !== 'OTHER' && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-warm/10 px-2.5 py-0.5 text-xs font-medium text-warm">
-                                        {t(`orgType_${group.organizationType}`)}
-                                    </span>
-                                )}
-                                {group.isHeritageCraft && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
-                                        <BookOpen className="h-3 w-3" />
-                                        {t('heritageCraft')}
-                                    </span>
-                                )}
-                                {group.isOpenToMembers && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
-                                        <DoorOpen className="h-3 w-3" />
-                                        {t('openToMembers')}
-                                    </span>
-                                )}
-                                {group.hasTrainingProgram && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800">
-                                        <GraduationCap className="h-3 w-3" />
-                                        {t('trainingProgram')}
-                                    </span>
-                                )}
-                                {group.certifications?.map((cert) => (
-                                    <span
-                                        key={cert}
-                                        className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-800"
-                                    >
-                                        <Award className="h-3 w-3" />
-                                        {t(`cert_${cert}`)}
-                                    </span>
-                                ))}
-                            </div>
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                    {group.organizationType &&
+                                        group.organizationType !== 'OTHER' && (
+                                            <span className="inline-flex items-center gap-1 rounded-full bg-warm/10 px-2.5 py-0.5 text-xs font-medium text-warm">
+                                                {t(`orgType_${group.organizationType}`)}
+                                            </span>
+                                        )}
+                                    {group.isHeritageCraft && (
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+                                            <BookOpen className="h-3 w-3" />
+                                            {t('heritageCraft')}
+                                        </span>
+                                    )}
+                                    {group.isOpenToMembers && (
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                                            <DoorOpen className="h-3 w-3" />
+                                            {t('openToMembers')}
+                                        </span>
+                                    )}
+                                    {group.hasTrainingProgram && (
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800">
+                                            <GraduationCap className="h-3 w-3" />
+                                            {t('trainingProgram')}
+                                        </span>
+                                    )}
+                                    {group.certifications?.map((cert) => (
+                                        <span
+                                            key={cert}
+                                            className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-800"
+                                        >
+                                            <Award className="h-3 w-3" />
+                                            {t(`cert_${cert}`)}
+                                        </span>
+                                    ))}
+                                </div>
                             </Link>
 
                             {/* Edit button — outside the Link to avoid nesting */}
                             {group.memberRole === 'ADMIN' && (
-                                <div className="absolute right-2 top-2">
+                                <div className="absolute end-2 top-2">
                                     <Button size="sm" variant="secondary" asChild>
                                         <Link href={`/groups/${group.slug}/manage`}>
-                                            <Pencil className="mr-1 h-3 w-3" />
+                                            <Pencil className="me-1 h-3 w-3" />
                                             {t('editGroup')}
                                         </Link>
                                     </Button>
@@ -185,4 +196,9 @@ export default async function MyGroupsPage() {
             )}
         </div>
     )
+}
+
+export async function generateMetadata() {
+    const t = await getTranslations('navbar')
+    return { title: t('mygroups') }
 }

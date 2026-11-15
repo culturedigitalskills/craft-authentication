@@ -1,8 +1,17 @@
-import { Suspense } from 'react'
+import { DirectionProvider } from '@radix-ui/react-direction'
+import type { Metadata } from 'next'
+import { seoOrigin } from '@/i8n/seo'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { Geist, Geist_Mono, Spectral, Caveat, Noto_Sans_Devanagari } from 'next/font/google'
+import {
+    Geist,
+    Geist_Mono,
+    Spectral,
+    Caveat,
+    Noto_Sans_Devanagari,
+    Noto_Sans_Arabic,
+} from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -11,7 +20,7 @@ import { prisma } from '@/lib/prisma'
 import { SessionProvider } from '@/components/auth/SessionProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import NextTopLoader from 'nextjs-toploader'
-import {routing} from '@/i8n/routing'
+import { routing } from '@/i8n/routing'
 //we are using the css in the main app folder
 import '../globals.css'
 
@@ -49,22 +58,34 @@ const caveat = Caveat({
 const devanagari = Noto_Sans_Devanagari({
     variable: '--font-devanagari',
     subsets: ['devanagari'],
-    weight: ['400', '500'],
+    weight: ['400', '500', '600', '700'],
     display: 'swap',
 })
 
+const arabic = Noto_Sans_Arabic({
+    variable: '--font-arabic',
+    subsets: ['arabic'],
+    weight: ['400', '500', '600', '700'],
+    display: 'swap',
+})
+
+export function generateMetadata(): Metadata {
+    return {
+        metadataBase: new URL(seoOrigin()),
+        title: { default: 'SustainableCrafting', template: '%s | SustainableCrafting' },
+        robots: { index: false, follow: false },
+    }
+}
+
 type Props = {
-  children: React.ReactNode;
-  params: Promise<{locale: string}>;
-};
-
-
+    children: React.ReactNode
+    params: Promise<{ locale: string }>
+}
 
 // A signed-in user with no artisan profile still needs onboarding — surface a
 // "Complete your profile" entry point in the nav so it's reachable after
-// skipping. Streamed behind Suspense so the session + profile lookup never
-// blocks the page shell: the header renders immediately without the badge and
-// re-renders with it once the lookup resolves.
+// skipping. Resolve this before mounting the interactive header, so late
+// session data cannot replace an already-open mobile menu.
 async function OnboardingAwareHeader() {
     const session = await auth()
     let needsOnboarding = false
@@ -79,16 +100,16 @@ async function OnboardingAwareHeader() {
 }
 
 export default async function LocaleLayout({ children, params }: Props) {
-// Ensure that the incoming `locale` is valid
-    const {locale} = await params;
-    const messages = await getMessages();
+    // Ensure that the incoming `locale` is valid
+    const { locale } = await params
+    const messages = await getMessages()
 
     if (!hasLocale(routing.locales, locale)) {
-    notFound();
+        notFound()
     }
 
     return (
-        <html lang={`${locale}`} suppressHydrationWarning>
+        <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
             <head>
                 <link href="/favicon.ico" rel="icon" sizes="32x32" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
@@ -103,32 +124,29 @@ export default async function LocaleLayout({ children, params }: Props) {
                     spectral.variable,
                     caveat.variable,
                     devanagari.variable,
+                    arabic.variable,
                 )}
             >
-
-
                 {/* Slim top progress bar during navigation — the page stays
                     visible instead of swapping to a full-screen spinner. */}
                 <NextTopLoader color="#bb5a2c" height={3} showSpinner={false} />
-                        <ThemeProvider
-                            attribute="class"
-                            defaultTheme="light"
-                            forcedTheme="light"
-                            enableSystem={false}
-                            disableTransitionOnChange
-                        >
-                        <SessionProvider>
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="light"
+                    forcedTheme="light"
+                    enableSystem={false}
+                    disableTransitionOnChange
+                >
+                    <SessionProvider>
                         <NextIntlClientProvider messages={messages}>
-                            <div className="sc-page flex min-h-screen flex-col">
-                                <div className="sc-grain" />
-                                <Suspense fallback={<Header />}>
+                            <DirectionProvider dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+                                <div className="sc-page flex min-h-screen flex-col">
+                                    <div className="sc-grain" />
                                     <OnboardingAwareHeader />
-                                </Suspense>
-                                <main className="flex-1">
-                                    {children}
-                                </main>
-                                <Footer />
-                            </div>
+                                    <main className="flex-1">{children}</main>
+                                    <Footer />
+                                </div>
+                            </DirectionProvider>
                         </NextIntlClientProvider>
                     </SessionProvider>
                 </ThemeProvider>

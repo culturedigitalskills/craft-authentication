@@ -42,7 +42,7 @@ export function AnswerMediaUpload({
         setCanRecord(
             typeof navigator !== 'undefined' &&
                 !!navigator.mediaDevices?.getUserMedia &&
-                typeof MediaRecorder !== 'undefined'
+                typeof MediaRecorder !== 'undefined',
         )
     }, [])
 
@@ -129,7 +129,7 @@ export function AnswerMediaUpload({
                         >
                             {isUploading ? (
                                 <>
-                                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                    <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                                     {t('uploading')} {progress}%
                                 </>
                             ) : mediaUrl ? (
@@ -146,7 +146,7 @@ export function AnswerMediaUpload({
                                     size="sm"
                                     onClick={() => setRecorderMode('audio')}
                                 >
-                                    <Mic className="mr-1.5 h-4 w-4" />
+                                    <Mic className="me-1.5 h-4 w-4" />
                                     {tRec('recordAudio')}
                                 </Button>
                                 <Button
@@ -155,7 +155,7 @@ export function AnswerMediaUpload({
                                     size="sm"
                                     onClick={() => setRecorderMode('video')}
                                 >
-                                    <Video className="mr-1.5 h-4 w-4" />
+                                    <Video className="me-1.5 h-4 w-4" />
                                     {tRec('recordVideo')}
                                 </Button>
                             </>
@@ -170,11 +170,13 @@ export function AnswerMediaUpload({
                                     setMimeType(null)
                                 }}
                             >
-                                <Trash2 className="mr-1.5 h-4 w-4" />
+                                <Trash2 className="me-1.5 h-4 w-4" />
                                 {t('remove')}
                             </Button>
                         )}
-                        <p className="text-xs text-muted-foreground">{t('hint', { max: MAX_VIDEO_MB })}</p>
+                        <p className="text-xs text-muted-foreground">
+                            {t('hint', { max: MAX_VIDEO_MB })}
+                        </p>
                     </div>
 
                     <input
@@ -185,7 +187,9 @@ export function AnswerMediaUpload({
                         className="hidden"
                     />
 
-                    {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
+                    {error && (
+                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+                    )}
                 </>
             )}
         </div>

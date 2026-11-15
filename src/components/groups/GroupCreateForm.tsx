@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { normalizeWebsite } from '@/lib/validations/artisan'
 import { Card, CardContent } from '@/components/ui/card'
@@ -59,10 +59,10 @@ export function GroupCreateForm() {
     })
 
     function toggleCertification(cert: string) {
-        setForm(f => ({
+        setForm((f) => ({
             ...f,
             certifications: f.certifications.includes(cert)
-                ? f.certifications.filter(c => c !== cert)
+                ? f.certifications.filter((c) => c !== cert)
                 : [...f.certifications, cert],
         }))
     }
@@ -93,7 +93,7 @@ export function GroupCreateForm() {
 
             if (!res.ok) {
                 const data = await res.json()
-                setError(data.error || t('saveFailed'))
+                setError(t('saveFailed'))
                 setSaving(false)
                 return
             }
@@ -119,10 +119,10 @@ export function GroupCreateForm() {
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                     <div>
-                        <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                        <h1 className="text-start text-2xl font-bold tracking-tight text-primary-foreground">
                             {t('createGroup')}
                         </h1>
-                        <p className="text-left text-sm text-primary-foreground/70">
+                        <p className="text-start text-sm text-primary-foreground/70">
                             {t('createGroupHelper')}
                         </p>
                     </div>
@@ -138,72 +138,72 @@ export function GroupCreateForm() {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="space-y-2">
-                        <Label htmlFor="name">
-                            {t('groupName')} *
-                        </Label>
+                        <Label htmlFor="name">{t('groupName')} *</Label>
                         <Input
                             id="name"
                             type="text"
                             value={form.name}
-                            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                             pattern=".*\D.*"
                             required
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="description">
-                            {t('description')}
-                        </Label>
+                        <Label htmlFor="description">{t('description')}</Label>
                         <Textarea
                             id="description"
                             value={form.description}
-                            onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                            onChange={(e) =>
+                                setForm((f) => ({ ...f, description: e.target.value }))
+                            }
                             rows={4}
                         />
                     </div>
 
                     <div className="grid gap-5 sm:grid-cols-2">
                         <div className="space-y-2">
-                            <Label htmlFor="website">
-                                {t('website')}
-                            </Label>
+                            <Label htmlFor="website">{t('website')}</Label>
                             <Input
                                 id="website"
                                 type="url"
                                 value={form.website}
-                                onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
-                                onBlur={() => setForm(f => ({ ...f, website: normalizeWebsite(f.website) }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({ ...f, website: e.target.value }))
+                                }
+                                onBlur={() =>
+                                    setForm((f) => ({ ...f, website: normalizeWebsite(f.website) }))
+                                }
                                 placeholder="https://"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="location">
-                                {t('location')}
-                            </Label>
+                            <Label htmlFor="location">{t('location')}</Label>
                             <Input
                                 id="location"
                                 type="text"
                                 value={form.location}
-                                onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({ ...f, location: e.target.value }))
+                                }
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="organizationType">
-                            {t('organizationType')}
-                        </Label>
+                        <Label htmlFor="organizationType">{t('organizationType')}</Label>
                         <Select
                             value={form.organizationType}
-                            onValueChange={value => setForm(f => ({ ...f, organizationType: value }))}
+                            onValueChange={(value) =>
+                                setForm((f) => ({ ...f, organizationType: value }))
+                            }
                         >
                             <SelectTrigger id="organizationType">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                {ORGANIZATION_TYPES.map(type => (
+                                {ORGANIZATION_TYPES.map((type) => (
                                     <SelectItem key={type} value={type}>
                                         {t(`orgType_${type}`)}
                                     </SelectItem>
@@ -215,7 +215,7 @@ export function GroupCreateForm() {
                     <div>
                         <p className="mb-2 text-sm font-medium">{t('certifications')}</p>
                         <div className="flex flex-wrap gap-2">
-                            {CERTIFICATIONS.map(cert => (
+                            {CERTIFICATIONS.map((cert) => (
                                 <button
                                     key={cert}
                                     type="button"
@@ -237,7 +237,9 @@ export function GroupCreateForm() {
                             <input
                                 type="checkbox"
                                 checked={form.isHeritageCraft}
-                                onChange={e => setForm(f => ({ ...f, isHeritageCraft: e.target.checked }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({ ...f, isHeritageCraft: e.target.checked }))
+                                }
                                 className="rounded border-input"
                             />
                             {t('heritageCraft')}
@@ -246,7 +248,9 @@ export function GroupCreateForm() {
                             <input
                                 type="checkbox"
                                 checked={form.isOpenToMembers}
-                                onChange={e => setForm(f => ({ ...f, isOpenToMembers: e.target.checked }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({ ...f, isOpenToMembers: e.target.checked }))
+                                }
                                 className="rounded border-input"
                             />
                             {t('openToMembers')}
@@ -255,7 +259,9 @@ export function GroupCreateForm() {
                             <input
                                 type="checkbox"
                                 checked={form.hasTrainingProgram}
-                                onChange={e => setForm(f => ({ ...f, hasTrainingProgram: e.target.checked }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({ ...f, hasTrainingProgram: e.target.checked }))
+                                }
                                 className="rounded border-input"
                             />
                             {t('trainingProgram')}
@@ -264,7 +270,7 @@ export function GroupCreateForm() {
 
                     <div className="flex justify-end">
                         <Button type="submit" disabled={saving}>
-                            {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                            {saving && <Loader2 className="me-1.5 h-4 w-4 animate-spin" />}
                             {saving ? t('creating') : t('createGroup')}
                         </Button>
                     </div>

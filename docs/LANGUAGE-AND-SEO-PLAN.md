@@ -1,72 +1,91 @@
 # Language and SEO implementation plan
 
-Updated: 15 November 2026. All implementation PRs target `staging`; promotion to `main` remains a separate release task.
+Updated: 15 November 2026. Branch: `codex/language-seo-foundation`. PRs target `staging`; promotion to `main` is a separate authorized release.
 
-## Scope and evidence
+## Scope and PR readiness
 
-The current site uses next-intl with seven catalogs (en, hi, es, ar, de, tr, el). Public HTTP checks and the deployed main revision confirm cookie-based language selection, English legal and onboarding content, missing Arabic direction, and locale-independent gallery dates. Catalog syntax passes. The original selector dropped query parameters in its navigation target. Browser regression checks now verify that the fix retains the craft edit ID, query values and fragment, and that cancelling a language change preserves unsaved input.
+This work covers the interface, language selection, Arabic layout, and multilingual SEO for en, hi, es, ar, de, tr and el. Artisan biographies, craft descriptions, story answers, original media and additional caption translations remain deferred. Stored original content, IDs and prior signed assets are preserved.
 
-This programme covers the interface, language navigation, and multilingual SEO. Artisan biographies, craft descriptions, story answers, original media, and additional caption translations are deferred. Signed credentials, identifiers, saved content, permissions, and production records must not be rewritten.
+Do not create or reopen any PR, including a draft, until its intended implementation is complete and full required verification has finished successfully. Blocked checks and unresolved failures keep the work local. Known failures are not waived without the user's explicit agreement. [PR #137](https://github.com/culturedigitalskills/craft-authentication/pull/137) remains closed and unmerged.
 
-## Delivery sequence
+## Implemented locally
 
-### PR 1 — Safe language selection (implemented and verified; PR review pending)
+### Language selection and navigation
 
-- Preserve the full query string, including duplicate parameters, craft edit IDs, pagination, search, and the fragment.
-- Make repeated selections deterministic without relying on the client router cache for a cookie-only URL.
-- Use native language names, an accessible translated label, a selected indication, keyboard controls, and visible focus.
-- Warn before a language change on editing, recording, upload, or account-entry screens can discard unsaved work. Cancelling must preserve both the page and its language preference. Selecting the current language must do nothing.
-- Keep the current URL policy and session-cookie lifetime in this PR. Neither a longer cookie lifetime nor this PR alone delivers multilingual SEO.
-- Add local isolated regression coverage, including real browser navigation. No production fixtures or writes.
+- English keeps existing unprefixed URLs; other languages use stable prefixes. Legacy /en/... URLs normalize to English.
+- Requested URLs determine language. Browser headers and old cookies cannot override them; the obsolete NEXT_LOCALE cookie is deleted.
+- The selector uses native names, ordinary server-rendered links, translated labels, visible focus, keyboard/Escape controls, current-language indication and pending state.
+- Normal language switching retains duplicate query values, searches, pagination, edit IDs and fragments. Current-language selection is a no-op. Cancelling the unsaved-work warning retains input and closes the menu.
+- Internal links, client routing, server redirects, pagination, login/registration callbacks and logout destinations retain locale.
 
-Implementation: [PR #137](https://github.com/culturedigitalskills/craft-authentication/pull/137).
-Verified on 15 November 2026: TypeScript, 31 language unit/integration tests, and four Chromium browser tests covering all locales, repeated switches, query/fragment retention, cancellation, desktop keyboard use, mobile menus, and authenticated craft editing. Desktop and mobile screenshots were inspected; the Hindi selector label now uses a self-hosted Devanagari subset. The full isolated suite reports 106 passing tests and the same six pre-existing C2PA trust/resolver failures. An isolated `pnpm test-deploy` completed successfully, and a read-only Chromium check against its production container passed repeated language switching and query/fragment preservation. The rehearsal containers, image, temporary data, and identified build-cache records were removed afterward.
+### Multilingual SEO
 
-Existing deployment issues observed during rehearsal (outside this language PR): the app healthcheck requests a nonexistent `/health` endpoint and its pipeline reports success despite HTTP 404; the Garage image lacks the `curl` command used by its healthcheck. Application startup was verified directly through HTTP and the browser rather than relying on those health indicators. Next.js also reports two existing FFmpeg tracing warnings. These findings should be addressed in a separate deployment-maintenance change.
+- Home, About and How it works have localized metadata, self-canonicals, reciprocal seven-language hreflang and x-default.
+- Original artisan/craft/community pages retain one unprefixed canonical; translated interface chrome is not represented as translated authored content.
+- Pagination keeps its distinct page number. Search results and private/account/editor/admin pages are noindex.
+- Public sitemap entries exclude deleted/private records and account/search pages. robots.txt advertises the sitemap.
+- Public origin comes from validated configuration, never the request Host. README and MIGRATION document SITE_URL and fallback behavior.
+- These changes provide crawlable language URLs and consistent signals; they do not guarantee indexing or rankings.
 
-### PR 2 — Stable URLs and multilingual SEO
+### Arabic and shared controls
 
-Decide and test the routing policy before changing any public URLs:
+- Arabic sets html dir=rtl, Radix controls inherit direction, and self-hosted Arabic and Devanagari fonts cover language labels and text.
+- Logical spacing/alignment replaces directional layout properties. Directional arrows mirror without mirroring media or logos.
+- Email, URL, password and technical-value fields retain readable LTR direction; ordinary text accepts mixed scripts.
+- Mobile navigation has modal semantics, focus containment, Escape support and focus restoration. Long translated desktop labels fit without hiding the login control.
+- Country display names, dates, numbers and plurals follow locale. Free-text locations remain authored. New hashtags support Unicode and NFC without rewriting existing data.
 
-- Keep English at existing unprefixed URLs; use non-English prefixes such as `/tr/about` and `/ar/about` (`localePrefix: 'as-needed'`).
-- Explicit URLs determine the language. Disable cookie/browser-language redirection of these URLs. A stored preference may suggest a language, but must not silently override a requested page.
-- Make language versions reachable through ordinary links; migrate internal links, client navigation, server redirects, auth callbacks, search and pagination to locale-aware navigation.
-- Preserve existing unprefixed public URLs, craft IDs, artisan slugs, QR destinations, credential identifiers, media URLs, and API endpoints. Any normalization of legacy `/en/...` links must preserve queries and fragments and avoid redirect loops.
-- Use a centralized locale/path policy shared by navigation, metadata, and sitemap generation.
-- For genuinely translated public editorial pages (home, about, how-it-works): translated titles/descriptions; self-referencing canonicals; reciprocal hreflang including self; valid language codes; and an appropriate x-default fallback.
-- Use one maintained hreflang implementation, preferably server-rendered HTML metadata. Sitemaps list canonical, public, indexable pages; duplicating all hreflang methods is unnecessary.
-- User-generated detail pages retain a single preferred original-content URL while only their interface is translated. Define canonical behavior per page type; do not pretend seven translated menus are seven translated biographies. Review listing/search/pagination policy separately.
-- Keep private/account/editor/admin pages out of sitemaps and explicitly noindex them. Authentication and media access rules remain independent of indexing.
-- Canonicals use a configured public origin, never an arbitrary request Host header. Keep sitemap and internal-link targets consistent.
-- Document the routing change and any required public-origin configuration in MIGRATION.md and README.md.
-- Verify with and without cookies and Accept-Language, including conflicting preferences. Explicit translated URLs must return the intended language directly.
-- After authorized staging deployment, inspect server HTML, canonical/hreflang relationships, redirects, and sitemap URLs. Search Console verification follows authorized production release.
+### Remaining interface text
 
-### PR 3 — Arabic layout and accessible shared UI
+- 218 interface entries cover onboarding, credential/vault setup, media/gallery, generation, errors, pagination and accessible labels in all seven catalogs.
+- API validation codes and limits map to translated UI errors. Normal user flows do not expose arbitrary provider/backend exceptions.
+- Catalog parity, ICU syntax and argument checks cover every locale, including corrected Greek upload parameters.
+- Retained English legal text is marked lang=en/dir=ltr with a translated availability notice.
+- PRIVACY_CONTACT_EMAIL and LEGAL_CONTACT_EMAIL are optional validated server configuration. When absent, verified institutional/project contact pages replace fabricated placeholder emails. Actual correspondence addresses still need operator confirmation.
 
-- Set document dir=rtl for Arabic and ltr for the other supported locales.
-- Audit shared navigation, drawers, dialogs, dropdowns, forms, pagination, and arrows using logical spacing/alignment. Do not mirror logos, media, or non-directional icons.
-- Handle mixed-script user content with appropriate direction isolation; URLs, email addresses, and technical identifiers remain readable.
-- Check fonts, long labels, wrapping, zoom, desktop and mobile layouts.
+### Verification issues resolved
 
-### PR 4 — Complete interface localization
+The required full-suite and deployment work exposed existing signing/deployment problems:
+- The C2PA SDK now uses its async signing path and timestamp resolver. Uploads record opening/uploading an existing asset without inventing its capture origin.
+- Non-Latin signing names and ordinary authentication account IDs work. Temporary keys are cleaned up, and issuance supports read-only root-key mounts.
+- Ownership comes from the validated active registry-issued certificate, including multi-manifest histories, instead of arbitrary text found in asset bytes.
+- The historical untrusted/malformed fixture remains rejected; tampered image bytes remain rejected. Trust checks are not disabled.
+- /health checks database readiness and returns explicit 200/503 JSON. Compose validates HTTP and JSON; Garage uses its available status command.
+- FFmpeg tracing is scoped so dev pages no longer repeatedly refresh while authentication is loading.
 
-- Inventory and migrate remaining hard-coded strings: onboarding entry, credentials and vault screens, pagination, errors, recovery instructions, accessibility labels, and metadata.
-- Translate dates, numbers, plurals, and display labels consistently using the selected locale. Preserve stored values and signed data.
-- Map API/validation error codes to translated UI messages instead of exposing arbitrary English server messages.
-- Add catalog parity and ICU-argument checks with a documented allowlist for intentional English-only legal content; correct the Greek upload-message variable omissions.
-- Mark retained English legal sections lang=en and dir=ltr, with a translated availability notice. Owner-reviewed legal translations can follow.
-- Published placeholder legal/privacy contact addresses need verified owner-provided replacements; do not invent them.
-- Obtain fluent-language review of new copy, particularly Arabic and Hindi. Syntax validation does not establish linguistic quality.
+## Verification evidence
 
-## Acceptance and release gates
+Completed locally against the current implementation:
+- Frozen-lockfile installation passed.
+- TypeScript passed.
+- Full isolated suite: **156 tests passed, 17 files, zero failures**.
+- Chromium browser suite: **13 tests passed**. Coverage includes seven languages, repeated switching, query/fragment retention, current-language no-op, unsaved-input cancellation, keyboard/mobile, authenticated editing, credential login and simulated Google-provider failure callbacks.
+- HTTP/browser checks verify deterministic routing despite conflicting cookies/headers, canonical/hreflang agreement, noindex, public-only sitemap entries, legal-language notices and health JSON.
+- Arabic account workflows and long German/Greek/Hindi/Arabic navigation checked. Desktop/mobile screenshots inspected.
+- JSX text inventory leaves only intentional measurement abbreviations. The mechanical UI detector reports one inherited decorative border, preserved while changing it to a logical RTL property.
+- Latest origin/staging fetched and merged: already up to date at cdf41e9.
 
-- TypeScript and relevant isolated tests pass; run the existing isolated suite and report pre-existing C2PA/fixture-trust failures without weakening verification.
-- Real browser coverage: all locales, repeated/back-and-forth switching, current-language no-op, search/page/id/fragment retention, unsaved-input cancellation, keyboard, mobile, and authenticated local editing.
-- For PR 2, add HTTP integration tests for deterministic locale routing, canonical/hreflang agreement, public sitemap inclusion, and noindex on non-public screens.
-- Rehearse production deployment only in an isolated local Compose project. Never run the production-stack teardown against an existing deployment.
-- Keep environment files, signing keys, database data, browser storage, and screenshots containing private data untracked.
-- Each PR describes what shipped, what was verified, known failures, and the remaining plan items. Do not merge or promote without release authorization.
+Still in progress:
+- Fresh isolated production Compose rehearsal and browser checks against that container. Earlier stage-one rehearsal is not evidence for the complete implementation.
+
+## Staging and later release
+
+After all required local checks finish successfully, prepare the replacement PR against staging with exact validation results. Do not merge or promote automatically.
+
+After authorized staging deployment:
+- Check the actual public hostname, redirects, server HTML, reciprocal language links, canonical targets and sitemap.
+- Exercise the real configured Google OAuth flow; local tests validate callback behavior with a simulated provider error and real credential authentication.
+- Ask fluent reviewers to approve new translated copy, especially Arabic/Hindi and security instructions, before production rollout. Automated syntax and layout checks are not independent linguistic approval.
+- Confirm the privacy and legal correspondence owners and set deployment email values if desired; verified contact-page fallbacks remain available.
+
+After an authorized production release, inspect Search Console indexing, submitted sitemap processing and locale coverage. Artisan-content translation, reviewed legal translations, translated captions, keyword/content strategy and future sitemap partitioning belong to later work.
+
+## Contact evidence
+
+- The [live website](https://sustainablecrafting.org/) identifies the University of Brighton as operator/data controller.
+- The [university privacy page](https://www.brighton.ac.uk/about-us/statistics-and-legal/privacy/index.aspx) and [information-request guidance](https://www.brighton.ac.uk/about-us/statistics-and-legal/requesting-information/index.aspx) identify the institutional data-protection route.
+- The [project contact page](https://craftingsustainablejawaja.org/contact/) identifies the research lead; that does not by itself appoint a legal representative.
+- Public addresses are not secrets, but deployment configuration makes ownership changes maintainable. Do not commit private environment files or invent an unverified legal mailbox.
 
 ## References
 
@@ -76,3 +95,4 @@ Decide and test the routing policy before changing any public URLs:
 - [Google: canonical URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls)
 - [next-intl routing configuration](https://next-intl.dev/docs/routing/configuration)
 - [W3C: direction in HTML](https://www.w3.org/International/questions/qa-html-dir)
+- [Content Authenticity signing guidance](https://opensource.contentauthenticity.org/docs/tasks/build/)

@@ -1,3 +1,6 @@
+import { LocalizedDate } from '@/components/shared/LocalizedDate'
+
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 import { ShieldCheck, Clock, RefreshCw, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { C2PAStatus } from './types'
@@ -17,18 +20,20 @@ export function SigningActiveCard({
     onToggleAutoRenew,
     onConfigureC2PA,
 }: SigningActiveCardProps) {
+    const tui = useInterfaceTranslations('interface')
+
     return (
         <div className="space-y-6">
             {/* Setup Status Card */}
             <div className="rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6 space-y-6 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 h-24 w-24 bg-primary/5 rounded-full blur-2xl -mr-6 -mt-6"></div>
+                <div className="absolute top-0 end-0 h-24 w-24 bg-primary/5 rounded-full blur-2xl -me-6 -mt-6"></div>
                 <div className="flex items-center justify-between border-b border-border/60 pb-4">
                     <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
                         <ShieldCheck className="h-5 w-5 text-primary" />
-                        Signing Active
+                        {tui('signingActive')}
                     </h3>
                     <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-semibold">
-                        Active
+                        {tui('active')}
                     </span>
                 </div>
 
@@ -37,14 +42,10 @@ export function SigningActiveCard({
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-muted-foreground flex items-center gap-1.5">
                                 <Clock className="h-4 w-4 text-muted-foreground" />
-                                Certificate Expires:
+                                {tui('certificateExpires')}
                             </span>
                             <span className="font-medium text-foreground">
-                                {new Date(status.c2paCertExpiresAt).toLocaleDateString(undefined, {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
+                                <LocalizedDate value={status.c2paCertExpiresAt} />
                             </span>
                         </div>
                     )}
@@ -56,10 +57,10 @@ export function SigningActiveCard({
                                 htmlFor="auto-renew"
                                 className="text-sm font-semibold text-foreground cursor-pointer"
                             >
-                                Auto-renew Certificate
+                                {tui('autoRenewCertificate')}
                             </label>
                             <p className="text-xs text-muted-foreground">
-                                Automatically refresh your signing identity before it expires.
+                                {tui('automaticallyRefreshYourSigningIdentityBeforeItExpires')}
                             </p>
                         </div>
                         <input
@@ -81,11 +82,11 @@ export function SigningActiveCard({
                         disabled={actionLoading}
                     >
                         {actionLoading ? (
-                            <RefreshCw className="h-3.5 w-3.5 animate-spin mr-2" />
+                            <RefreshCw className="h-3.5 w-3.5 animate-spin me-2" />
                         ) : (
-                            <RefreshCw className="h-3.5 w-3.5 mr-2" />
+                            <RefreshCw className="h-3.5 w-3.5 me-2" />
                         )}
-                        Rotate Keys
+                        {tui('rotateKeys')}
                     </Button>
                 </div>
             </div>
@@ -97,11 +98,10 @@ export function SigningActiveCard({
                         <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                         <div>
                             <h4 className="font-bold text-amber-900 text-sm">
-                                Certificate Expiring Soon
+                                {tui('certificateExpiringSoon')}
                             </h4>
                             <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                                Your signing identity expires soon. Renew it now to keep your uploads
-                                verified without any interruption.
+                                {tui('yourSigningIdentityExpiresSoonRenewItNowTo')}
                             </p>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ export function SigningActiveCard({
                         onClick={onConfigureC2PA}
                         disabled={actionLoading}
                     >
-                        Renew Certificate Now
+                        {tui('renewCertificateNow')}
                     </Button>
                 </div>
             )}
