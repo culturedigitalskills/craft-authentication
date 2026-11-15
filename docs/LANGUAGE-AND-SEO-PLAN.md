@@ -59,18 +59,25 @@ Completed locally against the current implementation:
 - Frozen-lockfile installation passed.
 - TypeScript passed.
 - Full isolated suite: **156 tests passed, 17 files, zero failures**.
-- Chromium browser suite: **13 tests passed**. Coverage includes seven languages, repeated switching, query/fragment retention, current-language no-op, unsaved-input cancellation, keyboard/mobile, authenticated editing, credential login and simulated Google-provider failure callbacks.
+- Chromium browser suite: **14 tests passed**. Coverage includes seven languages, repeated switching, query/fragment retention, current-language no-op, unsaved-input cancellation, keyboard/mobile, authenticated editing, credential login and simulated Google-provider failure callbacks.
 - HTTP/browser checks verify deterministic routing despite conflicting cookies/headers, canonical/hreflang agreement, noindex, public-only sitemap entries, legal-language notices and health JSON.
 - Arabic account workflows and long German/Greek/Hindi/Arabic navigation checked. Desktop/mobile screenshots inspected.
 - JSX text inventory leaves only intentional measurement abbreviations. The mechanical UI detector reports one inherited decorative border, preserved while changing it to a logical RTL property.
 - Latest origin/staging fetched and merged: already up to date at cdf41e9.
 
-Still in progress:
-- Fresh isolated production Compose rehearsal and browser checks against that container. Earlier stage-one rehearsal is not evidence for the complete implementation.
+Production rehearsal completed:
+- A fresh isolated pnpm test-deploy passed. The production build exposed a build-time robots.txt origin; the fix was followed by a final Docker rebuild from the same Dockerfile and a healthy startup.
+- Final production source matched all tracked application, catalog, style and schema files at code commit 24347b5. The later documentation commit does not change runtime code.
+- All three isolated containers (application, PostgreSQL, Garage) reported healthy. Migrations and storage initialization completed.
+- Chromium against the final production container passed all seven locales, canonical/hreflang, query/fragment preservation, Arabic mobile navigation, real credential registration, Unicode profile tags, vault setup, Arabic certificate issuance with read-only CA mounts, signed upload/edit, active-certificate identity, tamper rejection, legacy invalid-fixture rejection, sitemap and runtime robots origin.
+- The synthetic recovery token stayed in test-process memory and was not captured in screenshots, traces or logs.
+- The isolated containers, image, synthetic database/storage, temporary key copies and 39 identified build-cache records were removed. Normal local development health still returns HTTP 200.
+
+**Owner hold:** On 15 November 2026, after successful verification, the user explicitly said not to open a PR yet and to finish the existing work. Keep the completed changes local on the existing branch. Do not create/reopen a PR or push this work until the user resumes that step. PR #137 stays closed and unmerged.
 
 ## Staging and later release
 
-After all required local checks finish successfully, prepare the replacement PR against staging with exact validation results. Do not merge or promote automatically.
+Local implementation and required technical verification are complete. PR creation is on the explicit owner hold above. When the user resumes it, any replacement PR targets staging and includes the exact validation results. Do not merge or promote automatically.
 
 After authorized staging deployment:
 - Check the actual public hostname, redirects, server HTML, reciprocal language links, canonical targets and sitemap.
