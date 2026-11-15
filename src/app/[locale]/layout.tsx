@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { Geist, Geist_Mono, Spectral, Caveat } from 'next/font/google'
+import { Geist, Geist_Mono, Spectral, Caveat, Noto_Sans_Devanagari } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -41,6 +41,15 @@ const caveat = Caveat({
     variable: '--font-caveat',
     subsets: ['latin', 'latin-ext'],
     weight: ['600', '700'],
+    display: 'swap',
+})
+
+// Keep the Hindi language name readable even on devices without Indic fonts.
+// next/font serves this subset locally; visitors do not contact Google Fonts.
+const devanagari = Noto_Sans_Devanagari({
+    variable: '--font-devanagari',
+    subsets: ['devanagari'],
+    weight: ['400', '500'],
     display: 'swap',
 })
 
@@ -93,6 +102,7 @@ export default async function LocaleLayout({ children, params }: Props) {
                     geistMono.variable,
                     spectral.variable,
                     caveat.variable,
+                    devanagari.variable,
                 )}
             >
 

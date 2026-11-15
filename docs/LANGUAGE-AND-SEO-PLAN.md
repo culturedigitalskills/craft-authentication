@@ -4,13 +4,13 @@ Updated: 15 November 2026. All implementation PRs target `staging`; promotion to
 
 ## Scope and evidence
 
-The current site uses next-intl with seven catalogs (en, hi, es, ar, de, tr, el). Public HTTP checks and the deployed main revision confirm cookie-based language selection, English legal and onboarding content, missing Arabic direction, and locale-independent gallery dates. Catalog syntax passes. The selector drops query parameters in its navigation target; the resulting editor and unsaved-input behavior must be exercised in a browser.
+The current site uses next-intl with seven catalogs (en, hi, es, ar, de, tr, el). Public HTTP checks and the deployed main revision confirm cookie-based language selection, English legal and onboarding content, missing Arabic direction, and locale-independent gallery dates. Catalog syntax passes. The original selector dropped query parameters in its navigation target. Browser regression checks now verify that the fix retains the craft edit ID, query values and fragment, and that cancelling a language change preserves unsaved input.
 
 This programme covers the interface, language navigation, and multilingual SEO. Artisan biographies, craft descriptions, story answers, original media, and additional caption translations are deferred. Signed credentials, identifiers, saved content, permissions, and production records must not be rewritten.
 
 ## Delivery sequence
 
-### PR 1 — Safe language selection (in progress)
+### PR 1 — Safe language selection (implemented; deployment verification pending)
 
 - Preserve the full query string, including duplicate parameters, craft edit IDs, pagination, search, and the fragment.
 - Make repeated selections deterministic without relying on the client router cache for a cookie-only URL.
@@ -18,6 +18,9 @@ This programme covers the interface, language navigation, and multilingual SEO. 
 - Warn before a language change on editing, recording, upload, or account-entry screens can discard unsaved work. Cancelling must preserve both the page and its language preference. Selecting the current language must do nothing.
 - Keep the current URL policy and session-cookie lifetime in this PR. Neither a longer cookie lifetime nor this PR alone delivers multilingual SEO.
 - Add local isolated regression coverage, including real browser navigation. No production fixtures or writes.
+
+Implementation: [PR #137](https://github.com/culturedigitalskills/craft-authentication/pull/137).
+Verified on 15 November 2026: TypeScript, 31 language unit/integration tests, and four Chromium browser tests covering all locales, repeated switches, query/fragment retention, cancellation, desktop keyboard use, mobile menus, and authenticated craft editing. Desktop and mobile screenshots were inspected; the Hindi selector label now uses a self-hosted Devanagari subset. The full isolated suite reports 106 passing tests and the same six pre-existing C2PA trust/resolver failures. Production deployment rehearsal remains the final readiness check.
 
 ### PR 2 — Stable URLs and multilingual SEO
 

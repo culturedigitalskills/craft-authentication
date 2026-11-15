@@ -110,3 +110,8 @@
 * {
     @apply border-border;
 }
+
+/* Language names must remain legible independently of the current page locale. */
+.language-native-name[lang='hi'] {
+    font-family: var(--font-devanagari), sans-serif;
+}

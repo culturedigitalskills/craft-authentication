@@ -20,7 +20,11 @@ test('all languages, repeated selections, search parameters, hash, and current-l
         await expect(page.locator('html')).toHaveAttribute('lang', codes[i])
         const url = new URL(page.url())
         expect(url.pathname).toBe('/crafts')
-        expect(url.search).toBe('?q=blue%20cloth&tag=a&tag=b&page=2')
+        // The locale redirect may normalize spaces from %20 to +. Values,
+        // ordering, and repeated parameters must remain intact.
+        expect([...url.searchParams]).toEqual([
+            ['q', 'blue cloth'], ['tag', 'a'], ['tag', 'b'], ['page', '2'],
+        ])
         expect(url.hash).toBe('#collection')
         current = names[i]
     }
@@ -30,21 +34,21 @@ test('all languages, repeated selections, search parameters, hash, and current-l
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
     // A same-language selection must not reload, even on a screen with work.
     await page.goto('/register')
-    await page.getByLabel('Name', { exact: true }).fill('Unsaved local name')
+    await page.getByLabel('Full Name', { exact: true }).fill('Unsaved local name')
     let dialogs = 0
     page.on('dialog', async dialog => { dialogs++; await dialog.dismiss() })
     await chooseLanguage(page, 'English', 'English')
-    await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Unsaved local name')
+    await expect(page.getByLabel('Full Name', { exact: true })).toHaveValue('Unsaved local name')
     expect(dialogs).toBe(0)
 })
 
 test('cancel retains unsaved input and language; confirm navigates', async ({ page }) => {
     await page.goto('/register?invite=test#account')
-    await page.getByLabel('Name', { exact: true }).fill('Unsaved local name')
+    await page.getByLabel('Full Name', { exact: true }).fill('Unsaved local name')
     const beforeCookies = await page.context().cookies()
     page.once('dialog', dialog => dialog.dismiss())
     await chooseLanguage(page, 'English', 'Deutsch')
-    await expect(page.getByLabel('Name', { exact: true })).toHaveValue('Unsaved local name')
+    await expect(page.getByLabel('Full Name', { exact: true })).toHaveValue('Unsaved local name')
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
     expect((await page.context().cookies()).find(c => c.name === 'NEXT_LOCALE')?.value)
         .toBe(beforeCookies.find(c => c.name === 'NEXT_LOCALE')?.value)
@@ -72,6 +76,7 @@ test('desktop keyboard selection and mobile menu support native names', async ({
     await page.getByRole('button', { name: 'Open menu', exact: true }).click()
     await page.getByRole('button', { name: /العربية/ }).click()
     await expect(page.getByRole('menuitem', { name: 'العربية', exact: true })).toHaveAttribute('aria-current', 'true')
+    await page.evaluate(() => document.fonts.ready)
     await page.screenshot({ path: testInfo.outputPath('mobile-arabic-menu.png'), fullPage: false })
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })

@@ -62,7 +62,7 @@ export function LanguageSelect({ isMobile }: { isMobile: boolean }) {
                     {pending
                         ? <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
                         : <Languages className="h-4 w-4" aria-hidden="true" />}
-                    <span lang={locale} dir="auto">{languageNames[locale]}</span>
+                    <span className="language-native-name" lang={locale} dir="auto">{languageNames[locale]}</span>
                     <ChevronDown className="h-4 w-4" aria-hidden="true" />
                 </Button>
             </DropdownMenuTrigger>
@@ -74,7 +74,7 @@ export function LanguageSelect({ isMobile }: { isMobile: boolean }) {
                         aria-current={code === locale ? 'true' : undefined}
                         className="min-h-11 justify-between gap-6 px-3"
                     >
-                        <span lang={code} dir="auto">{languageNames[code]}</span>
+                        <span className="language-native-name" lang={code} dir="auto">{languageNames[code]}</span>
                         {code === locale && <Check className="h-4 w-4" aria-hidden="true" />}
                     </DropdownMenuItem>
                 ))}
