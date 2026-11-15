@@ -73,7 +73,7 @@ Earlier foundation container rehearsal (seven-language code):
 - The synthetic recovery token stayed in test-process memory and was not captured in screenshots, traces or logs.
 - The isolated containers, image, synthetic database/storage, temporary key copies and 39 identified build-cache records were removed. Normal local development health still returns HTTP 200.
 
-**Owner hold:** On 15 November 2026, after successful verification, the user explicitly said not to open a PR yet and to finish the existing work. Keep the completed changes local on the existing branch. Do not create/reopen a PR or push this work until the user resumes that step. PR #137 stays closed and unmerged.
+**PR readiness:** On 15 November 2026 the user authorized a new PR against staging. Required local verification is complete, including the final eleven-language container rehearsal below. PR #137 remains closed and unmerged. Merging and production promotion are separate actions.
 
 ## Four-language addition — 15 November 2026
 
@@ -87,12 +87,22 @@ Verification of this addition:
 - The changed UI files passed the mechanical detector. Desktop/mobile screenshots were reviewed and confirmed against the production build with motion disabled.
 - A separate Next.js production build passed. Its standalone server used a temporary local database and loopback-only port; browser smoke checks passed all four new locales, real Japanese font loading, mobile switching, headings, canonical/hreflang, sitemap, robots and health. Observed font requests were local.
 - The temporary production server, its separate database and temporary build directory were removed after verification.
-- This addition did not rerun the full container rebuild. The earlier seven-language Compose evidence is retained above; rehearse the final container candidate again before a future PR, after the owner resumes that step.
+- The complete eleven-language container candidate subsequently passed the final pre-PR deployment rehearsal recorded below.
 - Fluent-speaker review of the new copy remains a pre-production review step, not a claim established by the automated checks.
+
+## Final pre-PR deployment verification — 15 November 2026
+
+- Fetched origin and merged origin/staging; already up to date at cdf41e9.
+- The production source, dependencies and assets matched committed code 4964cf4 (315 files checked).
+- A fresh pnpm test-deploy passed in an isolated Compose project on a loopback-only port. Database migrations and storage initialization passed; application, PostgreSQL and Garage were healthy.
+- Production browser checks passed all eleven locales, canonical/hreflang, repeated switching with query/fragment preservation, self-hosted Japanese font loading, Arabic mobile navigation, credential registration, vault setup, read-only CA mounts, signed upload/edit, active-certificate identity, tamper rejection, invalid-fixture rejection, sitemap, robots and health.
+- The full isolated suite (169 tests), browser suite (18 tests), TypeScript and frozen-lockfile checks already passed for this unchanged runtime source.
+- Rehearsal containers, image, network, temporary data/key copies and 28 identified cache records were removed. The normal local development site remains healthy.
+- The following commit updates this verification record only.
 
 ## Staging and later release
 
-Local implementation and required technical verification are complete. PR creation is on the explicit owner hold above. When the user resumes it, any replacement PR targets staging and includes the exact validation results. Do not merge or promote automatically.
+Local implementation and required technical verification are complete. The authorized replacement PR targets staging and includes the validation results. Do not merge or promote automatically.
 
 After authorized staging deployment:
 - Check the actual public hostname, redirects, server HTML, reciprocal language links, canonical targets and sitemap.
