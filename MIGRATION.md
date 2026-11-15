@@ -1,5 +1,11 @@
 # Unreleased — language URLs, interface localization and verification
 
+## Additional interface languages
+
+Japanese (ja), French (fr), Italian (it) and Brazilian Portuguese (pt-BR) are now supported. Their URL prefixes are /ja, /fr, /it and /pt-BR. The owner selected Brazilian Portuguese; the selector explicitly labels it Português (Brasil). Editorial canonical/hreflang metadata and sitemap entries expand to these locales automatically.
+
+Install the updated frozen lockfile to include the pinned, self-hosted Noto Sans JP variable font. No database migration or additional environment setting is required. Legal document bodies stay in English with a translated notice; original artisan text and media are not translated.
+
 ## Public routes and indexing
 
 English pages keep their existing unprefixed URLs. Other supported languages use stable prefixes, for example /tr/about and /ar/about. Explicit URLs override browser language headers and old language cookies. The obsolete NEXT_LOCALE cookie is removed. Legacy /en/... addresses normalize to the unprefixed English route. Existing craft IDs, artisan slugs, QR destinations, API/media URLs and signed credentials are unchanged.

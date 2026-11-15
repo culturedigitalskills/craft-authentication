@@ -449,9 +449,21 @@ export const countries: Country[] = Object.entries(COUNTRY_NAMES).map(([isoCode,
 /**
  * Shown first in the country picker, ahead of the alphabetical list: one
  * country for each language the site is translated into (hi, en, ar, de, el,
- * es, tr), so add one here when a language is added.
+ * es, tr, ja, fr, it, pt-BR), so add one here when a language is added.
  */
-export const suggestedCountryCodes = ['IN', 'GB', 'EG', 'DE', 'GR', 'ES', 'TR']
+export const suggestedCountryCodes = [
+    'IN',
+    'GB',
+    'EG',
+    'DE',
+    'GR',
+    'ES',
+    'TR',
+    'JP',
+    'FR',
+    'IT',
+    'BR',
+]
 
 /**
  * The country's name in the visitor's language, falling back to the stored

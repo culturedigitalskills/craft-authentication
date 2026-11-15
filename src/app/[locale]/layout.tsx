@@ -22,6 +22,8 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import NextTopLoader from 'nextjs-toploader'
 import { routing } from '@/i8n/routing'
 //we are using the css in the main app folder
+// Version-pinned, self-hosted Japanese glyphs; no build-time Google font requests.
+import '@fontsource-variable/noto-sans-jp'
 import '../globals.css'
 
 const geistSans = Geist({

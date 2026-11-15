@@ -4,7 +4,7 @@ Updated: 15 November 2026. Branch: `codex/language-seo-foundation`. PRs target `
 
 ## Scope and PR readiness
 
-This work covers the interface, language selection, Arabic layout, and multilingual SEO for en, hi, es, ar, de, tr and el. Artisan biographies, craft descriptions, story answers, original media and additional caption translations remain deferred. Stored original content, IDs and prior signed assets are preserved.
+This work covers the interface, language selection, Arabic layout, and multilingual SEO for en, hi, es, ar, de, tr, el, ja, fr, it and pt-BR. Artisan biographies, craft descriptions, story answers, original media and additional caption translations remain deferred. Stored original content, IDs and prior signed assets are preserved.
 
 Do not create or reopen any PR, including a draft, until its intended implementation is complete and full required verification has finished successfully. Blocked checks and unresolved failures keep the work local. Known failures are not waived without the user's explicit agreement. [PR #137](https://github.com/culturedigitalskills/craft-authentication/pull/137) remains closed and unmerged.
 
@@ -20,7 +20,7 @@ Do not create or reopen any PR, including a draft, until its intended implementa
 
 ### Multilingual SEO
 
-- Home, About and How it works have localized metadata, self-canonicals, reciprocal seven-language hreflang and x-default.
+- Home, About and How it works have localized metadata, self-canonicals, reciprocal eleven-language hreflang and x-default.
 - Original artisan/craft/community pages retain one unprefixed canonical; translated interface chrome is not represented as translated authored content.
 - Pagination keeps its distinct page number. Search results and private/account/editor/admin pages are noindex.
 - Public sitemap entries exclude deleted/private records and account/search pages. robots.txt advertises the sitemap.
@@ -37,7 +37,7 @@ Do not create or reopen any PR, including a draft, until its intended implementa
 
 ### Remaining interface text
 
-- 218 interface entries cover onboarding, credential/vault setup, media/gallery, generation, errors, pagination and accessible labels in all seven catalogs.
+- 218 interface entries cover onboarding, credential/vault setup, media/gallery, generation, errors, pagination and accessible labels in all eleven catalogs.
 - API validation codes and limits map to translated UI errors. Normal user flows do not expose arbitrary provider/backend exceptions.
 - Catalog parity, ICU syntax and argument checks cover every locale, including corrected Greek upload parameters.
 - Retained English legal text is marked lang=en/dir=ltr with a translated availability notice.
@@ -58,14 +58,14 @@ The required full-suite and deployment work exposed existing signing/deployment 
 Completed locally against the current implementation:
 - Frozen-lockfile installation passed.
 - TypeScript passed.
-- Full isolated suite: **156 tests passed, 17 files, zero failures**.
-- Chromium browser suite: **14 tests passed**. Coverage includes seven languages, repeated switching, query/fragment retention, current-language no-op, unsaved-input cancellation, keyboard/mobile, authenticated editing, credential login and simulated Google-provider failure callbacks.
+- Full isolated suite: **169 tests passed, 17 files, zero failures**.
+- Chromium browser suite: **18 tests passed**. Coverage includes eleven languages, repeated switching, query/fragment retention, current-language no-op, unsaved-input cancellation, keyboard/mobile, authenticated editing, credential login and simulated Google-provider failure callbacks.
 - HTTP/browser checks verify deterministic routing despite conflicting cookies/headers, canonical/hreflang agreement, noindex, public-only sitemap entries, legal-language notices and health JSON.
 - Arabic account workflows and long German/Greek/Hindi/Arabic navigation checked. Desktop/mobile screenshots inspected.
 - JSX text inventory leaves only intentional measurement abbreviations. The mechanical UI detector reports one inherited decorative border, preserved while changing it to a logical RTL property.
 - Latest origin/staging fetched and merged: already up to date at cdf41e9.
 
-Production rehearsal completed:
+Earlier foundation container rehearsal (seven-language code):
 - A fresh isolated pnpm test-deploy passed. The production build exposed a build-time robots.txt origin; the fix was followed by a final Docker rebuild from the same Dockerfile and a healthy startup.
 - Final production source matched all tracked application, catalog, style and schema files at code commit 24347b5. The later documentation commit does not change runtime code.
 - All three isolated containers (application, PostgreSQL, Garage) reported healthy. Migrations and storage initialization completed.
@@ -74,6 +74,21 @@ Production rehearsal completed:
 - The isolated containers, image, synthetic database/storage, temporary key copies and 39 identified build-cache records were removed. Normal local development health still returns HTTP 200.
 
 **Owner hold:** On 15 November 2026, after successful verification, the user explicitly said not to open a PR yet and to finish the existing work. Keep the completed changes local on the existing branch. Do not create/reopen a PR or push this work until the user resumes that step. PR #137 stays closed and unmerged.
+
+## Four-language addition — 15 November 2026
+
+The user authorized Japanese, French, Italian and Portuguese, and selected Brazilian Portuguese. The interface now has eleven languages. Each new catalog supplies 942 interface strings (835 distinct source messages), including public pages, onboarding, forms, validation, credentials, vault, galleries and admin controls. Legal document bodies remain intentionally English.
+
+The locale registry now owns codes and native labels independently of the navigation framework. Routing, SEO metadata, sitemap generation and test matrices use that registry. Japanese gets a version-pinned, self-hosted variable font with Unicode-range loading and its OFL license; the initial Google-font download timeout was resolved by packaging the font rather than making builds fetch it.
+
+Verification of this addition:
+- Frozen-lockfile install, TypeScript and all 169 isolated tests passed.
+- All 18 browser tests passed, including the four new locale workflows, eleven-way switching, 12 editorial alternates (11 locales plus x-default), local-language form validation, mobile selection and long navigation.
+- The changed UI files passed the mechanical detector. Desktop/mobile screenshots were reviewed and confirmed against the production build with motion disabled.
+- A separate Next.js production build passed. Its standalone server used a temporary local database and loopback-only port; browser smoke checks passed all four new locales, real Japanese font loading, mobile switching, headings, canonical/hreflang, sitemap, robots and health. Observed font requests were local.
+- The temporary production server, its separate database and temporary build directory were removed after verification.
+- This addition did not rerun the full container rebuild. The earlier seven-language Compose evidence is retained above; rehearse the final container candidate again before a future PR, after the owner resumes that step.
+- Fluent-speaker review of the new copy remains a pre-production review step, not a claim established by the automated checks.
 
 ## Staging and later release
 

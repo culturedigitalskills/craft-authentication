@@ -2,13 +2,19 @@ import { test, expect, type Page } from '@playwright/test'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { randomUUID } from 'node:crypto'
+import { routing } from '../src/i8n/routing'
+import { languageNames } from '../src/i8n/locales'
 import { baseURL, isolatedEnvironment } from './isolated-environment.mjs'
 
-const names = ['हिन्दी', 'Español', 'العربية', 'Deutsch', 'Türkçe', 'Ελληνικά', 'English']
-const codes = ['hi', 'es', 'ar', 'de', 'tr', 'el', 'en']
+const codes = [...routing.locales.filter((locale) => locale !== 'en'), 'en'] as const
+const names = codes.map((locale) => languageNames[locale])
 
 async function chooseLanguage(page: Page, currentName: string, nextName: string) {
-    await page.getByRole('button', { name: new RegExp(currentName) }).click()
+    await page
+        .getByRole('button', {
+            name: new RegExp(currentName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+        })
+        .click()
     await page.getByRole('link', { name: nextName, exact: true }).click()
 }
 

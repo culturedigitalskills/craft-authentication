@@ -462,6 +462,14 @@ Run `pnpm exec playwright install --with-deps chromium` once, then `pnpm test:e2
 
 Unit tests for the selector use the project's isolated test environment: `pnpm exec dotenv run -f .env.test.local -- vitest run tests/language-switch.test.ts`.
 
+### Supported interface languages
+
+The local implementation supports English, Hindi, Spanish, Arabic, German, Turkish, Greek, Japanese, French, Italian and Brazilian Portuguese. Japanese uses /ja, French /fr, Italian /it, and Brazilian Portuguese /pt-BR; the selector displays their native names, including Português (Brasil). Portuguese wording and number/date formatting use the Brazilian locale.
+
+Supported codes and native labels live in src/i8n/locales.ts. All four added catalogs contain the full interface message set; English legal documents retain a translated availability notice. Artisan-authored content and additional caption translations remain outside this change.
+
+Japanese uses the pinned @fontsource-variable/noto-sans-jp package. Its Unicode-range font faces are served locally and load only the glyph subsets needed by a page, including the Japanese selector label on other locales. The OFL license is included at public/fonts/noto-sans-jp-LICENSE.txt. Review new copy with fluent speakers before production rollout.
+
 ### Locale URLs and SEO
 
 The interface language is selected by URL: English keeps /about, while other languages use /tr/about, /ar/about, and equivalent prefixes. Browser language headers and old locale cookies do not override explicit URLs. User-authored biographies, product descriptions and story answers remain in their original language; additional caption translations are deferred.

@@ -41,6 +41,7 @@
         "@better-auth/prisma-adapter": "^1.7.12",
         "@contentauth/c2pa-node": "^0.9.10",
         "@contentauth/c2pa-web": "^0.15.4",
+        "@fontsource-variable/noto-sans-jp": "5.3.1",
         "@hookform/resolvers": "^6.0.0",
         "@openrouter/sdk": "^1.5.7",
         "@prisma/adapter-pg": "^7.10.1",

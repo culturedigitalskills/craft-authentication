@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { routing } from '../src/i8n/routing'
 import { baseURL, isolatedEnvironment } from './isolated-environment.mjs'
 
 test('explicit URLs ignore conflicting browser and cookie preferences and publish matching alternates', async ({
@@ -17,7 +18,9 @@ test('explicit URLs ignore conflicting browser and cookie preferences and publis
         'href',
         baseURL + '/tr/about',
     )
-    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(8)
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(
+        routing.locales.length + 1,
+    )
     await expect(page.locator('link[hreflang="en"]')).toHaveAttribute('href', baseURL + '/about')
     await expect(page.locator('link[hreflang="ar"]')).toHaveAttribute('href', baseURL + '/ar/about')
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow')

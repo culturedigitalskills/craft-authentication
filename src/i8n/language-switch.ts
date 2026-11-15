@@ -1,17 +1,8 @@
 import { getPathname } from './navigation'
-import { routing } from './routing'
+import type { SiteLocale } from './locales'
 
-export type SiteLocale = (typeof routing.locales)[number]
-
-export const languageNames: Record<SiteLocale, string> = {
-    en: 'English',
-    hi: 'हिन्दी',
-    es: 'Español',
-    ar: 'العربية',
-    de: 'Deutsch',
-    tr: 'Türkçe',
-    el: 'Ελληνικά',
-}
+export { languageNames } from './locales'
+export type { SiteLocale } from './locales'
 
 /**
  * Build a stable locale URL, retaining repeated query parameters and fragments.

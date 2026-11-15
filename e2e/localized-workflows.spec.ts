@@ -105,7 +105,7 @@ test('Arabic account workflows render translated controls, verify a real invalid
 test('long translated navigation stays usable at desktop and intermediate widths', async ({
     page,
 }, testInfo) => {
-    for (const locale of ['de', 'el', 'hi', 'ar']) {
+    for (const locale of ['de', 'el', 'hi', 'ar', 'ja', 'fr', 'it', 'pt-BR']) {
         const messages = JSON.parse(readFileSync('messages/' + locale + '.json', 'utf8'))
         for (const width of [1100, 1440]) {
             await page.setViewportSize({ width, height: 1000 })
