@@ -10,7 +10,7 @@ This programme covers the interface, language navigation, and multilingual SEO. 
 
 ## Delivery sequence
 
-### PR 1 — Safe language selection (implemented; deployment verification pending)
+### PR 1 — Safe language selection (implemented and verified; PR review pending)
 
 - Preserve the full query string, including duplicate parameters, craft edit IDs, pagination, search, and the fragment.
 - Make repeated selections deterministic without relying on the client router cache for a cookie-only URL.
@@ -20,7 +20,9 @@ This programme covers the interface, language navigation, and multilingual SEO. 
 - Add local isolated regression coverage, including real browser navigation. No production fixtures or writes.
 
 Implementation: [PR #137](https://github.com/culturedigitalskills/craft-authentication/pull/137).
-Verified on 15 November 2026: TypeScript, 31 language unit/integration tests, and four Chromium browser tests covering all locales, repeated switches, query/fragment retention, cancellation, desktop keyboard use, mobile menus, and authenticated craft editing. Desktop and mobile screenshots were inspected; the Hindi selector label now uses a self-hosted Devanagari subset. The full isolated suite reports 106 passing tests and the same six pre-existing C2PA trust/resolver failures. Production deployment rehearsal remains the final readiness check.
+Verified on 15 November 2026: TypeScript, 31 language unit/integration tests, and four Chromium browser tests covering all locales, repeated switches, query/fragment retention, cancellation, desktop keyboard use, mobile menus, and authenticated craft editing. Desktop and mobile screenshots were inspected; the Hindi selector label now uses a self-hosted Devanagari subset. The full isolated suite reports 106 passing tests and the same six pre-existing C2PA trust/resolver failures. An isolated `pnpm test-deploy` completed successfully, and a read-only Chromium check against its production container passed repeated language switching and query/fragment preservation. The rehearsal containers, image, temporary data, and identified build-cache records were removed afterward.
+
+Existing deployment issues observed during rehearsal (outside this language PR): the app healthcheck requests a nonexistent `/health` endpoint and its pipeline reports success despite HTTP 404; the Garage image lacks the `curl` command used by its healthcheck. Application startup was verified directly through HTTP and the browser rather than relying on those health indicators. Next.js also reports two existing FFmpeg tracing warnings. These findings should be addressed in a separate deployment-maintenance change.
 
 ### PR 2 — Stable URLs and multilingual SEO
 
