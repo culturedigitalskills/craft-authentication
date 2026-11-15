@@ -150,3 +150,11 @@ test('health route returns JSON without locale redirects', async ({ request }) =
     expect(await response.json()).toEqual({ status: 'healthy' })
     expect(response.headers()['x-robots-tag']).toContain('noindex')
 })
+
+test('robots advertises the runtime public origin', async ({ request }) => {
+    const response = await request.get('/robots.txt')
+    expect(response.status()).toBe(200)
+    const body = await response.text()
+    expect(body).toContain('Sitemap: ' + baseURL + '/sitemap.xml')
+    expect(body).not.toContain('localhost:3000')
+})

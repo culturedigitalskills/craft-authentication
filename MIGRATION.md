@@ -16,7 +16,7 @@ No database migration is required. Before release, verify canonical URLs against
 
 ## API and deployment checks
 
-GET /health returns { status: "healthy" } only when a database check succeeds; otherwise it returns HTTP 503 with { status: "unavailable" }. It is non-cacheable and noindex, and does not expose database error details. The application Compose healthcheck now verifies both HTTP status and JSON status without a masking shell pipeline. Garage uses its available /garage status command.
+GET /health returns { status: "healthy" } only when a database check succeeds; otherwise it returns HTTP 503 with { status: "unavailable" }. It is non-cacheable and noindex, and does not expose database error details. The application Compose healthcheck now verifies both HTTP status and JSON status without a masking shell pipeline. Garage uses its available /garage status command. The app explicitly binds to 0.0.0.0 so both container networking and the loopback health probe reach it. robots.txt resolves SITE_URL at runtime so a build-time placeholder cannot leak into the advertised sitemap URL.
 
 Validation-error details can additionally include origin, minimum and maximum so clients can translate errors from codes and limits. Existing path, message and code fields are preserved.
 
