@@ -33,11 +33,12 @@ export function AdminAuditTrail({ entries }: { entries: AuditEntry[] }) {
                 <ul className="divide-y divide-border rounded-lg border border-border">
                     {entries.map((entry) => {
                         const subject =
-                            (entry.detail?.name as string) ??
-                            (entry.detail?.email as string) ??
-                            ''
+                            (entry.detail?.name as string) ?? (entry.detail?.email as string) ?? ''
                         return (
-                            <li key={entry.id} className="flex flex-wrap gap-x-2 gap-y-1 p-3 text-sm">
+                            <li
+                                key={entry.id}
+                                className="flex flex-wrap gap-x-2 gap-y-1 p-3 text-sm"
+                            >
                                 <span className="font-medium">{entry.actorEmail}</span>
                                 {/* The action key doubles as the message key, so
                                     an action added later without copy shows its
@@ -48,7 +49,7 @@ export function AdminAuditTrail({ entries }: { entries: AuditEntry[] }) {
                                         : entry.action}
                                 </span>
                                 {subject && <span className="font-medium">{subject}</span>}
-                                <span className="ml-auto text-xs text-muted-foreground">
+                                <span className="ms-auto text-xs text-muted-foreground">
                                     {format.dateTime(new Date(entry.createdAt), {
                                         dateStyle: 'medium',
                                         timeStyle: 'short',

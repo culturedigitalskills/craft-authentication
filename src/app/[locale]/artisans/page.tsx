@@ -1,5 +1,10 @@
+import { formatLocation } from '@/data/locations'
+import { getLocale as getDisplayLocale } from 'next-intl/server'
+import { LocalizedCount, LocalizedNumber } from '@/components/shared/LocalizedCount'
+import { catalogMetadata } from '@/i8n/seo-server'
+import { pageNumber, firstSearchValue } from '@/i8n/seo'
 import { prisma } from '@/lib/prisma'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { User, MapPin } from 'lucide-react'
 import PaginationControls from '@/components/craft/PaginationControls'
 import { getTranslations } from 'next-intl/server'
@@ -9,18 +14,19 @@ import { ScMedia } from '@/components/sc/ScMedia'
 import { PortraitFallback, IndigoDotsCover, tintFor } from '@/components/sc/fallbacks'
 
 interface PageProps {
-    searchParams: Promise<{ page?: string; q?: string }>
+    searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>
 }
 
 export default async function ArtisansPage({ searchParams }: PageProps) {
     const { page: pageParam, q: qParam } = await searchParams
-    const page = Math.max(1, parseInt(pageParam ?? '1', 10))
-    const q = qParam?.trim() ?? ''
+    const page = pageNumber(pageParam)
+    const q = firstSearchValue(qParam).trim()
     const limit = 12
     const skip = (page - 1) * limit
 
     const t = await getTranslations()
-    const currentPageUrl = `${process.env.AUTH_URL}/artisans`
+    const displayLocale = await getDisplayLocale()
+    const currentPageUrl = '/artisans'
 
     const whereClause = {
         deletedAt: null,
@@ -102,7 +108,7 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                 <SearchInput placeholder={t('artisans.searchPlaceholder')} />
                 {totalCount > 0 && (
                     <p className="sc-meta shrink-0">
-                        {totalCount} {t('artisans.artisansCount')}
+                        <LocalizedCount kind="artisanCount" count={totalCount} />
                     </p>
                 )}
             </div>
@@ -114,9 +120,7 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                         const photoUrl = mediaId ? `/api/media/${mediaId}` : null
                         const fullName = `${artisan.firstName} ${artisan.lastName}`
                         const location =
-                            artisan.region && artisan.country
-                                ? `${artisan.region}, ${artisan.country}`
-                                : (artisan.country ?? null)
+                            formatLocation(artisan.country, artisan.region, displayLocale) || null
                         const specialty = undefined // artisan.hashtags?.[0] //no hashtags field on artisans
                         const craftCount = craftCountMap.get(artisan.id) ?? 0
                         const hue = tintFor(artisan.slug)
@@ -206,7 +210,7 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                                                     color: 'var(--sc-ink)',
                                                 }}
                                             >
-                                                {craftCount}
+                                                <LocalizedNumber value={craftCount} />
                                             </span>
                                             <span className="sc-meta">{t('artisans.crafts')}</span>
                                         </span>
@@ -220,7 +224,9 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                                                         color: 'var(--sc-ink)',
                                                     }}
                                                 >
-                                                    {artisan.yearsOfExperience}
+                                                    <LocalizedNumber
+                                                        value={artisan.yearsOfExperience}
+                                                    />
                                                 </span>
                                                 <span className="sc-meta">
                                                     {t('artisans.yearsExperience')}
@@ -254,5 +260,18 @@ export default async function ArtisansPage({ searchParams }: PageProps) {
                 currentPageUrl={currentPageUrl}
             />
         </div>
+    )
+}
+
+export async function generateMetadata({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string | string[]; q?: string | string[] }>
+}) {
+    return catalogMetadata(
+        '/artisans',
+        'artisans.title',
+        'artisans.description',
+        await searchParams,
     )
 }

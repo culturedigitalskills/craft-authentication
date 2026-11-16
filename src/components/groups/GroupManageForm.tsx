@@ -1,9 +1,10 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { Trash2, UserPlus, Shield, User, ArrowLeft, Loader2, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,7 +52,14 @@ interface GroupManageFormProps {
     coverUrl: string | null
 }
 
-export function GroupManageForm({ group, members: initialMembers, logoUrl, coverUrl }: GroupManageFormProps) {
+export function GroupManageForm({
+    group,
+    members: initialMembers,
+    logoUrl,
+    coverUrl,
+}: GroupManageFormProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('groups')
     const router = useRouter()
     const [saving, setSaving] = useState(false)
@@ -63,8 +71,14 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     const [addError, setAddError] = useState('')
     const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
-    const [searchResults, setSearchResults] = useState<{ id: string; firstName: string; lastName: string; slug: string }[]>([])
-    const [selectedArtisan, setSelectedArtisan] = useState<{ id: string; firstName: string; lastName: string } | null>(null)
+    const [searchResults, setSearchResults] = useState<
+        { id: string; firstName: string; lastName: string; slug: string }[]
+    >([])
+    const [selectedArtisan, setSelectedArtisan] = useState<{
+        id: string
+        firstName: string
+        lastName: string
+    } | null>(null)
     const [searching, setSearching] = useState(false)
 
     const [form, setForm] = useState({
@@ -80,10 +94,10 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
     })
 
     function toggleCertification(cert: string) {
-        setForm(f => ({
+        setForm((f) => ({
             ...f,
             certifications: f.certifications.includes(cert)
-                ? f.certifications.filter(c => c !== cert)
+                ? f.certifications.filter((c) => c !== cert)
                 : [...f.certifications, cert],
         }))
     }
@@ -153,7 +167,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             if (res.ok) {
                 const results = await res.json()
                 // Filter out artisans already in the group
-                const memberIds = new Set(members.map(m => m.artisan.id))
+                const memberIds = new Set(members.map((m) => m.artisan.id))
                 setSearchResults(results.filter((a: { id: string }) => !memberIds.has(a.id)))
             }
         } catch {
@@ -175,16 +189,16 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             })
             if (!res.ok) {
                 const data = await res.json()
-                setAddError(data.error || 'Failed to add member')
+                setAddError(tui('failedToAddMember'))
                 return
             }
             const membership = await res.json()
-            setMembers(prev => [...prev, membership])
+            setMembers((prev) => [...prev, membership])
             setSelectedArtisan(null)
             setSearchQuery('')
             setSearchResults([])
         } catch {
-            setAddError('Failed to add member')
+            setAddError(tui('failedToAddMember'))
         }
     }
 
@@ -195,7 +209,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 method: 'DELETE',
             })
             if (!res.ok) throw new Error('Failed to remove')
-            setMembers(prev => prev.filter(m => m.id !== membershipId))
+            setMembers((prev) => prev.filter((m) => m.id !== membershipId))
             setConfirmRemove(null)
         } catch {
             setMemberError(t('removeMemberFailed'))
@@ -212,8 +226,8 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 body: JSON.stringify({ role: newRole }),
             })
             if (!res.ok) throw new Error('Failed to update role')
-            setMembers(prev =>
-                prev.map(m => m.id === membershipId ? { ...m, role: newRole } : m)
+            setMembers((prev) =>
+                prev.map((m) => (m.id === membershipId ? { ...m, role: newRole } : m)),
             )
         } catch {
             setMemberError(t('updateRoleFailed'))
@@ -232,13 +246,15 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">{group.name}</h1>
+                        <h1 className="text-2xl font-bold tracking-tight text-primary-foreground">
+                            {group.name}
+                        </h1>
                         <p className="text-sm text-primary-foreground/70">{t('editGroup')}</p>
                     </div>
                 </div>
                 <Button variant="outline" asChild className="shrink-0">
                     <Link href={`/groups/${group.slug}`}>
-                        <ExternalLink className="mr-2 h-4 w-4" />
+                        <ExternalLink className="me-2 h-4 w-4" />
                         {t('viewPublicPage')}
                     </Link>
                 </Button>
@@ -246,7 +262,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
 
             {/* Photos */}
             <div className="rounded-lg border border-border bg-card p-6">
-                <h2 className="mb-4 text-lg font-semibold">Photos</h2>
+                <h2 className="mb-4 text-lg font-semibold">{tui('photos')}</h2>
                 <div className="space-y-5">
                     <GroupPhotoUpload
                         groupId={group.id}
@@ -264,75 +280,84 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             </div>
 
             {/* Group details form */}
-            <form onSubmit={handleSave} className="space-y-5 rounded-lg border border-border bg-card p-6">
+            <form
+                onSubmit={handleSave}
+                className="space-y-5 rounded-lg border border-border bg-card p-6"
+            >
                 <div className="space-y-2">
-                    <Label htmlFor="name">
-                        {t('groupName')}
-                    </Label>
+                    <Label htmlFor="name">{t('groupName')}</Label>
                     <Input
                         id="name"
                         type="text"
                         value={form.name}
-                        onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                        onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                         pattern=".*\D.*"
                         required
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="description">
-                        {t('description')}
-                    </Label>
+                    <Label htmlFor="description">{t('description')}</Label>
                     <Textarea
                         id="description"
                         value={form.description}
-                        onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                        onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                         rows={4}
                     />
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
                     <div className="space-y-2">
-                        <Label htmlFor="website">
-                            {t('website')}
-                        </Label>
+                        <Label htmlFor="website">{t('website')}</Label>
                         <Input
                             id="website"
                             type="url"
                             value={form.website}
-                            onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
-                            onBlur={() => setForm(f => ({ ...f, website: normalizeWebsite(f.website) }))}
+                            onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))}
+                            onBlur={() =>
+                                setForm((f) => ({ ...f, website: normalizeWebsite(f.website) }))
+                            }
                             placeholder="https://"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="location">
-                            {t('location')}
-                        </Label>
+                        <Label htmlFor="location">{t('location')}</Label>
                         <Input
                             id="location"
                             type="text"
                             value={form.location}
-                            onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
+                            onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
                         />
                     </div>
                 </div>
 
                 {/* Organization type */}
                 <div className="space-y-2">
-                    <Label htmlFor="organizationType">
-                        {t('organizationType')}
-                    </Label>
+                    <Label htmlFor="organizationType">{t('organizationType')}</Label>
                     <Select
                         value={form.organizationType}
-                        onValueChange={value => setForm(f => ({ ...f, organizationType: value }))}
+                        onValueChange={(value) =>
+                            setForm((f) => ({ ...f, organizationType: value }))
+                        }
                     >
                         <SelectTrigger id="organizationType">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            {(['COOPERATIVE', 'COLLECTIVE', 'GUILD', 'ASSOCIATION', 'SOCIAL_ENTERPRISE', 'NONPROFIT', 'STUDIO', 'NETWORK', 'OTHER'] as const).map(type => (
+                            {(
+                                [
+                                    'COOPERATIVE',
+                                    'COLLECTIVE',
+                                    'GUILD',
+                                    'ASSOCIATION',
+                                    'SOCIAL_ENTERPRISE',
+                                    'NONPROFIT',
+                                    'STUDIO',
+                                    'NETWORK',
+                                    'OTHER',
+                                ] as const
+                            ).map((type) => (
                                 <SelectItem key={type} value={type}>
                                     {t(`orgType_${type}`)}
                                 </SelectItem>
@@ -345,7 +370,16 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                 <div>
                     <p className="mb-2 text-sm font-medium">{t('certifications')}</p>
                     <div className="flex flex-wrap gap-2">
-                        {(['WFTO_FAIR_TRADE', 'FAIRTRADE_CERTIFIED', 'NEST_ETHICAL_HANDCRAFT', 'BCORP', 'UNESCO_ICH', 'FAIR_TRADE_FEDERATION'] as const).map(cert => (
+                        {(
+                            [
+                                'WFTO_FAIR_TRADE',
+                                'FAIRTRADE_CERTIFIED',
+                                'NEST_ETHICAL_HANDCRAFT',
+                                'BCORP',
+                                'UNESCO_ICH',
+                                'FAIR_TRADE_FEDERATION',
+                            ] as const
+                        ).map((cert) => (
                             <button
                                 key={cert}
                                 type="button"
@@ -368,7 +402,9 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                         <input
                             type="checkbox"
                             checked={form.isHeritageCraft}
-                            onChange={e => setForm(f => ({ ...f, isHeritageCraft: e.target.checked }))}
+                            onChange={(e) =>
+                                setForm((f) => ({ ...f, isHeritageCraft: e.target.checked }))
+                            }
                             className="rounded border-input"
                         />
                         {t('heritageCraft')}
@@ -377,7 +413,9 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                         <input
                             type="checkbox"
                             checked={form.isOpenToMembers}
-                            onChange={e => setForm(f => ({ ...f, isOpenToMembers: e.target.checked }))}
+                            onChange={(e) =>
+                                setForm((f) => ({ ...f, isOpenToMembers: e.target.checked }))
+                            }
                             className="rounded border-input"
                         />
                         {t('openToMembers')}
@@ -386,16 +424,16 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                         <input
                             type="checkbox"
                             checked={form.hasTrainingProgram}
-                            onChange={e => setForm(f => ({ ...f, hasTrainingProgram: e.target.checked }))}
+                            onChange={(e) =>
+                                setForm((f) => ({ ...f, hasTrainingProgram: e.target.checked }))
+                            }
                             className="rounded border-input"
                         />
                         {t('trainingProgram')}
                     </label>
                 </div>
 
-                {formError && (
-                    <p className="text-sm text-destructive">{formError}</p>
-                )}
+                {formError && <p className="text-sm text-destructive">{formError}</p>}
 
                 <div className="flex items-center justify-between">
                     {confirmDelete ? (
@@ -407,7 +445,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                                 disabled={deleting}
                                 onClick={handleDelete}
                             >
-                                {deleting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                                {deleting && <Loader2 className="me-1.5 h-4 w-4 animate-spin" />}
                                 {t('deleteGroup')}
                             </Button>
                             <Button
@@ -419,16 +457,12 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                             </Button>
                         </div>
                     ) : (
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={handleDelete}
-                        >
+                        <Button type="button" variant="destructive" onClick={handleDelete}>
                             {t('deleteGroup')}
                         </Button>
                     )}
                     <Button type="submit" disabled={saving}>
-                        {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                        {saving && <Loader2 className="me-1.5 h-4 w-4 animate-spin" />}
                         {saving ? t('saving') : t('editGroup')}
                     </Button>
                 </div>
@@ -438,33 +472,41 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
             <div className="rounded-lg border border-border bg-card p-6">
                 <h2 className="mb-4 text-lg font-semibold">{t('members')}</h2>
 
-                {memberError && (
-                    <p className="mb-3 text-sm text-destructive">{memberError}</p>
-                )}
+                {memberError && <p className="mb-3 text-sm text-destructive">{memberError}</p>}
 
                 {/* Add member */}
                 <div className="mb-6">
                     <div className="relative">
                         <Input
                             type="text"
-                            value={selectedArtisan ? `${selectedArtisan.firstName} ${selectedArtisan.lastName}` : searchQuery}
-                            onChange={e => handleSearch(e.target.value)}
+                            value={
+                                selectedArtisan
+                                    ? `${selectedArtisan.firstName} ${selectedArtisan.lastName}`
+                                    : searchQuery
+                            }
+                            onChange={(e) => handleSearch(e.target.value)}
                             placeholder={t('searchArtisan')}
                         />
                         {searching && (
-                            <div className="absolute right-3 top-2.5 text-xs text-muted-foreground">...</div>
+                            <div className="absolute end-3 top-2.5 text-xs text-muted-foreground">
+                                ...
+                            </div>
                         )}
                         {searchResults.length > 0 && !selectedArtisan && (
                             <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-card shadow-lg">
-                                {searchResults.map(a => (
+                                {searchResults.map((a) => (
                                     <button
                                         key={a.id}
                                         type="button"
                                         onClick={() => {
-                                            setSelectedArtisan({ id: a.id, firstName: a.firstName, lastName: a.lastName })
+                                            setSelectedArtisan({
+                                                id: a.id,
+                                                firstName: a.firstName,
+                                                lastName: a.lastName,
+                                            })
                                             setSearchResults([])
                                         }}
-                                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+                                        className="flex w-full items-center gap-2 px-3 py-2 text-start text-sm transition-colors hover:bg-muted"
                                     >
                                         <User className="h-4 w-4 text-muted-foreground" />
                                         {a.firstName} {a.lastName}
@@ -482,20 +524,21 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                             <Button
                                 type="button"
                                 variant="ghost"
-                                onClick={() => { setSelectedArtisan(null); setSearchQuery('') }}
+                                onClick={() => {
+                                    setSelectedArtisan(null)
+                                    setSearchQuery('')
+                                }}
                             >
                                 {t('cancel')}
                             </Button>
                         </div>
                     )}
                 </div>
-                {addError && (
-                    <p className="mb-4 text-sm text-destructive">{addError}</p>
-                )}
+                {addError && <p className="mb-4 text-sm text-destructive">{addError}</p>}
 
                 {/* Members list */}
                 <div className="space-y-2">
-                    {members.map(member => (
+                    {members.map((member) => (
                         <div
                             key={member.id}
                             className="flex items-center justify-between rounded-md border border-border p-3"
@@ -526,7 +569,11 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                                     type="button"
                                     onClick={() => handleToggleRole(member.id, member.role)}
                                     className="rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                                    title={member.role === 'ADMIN' ? 'Demote to member' : 'Promote to admin'}
+                                    title={
+                                        member.role === 'ADMIN'
+                                            ? tui('demoteToMember')
+                                            : tui('promoteToAdmin')
+                                    }
                                 >
                                     {member.role === 'ADMIN' ? (
                                         <User className="h-4 w-4" />
@@ -549,7 +596,7 @@ export function GroupManageForm({ group, members: initialMembers, logoUrl, cover
                                             onClick={() => setConfirmRemove(null)}
                                             className="rounded-md px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted"
                                         >
-                                            Cancel
+                                            {tui('cancel')}
                                         </button>
                                     </div>
                                 ) : (

@@ -20,3 +20,10 @@ LICENSE
 garage.toml.example
 next-env.d.ts
 .vscode
+
+# Private local tooling and browser-test state
+.local-dev
+.next-e2e
+AGENTS.md
+secrets
+garage.toml

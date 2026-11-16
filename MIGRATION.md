@@ -1,3 +1,35 @@
+# Unreleased — language URLs, interface localization and verification
+
+## Additional interface languages
+
+Japanese (ja), French (fr), Italian (it) and Brazilian Portuguese (pt-BR) are now supported. Their URL prefixes are /ja, /fr, /it and /pt-BR. The owner selected Brazilian Portuguese; the selector explicitly labels it Português (Brasil). Editorial canonical/hreflang metadata and sitemap entries expand to these locales automatically.
+
+Install the updated frozen lockfile to include the pinned, self-hosted Noto Sans JP variable font. No database migration or additional environment setting is required. Legal document bodies stay in English with a translated notice; original artisan text and media are not translated.
+
+## Public routes and indexing
+
+English pages keep their existing unprefixed URLs. Other supported languages use stable prefixes, for example /tr/about and /ar/about. Explicit URLs override browser language headers and old language cookies. The obsolete NEXT_LOCALE cookie is removed. Legacy /en/... addresses normalize to the unprefixed English route. Existing craft IDs, artisan slugs, QR destinations, API/media URLs and signed credentials are unchanged.
+
+Translated editorial pages publish canonical and reciprocal hreflang metadata. Original artisan/craft/community content has one preferred unprefixed URL until content translation is introduced. Search results and account/editor/admin pages are noindex. /sitemap.xml contains only public canonical URLs; /robots.txt advertises it.
+
+Optional server-side settings:
+- SITE_URL: canonical public origin, such as https://your-site.example. Defaults to NEXT_PUBLIC_SERVER_URL, AUTH_URL, then https://sustainablecrafting.org. Do not include a path, credentials, query or fragment.
+- PRIVACY_CONTACT_EMAIL and LEGAL_CONTACT_EMAIL: owner-approved public correspondence addresses. Keep deployment values in the environment, not translation catalogs. When unset, legal text links to the verified university data-protection contact page or research-project contact page. Placeholder .invalid addresses are rejected.
+
+New hashtags now accept Unicode letters, combining marks, numbers and underscores with NFC normalization. Known country display names follow the selected language; stored locations and tags are unchanged.
+
+No database migration is required. Before release, verify canonical URLs against the actual public hostname, language links and auth redirects, public sitemap visibility, RTL layout and the English legal-language notice.
+
+## API and deployment checks
+
+GET /health returns { status: "healthy" } only when a database check succeeds; otherwise it returns HTTP 503 with { status: "unavailable" }. It is non-cacheable and noindex, and does not expose database error details. The application Compose healthcheck now verifies both HTTP status and JSON status without a masking shell pipeline. Garage uses its available /garage status command. The app explicitly binds to 0.0.0.0 so both container networking and the loopback health probe reach it. robots.txt resolves SITE_URL at runtime so a build-time placeholder cannot leak into the advertised sitemap URL.
+
+Validation-error details can additionally include origin, minimum and maximum so clients can translate errors from codes and limits. Existing path, message and code fields are preserved.
+
+## C2PA compatibility
+
+Signing now uses the SDK's asynchronous callback signer with the same local key, certificate chain and timestamp authority. Uploaded files are recorded as opened existing assets with an upload action; the registry no longer invents a capture/creation source for uploads. Prior signed data is not rewritten. The historical malformed/untrusted fixture remains a rejection test. Trust verification, ownership checks and tamper rejection remain enabled. Signing names use UTF-8 without entering shell commands or OpenSSL configuration. Temporary keys live in an automatically cleaned private temporary directory, and random certificate serials avoid writes to read-only CA mounts. New non-UUID account IDs are supported; legacy UUID identities remain readable. Account ownership comes from the active registry-issued certificate, not arbitrary asset bytes. No existing asset or certificate backfill is required.
+
 # v0.16.0 -> v0.17.0
 
 ### Site Administration

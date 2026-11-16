@@ -11,13 +11,17 @@ export function ffmpegPath(): string {
 
 export function runFfmpeg(args: string[], opts?: { cwd?: string }): Promise<void> {
     return new Promise((resolve, reject) => {
-        const proc = spawn(ffmpegPath(), args, opts?.cwd ? { cwd: opts.cwd } : {})
+        const proc = spawn(
+            /* turbopackIgnore: true */ ffmpegPath(),
+            args,
+            opts?.cwd ? { cwd: opts.cwd } : {},
+        )
         let stderr = ''
-        proc.stderr.on('data', chunk => {
+        proc.stderr.on('data', (chunk) => {
             stderr += chunk.toString()
         })
         proc.on('error', reject)
-        proc.on('close', code => {
+        proc.on('close', (code) => {
             if (code === 0) resolve()
             else reject(new Error(`ffmpeg exited with code ${code}: ${stderr.slice(-500)}`))
         })
@@ -28,9 +32,9 @@ export function runFfmpeg(args: string[], opts?: { cwd?: string }): Promise<void
 // (`-i` only, or decode-to-null) exit non-zero by design.
 function captureStderr(args: string[]): Promise<string> {
     return new Promise((resolve, reject) => {
-        const proc = spawn(ffmpegPath(), args)
+        const proc = spawn(/* turbopackIgnore: true */ ffmpegPath(), args)
         let stderr = ''
-        proc.stderr.on('data', chunk => {
+        proc.stderr.on('data', (chunk) => {
             stderr += chunk.toString()
         })
         proc.on('error', reject)

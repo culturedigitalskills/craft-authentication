@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -18,6 +19,8 @@ export function CoverPhotoUpload({
     currentCoverUrl,
     onCoverUploaded,
 }: CoverPhotoUploadProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('profile')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
@@ -46,7 +49,7 @@ export function CoverPhotoUpload({
 
         try {
             const outcome = await uploadWithProgress(file, setProgress)
-            if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+            if (!outcome.ok) throw new Error(outcome.error || tui('uploadFailed'))
             const mediaFile = outcome.media
 
             if (artisanId) {
@@ -64,14 +67,14 @@ export function CoverPhotoUpload({
 
                 if (!attachRes.ok) {
                     const attachError = await attachRes.json().catch(() => ({}))
-                    throw new Error(attachError.error || 'Attachment failed')
+                    throw new Error(attachError.error || tui('attachmentFailed'))
                 }
             }
 
             onCoverUploaded(mediaFile.id)
             setPreviewUrl(`/api/media/${mediaFile.id}`)
         } catch (err: any) {
-            setError(err.message || t('coverUploadFailed'))
+            setError(t('coverUploadFailed'))
             setPreviewUrl(currentCoverUrl)
         } finally {
             setIsUploading(false)
@@ -90,7 +93,7 @@ export function CoverPhotoUpload({
                 {previewUrl ? (
                     <Image
                         src={previewUrl}
-                        alt="Cover photo"
+                        alt={tui('coverPhoto')}
                         fill
                         sizes="100vw"
                         className="object-cover"

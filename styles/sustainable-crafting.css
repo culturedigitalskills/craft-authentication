@@ -133,8 +133,8 @@ body {
 .sc-container {
   max-width: var(--sc-maxw);
   margin: 0 auto;
-  padding-left: var(--sc-gutter);
-  padding-right: var(--sc-gutter);
+  padding-inline-start: var(--sc-gutter);
+  padding-inline-end: var(--sc-gutter);
 }
 
 /* ---- Typography helpers ----------------------------------- */
@@ -200,8 +200,8 @@ body {
   font-size: 38px;
   line-height: 1.15;
   color: var(--sc-ink);
-  border-left: 4px solid var(--sc-accent);
-  padding-left: 28px;
+  border-inline-start: 4px solid var(--sc-accent);
+  padding-inline-start: 28px;
   margin: 0;
 }
 
@@ -335,12 +335,12 @@ a.sc-card:hover,
 }
 
 .sc-stack > * {
-  margin-left: -10px;
+  margin-inline-start: -10px;
   border: 2.5px solid var(--sc-ink);
 }
 
 .sc-stack > *:first-child {
-  margin-left: 0;
+  margin-inline-start: 0;
 }
 
 /* ---- Section divider rule (title … line … action) --------- */

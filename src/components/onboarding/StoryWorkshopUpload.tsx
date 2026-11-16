@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { useTranslations } from 'next-intl'
@@ -34,6 +35,8 @@ export function StoryWorkshopUpload({
     captionStatuses = {},
     onUploaded,
 }: StoryWorkshopUploadProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('craftStory.workshop')
     const tStory = useTranslations('craftStory')
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -76,9 +79,11 @@ export function StoryWorkshopUpload({
                 readyFiles.map(async (file, i) => {
                     const outcome = await uploadWithProgress(file, (pct) => {
                         perFilePct[i] = pct
-                        setProgress(Math.round(perFilePct.reduce((a, b) => a + b, 0) / perFilePct.length))
+                        setProgress(
+                            Math.round(perFilePct.reduce((a, b) => a + b, 0) / perFilePct.length),
+                        )
                     })
-                    if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+                    if (!outcome.ok) throw new Error(outcome.error || tui('uploadFailed'))
 
                     const attachRes = await fetch('/api/media/attachments', {
                         method: 'POST',
@@ -93,7 +98,7 @@ export function StoryWorkshopUpload({
                     })
                     if (!attachRes.ok) {
                         const attachError = await attachRes.json().catch(() => ({}))
-                        throw new Error(attachError.error || 'Attachment failed')
+                        throw new Error(attachError.error || tui('attachmentFailed'))
                     }
                     const attachment = await attachRes.json()
                     return {
@@ -119,7 +124,9 @@ export function StoryWorkshopUpload({
             const firstFailure = results.find((r) => r.status === 'rejected')
             if (firstFailure && firstFailure.status === 'rejected') {
                 const reason = firstFailure.reason
-                setError(reason instanceof Error && reason.message ? reason.message : t('uploadFailed'))
+                setError(
+                    reason instanceof Error && reason.message ? reason.message : t('uploadFailed'),
+                )
             }
         } finally {
             setIsUploading(false)
@@ -249,7 +256,7 @@ export function StoryWorkshopUpload({
                         <button
                             type="button"
                             onClick={() => handleRemove(item)}
-                            className="absolute right-1.5 top-1.5 rounded-full bg-black/60 p-2 text-white"
+                            className="absolute end-1.5 top-1.5 rounded-full bg-black/60 p-2 text-white"
                             aria-label={t('removeItem')}
                         >
                             <Trash2 className="h-4 w-4" />
@@ -261,8 +268,11 @@ export function StoryWorkshopUpload({
                         {items.length > 1 && (
                             <>
                                 <span
-                                    className="absolute left-1.5 top-1.5 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white"
-                                    aria-label={t('position', { index: index + 1, count: items.length })}
+                                    className="absolute start-1.5 top-1.5 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white"
+                                    aria-label={t('position', {
+                                        index: index + 1,
+                                        count: items.length,
+                                    })}
                                 >
                                     {index + 1}
                                 </span>

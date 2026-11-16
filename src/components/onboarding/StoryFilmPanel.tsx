@@ -104,7 +104,7 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
             })
             if (res.ok) {
                 const data = await res.json()
-                setFilm(f => (f ? { ...f, isPublic: data.film.isPublic } : f))
+                setFilm((f) => (f ? { ...f, isPublic: data.film.isPublic } : f))
             }
         } finally {
             setBusy(false)
@@ -147,8 +147,14 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                         {t('failed')}
                     </p>
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(false)} disabled={busy}>
-                            <RefreshCw className="mr-1.5 h-4 w-4" />
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void startRender(false)}
+                            disabled={busy}
+                        >
+                            <RefreshCw className="me-1.5 h-4 w-4" />
                             {t('retry')}
                         </Button>
                         {/* A render that keeps failing should not trap the
@@ -162,14 +168,20 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                 <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
                         <Button type="button" size="sm" onClick={() => setOpen(true)}>
-                            <Clapperboard className="mr-1.5 h-4 w-4" />
+                            <Clapperboard className="me-1.5 h-4 w-4" />
                             {t('watch')}
                         </Button>
-                        <Button type="button" size="sm" variant="outline" onClick={() => void startRender(true)} disabled={busy}>
+                        <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void startRender(true)}
+                            disabled={busy}
+                        >
                             {busy ? (
-                                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                             ) : (
-                                <RefreshCw className="mr-1.5 h-4 w-4" />
+                                <RefreshCw className="me-1.5 h-4 w-4" />
                             )}
                             {isUploaded ? t('generateInstead') : t('regenerate')}
                         </Button>
@@ -182,7 +194,12 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                             the story is published already. Without this the film
                             sits finished and invisible with nothing to press. */}
                         {!film.isPublic && storyPublished && (
-                            <Button type="button" size="sm" onClick={() => void togglePublish()} disabled={busy}>
+                            <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => void togglePublish()}
+                                disabled={busy}
+                            >
                                 {t('showOnStory')}
                             </Button>
                         )}
@@ -220,8 +237,17 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
             {!film && !isProcessing && (
                 <div className="space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button type="button" size="sm" onClick={() => void startRender(false)} disabled={busy}>
-                            {busy ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Clapperboard className="mr-1.5 h-4 w-4" />}
+                        <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => void startRender(false)}
+                            disabled={busy}
+                        >
+                            {busy ? (
+                                <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Clapperboard className="me-1.5 h-4 w-4" />
+                            )}
                             {t('create')}
                         </Button>
                         {uploadControl}
@@ -246,8 +272,14 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                             className="w-full rounded-md bg-black"
                         />
                         <div className="flex flex-wrap items-center justify-end gap-2">
-                            <Button type="button" variant="outline" size="sm" onClick={() => void startRender(true)} disabled={busy}>
-                                <RefreshCw className="mr-1.5 h-4 w-4" />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => void startRender(true)}
+                                disabled={busy}
+                            >
+                                <RefreshCw className="me-1.5 h-4 w-4" />
                                 {t('regenerate')}
                             </Button>
                             <a
@@ -255,13 +287,19 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                                 download
                                 className="inline-flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
                             >
-                                <Download className="mr-1.5 h-4 w-4" />
+                                <Download className="me-1.5 h-4 w-4" />
                                 {t('download')}
                             </a>
                             {/* No separate "publish film" button — publishing the
                                 story features a ready film. Only offer to hide it. */}
                             {film.isPublic && (
-                                <Button type="button" variant="outline" size="sm" onClick={() => void togglePublish()} disabled={busy}>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => void togglePublish()}
+                                    disabled={busy}
+                                >
                                     {t('unpublish')}
                                 </Button>
                             )}

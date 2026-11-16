@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -18,6 +19,8 @@ export function ProfilePhotoUpload({
     currentPhotoUrl,
     onPhotoUploaded,
 }: ProfilePhotoUploadProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('profile')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
@@ -47,7 +50,7 @@ export function ProfilePhotoUpload({
 
         try {
             const outcome = await uploadWithProgress(file, setProgress)
-            if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+            if (!outcome.ok) throw new Error(outcome.error || tui('uploadFailed'))
             const mediaFile = outcome.media
 
             // If artisan already exists, create the attachment now
@@ -66,14 +69,14 @@ export function ProfilePhotoUpload({
 
                 if (!attachRes.ok) {
                     const attachError = await attachRes.json().catch(() => ({}))
-                    throw new Error(attachError.error || 'Attachment failed')
+                    throw new Error(attachError.error || tui('attachmentFailed'))
                 }
             }
 
             onPhotoUploaded(mediaFile.id)
             setPreviewUrl(`/api/media/${mediaFile.id}`)
         } catch (err: any) {
-            setError(err.message || t('photoUploadFailed'))
+            setError(t('photoUploadFailed'))
             setPreviewUrl(currentPhotoUrl)
         } finally {
             setIsUploading(false)
@@ -92,7 +95,7 @@ export function ProfilePhotoUpload({
                 {previewUrl ? (
                     <Image
                         src={previewUrl}
-                        alt="Profile photo"
+                        alt={tui('profilePhoto')}
                         fill
                         sizes="128px"
                         className="object-cover"

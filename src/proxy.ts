@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import createMiddleware from 'next-intl/middleware'
 import { routing } from './i8n/routing'
 import { auth } from '@/lib/auth'
@@ -23,9 +23,7 @@ function generateCsp(nonce: string) {
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' blob: data: https://*.wikimedia.org",
         "font-src 'self'",
-        isDev
-            ? "connect-src 'self' ws://localhost:*"
-            : "connect-src 'self'",
+        isDev ? "connect-src 'self' ws://localhost:*" : "connect-src 'self'",
         "media-src 'self' blob:",
         "object-src 'none'",
         "base-uri 'self'",
@@ -33,7 +31,9 @@ function generateCsp(nonce: string) {
         "frame-src 'self' https://www.youtube-nocookie.com https://www.openstreetmap.org",
         "frame-ancestors 'none'",
         isDev ? '' : 'upgrade-insecure-requests',
-    ].filter(Boolean).join('; ')
+    ]
+        .filter(Boolean)
+        .join('; ')
 }
 
 /**
@@ -44,6 +44,7 @@ function generateCsp(nonce: string) {
  */
 export default async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname
+    if (pathname === '/health') return NextResponse.next()
 
     // Apply rate limiting only to API routes
     if (pathname.startsWith('/api/')) {
@@ -53,6 +54,8 @@ export default async function proxy(request: NextRequest) {
 
     // For non-API routes, apply next-intl middleware then add CSP
     const response = intlMiddleware(request)
+    // Retire the old cookie-only preference; language is now explicit in the URL.
+    if (request.cookies.has('NEXT_LOCALE')) response.cookies.delete('NEXT_LOCALE')
 
     const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
     response.headers.set('x-nonce', nonce)

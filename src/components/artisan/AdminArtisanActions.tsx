@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Images, Loader2, ShieldAlert, Trash2, Undo2 } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -81,9 +81,9 @@ export function AdminArtisanActions({
             {isRemoved ? (
                 <Button type="button" size="sm" onClick={() => void submit(true)} disabled={busy}>
                     {busy ? (
-                        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                        <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                     ) : (
-                        <Undo2 className="mr-1.5 h-4 w-4" />
+                        <Undo2 className="me-1.5 h-4 w-4" />
                     )}
                     {t('restore')}
                 </Button>
@@ -95,7 +95,7 @@ export function AdminArtisanActions({
                     onClick={() => setConfirming(true)}
                     disabled={busy}
                 >
-                    <Trash2 className="mr-1.5 h-4 w-4" />
+                    <Trash2 className="me-1.5 h-4 w-4" />
                     {t('remove')}
                 </Button>
             )}
@@ -155,7 +155,7 @@ export function AdminArtisanActions({
                             onClick={() => void submit(false)}
                             disabled={busy}
                         >
-                            {busy && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                            {busy && <Loader2 className="me-1.5 h-4 w-4 animate-spin" />}
                             {t('confirmRemove')}
                         </Button>
                     </DialogFooter>

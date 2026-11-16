@@ -1,5 +1,6 @@
+import { editorialMetadata } from '@/i8n/seo-server'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import {
     ArrowRight,
     BadgeCheck,
@@ -38,7 +39,7 @@ export default function HowItWorksPage() {
             <header className="sc-dark" style={{ background: 'var(--sc-ink)' }}>
                 <div className="sc-container py-14">
                     <p className="sc-eyebrow mb-3">
-                        <ScanLine className="mr-1.5 inline h-3.5 w-3.5" />
+                        <ScanLine className="me-1.5 inline h-3.5 w-3.5" />
                         {tHome('provenance.eyebrow')}
                     </p>
                     <h1 className="sc-h1" style={{ color: 'var(--sc-text-on-dark)' }}>
@@ -66,7 +67,10 @@ export default function HowItWorksPage() {
 
                 <div className="flex items-center gap-4">
                     <span className="sc-rule" />
-                    <FileSignature className="h-4 w-4" style={{ color: 'var(--sc-border-strong)' }} />
+                    <FileSignature
+                        className="h-4 w-4"
+                        style={{ color: 'var(--sc-border-strong)' }}
+                    />
                     <span className="sc-rule" />
                 </div>
 
@@ -136,7 +140,10 @@ function Audience({
                             </div>
                             <h3
                                 className="mb-1.5 text-base font-semibold"
-                                style={{ fontFamily: 'var(--sc-font-display)', color: 'var(--sc-ink)' }}
+                                style={{
+                                    fontFamily: 'var(--sc-font-display)',
+                                    color: 'var(--sc-ink)',
+                                }}
                             >
                                 {step.title}
                             </h3>
@@ -154,4 +161,8 @@ function Audience({
             </Link>
         </section>
     )
+}
+
+export async function generateMetadata() {
+    return editorialMetadata('/how-it-works', 'howItWorks.title', 'howItWorks.subtitle')
 }

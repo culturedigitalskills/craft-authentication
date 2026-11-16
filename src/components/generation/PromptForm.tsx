@@ -1,10 +1,15 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { Sparkles, Loader2, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select'
 import { useTranslations } from 'next-intl'
 
@@ -25,8 +30,10 @@ export function PromptForm({
     model,
     setModel,
     isSubmitting,
-    onSubmit
+    onSubmit,
 }: PromptFormProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('imageWorkspace')
 
     return (
@@ -34,34 +41,31 @@ export function PromptForm({
             <div className="flex flex-col gap-1 border-b border-border/60 pb-4">
                 <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    Image Parameters
+                    {tui('imageParameters')}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                    Input details for generating your media
+                    {tui('inputDetailsForGeneratingYourMedia')}
                 </p>
             </div>
             <form onSubmit={onSubmit} className="space-y-6">
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <label className="text-sm font-semibold text-foreground flex items-center gap-1">
-                            Model Selection
+                            {tui('modelSelection')}
                         </label>
-                        <Select
-                            value={model}
-                            onValueChange={setModel}
-                        >
+                        <Select value={model} onValueChange={setModel}>
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select model" />
+                                <SelectValue placeholder={tui('selectModel')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="sourceful/riverflow-v2.5-pro:free">
-                                    Riverflow v2.5 Pro (Free)
+                                    {tui('riverflowV25ProFree')}
                                 </SelectItem>
                                 <SelectItem value="google/gemini-2.5-flash:free">
-                                    Gemini 2.5 Flash (Free)
+                                    {tui('gemini25FlashFree')}
                                 </SelectItem>
                                 <SelectItem value="black-forest-labs/flux.2-pro">
-                                    Flux 2 Pro (Paid)
+                                    {tui('flux2ProPaid')}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -90,7 +94,7 @@ export function PromptForm({
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                Scheduling Task...
+                                {tui('schedulingTask')}
                             </>
                         ) : (
                             <>

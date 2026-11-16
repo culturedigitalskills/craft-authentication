@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -23,6 +24,8 @@ interface MediaGalleryManagerProps {
 }
 
 export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryManagerProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('mediaGallery')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [items, setItems] = useState<MediaItem[]>(initialItems)
@@ -62,7 +65,9 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                 readyFiles.map(async (file, i) => {
                     const outcome = await uploadWithProgress(file, (pct) => {
                         perFilePct[i] = pct
-                        setProgress(Math.round(perFilePct.reduce((a, b) => a + b, 0) / perFilePct.length))
+                        setProgress(
+                            Math.round(perFilePct.reduce((a, b) => a + b, 0) / perFilePct.length),
+                        )
                     })
                     if (!outcome.ok) throw new Error(outcome.error || t('uploadFailed'))
 
@@ -99,7 +104,9 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
             const firstFailure = results.find((r) => r.status === 'rejected')
             if (firstFailure && firstFailure.status === 'rejected') {
                 const reason = firstFailure.reason
-                setError(reason instanceof Error && reason.message ? reason.message : t('uploadFailed'))
+                setError(
+                    reason instanceof Error && reason.message ? reason.message : t('uploadFailed'),
+                )
             }
         } finally {
             setIsUploading(false)
@@ -164,7 +171,7 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                             {kind === 'image' && (
                                 <Image
                                     src={item.url}
-                                    alt="Gallery item"
+                                    alt={tui('galleryItem')}
                                     fill
                                     sizes="(max-width: 768px) 50vw, 25vw"
                                     className="object-cover transition-transform group-hover:scale-105"
@@ -198,7 +205,7 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
 
                             {/* Private badge */}
                             {!item.isPublic && (
-                                <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
+                                <span className="absolute start-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
                                     <EyeOff className="h-3 w-3" />
                                     {t('private')}
                                 </span>
@@ -211,7 +218,9 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                     style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.78)' }}
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <p className="text-sm font-medium text-white">{t('deleteConfirm')}</p>
+                                    <p className="text-sm font-medium text-white">
+                                        {t('deleteConfirm')}
+                                    </p>
                                     <div className="flex gap-2">
                                         <button
                                             type="button"
@@ -234,7 +243,7 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                    than revealed on hover, because touch devices have no hover
                                    and this is the only way to remove or hide an item. */
                                 <div
-                                    className="absolute right-1.5 top-1.5 flex gap-1.5"
+                                    className="absolute end-1.5 top-1.5 flex gap-1.5"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <button
@@ -242,7 +251,9 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                                         disabled={busy === item.mediaId}
                                         onClick={() => toggleVisibility(item)}
                                         title={item.isPublic ? t('makePrivate') : t('makePublic')}
-                                        aria-label={item.isPublic ? t('makePrivate') : t('makePublic')}
+                                        aria-label={
+                                            item.isPublic ? t('makePrivate') : t('makePublic')
+                                        }
                                         className="rounded-full p-2 text-white disabled:opacity-50"
                                         style={{ backgroundColor: 'oklch(0.08 0.01 250 / 0.6)' }}
                                     >
@@ -285,9 +296,14 @@ export function MediaGalleryManager({ artisanId, initialItems }: MediaGalleryMan
                     ) : (
                         <>
                             <Upload className="h-8 w-8 text-muted-foreground" />
-                            <span className="text-xs font-medium text-muted-foreground">{t('addMedia')}</span>
+                            <span className="text-xs font-medium text-muted-foreground">
+                                {t('addMedia')}
+                            </span>
                             <span className="text-[10px] text-muted-foreground/70">
-                                {t('uploadHint', { imageMax: MAX_IMAGE_MB, videoMax: MAX_VIDEO_MB })}
+                                {t('uploadHint', {
+                                    imageMax: MAX_IMAGE_MB,
+                                    videoMax: MAX_VIDEO_MB,
+                                })}
                             </span>
                         </>
                     )}

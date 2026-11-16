@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { PackageX } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 

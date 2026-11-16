@@ -447,3 +447,45 @@ craft-authentication/
 ## License
 
 See [LICENSE](./LICENSE).
+
+
+## Language and SEO improvements
+
+The implementation sequence and release checks are in [the language and SEO plan](docs/LANGUAGE-AND-SEO-PLAN.md). Artisan content translation is deferred.
+
+### Language-switch browser tests
+
+Use Node/pnpm from package.json and install with `pnpm install --frozen-lockfile`.
+Prepare a private `.env.test.local` with `NODE_ENV=development` and both database URLs targeting a local `crafts_test` database, with the existing migrations applied. Never point these tests at production or the normal development database.
+
+Run `pnpm exec playwright install --with-deps chromium` once, then `pnpm test:e2e:languages`. The test server starts on localhost:20200, uses a separate `.next-e2e` build cache, and refuses to reuse an existing server. Tests create and clean up synthetic local accounts, artisans, crafts and groups. External transcription/Google providers are disabled. Browser traces and screenshots stay under ignored `.local-dev/playwright-results`. No production configuration change is needed.
+
+Unit tests for the selector use the project's isolated test environment: `pnpm exec dotenv run -f .env.test.local -- vitest run tests/language-switch.test.ts`.
+
+### Supported interface languages
+
+The local implementation supports English, Hindi, Spanish, Arabic, German, Turkish, Greek, Japanese, French, Italian and Brazilian Portuguese. Japanese uses /ja, French /fr, Italian /it, and Brazilian Portuguese /pt-BR; the selector displays their native names, including Português (Brasil). Portuguese wording and number/date formatting use the Brazilian locale.
+
+Supported codes and native labels live in src/i8n/locales.ts. All four added catalogs contain the full interface message set; English legal documents retain a translated availability notice. Artisan-authored content and additional caption translations remain outside this change.
+
+Japanese uses the pinned @fontsource-variable/noto-sans-jp package. Its Unicode-range font faces are served locally and load only the glyph subsets needed by a page, including the Japanese selector label on other locales. The OFL license is included at public/fonts/noto-sans-jp-LICENSE.txt. Review new copy with fluent speakers before production rollout.
+
+### Locale URLs and SEO
+
+The interface language is selected by URL: English keeps /about, while other languages use /tr/about, /ar/about, and equivalent prefixes. Browser language headers and old locale cookies do not override explicit URLs. User-authored biographies, product descriptions and story answers remain in their original language; additional caption translations are deferred.
+
+Fully translated public editorial pages have canonical/hreflang metadata. Original-content record pages use one unprefixed canonical until content translation exists. Account/editor pages and search results are noindex. Public canonical URLs are listed in /sitemap.xml and advertised by /robots.txt.
+
+Optional server settings are SITE_URL, PRIVACY_CONTACT_EMAIL and LEGAL_CONTACT_EMAIL; see MIGRATION.md. The email settings are public contact information when rendered, not secrets, but keeping their values in deployment configuration avoids changing code or every translation when correspondence ownership changes. Private environment files must remain untracked. An absent email uses the existing verified institutional/project contact page rather than a fabricated address.
+
+### Readiness and translated API errors
+
+- GET /health: HTTP 200 with { status: "healthy" } when the database responds, or HTTP 503 with { status: "unavailable" }. No sensitive diagnostics are returned.
+- Validation error details retain path, message and code and may include origin, minimum and maximum. Clients use the codes and limits for localized messages rather than displaying raw English backend exceptions.
+- Run all browser regressions with pnpm exec playwright test. They use only the local crafts_test environment and cover deterministic locale routing, SEO metadata, public-only sitemap entries, legal-language notices and authenticated editing.
+
+### Localized input and signing compatibility
+
+Country display names are localized without rewriting stored locations. Free-text regions and unknown country names remain as authored. New hashtags accept Unicode letters, combining marks, numbers and underscores, normalize to NFC and keep the existing 50-character limit; stored tags are not rewritten.
+
+Signing supports non-Latin names and both UUID and standard authentication account IDs. Temporary key material is created in a private temporary directory and removed after use; certificate issuance does not write serial files beside read-only root-key mounts. Ownership is read from the active certificate issued by this installation, after native signature validation, rather than scanning arbitrary image bytes. Legacy UUID identities remain readable. Existing signed assets and trust settings are not rewritten.

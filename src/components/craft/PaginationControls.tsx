@@ -1,16 +1,30 @@
-"use client"
+'use client'
+import { useTranslations, useFormatter } from 'next-intl'
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Link } from '@/i8n/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from '@/i8n/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 type PaginationProps = {
     currentPage: number
-    pagination: { currentPage: number; totalPages: number; totalCount?: number; hasNext: boolean; hasPrev: boolean }
+    pagination: {
+        currentPage: number
+        totalPages: number
+        totalCount?: number
+        hasNext: boolean
+        hasPrev: boolean
+    }
     currentPageUrl: string
 }
 
-export default function PaginationControls({ currentPage, pagination, currentPageUrl }: PaginationProps) {
+export default function PaginationControls({
+    currentPage,
+    pagination,
+    currentPageUrl,
+}: PaginationProps) {
+    const tui = useTranslations('interface')
+    const format = useFormatter()
     const [inputPage, setInputPage] = useState(String(currentPage))
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -42,8 +56,11 @@ export default function PaginationControls({ currentPage, pagination, currentPag
         <div className="mt-12 flex flex-col items-center gap-3">
             {pagination.totalCount !== undefined && (
                 <p className="sc-meta">
-                    Page {currentPage} of {pagination.totalPages}
-                    {' '}· {pagination.totalCount} total
+                    {tui('pageSummary', {
+                        page: format.number(currentPage),
+                        pages: format.number(pagination.totalPages),
+                        count: pagination.totalCount,
+                    })}
                 </p>
             )}
             <div className="flex items-center gap-2">
@@ -51,17 +68,20 @@ export default function PaginationControls({ currentPage, pagination, currentPag
                     href={buildUrl(currentPage - 1)}
                     aria-disabled={!pagination.hasPrev}
                     className={`inline-flex items-center gap-1 rounded-[var(--sc-r-btn)] border px-3 py-2 text-sm transition-colors ${
-                        !pagination.hasPrev ? 'pointer-events-none cursor-not-allowed opacity-40' : ''
+                        !pagination.hasPrev
+                            ? 'pointer-events-none cursor-not-allowed opacity-40'
+                            : ''
                     }`}
                     style={pillStyle}
                 >
                     <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                    Previous
+                    {tui('previous')}
                 </Link>
 
                 <div className="flex items-center gap-1.5">
                     <input
                         type="number"
+                        aria-label={tui('pageNumber')}
                         min={1}
                         max={pagination.totalPages}
                         value={inputPage}
@@ -70,14 +90,14 @@ export default function PaginationControls({ currentPage, pagination, currentPag
                         className="w-14 rounded-[var(--sc-r-btn)] border px-2 py-2 text-center text-sm focus-visible:outline-none focus-visible:ring-2"
                         style={pillStyle}
                     />
-                    <span className="sc-meta">/ {pagination.totalPages}</span>
+                    <span className="sc-meta">/ {format.number(pagination.totalPages)}</span>
                     <button
                         onClick={handlePageSubmit}
-                        aria-label="Go to page"
+                        aria-label={tui('goToPage')}
                         className="rounded-[var(--sc-r-btn)] border px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2"
                         style={pillStyle}
                     >
-                        Go
+                        {tui('go')}
                     </button>
                 </div>
 
@@ -85,11 +105,13 @@ export default function PaginationControls({ currentPage, pagination, currentPag
                     href={buildUrl(currentPage + 1)}
                     aria-disabled={!pagination.hasNext}
                     className={`inline-flex items-center gap-1 rounded-[var(--sc-r-btn)] border px-3 py-2 text-sm transition-colors ${
-                        !pagination.hasNext ? 'pointer-events-none cursor-not-allowed opacity-40' : ''
+                        !pagination.hasNext
+                            ? 'pointer-events-none cursor-not-allowed opacity-40'
+                            : ''
                     }`}
                     style={pillStyle}
                 >
-                    Next
+                    {tui('next')}
                     <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
             </div>

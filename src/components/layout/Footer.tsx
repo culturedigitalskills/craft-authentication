@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
 import { Globe, Mail } from 'lucide-react'
 import { FaBluesky } from 'react-icons/fa6'
@@ -31,26 +31,44 @@ export function Footer() {
                     <div className="min-w-0 space-y-1">
                         <span
                             className="text-base font-semibold"
-                            style={{ fontFamily: 'var(--sc-font-display)', color: 'var(--sc-text-on-dark)' }}
+                            style={{
+                                fontFamily: 'var(--sc-font-display)',
+                                color: 'var(--sc-text-on-dark)',
+                            }}
                         >
                             {t('copyright')}
                         </span>
-                        <p className="text-xs leading-relaxed" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
+                        <p
+                            className="text-xs leading-relaxed"
+                            style={{ color: 'var(--sc-text-on-dark-muted)' }}
+                        >
                             {t('footer.description')}
                         </p>
                     </div>
 
                     {/* Social icons */}
                     <div className="flex shrink-0 items-center gap-4">
-                        <Link href="https://craftingsustainablejawaja.org/" className="transition-opacity hover:opacity-100" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
+                        <Link
+                            href="https://craftingsustainablejawaja.org/"
+                            className="transition-opacity hover:opacity-100"
+                            style={{ color: 'var(--sc-text-on-dark-muted)' }}
+                        >
                             <Globe className="h-5 w-5" />
                             <span className="sr-only">{t('socialmedia.website')}</span>
                         </Link>
-                        <Link href="https://bsky.app/profile/cultinformatics.bsky.social" className="transition-opacity hover:opacity-100" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
+                        <Link
+                            href="https://bsky.app/profile/cultinformatics.bsky.social"
+                            className="transition-opacity hover:opacity-100"
+                            style={{ color: 'var(--sc-text-on-dark-muted)' }}
+                        >
                             <FaBluesky className="h-5 w-5" />
                             <span className="sr-only">{t('socialmedia.bluesky')}</span>
                         </Link>
-                        <Link href="mailto:info@culturedigitalskills.org?subject=Enquiry%20Sustainable%20Crafting" className="transition-opacity hover:opacity-100" style={{ color: 'var(--sc-text-on-dark-muted)' }}>
+                        <Link
+                            href="mailto:info@culturedigitalskills.org?subject=Enquiry%20Sustainable%20Crafting"
+                            className="transition-opacity hover:opacity-100"
+                            style={{ color: 'var(--sc-text-on-dark-muted)' }}
+                        >
                             <Mail className="h-5 w-5" />
                             <span className="sr-only">{t('socialmedia.email')}</span>
                         </Link>
@@ -60,12 +78,21 @@ export function Footer() {
                 {/* Policy links */}
                 <div
                     className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t pt-4 text-xs"
-                    style={{ borderColor: 'var(--sc-text-on-dark-muted)', color: 'var(--sc-text-on-dark-muted)' }}
+                    style={{
+                        borderColor: 'var(--sc-text-on-dark-muted)',
+                        color: 'var(--sc-text-on-dark-muted)',
+                    }}
                 >
-                    <Link href="/terms" className="transition-opacity hover:opacity-100 hover:underline">
+                    <Link
+                        href="/terms"
+                        className="transition-opacity hover:opacity-100 hover:underline"
+                    >
                         {t('footer.terms')}
                     </Link>
-                    <Link href="/privacy" className="transition-opacity hover:opacity-100 hover:underline">
+                    <Link
+                        href="/privacy"
+                        className="transition-opacity hover:opacity-100 hover:underline"
+                    >
                         {t('footer.privacy')}
                     </Link>
                 </div>

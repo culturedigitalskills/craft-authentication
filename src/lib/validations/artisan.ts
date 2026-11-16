@@ -1,7 +1,12 @@
+import { normalizeHashtag, isValidHashtag } from './hashtag'
 import { z } from 'zod'
 
 const nameField = (label: string) =>
-    z.string().min(1, `${label} is required`).max(100).regex(/\D/, `${label} must contain at least one letter`)
+    z
+        .string()
+        .min(1, `${label} is required`)
+        .max(100)
+        .regex(/\D/, `${label} must contain at least one letter`)
 
 const handleField = z.string().trim().max(100).optional()
 
@@ -14,7 +19,7 @@ export function normalizeWebsite(value: string): string {
 }
 const websiteField = z.union([z.string().url().max(255), z.literal('')]).optional()
 const hashtagsField = z
-    .array(z.string().regex(/^[A-Za-z0-9_]{1,50}$/).max(50))
+    .array(z.string().transform(normalizeHashtag).refine(isValidHashtag))
     .max(20)
     .optional()
 
