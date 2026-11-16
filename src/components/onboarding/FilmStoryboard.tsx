@@ -45,9 +45,12 @@ export function FilmStoryboard({
     // Media already asked about, so a re-render does not measure it twice.
     const requested = useRef<Set<string>>(new Set())
     const mounted = useRef(true)
-    useEffect(() => () => {
-        mounted.current = false
-    }, [])
+    useEffect(
+        () => () => {
+            mounted.current = false
+        },
+        [],
+    )
 
     // Read each spoken answer's length straight from the media element. Cheap
     // (metadata only, and the media route serves ranges), and it avoids adding a
@@ -64,9 +67,9 @@ export function FilmStoryboard({
             if (requested.current.has(answer.mediaId)) continue
             requested.current.add(answer.mediaId)
 
-            void measureMediaDuration(answer.kind, `/api/media/${answer.mediaId}`).then(value => {
+            void measureMediaDuration(answer.kind, `/api/media/${answer.mediaId}`).then((value) => {
                 if (!mounted.current) return
-                setDurations(prev => ({ ...prev, [answer.mediaId]: value }))
+                setDurations((prev) => ({ ...prev, [answer.mediaId]: value }))
             })
         }
     }, [answers])
@@ -93,8 +96,8 @@ export function FilmStoryboard({
             // text, so the name and profile URL are not needed here.
             artisanName: '',
             profileUrl: '',
-            chapters: ANSWER_KEYS.map(key => {
-                const answer = answers.find(a => a.key === key)
+            chapters: ANSWER_KEYS.map((key) => {
+                const answer = answers.find((a) => a.key === key)
                 const duration = answer ? (effectiveDurations[answer.mediaId] ?? 0) : 0
                 return {
                     key,
@@ -105,7 +108,7 @@ export function FilmStoryboard({
                     segments: answer ? (segments[answer.mediaId] ?? null) : null,
                 }
             }),
-            visuals: workshopMedia.map(m => ({
+            visuals: workshopMedia.map((m) => ({
                 mediaId: m.mediaId,
                 kind: m.isVideo ? ('video' as const) : ('image' as const),
             })),
@@ -121,10 +124,10 @@ export function FilmStoryboard({
     // recordings yet" with "still reading their lengths", and the panel would
     // silently vanish in both cases.
     const hasIngredients =
-        answers.length > 0 && (workshopMedia.length > 0 || answers.some(a => a.kind === 'video'))
+        answers.length > 0 && (workshopMedia.length > 0 || answers.some((a) => a.kind === 'video'))
     if (!hasIngredients) return null
 
-    const measured = answers.some(a => (effectiveDurations[a.mediaId] ?? 0) > 0)
+    const measured = answers.some((a) => (effectiveDurations[a.mediaId] ?? 0) > 0)
 
     if (!measured || !plan) {
         return (
@@ -138,7 +141,7 @@ export function FilmStoryboard({
         )
     }
 
-    const captionsPending = answers.some(a => !segments[a.mediaId])
+    const captionsPending = answers.some((a) => !segments[a.mediaId])
 
     return (
         <section className="mt-8 rounded-lg border border-border bg-muted/20 p-4">
@@ -152,7 +155,7 @@ export function FilmStoryboard({
             </p>
 
             <div className="flex flex-col gap-4">
-                {plan.chapters.map(chapter => (
+                {plan.chapters.map((chapter) => (
                     <div key={chapter.key}>
                         <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                             {tStory(`step${ANSWER_KEYS.indexOf(chapter.key) + 1}.title`)}
@@ -190,7 +193,7 @@ export function FilmStoryboard({
                                             </span>
                                         </>
                                     )}
-                                    <span className="absolute bottom-0.5 right-0.5 rounded bg-black/70 px-1 text-[10px] font-medium text-white">
+                                    <span className="absolute bottom-0.5 end-0.5 rounded bg-black/70 px-1 text-[10px] font-medium text-white">
                                         {shot.durationSec.toFixed(1)}s
                                     </span>
                                 </div>

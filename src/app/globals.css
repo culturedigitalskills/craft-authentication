@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 /* Sustainable Crafting — warm-artisanal design system (tokens + .sc-* components). */
-@import "../../styles/sustainable-crafting.css";
+@import '../../styles/sustainable-crafting.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -39,13 +39,21 @@
 }
 
 @keyframes accordion-down {
-    from { height: 0; }
-    to { height: var(--radix-accordion-content-height); }
+    from {
+        height: 0;
+    }
+    to {
+        height: var(--radix-accordion-content-height);
+    }
 }
 
 @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height); }
-    to { height: 0; }
+    from {
+        height: var(--radix-accordion-content-height);
+    }
+    to {
+        height: 0;
+    }
 }
 
 @utility container {
@@ -57,6 +65,7 @@
 }
 
 :root {
+    --font-japanese: 'Noto Sans JP Variable';
     --background: 210 30% 98.5%;
     --foreground: 214 35% 12%;
     --card: 0 0% 100%;
@@ -109,4 +118,51 @@
 
 * {
     @apply border-border;
+}
+
+/* Language names must remain legible independently of the current page locale. */
+.language-native-name[lang='hi'] {
+    font-family: var(--font-devanagari), sans-serif;
+}
+
+.language-native-name[lang='ar'] {
+    font-family: var(--font-arabic), sans-serif;
+}
+body:lang(ar) {
+    --sc-font-body: var(--font-arabic), sans-serif;
+    --sc-font-display: var(--font-arabic), sans-serif;
+    --sc-font-hand: var(--font-arabic), sans-serif;
+}
+body:lang(hi) {
+    --sc-font-body: var(--font-devanagari), sans-serif;
+    --sc-font-display: var(--font-devanagari), sans-serif;
+    --sc-font-hand: var(--font-devanagari), sans-serif;
+}
+body:lang(ar) .sc-eyebrow {
+    letter-spacing: normal;
+}
+html[dir='rtl']
+    :is(.lucide-arrow-left, .lucide-arrow-right, .lucide-chevron-left, .lucide-chevron-right) {
+    transform: scaleX(-1);
+}
+pre,
+code {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left;
+}
+
+/* Keep Japanese glyphs available in the selector and the full Japanese UI. */
+.language-native-name[lang='ja'] {
+    font-family: var(--font-japanese), sans-serif;
+}
+body:lang(ja) {
+    --sc-font-body: var(--font-japanese), sans-serif;
+    --sc-font-display: var(--font-japanese), sans-serif;
+    --sc-font-hand: var(--font-japanese), sans-serif;
+    line-break: strict;
+    word-break: normal;
+}
+body:lang(ja) .sc-eyebrow {
+    letter-spacing: normal;
 }

@@ -1,7 +1,14 @@
+import { formatLocation } from '@/data/locations'
+import { LocalizedCount } from '@/components/shared/LocalizedCount'
+
+import { getTranslations as getInterfaceTranslations } from 'next-intl/server'
+import { publicMetadata } from '@/i8n/seo'
+import { getLocale } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { notFound, redirect } from 'next/navigation'
-import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { redirect } from '@/i8n/navigation'
+import { Link } from '@/i8n/navigation'
 import { MapPin, Clock, GraduationCap, Users, Globe } from 'lucide-react'
 import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
 import { GalleryGrid } from '@/components/shared/GalleryGrid'
@@ -24,14 +31,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { slug } = await params
     const artisan = await prisma.artisan.findFirst({
         where: { OR: [{ slug }, { previousSlugs: { has: slug } }], deletedAt: null },
-        select: { id: true, firstName: true, lastName: true, bio: true },
+        select: { id: true, slug: true, firstName: true, lastName: true, bio: true },
     })
-    if (!artisan) return { title: 'Artisan Not Found' }
+    if (!artisan) return { robots: { index: false, follow: false } }
 
-    const title = `${artisan.firstName} ${artisan.lastName} — Artisan Profile`
-    const description =
-        artisan.bio?.slice(0, 160) ??
-        `Discover the craft of ${artisan.firstName} ${artisan.lastName}.`
+    const title = artisan.firstName + ' ' + artisan.lastName
+    const description = artisan.bio?.slice(0, 160) || undefined
+    const base = publicMetadata('/artisans/' + artisan.slug, 'en', title, description)
 
     // Use profile photo as OG image if available
     const photoAttachment = await prisma.mediaAttachment.findFirst({
@@ -46,9 +52,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const ogImage = photoAttachment ? `/api/media/${photoAttachment.mediaId}` : undefined
 
     return {
-        title,
-        description,
+        ...base,
         openGraph: {
+            ...base.openGraph,
             title,
             description,
             type: 'profile',
@@ -64,6 +70,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ArtisanPublicProfilePage({ params }: PageProps) {
+    const tui = await getInterfaceTranslations('interface')
+
     const { slug } = await params
     const t = await getTranslations('artisanProfile')
 
@@ -116,7 +124,8 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     if (!artisan) notFound()
 
     // Requested via a retired slug — send to the current canonical URL.
-    if (artisan.slug !== slug) redirect(`/artisans/${artisan.slug}`)
+    if (artisan.slug !== slug)
+        return redirect({ href: `/artisans/${artisan.slug}`, locale: await getLocale() })
 
     // Fetch the artisan's public crafts
     const craftRecords = await prisma.craft.findMany({
@@ -130,7 +139,9 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     const crafts = craftRecords.map((record) => ({
         id: record.id,
         name: record.title,
-        imageUrl: craftImageMap.has(record.id) ? `/api/media/${craftImageMap.get(record.id)}` : null,
+        imageUrl: craftImageMap.has(record.id)
+            ? `/api/media/${craftImageMap.get(record.id)}`
+            : null,
     }))
 
     const photoAttachment = await prisma.mediaAttachment.findFirst({
@@ -243,17 +254,44 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
         }
     }
 
-    const locationText =
-        artisan.region && artisan.country ? `${artisan.region}, ${artisan.country}` : null
+    const locationText = formatLocation(artisan.country, artisan.region, await getLocale()) || null
 
     const socials = [
-        artisan.socialInstagram && { Icon: FaInstagram, label: `@${artisan.socialInstagram}`, href: `https://instagram.com/${artisan.socialInstagram}` },
-        artisan.socialFacebook && { Icon: FaFacebook, label: artisan.socialFacebook, href: `https://facebook.com/${artisan.socialFacebook}` },
-        artisan.socialTwitter && { Icon: FaXTwitter, label: `@${artisan.socialTwitter}`, href: `https://x.com/${artisan.socialTwitter}` },
-        artisan.socialTiktok && { Icon: FaTiktok, label: `@${artisan.socialTiktok}`, href: `https://tiktok.com/@${artisan.socialTiktok}` },
-        artisan.socialYoutube && { Icon: FaYoutube, label: artisan.socialYoutube, href: `https://youtube.com/@${artisan.socialYoutube}` },
-        artisan.website && { Icon: Globe, label: artisan.website.replace(/^https?:\/\//, ''), href: artisan.website },
-    ].filter(Boolean) as { Icon: React.ComponentType<{ className?: string }>; label: string; href: string }[]
+        artisan.socialInstagram && {
+            Icon: FaInstagram,
+            label: `@${artisan.socialInstagram}`,
+            href: `https://instagram.com/${artisan.socialInstagram}`,
+        },
+        artisan.socialFacebook && {
+            Icon: FaFacebook,
+            label: artisan.socialFacebook,
+            href: `https://facebook.com/${artisan.socialFacebook}`,
+        },
+        artisan.socialTwitter && {
+            Icon: FaXTwitter,
+            label: `@${artisan.socialTwitter}`,
+            href: `https://x.com/${artisan.socialTwitter}`,
+        },
+        artisan.socialTiktok && {
+            Icon: FaTiktok,
+            label: `@${artisan.socialTiktok}`,
+            href: `https://tiktok.com/@${artisan.socialTiktok}`,
+        },
+        artisan.socialYoutube && {
+            Icon: FaYoutube,
+            label: artisan.socialYoutube,
+            href: `https://youtube.com/@${artisan.socialYoutube}`,
+        },
+        artisan.website && {
+            Icon: Globe,
+            label: artisan.website.replace(/^https?:\/\//, ''),
+            href: artisan.website,
+        },
+    ].filter(Boolean) as {
+        Icon: React.ComponentType<{ className?: string }>
+        label: string
+        href: string
+    }[]
 
     return (
         <>
@@ -276,7 +314,7 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                 <div className="relative h-56 w-full overflow-hidden sm:h-72">
                     <ScMedia
                         src={coverUrl}
-                        alt="Cover"
+                        alt={tui('cover')}
                         fallback={<IndigoDotsCover />}
                         sizes="100vw"
                         priority
@@ -288,12 +326,19 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                     <div className="-mt-16 flex flex-col items-start gap-4 sm:-mt-20 sm:flex-row sm:items-start">
                         <div
                             className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full sm:h-40 sm:w-40"
-                            style={{ border: '4px solid var(--sc-surface)', boxShadow: 'var(--sc-shadow-hero)' }}
+                            style={{
+                                border: '4px solid var(--sc-surface)',
+                                boxShadow: 'var(--sc-shadow-hero)',
+                            }}
                         >
                             <ScMedia
                                 src={photoUrl}
                                 alt={`${artisan.firstName} ${artisan.lastName}`}
-                                fallback={<PortraitFallback name={`${artisan.firstName} ${artisan.lastName}`} />}
+                                fallback={
+                                    <PortraitFallback
+                                        name={`${artisan.firstName} ${artisan.lastName}`}
+                                    />
+                                }
                                 sizes="160px"
                                 priority
                                 unoptimized={mediaNeedsCredentials}
@@ -305,23 +350,37 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                 {artisan.firstName} {artisan.lastName}
                             </h1>
                             {/* Stat chips */}
-                            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm" style={{ color: 'var(--sc-text-soft)' }}>
+                            <div
+                                className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm"
+                                style={{ color: 'var(--sc-text-soft)' }}
+                            >
                                 {artisan.yearsOfExperience !== null && (
                                     <span className="flex items-center gap-1.5">
-                                        <Clock className="h-4 w-4" style={{ color: 'var(--sc-accent)' }} />
-                                        <span style={{ color: 'var(--sc-text)', fontWeight: 600 }}>{artisan.yearsOfExperience}</span>
-                                        {t('yearsExperience')}
+                                        <Clock
+                                            className="h-4 w-4"
+                                            style={{ color: 'var(--sc-accent)' }}
+                                        />
+                                        <LocalizedCount
+                                            kind="experienceYears"
+                                            count={artisan.yearsOfExperience}
+                                        />
                                     </span>
                                 )}
                                 {artisan.learningSource && (
                                     <span className="flex items-center gap-1.5">
-                                        <GraduationCap className="h-4 w-4" style={{ color: 'var(--sc-accent)' }} />
+                                        <GraduationCap
+                                            className="h-4 w-4"
+                                            style={{ color: 'var(--sc-accent)' }}
+                                        />
                                         {artisan.learningSource}
                                     </span>
                                 )}
                                 {locationText && (
                                     <span className="flex items-center gap-1.5">
-                                        <MapPin className="h-4 w-4" style={{ color: 'var(--sc-accent)' }} />
+                                        <MapPin
+                                            className="h-4 w-4"
+                                            style={{ color: 'var(--sc-accent)' }}
+                                        />
                                         {locationText}
                                     </span>
                                 )}
@@ -337,7 +396,9 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                     {/* Main story column */}
                     <div className="flex flex-col gap-12">
                         {artisan.bio && (
-                            <p className="sc-lead whitespace-pre-line">{artisan.bio}</p>
+                            <p dir="auto" className="sc-lead whitespace-pre-line">
+                                {artisan.bio}
+                            </p>
                         )}
 
                         {story && publicFilm && (
@@ -363,7 +424,11 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                 <SectionHeader title={t('crafts')} className="mb-6" />
                                 <div className="grid gap-[var(--sc-grid-gap)] sm:grid-cols-2 md:grid-cols-3">
                                     {crafts.map((craft) => (
-                                        <Link key={craft.id} href={`/crafts/${craft.id}`} className="sc-card group block">
+                                        <Link
+                                            key={craft.id}
+                                            href={`/crafts/${craft.id}`}
+                                            className="sc-card group block"
+                                        >
                                             <div className="relative aspect-square overflow-hidden">
                                                 <ScMedia
                                                     src={craft.imageUrl}
@@ -374,7 +439,10 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                                     className="transition-transform duration-300 group-hover:scale-105"
                                                 />
                                             </div>
-                                            <p className="line-clamp-1 p-3 text-sm font-medium transition-colors group-hover:text-[color:var(--sc-accent)]" style={{ color: 'var(--sc-text)' }}>
+                                            <p
+                                                className="line-clamp-1 p-3 text-sm font-medium transition-colors group-hover:text-[color:var(--sc-accent)]"
+                                                style={{ color: 'var(--sc-text)' }}
+                                            >
                                                 {craft.name}
                                             </p>
                                         </Link>
@@ -453,7 +521,12 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                                         >
                                             <span className="truncate">{m.group.name}</span>
                                             {m.role === 'ADMIN' && (
-                                                <span className="sc-badge shrink-0" style={{ ['--t' as string]: 'var(--sc-teal)' }}>Admin</span>
+                                                <span
+                                                    className="sc-badge shrink-0"
+                                                    style={{ ['--t' as string]: 'var(--sc-teal)' }}
+                                                >
+                                                    {tui('admin')}
+                                                </span>
                                             )}
                                         </Link>
                                     ))}
@@ -464,7 +537,13 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                         {artisan.hashtags.length > 0 && (
                             <div className="flex flex-wrap gap-1.5">
                                 {artisan.hashtags.map((tag) => (
-                                    <span key={tag} className="sc-chip" style={{ cursor: 'default' }}>#{tag}</span>
+                                    <span
+                                        key={tag}
+                                        className="sc-chip"
+                                        style={{ cursor: 'default' }}
+                                    >
+                                        #{tag}
+                                    </span>
                                 ))}
                             </div>
                         )}

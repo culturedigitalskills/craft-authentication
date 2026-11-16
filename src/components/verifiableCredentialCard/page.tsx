@@ -1,3 +1,6 @@
+import { LocalizedDate } from '@/components/shared/LocalizedDate'
+
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 import { BadgeCheck, ShieldAlert, ShieldOff, Calendar, User, Hash, Download } from 'lucide-react'
 
 interface VerifiableCredentialCardProps {
@@ -22,11 +25,13 @@ export function VerifiableCredentialCard({
     verified,
     craftId,
 }: VerifiableCredentialCardProps) {
+    const tui = useInterfaceTranslations('interface')
+
     if (verified === null || !credentialId) {
         return (
             <div className="w-full rounded-md border border-dashed border-border bg-muted/30 px-4 py-3 text-center">
                 <ShieldOff className="mx-auto mb-1 h-4 w-4 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">Certificate pending</p>
+                <p className="text-xs text-muted-foreground">{tui('certificatePending')}</p>
             </div>
         )
     }
@@ -38,12 +43,12 @@ export function VerifiableCredentialCard({
                 {verified ? (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white">
                         <BadgeCheck className="h-3.5 w-3.5" />
-                        Credential verified
+                        {tui('credentialVerified')}
                     </span>
                 ) : (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-xs font-medium text-white">
                         <ShieldAlert className="h-3.5 w-3.5" />
-                        Verification failed
+                        {tui('verificationFailed')}
                     </span>
                 )}
             </div>
@@ -54,12 +59,7 @@ export function VerifiableCredentialCard({
                     <div className="flex items-center gap-2">
                         <Calendar className="h-3.5 w-3.5 shrink-0" />
                         <span>
-                            Issued{' '}
-                            {new Date(issuanceDate).toLocaleDateString('en-GB', {
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric',
-                            })}
+                            {tui('issued')} <LocalizedDate value={issuanceDate} />
                         </span>
                     </div>
                 )}
@@ -83,7 +83,7 @@ export function VerifiableCredentialCard({
                     className="flex w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
                 >
                     <Download className="h-3.5 w-3.5" />
-                    Download Certificate
+                    {tui('downloadCertificate')}
                 </a>
             )}
         </div>

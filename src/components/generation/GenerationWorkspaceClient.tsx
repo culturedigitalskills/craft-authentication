@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Sparkles, Loader2, RefreshCw, Layers } from 'lucide-react'
@@ -12,7 +13,7 @@ import {
     deleteTaskEventMediaAction,
     generateImageAction,
     deleteTaskEventAction,
-    addToGalleryAction
+    addToGalleryAction,
 } from '@/app/actions/generate-image'
 import { ApiKeyConfig } from './ApiKeyConfig'
 import { PromptForm } from './PromptForm'
@@ -24,6 +25,8 @@ interface GenerationWorkspaceClientProps {
 }
 
 export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('imageWorkspace')
     const [hasKey, setHasKey] = useState<boolean | null>(null)
 
@@ -82,7 +85,7 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
         try {
             // 1. Create task event in database
             const task = await createTaskEventAction(prompt.trim(), model)
-            
+
             // 2. Refresh queue and clear prompt
             await loadTasks(false)
             setPrompt('')
@@ -170,19 +173,16 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
             <div className="max-w-3xl space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                     <Sparkles className="h-3.5 w-3.5" />
-                    OpenRouter AI Generator
+                    {tui('openrouterAiGenerator')}
                 </div>
                 <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-foreground">
                     {t('title')}
                 </h1>
-                <p className="text-lg text-muted-foreground">
-                    {t('description')}
-                </p>
+                <p className="text-lg text-muted-foreground">{t('description')}</p>
             </div>
 
             {/* Main Grid: Left Settings & Form, Right History */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
                 {/* Left Column: Key configuration and prompt submission (5 cols) */}
                 <div className="lg:col-span-5 space-y-6">
                     <ApiKeyConfig userId={userId} hasKey={hasKey} setHasKey={setHasKey} />
@@ -207,7 +207,7 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                     {t('taskQueue')}
                                 </h3>
                                 <p className="text-xs text-muted-foreground">
-                                    Monitor status of generative tasks
+                                    {tui('monitorStatusOfGenerativeTasks')}
                                 </p>
                             </div>
                             <Button
@@ -215,7 +215,7 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                                 size="icon"
                                 onClick={() => loadTasks(true)}
                                 className="h-9 w-9 border border-border bg-background/50 hover:bg-muted"
-                                title="Refresh manually"
+                                title={tui('refreshManually')}
                             >
                                 <RefreshCw className="h-4 w-4 text-muted-foreground" />
                             </Button>
@@ -224,7 +224,9 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                             {loadingTasks && tasks.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-3">
                                     <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                                    <p className="text-sm text-muted-foreground">Loading queue history...</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {tui('loadingQueueHistory')}
+                                    </p>
                                 </div>
                             ) : (
                                 <EventList
@@ -241,7 +243,6 @@ export function GenerationWorkspaceClient({ userId }: GenerationWorkspaceClientP
                         </div>
                     </div>
                 </div>
-
             </div>
 
             {/* Detail Dialog Modal */}

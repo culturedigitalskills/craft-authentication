@@ -1,23 +1,20 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { signIn, signUp } from '@/lib/auth-client'
-import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i8n/navigation'
+import { useLocale, useTranslations } from 'next-intl'
+import { getPathname } from '@/i8n/navigation'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
-import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Link } from '@/i8n/navigation'
 import { registerRequestSchema } from '@/lib/validations/auth'
 
 const registerFormSchema = registerRequestSchema
@@ -33,7 +30,11 @@ const registerFormSchema = registerRequestSchema
 type RegisterFormData = z.infer<typeof registerFormSchema>
 
 export function RegisterForm() {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('auth')
+    const locale = useLocale()
+    const callbackUrl = getPathname({ href: '/auth/redirect', locale })
     const router = useRouter()
     const [serverError, setServerError] = useState<string | null>(null)
     const [showPassword, setShowPassword] = useState(false)
@@ -69,10 +70,10 @@ export function RegisterForm() {
             })
 
             if (res.error) {
-                const isEmailExists = res.code === 'USER_ALREADY_EXISTS' || res.error.toLowerCase().includes('already exists')
-                setServerError(
-                    isEmailExists ? t('emailExists') : (res.error || t('registrationFailed'))
-                )
+                const isEmailExists =
+                    res.code === 'USER_ALREADY_EXISTS' ||
+                    res.error.toLowerCase().includes('already exists')
+                setServerError(isEmailExists ? t('emailExists') : t('registrationFailed'))
                 return
             }
 
@@ -107,9 +108,7 @@ export function RegisterForm() {
                             {...register('name')}
                         />
                         {errors.name && (
-                            <p className="text-sm text-red-500">
-                                {t('validation.nameRequired')}
-                            </p>
+                            <p className="text-sm text-red-500">{t('validation.nameRequired')}</p>
                         )}
                     </div>
                     <div className="space-y-2">
@@ -121,9 +120,7 @@ export function RegisterForm() {
                             {...register('email')}
                         />
                         {errors.email && (
-                            <p className="text-sm text-red-500">
-                                {t('validation.emailInvalid')}
-                            </p>
+                            <p className="text-sm text-red-500">{t('validation.emailInvalid')}</p>
                         )}
                     </div>
                     <div className="space-y-2">
@@ -133,43 +130,51 @@ export function RegisterForm() {
                                 id="password"
                                 type={showPassword ? 'text' : 'password'}
                                 aria-invalid={!!errors.password}
-                                className="pr-10"
+                                className="pe-10"
                                 {...register('password')}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                aria-label={
+                                    showPassword ? tui('hidePassword') : tui('showPassword')
+                                }
                             >
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {showPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
                             </button>
                         </div>
                         {errors.password && (
-                            <p className="text-sm text-red-500">
-                                {t('validation.passwordMin')}
-                            </p>
+                            <p className="text-sm text-red-500">{t('validation.passwordMin')}</p>
                         )}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">
-                            {t('confirmPassword')}
-                        </Label>
+                        <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
                         <div className="relative">
                             <Input
                                 id="confirmPassword"
                                 type={showConfirmPassword ? 'text' : 'password'}
                                 aria-invalid={!!errors.confirmPassword}
-                                className="pr-10"
+                                className="pe-10"
                                 {...register('confirmPassword')}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                                className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                aria-label={
+                                    showConfirmPassword ? tui('hidePassword') : tui('showPassword')
+                                }
                             >
-                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                {showConfirmPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
                             </button>
                         </div>
                         {errors.confirmPassword && (
@@ -187,7 +192,10 @@ export function RegisterForm() {
                                 aria-invalid={!!errors.acceptTerms}
                                 {...register('acceptTerms')}
                             />
-                            <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug">
+                            <Label
+                                htmlFor="acceptTerms"
+                                className="text-sm font-normal leading-snug"
+                            >
                                 {t.rich('acceptTerms', {
                                     terms: (chunks) => (
                                         <Link href="/terms" className="text-warm hover:underline">
@@ -208,12 +216,8 @@ export function RegisterForm() {
                             </p>
                         )}
                     </div>
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={busy || googleLoading}
-                    >
-                        {busy && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                    <Button type="submit" className="w-full" disabled={busy || googleLoading}>
+                        {busy && <Loader2 className="me-1.5 h-4 w-4 animate-spin" />}
                         {busy ? t('registering') : t('register')}
                     </Button>
                     <div className="relative my-4">
@@ -231,13 +235,18 @@ export function RegisterForm() {
                         variant="outline"
                         className="w-full"
                         disabled={busy || googleLoading || !acceptedTerms}
-                        onClick={() => {
+                        onClick={async () => {
                             setGoogleLoading(true)
-                            void signIn('google', { callbackUrl: '/auth/redirect' })
+                            setServerError(null)
+                            const result = await signIn('google', { callbackUrl })
+                            if (result.error) {
+                                setServerError(tui('requestFailed'))
+                                setGoogleLoading(false)
+                            }
                         }}
                     >
-                        {googleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                        {googleLoading && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+                        <svg className="me-2 h-4 w-4" viewBox="0 0 24 24">
                             <path
                                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
                                 fill="#4285F4"
@@ -259,10 +268,7 @@ export function RegisterForm() {
                     </Button>
                     <p className="text-center text-sm text-muted-foreground">
                         {t('haveAccount')}{' '}
-                        <Link
-                            href="/login"
-                            className="text-warm hover:underline"
-                        >
+                        <Link href="/login" className="text-warm hover:underline">
                             {t('login')}
                         </Link>
                     </p>

@@ -1,5 +1,9 @@
 'use client'
 
+import { LocalizedDate } from '@/components/shared/LocalizedDate'
+
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
+
 import { useState, useEffect, useRef } from 'react'
 import {
     Activity,
@@ -20,6 +24,8 @@ interface AssetVerificationPanelProps {
 }
 
 export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const [dragActive, setDragActive] = useState(false)
     const [verifying, setVerifying] = useState(false)
     const [verifyError, setVerifyError] = useState<string | null>(null)
@@ -77,11 +83,10 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}))
-                throw new Error(errorData.error || 'Verification failed')
+                throw new Error(errorData.error || tui('verificationFailed'))
             }
 
             const data = await res.json()
-            console.log('C2PA verification data:', data, 'current userId:', userId)
 
             setVerifyResult({
                 hasManifest: data.hasManifest,
@@ -96,7 +101,7 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
             })
         } catch (err: any) {
             console.error(err)
-            setVerifyError('Error verifying Content Credentials: ' + (err.message || 'Unknown error.'))
+            setVerifyError(tui('verificationRequestFailed'))
         } finally {
             setVerifying(false)
         }
@@ -107,11 +112,10 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
             <div className="border-b border-border/60 pb-4">
                 <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
                     <Activity className="h-5 w-5 text-muted-foreground" />
-                    Verify Asset Credentials
+                    {tui('verifyAssetCredentials')}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                    Drop any image here to check whether it carries a verified creator stamp and see
-                    its full history.
+                    {tui('dropAnyImageHereToCheckWhetherItCarries')}
                 </p>
             </div>
 
@@ -132,14 +136,14 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={previewUrl}
-                            alt="Uploaded image preview"
+                            alt={tui('uploadedImagePreview')}
                             className="w-full max-h-72 object-contain rounded-xl"
                         />
                         {verifying && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 rounded-xl backdrop-blur-sm">
                                 <RefreshCw className="h-8 w-8 animate-spin text-primary mb-2" />
                                 <p className="text-sm text-foreground font-medium">
-                                    Verifying...
+                                    {tui('verifying')}
                                 </p>
                             </div>
                         )}
@@ -148,9 +152,9 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                     <div className="flex flex-col items-center text-center py-4">
                         <FileUp className="h-12 w-12 text-muted-foreground mb-4" />
                         <p className="text-sm font-semibold text-foreground">
-                            Drag & drop image here, or{' '}
+                            {tui('dragDropImageHereOr')}{' '}
                             <label className="text-primary hover:underline cursor-pointer">
-                                browse
+                                {tui('browse')}
                                 <input
                                     type="file"
                                     accept="image/jpeg, image/png, image/webp"
@@ -160,7 +164,7 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                             </label>
                         </p>
                         <p className="text-xs text-muted-foreground mt-2">
-                            Supports JPEG, PNG, and WebP images.
+                            {tui('supportsJpegPngAndWebpImages')}
                         </p>
                     </div>
                 )}
@@ -184,43 +188,18 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                                     <div className="space-y-1">
                                         {verifyResult.creatorUserId &&
                                             userId &&
-                                            verifyResult.creatorUserId.trim().toLowerCase() ===
-                                                userId.trim().toLowerCase() && (
+                                            verifyResult.creatorUserId === userId && (
                                                 <span className="inline-block px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase bg-amber-600 text-white rounded mb-1">
-                                                    This is your creation
+                                                    {tui('thisIsYourCreation')}
                                                 </span>
                                             )}
                                         <h4 className="font-bold text-sm">
-                                            Credentials Secured (Untrusted Issuer)
+                                            {tui('credentialsSecuredUntrustedIssuer')}
                                         </h4>
                                         <p className="text-xs text-amber-800 leading-relaxed">
-                                            This image has a valid creator stamp that hasn't been
-                                            altered. However,{' '}
-                                            {verifyResult.artisanName &&
-                                            verifyResult.issuer &&
-                                            verifyResult.artisanName === verifyResult.issuer ? (
-                                                <>
-                                                    the signing certificate for{' '}
-                                                    <span className="font-semibold">
-                                                        {verifyResult.artisanName}
-                                                    </span>{' '}
-                                                    is self-signed and not globally trusted.
-                                                </>
-                                            ) : (
-                                                <>
-                                                    the root signing certificate/issuer{' '}
-                                                    <span className="font-semibold">
-                                                        {verifyResult.issuer || 'unknown issuer'}
-                                                    </span>{' '}
-                                                    (which issued the certificate for{' '}
-                                                    <span className="font-semibold">
-                                                        {verifyResult.artisanName}
-                                                    </span>
-                                                    ) is self-signed or not globally trusted.
-                                                </>
-                                            )}
+                                            {tui('theSignatureIsIntactButTheSigningCertificateOr')}
                                         </p>
-                                        <div className="mt-2 text-xs font-mono space-y-1 text-amber-700 border-t border-amber-200/50 pt-2">
+                                        <div className="mt-2 text-xs font-mono break-words [overflow-wrap:anywhere] space-y-1 text-amber-700 border-t border-amber-200/50 pt-2">
                                             {verifyResult.validationStatus.map((err, idx) => (
                                                 <div key={idx}>• {err}</div>
                                             ))}
@@ -233,18 +212,16 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                                     <div className="space-y-1">
                                         {verifyResult.creatorUserId &&
                                             userId &&
-                                            verifyResult.creatorUserId.trim().toLowerCase() ===
-                                                userId.trim().toLowerCase() && (
+                                            verifyResult.creatorUserId === userId && (
                                                 <span className="inline-block px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase bg-emerald-600 text-white rounded mb-1">
-                                                    This is your creation
+                                                    {tui('thisIsYourCreation')}
                                                 </span>
                                             )}
                                         <h4 className="font-bold text-sm">
-                                            Authentic Credentials Secured
+                                            {tui('authenticCredentialsSecured')}
                                         </h4>
                                         <p className="text-xs text-emerald-800 leading-relaxed">
-                                            This image has a valid creator stamp that hasn't been
-                                            altered. It was signed by a registered artisan.
+                                            {tui('thisImageHasAValidCreatorStampThatHasnt')}
                                         </p>
                                     </div>
                                 </div>
@@ -253,10 +230,11 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                             <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/20 text-destructive flex items-start gap-3">
                                 <XCircle className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
                                 <div className="space-y-1">
-                                    <h4 className="font-bold text-sm">Signature Issues Found</h4>
+                                    <h4 className="font-bold text-sm">
+                                        {tui('signatureIssuesFound')}
+                                    </h4>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
-                                        This image has a creator stamp, but it appears to have been
-                                        tampered with or the signer is not recognised.
+                                        {tui('thisImageHasACreatorStampButItAppears')}
                                     </p>
                                     <div className="mt-2 text-xs font-mono space-y-1 text-destructive">
                                         {verifyResult.validationStatus.map((err, idx) => (
@@ -271,11 +249,10 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                             <Info className="h-6 w-6 text-muted-foreground shrink-0 mt-0.5" />
                             <div className="space-y-1">
                                 <h4 className="font-bold text-sm text-foreground">
-                                    No Credentials Found
+                                    {tui('noCredentialsFound')}
                                 </h4>
                                 <p className="text-xs leading-relaxed">
-                                    This image is unsigned and does not contain a C2PA manifest. It
-                                    has no verifiable history or origin.
+                                    {tui('thisImageIsUnsignedAndDoesNotContainA')}
                                 </p>
                             </div>
                         </div>
@@ -285,22 +262,31 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                     {verifyResult.hasManifest && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/40 p-4 rounded-2xl border border-border/50 text-xs">
                             <div>
-                                <p className="text-muted-foreground font-medium">Creator</p>
+                                <p className="text-muted-foreground font-medium">
+                                    {tui('creator')}
+                                </p>
                                 <p className="font-semibold text-foreground text-sm mt-0.5">
                                     {verifyResult.artisanName}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-muted-foreground font-medium">Issued By</p>
+                                <p className="text-muted-foreground font-medium">
+                                    {tui('issuedBy')}
+                                </p>
                                 <p className="font-semibold text-foreground mt-0.5">
                                     {verifyResult.issuer}
                                 </p>
                             </div>
                             {verifyResult.date && (
                                 <div className="md:col-span-2 border-t border-border/60 pt-2 mt-2">
-                                    <p className="text-muted-foreground font-medium">Signing Time</p>
+                                    <p className="text-muted-foreground font-medium">
+                                        {tui('signingTime')}
+                                    </p>
                                     <p className="font-semibold text-foreground mt-0.5">
-                                        {new Date(verifyResult.date).toLocaleString()}
+                                        <LocalizedDate
+                                            value={verifyResult.date}
+                                            format="dateTime"
+                                        />
                                     </p>
                                 </div>
                             )}
@@ -320,8 +306,8 @@ export function AssetVerificationPanel({ userId }: AssetVerificationPanelProps) 
                         size="sm"
                         onClick={() => changeInputRef.current?.click()}
                     >
-                        <FolderOpen className="h-3.5 w-3.5 mr-2" />
-                        Change image
+                        <FolderOpen className="h-3.5 w-3.5 me-2" />
+                        {tui('changeImage')}
                     </Button>
                     <input
                         ref={changeInputRef}

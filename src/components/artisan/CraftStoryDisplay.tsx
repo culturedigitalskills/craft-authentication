@@ -39,7 +39,7 @@ export function CraftStoryDisplay({
     const captioned = new Set(captionedMediaIds)
 
     const hasAny =
-        ANSWER_KEYS.some(k => {
+        ANSWER_KEYS.some((k) => {
             const text = story[`answer${k}Text` as const]
             const media = story[`answer${k}MediaId` as const]
             return (text && text.trim().length > 0) || media
@@ -64,19 +64,27 @@ export function CraftStoryDisplay({
                         <article key={key}>
                             <h3
                                 className="mb-3"
-                                style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '21px', color: 'var(--sc-ink)' }}
+                                style={{
+                                    fontFamily: 'var(--sc-font-display)',
+                                    fontWeight: 600,
+                                    fontSize: '21px',
+                                    color: 'var(--sc-ink)',
+                                }}
                             >
                                 {t(`step${i + 1}.title`)}
                             </h3>
                             {text?.trim() && (
-                                <p className="sc-body mb-4 whitespace-pre-wrap">
+                                <p dir="auto" className="sc-body mb-4 whitespace-pre-wrap">
                                     {text}
                                 </p>
                             )}
                             {mediaId && (
                                 <div
                                     className="rounded-[var(--sc-r-card)] p-2"
-                                    style={{ border: '1px solid var(--sc-border)', background: 'var(--sc-surface-trans)' }}
+                                    style={{
+                                        border: '1px solid var(--sc-border)',
+                                        background: 'var(--sc-surface-trans)',
+                                    }}
                                 >
                                     {isVideo ? (
                                         <CaptionedVideo
@@ -106,16 +114,25 @@ export function CraftStoryDisplay({
                     <article>
                         <h3
                             className="mb-3"
-                            style={{ fontFamily: 'var(--sc-font-display)', fontWeight: 600, fontSize: '21px', color: 'var(--sc-ink)' }}
+                            style={{
+                                fontFamily: 'var(--sc-font-display)',
+                                fontWeight: 600,
+                                fontSize: '21px',
+                                color: 'var(--sc-ink)',
+                            }}
                         >
                             {t('step7.title')}
                         </h3>
                         <div className="grid grid-cols-2 gap-[var(--sc-grid-gap)] sm:grid-cols-3">
-                            {workshop.map(item => (
+                            {workshop.map((item) => (
                                 <div
                                     key={item.mediaId}
                                     className="overflow-hidden rounded-[var(--sc-r-card)]"
-                                    style={{ border: '1px solid var(--sc-border)', background: 'var(--sc-surface-trans)', boxShadow: 'var(--sc-shadow-card)' }}
+                                    style={{
+                                        border: '1px solid var(--sc-border)',
+                                        background: 'var(--sc-surface-trans)',
+                                        boxShadow: 'var(--sc-shadow-card)',
+                                    }}
                                 >
                                     {item.isVideo ? (
                                         <CaptionedVideo

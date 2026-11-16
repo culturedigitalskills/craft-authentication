@@ -1,7 +1,10 @@
+import { certificateAccountUri, verifiedRegistryAccount } from '@/lib/c2pa-identity'
+import { tmpdir } from 'node:os'
+import { createAsyncSigner } from '@/lib/c2pa-signer'
 import 'server-only'
 import crypto from 'crypto'
-import { execSync } from 'child_process'
-import { writeFileSync, existsSync, unlinkSync } from 'fs'
+import { execFileSync } from 'child_process'
+import { writeFileSync, readFileSync, mkdtempSync, rmSync } from 'fs'
 import { join } from 'path'
 import { prisma } from '@/lib/prisma'
 import { KMS } from '@/lib/kms'
@@ -10,7 +13,6 @@ import { UserSecretsService } from '@/lib/user-secrets-service'
 import {
     Reader,
     Builder,
-    LocalSigner,
     createTrustSettings,
     createVerifySettings,
     mergeSettings,
@@ -20,8 +22,6 @@ import type { C2PAState } from '@/types/c2pa'
 
 // How close to expiry a certificate must be before the sweep renews it.
 const RENEWAL_WINDOW_DAYS = 30
-
-const secretsDir = join(process.cwd(), 'secrets')
 
 // CLI tool helper removed as we transitioned to @contentauth/c2pa-node
 
@@ -252,15 +252,10 @@ export class C2PAService {
 
         const certChain = Buffer.from(certificate, 'utf8')
         const leafKey = Buffer.from(privateKey, 'utf8')
-        const signer = LocalSigner.newSigner(
-            certChain,
-            leafKey,
-            'es256',
-            'http://timestamp.digicert.com',
-        )
+        const signer = createAsyncSigner(certChain, leafKey)
 
         const createdAction: any = {
-            action: generationMetadata ? 'c2pa.published' : 'c2pa.created',
+            action: generationMetadata ? 'c2pa.created' : 'org.sustainablecrafting.uploaded',
             softwareAgent: 'Crafts Registry v1',
             timestamp: new Date().toISOString(),
             description: 'Uploaded to Crafts Registry',
@@ -293,11 +288,25 @@ export class C2PAService {
             ],
         }
 
-        const builder = Builder.withJson(manifestDefinition)
+        const builder = await Builder.withJsonAsync(manifestDefinition)
+        if (!generationMetadata) {
+            // Uploading is not evidence of digital capture or creation. Record
+            // opening the existing asset, preserve it as a parent ingredient,
+            // and describe only the upload performed by this registry.
+            builder.setIntent('edit')
+            await builder.addIngredient(
+                JSON.stringify({
+                    title: 'Uploaded source',
+                    format: mimeType,
+                    relationship: 'parentOf',
+                }),
+                { buffer: mediaBuffer, mimeType },
+            )
+        }
         const input = { buffer: mediaBuffer, mimeType }
         const output: { buffer: Buffer | null } = { buffer: null }
 
-        builder.sign(signer, input, output)
+        await builder.signAsync(signer, input, output)
 
         if (!output.buffer) {
             throw new Error('C2PA initializeManifest failed: output buffer is null')
@@ -326,12 +335,7 @@ export class C2PAService {
 
         const certChain = Buffer.from(certificate, 'utf8')
         const leafKey = Buffer.from(privateKey, 'utf8')
-        const signer = LocalSigner.newSigner(
-            certChain,
-            leafKey,
-            'es256',
-            'http://timestamp.digicert.com',
-        )
+        const signer = createAsyncSigner(certChain, leafKey)
 
         const manifestDefinition = {
             claim_generator: 'Crafts Registry',
@@ -363,7 +367,9 @@ export class C2PAService {
             ],
         }
 
-        const builder = Builder.withJson(manifestDefinition)
+        const builder = await Builder.withJsonAsync(manifestDefinition)
+
+        builder.setIntent('edit')
 
         // Preserve the AI model's signed manifest in the provenance chain
         await builder.addIngredient(
@@ -378,7 +384,7 @@ export class C2PAService {
         const input = { buffer: mediaBuffer, mimeType }
         const output: { buffer: Buffer | null } = { buffer: null }
 
-        builder.sign(signer, input, output)
+        await builder.signAsync(signer, input, output)
 
         if (!output.buffer) {
             throw new Error('C2PA addCommissionManifest failed: output buffer is null')
@@ -407,12 +413,7 @@ export class C2PAService {
 
         const certChain = Buffer.from(certificate, 'utf8')
         const leafKey = Buffer.from(privateKey, 'utf8')
-        const signer = LocalSigner.newSigner(
-            certChain,
-            leafKey,
-            'es256',
-            'http://timestamp.digicert.com',
-        )
+        const signer = createAsyncSigner(certChain, leafKey)
 
         const manifestDefinition = {
             claim_generator: 'Crafts Registry',
@@ -439,7 +440,7 @@ export class C2PAService {
             ],
         }
 
-        const builder = Builder.withJson(manifestDefinition)
+        const builder = await Builder.withJsonAsync(manifestDefinition)
         builder.setIntent('edit')
         const parentJson = {
             title: 'Parent Image',
@@ -451,7 +452,7 @@ export class C2PAService {
         const input = { buffer: mediaBuffer, mimeType }
         const output = { buffer: null }
 
-        builder.sign(signer, input, output)
+        await builder.signAsync(signer, input, output)
 
         if (!output.buffer) {
             throw new Error('C2PA addEditAssertion failed: output buffer is null')
@@ -564,11 +565,9 @@ export class C2PAService {
                 }
             }
 
-            // Extract creatorUserId from leaf certificate subjectAltName (urn:uuid)
-            // The certificate is embedded in the binary block in DER format, containing the ASCII substring "urn:uuid:<UUID>"
-            const bufferStr = mediaBuffer.toString('binary')
-            const uuidMatch = bufferStr.match(/urn:uuid:([0-9a-fA-F-]{36})/)
-            const creatorUserId = uuidMatch ? uuidMatch[1] : undefined
+            const creatorUserId = authentic
+                ? await verifiedRegistryAccount(reader, activeManifestId, ourCert)
+                : undefined
 
             let date: string | null = activeManifest.signature_info?.time || null
 
@@ -687,68 +686,97 @@ export class C2PAService {
         userId: string,
         artisanName: string,
     ): Promise<{ privateKey: string; certificateChain: string; expiresAt: Date }> {
-        const tempDir = secretsDir
-        const prefix = `artisan-${userId}`
-
-        const keyPath = join(tempDir, `${prefix}_key.pem`)
-        const csrPath = join(tempDir, `${prefix}_csr.pem`)
-        const certPath = join(tempDir, `${prefix}_cert.pem`)
-        const confPath = join(tempDir, `${prefix}_openssl.cnf`)
-
+        if (
+            !artisanName.trim() ||
+            Array.from(artisanName).length > 64 ||
+            /[\r\n\0]/.test(artisanName)
+        ) {
+            throw new Error('Signing name must contain 1–64 characters without control characters')
+        }
+        const accountUri = certificateAccountUri(userId)
+        const tempDir = mkdtempSync(join(tmpdir(), 'craft-c2pa-'))
+        const keyPath = join(tempDir, 'key.pem')
+        const csrPath = join(tempDir, 'request.pem')
+        const certPath = join(tempDir, 'certificate.pem')
+        const confPath = join(tempDir, 'openssl.cnf')
         try {
             const { certificate: rootCert } = getC2PARootKeys()
-            const rootCertPath = process.env.C2PA_ROOT_CERT_PATH!
-            const rootKeyPath = process.env.C2PA_ROOT_KEY_PATH!
-
-            // Create config with SAN URI extension (W3C/DID standard) and required C2PA extensions
-            const cnfContent = `
-[ req ]
-distinguished_name = req_distinguished_name
-req_extensions = v3_req
-prompt = no
-
-[ req_distinguished_name ]
-C = US
-O = Sustainable Crafting Registry
-CN = ${artisanName}
-
-[ v3_req ]
-basicConstraints = CA:FALSE
-keyUsage = critical, digitalSignature
-extendedKeyUsage = emailProtection, 1.3.6.1.5.5.7.3.36
-subjectAltName = URI:urn:uuid:${userId}
-`
-            writeFileSync(confPath, cnfContent.trim(), 'utf8')
-
-            // 1. Generate EC key pair and CSR
-            execSync(
-                `openssl req -new -nodes -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 ` +
-                    `-keyout "${keyPath}" -out "${csrPath}" -config "${confPath}"`,
+            // User-supplied names never enter an OpenSSL config or a shell.
+            const subjectName = artisanName.replace(/[\\/+]/g, '\\$&')
+            const subject = '/C=US/O=Sustainable Crafting Registry/CN=' + subjectName
+            const config = [
+                '[ req ]',
+                'distinguished_name = subject',
+                'req_extensions = v3_req',
+                'prompt = no',
+                'utf8 = yes',
+                '[ subject ]',
+                '[ v3_req ]',
+                'basicConstraints = CA:FALSE',
+                'keyUsage = critical, digitalSignature',
+                'extendedKeyUsage = emailProtection, 1.3.6.1.5.5.7.3.36',
+                'subjectAltName = URI:' + accountUri,
+            ].join('\n')
+            writeFileSync(confPath, config, { encoding: 'utf8', mode: 0o600 })
+            execFileSync(
+                'openssl',
+                [
+                    'req',
+                    '-new',
+                    '-nodes',
+                    '-newkey',
+                    'ec',
+                    '-pkeyopt',
+                    'ec_paramgen_curve:prime256v1',
+                    '-utf8',
+                    '-keyout',
+                    keyPath,
+                    '-out',
+                    csrPath,
+                    '-config',
+                    confPath,
+                    '-subj',
+                    subject,
+                ],
                 { stdio: 'ignore' },
             )
-
-            // 2. Sign the CSR with CA Root certificate (expires in 365 days)
-            execSync(
-                `openssl x509 -req -in "${csrPath}" -CA "${rootCertPath}" ` +
-                    `-CAkey "${rootKeyPath}" -CAcreateserial ` +
-                    `-out "${certPath}" -days 365 -sha256 -extfile "${confPath}" -extensions v3_req`,
+            const serial = crypto.randomBytes(20)
+            serial[0] = serial[0] & 0x7f || 1
+            // A random positive serial avoids writing a .srl file into a read-only CA mount.
+            execFileSync(
+                'openssl',
+                [
+                    'x509',
+                    '-req',
+                    '-in',
+                    csrPath,
+                    '-CA',
+                    process.env.C2PA_ROOT_CERT_PATH!,
+                    '-CAkey',
+                    process.env.C2PA_ROOT_KEY_PATH!,
+                    '-set_serial',
+                    '0x' + serial.toString('hex'),
+                    '-out',
+                    certPath,
+                    '-days',
+                    '365',
+                    '-sha256',
+                    '-extfile',
+                    confPath,
+                    '-extensions',
+                    'v3_req',
+                ],
                 { stdio: 'ignore' },
             )
-
-            const privateKey = execSync(`cat "${keyPath}"`, { encoding: 'utf8' })
-            const artisanCert = execSync(`cat "${certPath}"`, { encoding: 'utf8' })
-
-            // Build chain (Artisan Cert + Root CA Cert)
-            const certificateChain = artisanCert + '\n' + rootCert
-            const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-
-            return { privateKey, certificateChain, expiresAt }
+            const privateKey = readFileSync(keyPath, 'utf8')
+            const artisanCert = readFileSync(certPath, 'utf8')
+            return {
+                privateKey,
+                certificateChain: artisanCert + '\n' + rootCert,
+                expiresAt: new Date(new crypto.X509Certificate(artisanCert).validTo),
+            }
         } finally {
-            // Clean up temporary files
-            if (existsSync(keyPath)) unlinkSync(keyPath)
-            if (existsSync(csrPath)) unlinkSync(csrPath)
-            if (existsSync(certPath)) unlinkSync(certPath)
-            if (existsSync(confPath)) unlinkSync(confPath)
+            rmSync(tempDir, { recursive: true, force: true })
         }
     }
 
@@ -790,11 +818,7 @@ subjectAltName = URI:urn:uuid:${userId}
                 userId = session?.user?.id
             }
 
-            if (
-                userId &&
-                inspect.creatorUserId &&
-                inspect.creatorUserId.trim().toLowerCase() === userId.trim().toLowerCase()
-            ) {
+            if (userId && inspect.creatorUserId && inspect.creatorUserId === userId) {
                 return 'owned'
             }
 

@@ -1,6 +1,7 @@
+import { getLocale } from 'next-intl/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
+import { redirect } from '@/i8n/navigation'
 import { CraftWizard } from '@/components/craft/CraftWizard'
 import { getCraftMediaItems } from '@/lib/craft'
 
@@ -13,7 +14,7 @@ export default async function CraftCreatePage({
 
     const session = await auth()
     if (!session?.user) {
-        redirect('/login')
+        return redirect({ href: '/login', locale: await getLocale() })
     }
 
     // Crafts belong to an artisan profile, so send anyone without one to
@@ -24,7 +25,7 @@ export default async function CraftCreatePage({
         select: { id: true },
     })
     if (!artisan) {
-        redirect('/onboarding/artisan')
+        return redirect({ href: '/onboarding/artisan', locale: await getLocale() })
     }
 
     let craft = null
@@ -35,9 +36,9 @@ export default async function CraftCreatePage({
         })
 
         // Only the owner (or a site admin) may open a craft for editing.
-        if (!record) redirect('/crafts')
+        if (!record) return redirect({ href: '/crafts', locale: await getLocale() })
         if (record.artisan.userId !== session.user.id && session.user.role !== 'ADMIN') {
-            redirect('/crafts')
+            return redirect({ href: '/crafts', locale: await getLocale() })
         }
 
         const media = await getCraftMediaItems(record.id)

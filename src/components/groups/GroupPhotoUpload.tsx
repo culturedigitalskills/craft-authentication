@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -22,6 +23,8 @@ export function GroupPhotoUpload({
     label,
     className = '',
 }: GroupPhotoUploadProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('groups')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [isUploading, setIsUploading] = useState(false)
@@ -50,7 +53,7 @@ export function GroupPhotoUpload({
 
         try {
             const outcome = await uploadWithProgress(file, setProgress)
-            if (!outcome.ok) throw new Error(outcome.error || 'Upload failed')
+            if (!outcome.ok) throw new Error(outcome.error || tui('uploadFailed'))
             const mediaFile = outcome.media
 
             const attachRes = await fetch('/api/media/attachments', {
@@ -66,12 +69,12 @@ export function GroupPhotoUpload({
             })
             if (!attachRes.ok) {
                 const attachError = await attachRes.json().catch(() => ({}))
-                throw new Error(attachError.error || 'Attachment failed')
+                throw new Error(attachError.error || tui('attachmentFailed'))
             }
 
             setPreviewUrl(`/api/media/${mediaFile.id}`)
         } catch (err: any) {
-            setError(err.message || t('saveFailed'))
+            setError(t('saveFailed'))
             setPreviewUrl(currentUrl)
         } finally {
             setIsUploading(false)
@@ -104,7 +107,7 @@ export function GroupPhotoUpload({
                 ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center gap-1.5">
                         <ImagePlus className="h-6 w-6 text-muted-foreground" />
-                        <p className="text-xs text-muted-foreground">Upload</p>
+                        <p className="text-xs text-muted-foreground">{tui('upload')}</p>
                     </div>
                 )}
                 {isUploading && (

@@ -449,9 +449,21 @@ export const countries: Country[] = Object.entries(COUNTRY_NAMES).map(([isoCode,
 /**
  * Shown first in the country picker, ahead of the alphabetical list: one
  * country for each language the site is translated into (hi, en, ar, de, el,
- * es, tr), so add one here when a language is added.
+ * es, tr, ja, fr, it, pt-BR), so add one here when a language is added.
  */
-export const suggestedCountryCodes = ['IN', 'GB', 'EG', 'DE', 'GR', 'ES', 'TR']
+export const suggestedCountryCodes = [
+    'IN',
+    'GB',
+    'EG',
+    'DE',
+    'GR',
+    'ES',
+    'TR',
+    'JP',
+    'FR',
+    'IT',
+    'BR',
+]
 
 /**
  * The country's name in the visitor's language, falling back to the stored
@@ -472,3 +484,22 @@ export function countryLabel(country: Country, locale: string): string {
 }
 
 const displayNames = new Map<string, Intl.DisplayNames>()
+
+/** Translate known country labels only; free-text regions and country values stay authored. */
+export function displayCountry(value: string | null | undefined, locale: string): string {
+    if (!value) return ''
+    const country = countries.find(
+        (item) => item.name === value || item.isoCode === value.toUpperCase(),
+    )
+    return country ? countryLabel(country, locale) : value
+}
+
+export function formatLocation(
+    country: string | null | undefined,
+    region: string | null | undefined,
+    locale: string,
+): string {
+    return [region, displayCountry(country, locale)]
+        .filter(Boolean)
+        .join(locale === 'ar' ? '، ' : ', ')
+}

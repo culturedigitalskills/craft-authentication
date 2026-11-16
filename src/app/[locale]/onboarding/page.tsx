@@ -1,14 +1,19 @@
-import Link from 'next/link'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
+import { Link } from '@/i8n/navigation'
 import { Container } from '@/components/layout/Container'
 import { Hammer, ShoppingBag } from 'lucide-react'
 
 export default function OnboardingPage() {
+    const tui = useInterfaceTranslations('interface')
+
     return (
         <Container>
             <div className="mx-auto max-w-2xl py-16 text-center">
-                <h1 className="mb-3 text-3xl font-bold tracking-tight">Welcome to Sustainable Crafting</h1>
+                <h1 className="mb-3 text-3xl font-bold tracking-tight">
+                    {tui('welcomeToSustainableCrafting')}
+                </h1>
                 <p className="mb-12 text-muted-foreground">
-                    Tell us a bit about yourself so we can tailor your experience.
+                    {tui('tellUsABitAboutYourselfSoWeCan')}
                 </p>
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -20,9 +25,9 @@ export default function OnboardingPage() {
                             <Hammer className="h-7 w-7 text-primary" />
                         </div>
                         <div>
-                            <p className="text-lg font-semibold">I&apos;m an Artisan</p>
+                            <p className="text-lg font-semibold">{tui('imAnArtisan')}</p>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                I create crafts and want to register and authenticate my work.
+                                {tui('iCreateCraftsAndWantToRegisterAndAuthenticate')}
                             </p>
                         </div>
                     </Link>
@@ -35,17 +40,17 @@ export default function OnboardingPage() {
                             <ShoppingBag className="h-7 w-7 text-primary" />
                         </div>
                         <div>
-                            <p className="text-lg font-semibold">I&apos;m a Buyer</p>
+                            <p className="text-lg font-semibold">{tui('imABuyer')}</p>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                I want to discover and verify the authenticity of crafts.
+                                {tui('iWantToDiscoverAndVerifyTheAuthenticityOf')}
                             </p>
                         </div>
                     </Link>
                 </div>
 
                 <p className="mt-8 text-xs text-muted-foreground">
-                    You can always set up your artisan profile later from your account settings.
-</p>
+                    {tui('youCanAlwaysSetUpYourArtisanProfileLater')}
+                </p>
             </div>
         </Container>
     )

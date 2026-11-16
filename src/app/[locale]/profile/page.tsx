@@ -1,13 +1,14 @@
+import { getLocale } from 'next-intl/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
+import { redirect } from '@/i8n/navigation'
 import { ArtisanProfileForm } from '@/components/profile/ArtisanProfileForm'
 import { siteBaseUrl } from '@/lib/site-url'
 
 export default async function ProfilePage() {
     const session = await auth()
     if (!session?.user) {
-        redirect('/login')
+        return redirect({ href: '/login', locale: await getLocale() })
     }
 
     const artisan = await prisma.artisan.findUnique({
@@ -75,7 +76,7 @@ export default async function ProfilePage() {
           })
         : []
 
-    const myGroups = groupMemberships.map(m => ({
+    const myGroups = groupMemberships.map((m) => ({
         membershipId: m.id,
         role: m.role,
         group: m.group,
@@ -88,7 +89,11 @@ export default async function ProfilePage() {
           })
         : null
 
-    const storyBanner: { state: 'none' | 'draft' | 'published'; progress: number; slug: string | null } = story
+    const storyBanner: {
+        state: 'none' | 'draft' | 'published'
+        progress: number
+        slug: string | null
+    } = story
         ? {
               state: story.status === 'PUBLISHED' ? 'published' : 'draft',
               progress: story.lastStepReached,

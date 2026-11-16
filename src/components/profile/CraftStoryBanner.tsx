@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
 import { BookOpen, ArrowRight, CheckCircle2, Pencil } from 'lucide-react'
 
@@ -11,7 +11,12 @@ export type CraftStoryBannerProps = {
     slug?: string | null
 }
 
-export function CraftStoryBanner({ state, progress = 0, total = 8, slug = null }: CraftStoryBannerProps) {
+export function CraftStoryBanner({
+    state,
+    progress = 0,
+    total = 8,
+    slug = null,
+}: CraftStoryBannerProps) {
     const t = useTranslations('craftStory.banner')
 
     if (state === 'published') {
@@ -25,9 +30,7 @@ export function CraftStoryBanner({ state, progress = 0, total = 8, slug = null }
                         <p className="text-base font-semibold tracking-tight">
                             {t('publishedBadge')}
                         </p>
-                        <p className="mt-0.5 text-sm text-muted-foreground">
-                            {t('publishedBody')}
-                        </p>
+                        <p className="mt-0.5 text-sm text-muted-foreground">{t('publishedBody')}</p>
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -66,9 +69,7 @@ export function CraftStoryBanner({ state, progress = 0, total = 8, slug = null }
                         {isDraft ? t('continueTitle') : t('startTitle')}
                     </p>
                     <p className="mt-0.5 text-sm text-muted-foreground">
-                        {isDraft
-                            ? t('continueBody', { current: progress, total })
-                            : t('startBody')}
+                        {isDraft ? t('continueBody', { current: progress, total }) : t('startBody')}
                     </p>
                 </div>
             </div>

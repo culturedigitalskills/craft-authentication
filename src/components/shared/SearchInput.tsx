@@ -1,5 +1,6 @@
 'use client'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter, usePathname } from '@/i8n/navigation'
 import { Search } from 'lucide-react'
 import { useTransition } from 'react'
 
@@ -31,15 +32,16 @@ export function SearchInput({ placeholder }: SearchInputProps) {
         <div className="relative w-full max-w-sm">
             <Search
                 aria-hidden="true"
-                className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors"
+                className="absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors"
                 style={{ color: isPending ? 'var(--sc-accent)' : 'var(--sc-text-muted)' }}
             />
             <input
+                dir="auto"
                 type="text"
                 defaultValue={value}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full rounded-[var(--sc-r-chip)] border py-2.5 pl-10 pr-4 text-sm focus-visible:outline-none focus-visible:ring-2"
+                className="w-full rounded-[var(--sc-r-chip)] border py-2.5 ps-10 pe-4 text-sm focus-visible:outline-none focus-visible:ring-2"
                 style={{
                     background: 'var(--sc-surface)',
                     borderColor: 'var(--sc-border-strong)',
