@@ -17,7 +17,7 @@ export function computeInputsHash(inputs: FilmInputs): string {
         profileUrl: inputs.profileUrl,
         answers: inputs.chapters
             .filter(c => c.voiceMediaId)
-            .map(c => `${c.key}:${c.voiceMediaId}`)
+            .map(c => JSON.stringify([c.key, c.voiceMediaId, c.visualId ?? null, c.captionText ?? null, c.captionText ? null : c.segments]))
             .sort(),
         visuals: inputs.visuals.map(v => v.mediaId),
     }

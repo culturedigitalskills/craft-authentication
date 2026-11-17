@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import { CRAFT_ENTITY_TYPE } from '@/lib/craft'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
+import { CRAFT_ENTITY_TYPE } from '@/lib/craft'
 
 /**
  * Whether a media file may be served to anybody, or only to its owner.
@@ -18,6 +18,7 @@ import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 
 export type MediaAccess = {
     isPublic: boolean
+    revalidate?: boolean
     // Null when ownership cannot be established (an orphan, or a Group file).
     ownerUserId: string | null
 }
@@ -42,7 +43,8 @@ export function attachmentIsPublic(
         return entity.isPublic && !entity.removed && !entity.artisanRemoved
     }
     if (entityType === 'CraftStory' && entity.kind === 'story') {
-        return entity.published && !entity.artisanRemoved
+        // A working attachment alone never grants visitor access; the edition does.
+        return false
     }
     if (entityType === 'Group' && entity.kind === 'group') return entity.isActive
     return false
@@ -61,6 +63,12 @@ export async function resolveMediaAccess(
     let isPublic = false
 
     for (const attachment of attachments) {
+        // A workshop attachment is draft material, even on a published story.
+        // The edition below grants access only to the files the maker shared.
+        if (attachment.entityType === 'CraftStory') {
+            if (!ownerUserId) ownerUserId = (await loadEntity('CraftStory', attachment.entityId)).ownerUserId
+            continue
+        }
         const entity = await loadEntity(attachment.entityType, attachment.entityId)
         if (!ownerUserId) ownerUserId = entity.ownerUserId
         if (attachmentIsPublic(attachment.entityType, attachment.isPublic, entity.state)) {
@@ -71,52 +79,22 @@ export async function resolveMediaAccess(
         }
     }
 
-    // The two things a MediaFile can be without any attachment at all. Both are
-    // reached by column, so an attached file is almost never either, and the
-    // lookups wait until the cheap path has already failed.
-
-    // A rendered story film: the film row points at its output.
-    const film = await prisma.storyFilm.findFirst({
-        where: { outputMediaId: mediaId },
-        select: {
-            isPublic: true,
-            status: true,
-            story: {
-                select: {
-                    status: true,
-                    artisan: { select: { userId: true, deletedAt: true } },
-                },
-            },
+    const edition = await prisma.storyPublication.findFirst({
+        where: {
+            OR: [{ mediaIds: { has: mediaId } }, { filmMediaId: mediaId }],
+            story: { status: 'PUBLISHED', artisan: { deletedAt: null } },
         },
+        select: { story: { select: { artisan: { select: { userId: true } } } } },
     })
-    if (film) {
-        ownerUserId = ownerUserId ?? film.story.artisan.userId
-        if (
-            film.isPublic &&
-            film.status === 'READY' &&
-            film.story.status === 'PUBLISHED' &&
-            !film.story.artisan.deletedAt
-        ) {
-            return { isPublic: true, ownerUserId }
-        }
+    if (edition) return { isPublic: true, revalidate: true, ownerUserId: ownerUserId ?? edition.story.artisan.userId }
+    if (!ownerUserId) {
+        // Legacy files without uploaderId still belong to their maker in a private preview.
+        const owner = await prisma.craftStory.findFirst({
+            where: { OR: [...ANSWER_MEDIA_FIELDS.map(k => ({ [k]: mediaId })), { film: { outputMediaId: mediaId } }] },
+            select: { artisan: { select: { userId: true } } },
+        })
+        ownerUserId = owner?.artisan.userId ?? null
     }
-
-    // A spoken answer: the story points at one per question. Miss this and
-    // every recording on a published story stops playing.
-    const answerStory = await prisma.craftStory.findFirst({
-        where: { OR: ANSWER_MEDIA_FIELDS.map(field => ({ [field]: mediaId })) },
-        select: {
-            status: true,
-            artisan: { select: { userId: true, deletedAt: true } },
-        },
-    })
-    if (answerStory) {
-        ownerUserId = ownerUserId ?? answerStory.artisan.userId
-        if (answerStory.status === 'PUBLISHED' && !answerStory.artisan.deletedAt) {
-            return { isPublic: true, ownerUserId }
-        }
-    }
-
     return { isPublic, ownerUserId }
 }
 

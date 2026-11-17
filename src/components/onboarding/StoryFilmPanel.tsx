@@ -22,6 +22,7 @@ interface FilmView {
     source: FilmSource
     isPublic: boolean
     outputMediaId: string | null
+    hasCaptions?: boolean
     durationSec: number | null
     error: string | null
     updatedAt: string
@@ -32,11 +33,15 @@ interface FilmView {
  * public when the story is published, so a film rendered after that point sits
  * finished but hidden until the artisan is told to show it.
  */
-export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: boolean }) {
+export function StoryFilmPanel({ storyPublished = false, beforeRender, featureChoice, onFeatureChoice }: {
+    storyPublished?: boolean; beforeRender: () => Promise<boolean>
+    featureChoice: string | null; onFeatureChoice: (id: string | null) => void
+}) {
     const t = useTranslations('craftStory.film')
     const tStory = useTranslations('craftStory')
 
     const [film, setFilm] = useState<FilmView | null>(null)
+    const [featuredId, setFeaturedId] = useState<string | null>(null)
     const [stale, setStale] = useState(false)
     const [busy, setBusy] = useState(false)
     const [notice, setNotice] = useState<string | null>(null)
@@ -48,6 +53,7 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
             if (!res.ok) return
             const data = await res.json()
             setFilm(data.film ?? null)
+            setFeaturedId(data.featuredMediaId ?? null)
             setStale(Boolean(data.stale))
         } catch {
             // Status is informational — never surface fetch failures.
@@ -62,7 +68,7 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
     const active = film?.status === 'PENDING' || film?.status === 'PROCESSING'
     useEffect(() => {
         if (!active) return
-        const id = setInterval(() => void refresh(), 8000)
+        const id = setInterval(() => void refresh(), 2500)
         return () => clearInterval(id)
     }, [active, refresh])
 
@@ -70,6 +76,8 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
         setBusy(true)
         setNotice(null)
         try {
+            if (!await beforeRender()) return
+            onFeatureChoice(null)
             const res = await fetch('/api/artisans/me/story/film', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -93,19 +101,22 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
         }
     }
 
-    async function togglePublish() {
+    async function togglePublish(show = !film?.isPublic) {
         if (!film) return
         setBusy(true)
         try {
             const res = await fetch('/api/artisans/me/story/film', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ isPublic: !film.isPublic }),
+                body: JSON.stringify({ isPublic: show, outputMediaId: film.outputMediaId }),
             })
             if (res.ok) {
                 const data = await res.json()
+                setFeaturedId(show ? film.outputMediaId : null)
                 setFilm((f) => (f ? { ...f, isPublic: data.film.isPublic } : f))
-            }
+            } else setNotice(tStory('studio.featureFailed'))
+        } catch {
+            setNotice(tStory('studio.featureFailed'))
         } finally {
             setBusy(false)
         }
@@ -121,7 +132,7 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
         <StoryFilmUploadButton
             label={isReady ? t('uploadReplace') : t('uploadOwn')}
             disabled={busy}
-            onUploaded={refresh}
+            onUploaded={() => { onFeatureChoice(null); void refresh() }}
         />
     )
 
@@ -131,8 +142,14 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                 <Clapperboard className="h-5 w-5 text-warm" />
                 <h3 className="text-sm font-semibold">{t('title')}</h3>
             </div>
-            <p className="mb-3 text-sm text-muted-foreground">{t('description')}</p>
+            <p className="mb-3 text-sm text-muted-foreground">{tStory('studio.filmHint')}</p>
 
+            {featuredId && (featuredId !== film?.outputMediaId || film?.status !== 'READY') &&
+                <div className="mb-3 flex flex-wrap items-center gap-2 rounded-md border p-2 text-sm">
+                    <span>{tStory('studio.previousFilm')}</span>
+                    <Button type="button" size="sm" variant="outline" disabled={busy}
+                        onClick={() => void togglePublish(false)}>{t('unpublish')}</Button>
+                </div>}
             {isProcessing && (
                 <p className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -189,20 +206,6 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                         {film.isPublic && (
                             <span className="text-xs font-medium text-warm">{t('published')}</span>
                         )}
-                        {/* Rendering a film for an already published story does
-                            not put it on the page: only publishing does that, and
-                            the story is published already. Without this the film
-                            sits finished and invisible with nothing to press. */}
-                        {!film.isPublic && storyPublished && (
-                            <Button
-                                type="button"
-                                size="sm"
-                                onClick={() => void togglePublish()}
-                                disabled={busy}
-                            >
-                                {t('showOnStory')}
-                            </Button>
-                        )}
                     </div>
                     {isUploaded && (
                         <p className="text-xs text-muted-foreground">{t('uploadedBadge')}</p>
@@ -217,12 +220,12 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                         </p>
                     )}
                     {!film.isPublic && !storyPublished && (
-                        <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
+                        <p className="text-xs text-muted-foreground">{tStory('studio.featureAfter')}</p>
                     )}
                     {!film.isPublic && storyPublished && (
                         <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
                             <AlertCircle className="h-3.5 w-3.5" />
-                            {t('notShowingYet')}
+                            {tStory('studio.featureAfter')}
                         </p>
                     )}
                     {stale && (
@@ -252,7 +255,7 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                         </Button>
                         {uploadControl}
                     </div>
-                    <p className="text-xs text-muted-foreground">{t('uploadHint')}</p>
+                    <p className="text-xs text-muted-foreground">{tStory('studio.featureAfter')}</p>
                 </div>
             )}
 
@@ -263,14 +266,15 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                     <DialogContent className="max-w-2xl">
                         <DialogHeader>
                             <DialogTitle>{t('premiereTitle')}</DialogTitle>
-                            <DialogDescription>{t('description')}</DialogDescription>
+                            <DialogDescription>{tStory('studio.filmHint')}</DialogDescription>
                         </DialogHeader>
                         <CaptionedVideo
                             src={`/api/media/${film.outputMediaId}`}
-                            captionsSrc={`/api/media/${film.outputMediaId}/subtitles`}
+                            captionsSrc={film.hasCaptions ? '/api/media/' + film.outputMediaId + '/subtitles' : undefined}
                             captionsLabel={tStory('captionsLabel')}
                             className="w-full rounded-md bg-black"
                         />
+                        <p className="text-sm text-muted-foreground">{film.hasCaptions ? tStory('captions.ready') : tStory('studio.noCaptions')}</p>
                         <div className="flex flex-wrap items-center justify-end gap-2">
                             <Button
                                 type="button"
@@ -290,9 +294,12 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                                 <Download className="me-1.5 h-4 w-4" />
                                 {t('download')}
                             </a>
-                            {/* No separate "publish film" button — publishing the
-                                story features a ready film. Only offer to hide it. */}
-                            {film.isPublic && (
+                            {!storyPublished && <label className="flex items-center gap-2 text-sm">
+                                <input type="checkbox" checked={featureChoice === film.outputMediaId}
+                                    onChange={e => onFeatureChoice(e.target.checked ? film.outputMediaId : null)} />
+                                {tStory('studio.featureWithPage')}
+                            </label>}
+                            {storyPublished && (
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -300,12 +307,12 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
                                     onClick={() => void togglePublish()}
                                     disabled={busy}
                                 >
-                                    {t('unpublish')}
+                                    {film.isPublic ? t('unpublish') : t('showOnStory')}
                                 </Button>
                             )}
                         </div>
-                        {!film.isPublic && (
-                            <p className="text-xs text-muted-foreground">{t('willBeHighlight')}</p>
+                        {!film.isPublic && !storyPublished && (
+                            <p className="text-xs text-muted-foreground">{tStory('studio.featureAfter')}</p>
                         )}
                     </DialogContent>
                 </Dialog>

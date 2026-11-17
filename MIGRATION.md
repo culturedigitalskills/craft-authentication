@@ -1,5 +1,10 @@
 # Unreleased — language URLs, interface localization and verification
 
+## Artisan story editions and films
+
+Apply the Prisma migration `20261117000000_story_publication` and regenerate the client before starting the updated application. It snapshots existing published stories and featured films; private drafts and hidden films stay private. Existing films remain playable; regenerating applies the new voice-first timing and chapter markers. Film generation requires FFmpeg with libx264, drawtext and the project's Noto fonts. The server checks this on startup. No transcription key is required for rendering or for English captions entered by the maker.
+
+
 ## Additional interface languages
 
 Japanese (ja), French (fr), Italian (it) and Brazilian Portuguese (pt-BR) are now supported. Their URL prefixes are /ja, /fr, /it and /pt-BR. The owner selected Brazilian Portuguese; the selector explicitly labels it Português (Brasil). Editorial canonical/hreflang metadata and sitemap entries expand to these locales automatically.

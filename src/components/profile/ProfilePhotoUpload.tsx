@@ -50,7 +50,12 @@ export function ProfilePhotoUpload({
 
         try {
             const outcome = await uploadWithProgress(file, setProgress)
-            if (!outcome.ok) throw new Error(outcome.error || tui('uploadFailed'))
+            if (!outcome.ok) {
+                // Keep the server's actionable credential refusal. Other errors stay localized.
+                setError(outcome.status === 403 && outcome.error ? outcome.error : t('photoUploadFailed'))
+                setPreviewUrl(currentPhotoUrl)
+                return
+            }
             const mediaFile = outcome.media
 
             // If artisan already exists, create the attachment now
@@ -88,6 +93,7 @@ export function ProfilePhotoUpload({
         <div className="flex flex-col items-center gap-3">
             <button
                 type="button"
+                aria-label={tui('profilePhoto')}
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
                 className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-muted bg-muted/30 shadow-sm transition-all hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

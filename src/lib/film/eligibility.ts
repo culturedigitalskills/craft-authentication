@@ -14,8 +14,7 @@ export interface FilmIngredientCounts {
 /**
  * The single rule for whether a story has the raw material for a film: at least
  * one spoken answer AND at least one visual (workshop media, or a video answer
- * that can stand in as a talking head). Shared by the film API and the publish
- * gate so they never disagree.
+ * that can stand in as a talking head). Used to offer or queue a movie independently of page publication.
  */
 export function canMakeFilm(counts: FilmIngredientCounts): boolean {
     return counts.spokenCount >= 1 && (counts.workshopCount >= 1 || counts.videoAnswerCount >= 1)

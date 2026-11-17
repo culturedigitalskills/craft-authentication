@@ -49,6 +49,10 @@ Generic starter CRUD over the `DataRecord` table (not used by the craft feature)
 ### Artisan Profile
 
 - `GET /api/artisans/me` - Get current user's artisan profile
+- `GET / PUT /api/artisans/me/story` - Load or patch a private story draft. Send `expectedUpdatedAt` for revision checks; conflicting writes return 409. Optional `sceneSettings` maps question names to a workshop `visualId` and/or a recording-bound English caption (`{mediaId, text}`).
+- `POST /api/artisans/me/story/publish` - Publish the saved edition (`{consent, expectedUpdatedAt, featureFilmId?}`). A recording or photo alone qualifies; the optional first film queues separately when eligible. The featured film stays unchanged unless the maker explicitly selects a reviewed output via `featureFilmId`.
+- `GET / POST /api/artisans/me/story/film` - Inspect or start a background render; POST retries a failed job from the saved sources. GET includes caption availability and staleness.
+- `PATCH /api/artisans/me/story/film` - Feature a reviewed output with `{isPublic:true, outputMediaId}`, or hide it with `{isPublic:false}`. The page must already be published.
 - `GET /api/artisans/me/story/transcripts` - Caption-generation status per story video (authenticated)
 - `POST /api/artisans` - Create artisan profile (authenticated)
 - `PUT /api/artisans/:id` - Update artisan profile (owner only)

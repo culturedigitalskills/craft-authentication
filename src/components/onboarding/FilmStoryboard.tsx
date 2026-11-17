@@ -10,7 +10,7 @@ import {
     FILM_TEMPLATE_VERSION,
     type FilmInputs,
 } from '@/lib/film/planner'
-import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
+import { ANSWER_KEYS, type AnswerKey, type SceneSettings } from '@/lib/validations/craftStory'
 import type { TranscriptSegment } from '@/lib/vtt'
 import { measureMediaDuration, formatDuration } from '@/lib/media-duration'
 import type { WorkshopMedia } from './StoryWorkshopUpload'
@@ -33,9 +33,11 @@ export interface StoryboardAnswer {
 export function FilmStoryboard({
     answers,
     workshopMedia,
-    segments,
+    segments, settings, onScene,
 }: {
     answers: StoryboardAnswer[]
+    settings: SceneSettings
+    onScene: (key: AnswerKey, value: NonNullable<SceneSettings[AnswerKey]>) => void
     workshopMedia: WorkshopMedia[]
     segments: Record<string, TranscriptSegment[]>
 }) {
@@ -46,8 +48,9 @@ export function FilmStoryboard({
     const requested = useRef<Set<string>>(new Set())
     const mounted = useRef(true)
     useEffect(
-        () => () => {
-            mounted.current = false
+        () => {
+            mounted.current = true
+            return () => { mounted.current = false }
         },
         [],
     )
@@ -102,6 +105,8 @@ export function FilmStoryboard({
                 return {
                     key,
                     titleCardText: '',
+                    visualId: settings[key]?.visualId,
+                    captionText: answer && settings[key]?.caption?.mediaId === answer.mediaId ? settings[key]?.caption?.text : undefined,
                     voiceMediaId: answer?.mediaId ?? null,
                     voiceKind: answer?.kind ?? null,
                     voiceDurationSec: duration,
@@ -117,7 +122,7 @@ export function FilmStoryboard({
 
         if (!validateIngredients(inputs).ok) return null
         return buildFilmPlan(inputs)
-    }, [answers, effectiveDurations, workshopMedia, segments])
+    }, [answers, effectiveDurations, workshopMedia, segments, settings])
 
     // Whether a film is possible at all, judged on what exists rather than on
     // measured durations. Deciding this from the plan alone would conflate "no
@@ -141,7 +146,7 @@ export function FilmStoryboard({
         )
     }
 
-    const captionsPending = answers.some((a) => !segments[a.mediaId])
+    const captionsPending = answers.some(a => !segments[a.mediaId] && !(settings[a.key]?.caption?.mediaId === a.mediaId && settings[a.key]?.caption?.text.trim()))
 
     return (
         <section className="mt-8 rounded-lg border border-border bg-muted/20 p-4">
@@ -160,6 +165,16 @@ export function FilmStoryboard({
                         <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                             {tStory(`step${ANSWER_KEYS.indexOf(chapter.key) + 1}.title`)}
                         </p>
+                        {workshopMedia.length > 0 && <label className="mb-2 block text-sm">{tStory('studio.sceneVisual')}
+                            <select className="ms-2 max-w-full rounded-md border bg-background p-2"
+                                value={workshopMedia.some(m => m.mediaId === settings[chapter.key]?.visualId) ? settings[chapter.key]?.visualId : ''}
+                                onChange={e => onScene(chapter.key, { ...settings[chapter.key], visualId: e.target.value || undefined })}>
+                                <option value="">{tStory('studio.automatic')}</option>
+                                {workshopMedia.map((m,i) => <option key={m.mediaId} value={m.mediaId}>{tStory('studio.shot', { n: i+1 })}</option>)}
+                            </select>
+                        </label>}
+                        <audio controls preload="none" className="mb-2 w-full" aria-label={tStory('studio.scenePreview')}
+                            src={'/api/media/' + chapter.voiceMediaId} />
                         <div className="flex gap-2 overflow-x-auto pb-1">
                             {chapter.shots.map((shot, i) => (
                                 <div

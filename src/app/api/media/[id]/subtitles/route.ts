@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { errorResponse } from '@/lib/validations/types'
-import { segmentsToVtt, type TranscriptSegment } from '@/lib/vtt'
+import { segmentsToVtt, validCues } from '@/lib/vtt'
 import { resolveMediaAccess } from '@/lib/media-visibility'
 import { auth } from '@/lib/auth'
 
@@ -46,13 +46,14 @@ export async function GET(
             return errorResponse('Captions not available', 404)
         }
 
-        const segments = transcript.segments as unknown as TranscriptSegment[]
+        const segments = validCues(transcript.segments)
+        if (!segments.length) return errorResponse('Captions not available', 404)
         const vtt = segmentsToVtt(segments)
 
         return new NextResponse(vtt, {
             headers: {
                 'Content-Type': 'text/vtt; charset=utf-8',
-                'Cache-Control': access.isPublic ? 'public, max-age=3600' : 'private, no-store',
+                'Cache-Control': access.isPublic ? 'public, no-cache' : 'private, no-store',
             },
         })
     } catch (error) {

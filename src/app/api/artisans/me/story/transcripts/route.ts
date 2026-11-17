@@ -4,7 +4,7 @@ import { requireAuth, requireActiveArtisan } from '@/lib/auth-guard'
 import { errorResponse } from '@/lib/validations/types'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 import { enqueueTranscription } from '@/lib/transcription'
-import type { TranscriptSegment } from '@/lib/vtt'
+import { validCues, type TranscriptSegment } from '@/lib/vtt'
 
 // All media ids on the current user's story that can carry captions (answer
 // recordings + workshop media), or null when there's no artisan/story.
@@ -47,8 +47,10 @@ async function transcriptsFor(mediaIds: string[]): Promise<{
     const segments: Record<string, TranscriptSegment[]> = {}
     for (const t of transcripts) {
         statuses[t.mediaId] = t.status
-        if (t.status === 'READY' && t.segments) {
-            segments[t.mediaId] = t.segments as unknown as TranscriptSegment[]
+        if (t.status === 'READY') {
+            const cues = validCues(t.segments)
+            if (cues.length) segments[t.mediaId] = cues
+            else delete statuses[t.mediaId]
         }
     }
     return { statuses, segments }

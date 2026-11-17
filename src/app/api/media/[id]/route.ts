@@ -92,7 +92,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         // or unpublishing that made it private in the first place.
         headers.set(
             'Cache-Control',
-            access.isPublic ? 'public, max-age=31536000' : 'private, no-store',
+            access.isPublic ? (access.revalidate ? 'public, no-cache' : 'public, max-age=31536000') : 'private, no-store',
         )
         headers.set('Accept-Ranges', 'bytes')
 
@@ -148,6 +148,12 @@ export async function DELETE(
         if (!isOwner && !isAdmin) {
             return errorResponse('Forbidden', 403)
         }
+
+        // Removing a file from a draft must not break the edition a visitor can still see.
+        const edition = await prisma.storyPublication.findFirst({
+            where: { OR: [{ mediaIds: { has: id } }, { filmMediaId: id }] }, select: { storyId: true },
+        })
+        if (edition) return errorResponse('Remove this file from the published story before deleting it.', 409)
 
         // If this media has captions, its extracted-audio asset has no
         // attachment and won't be cleaned up by the cascade — capture it now

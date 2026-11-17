@@ -202,8 +202,8 @@ describe('buildFilmPlan captions and duration', () => {
                 visuals: [img('A')],
             }),
         )
-        // First chapter voice starts after intro (3.0) + title card (2.6) = 5.6.
-        expect(plan.captionSegments[0].start).toBeCloseTo(5.6)
+        // No title card delays the first spoken word.
+        expect(plan.captionSegments[0].start).toBeCloseTo(0)
         // Cues are monotonic and never run past the film end.
         for (let i = 1; i < plan.captionSegments.length; i++) {
             expect(plan.captionSegments[i].start).toBeGreaterThanOrEqual(plan.captionSegments[i - 1].start)
@@ -212,7 +212,7 @@ describe('buildFilmPlan captions and duration', () => {
         expect(lastEnd).toBeLessThanOrEqual(plan.totalDurationSec)
     })
 
-    it('computes total duration as intro + per-chapter (title + voice) + outro', () => {
+    it('computes uninterrupted chapter starts and a short credit', () => {
         const plan = buildFilmPlan(
             inputs({
                 chapters: [
@@ -222,9 +222,24 @@ describe('buildFilmPlan captions and duration', () => {
                 visuals: [img('A')],
             }),
         )
-        // 3.0 + (2.6 + 12) + (2.6 + 6) + 4.0
-        expect(plan.totalDurationSec).toBeCloseTo(30.2)
+        expect(plan.chapters.map(c => c.startSec)).toEqual([0, 12])
+        expect(plan.totalDurationSec).toBeCloseTo(20.5)
     })
+})
+
+it('uses the selected scene visual throughout that chapter and times only maker-supplied caption lines', () => {
+    const source = inputs({ chapters: [
+        chapter({ key: 'Self', voiceMediaId: 'one', voiceKind: 'audio', voiceDurationSec: 12, visualId: 'B',
+            captionText: 'I print ferns.\nBlue lasts.' }),
+        chapter({ key: 'Craft', voiceMediaId: 'two', voiceKind: 'audio', voiceDurationSec: 6, visualId: 'detached' }),
+    ], visuals: [img('A'), img('B')] })
+    const plan = buildFilmPlan(source)
+    expect(plan.chapters[0].shots.every(s => s.source.mediaId === 'B')).toBe(true)
+    expect(plan.chapters[1].shots.every(s => ['A','B'].includes(s.source.mediaId))).toBe(true)
+    expect(plan.captionSegments.map(c => c.text)).toEqual(['I print ferns.', 'Blue lasts.'])
+    expect(plan.captionSegments.at(-1)?.end).toBe(12)
+    const changed = { ...source, chapters: source.chapters.map(c => ({ ...c, visualId: 'A' })) }
+    expect(computeInputsHash(changed)).not.toBe(computeInputsHash(source))
 })
 
 describe('computeInputsHash', () => {
