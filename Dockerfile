@@ -1,9 +1,11 @@
 FROM node:24-slim AS base
+ARG PNPM_VERSION=12.21.0
 ENV PNPM_HOME=/pnpm
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN corepack prepare pnpm@11.5.2 --activate
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/* 
+RUN corepack prepare "pnpm@${PNPM_VERSION}" --activate
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 FROM base AS deps
 WORKDIR /app
@@ -36,7 +38,10 @@ ENV FFMPEG_PATH=/usr/bin/ffmpeg
 # Install system dependencies (openssl for credentials generation, curl & jq for
 # healthchecks, ffmpeg for the My Story caption + film pipelines, fonts-noto-core
 # for the film's title/name cards incl. Arabic & Devanagari) and prisma CLI
-RUN apt-get update && apt-get install -y openssl curl jq ffmpeg fonts-noto-core && rm -rf /var/lib/apt/lists/* && npm install -g npm@latest prisma@7.10.1
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openssl curl jq ffmpeg fonts-noto-core \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install -g npm@12.2.3 prisma@7.10.1
 
 # Application files
 COPY --from=builder /app/public ./public

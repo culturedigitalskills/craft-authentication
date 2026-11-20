@@ -45,6 +45,7 @@ services:
 
     postgres:
         image: postgres:16-alpine
+        pull_policy: always
         restart: unless-stopped
         env_file:
             - .env.production
@@ -62,7 +63,8 @@ services:
             start_period: 120s
 
     garage:
-        image: dxflrs/garage:v2.1.0
+        image: dxflrs/garage:v2.5.0
+        pull_policy: always
         restart: unless-stopped
         env_file:
             - .env.production
