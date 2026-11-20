@@ -1,17 +1,25 @@
 allowBuilds:
-    '@contentauth/c2pa-node': true
-    '@openrouter/sdk': true
-    '@parcel/watcher': true
-    '@prisma/engines': true
-    '@swc/core': true
-    ffmpeg-static: true
-    esbuild: true
-    prisma: true
-    sharp: true
-    unrs-resolver: true
+  '@contentauth/c2pa-node': true
+  '@openrouter/sdk': true
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  '@swc/core': true
+  ffmpeg-static: true
+  esbuild: true
+  prisma: true
+  sharp: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@atproto/api@0.32.3'
+  - '@atproto/common-web@0.5.18'
+  - '@atproto/lex-data@0.1.11'
+  - '@atproto/lex-json@0.1.10'
+  - '@atproto/lexicon@0.7.20'
+  - '@atproto/syntax@0.7.8'
+  - '@atproto/xrpc@0.8.19'
 onlyBuiltDependencies:
-    - '@prisma/engines'
-    - prisma
+  - '@prisma/engines'
+  - prisma
 
 overrides:
-    kysely: '0.28.0'
+  kysely: '0.29.9'
