@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
@@ -18,6 +19,8 @@ export function GalleryLightbox({
     onClose,
     onNavigate,
 }: GalleryLightboxProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const hasPrev = currentIndex > 0
     const hasNext = currentIndex < images.length - 1
     const dialogRef = useRef<HTMLDivElement>(null)
@@ -65,8 +68,8 @@ export function GalleryLightbox({
             <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close gallery"
-                className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+                aria-label={tui('closeGallery')}
+                className="absolute end-4 top-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
             >
                 <X className="h-6 w-6" />
             </button>
@@ -78,8 +81,8 @@ export function GalleryLightbox({
                     onNavigate(currentIndex - 1)
                 }}
                 disabled={!hasPrev}
-                aria-label="Previous image"
-                className={`absolute left-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 ${
+                aria-label={tui('previousImage')}
+                className={`absolute start-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 ${
                     !hasPrev ? 'invisible' : ''
                 }`}
             >
@@ -114,7 +117,13 @@ export function GalleryLightbox({
                     if (kind === 'audio') {
                         return (
                             <div className="w-[80vw] max-w-md rounded-2xl bg-white/5 p-8">
-                                <audio key={item.mediaId} src={item.url} controls autoPlay className="w-full" />
+                                <audio
+                                    key={item.mediaId}
+                                    src={item.url}
+                                    controls
+                                    autoPlay
+                                    className="w-full"
+                                />
                             </div>
                         )
                     }
@@ -138,8 +147,8 @@ export function GalleryLightbox({
                     onNavigate(currentIndex + 1)
                 }}
                 disabled={!hasNext}
-                aria-label="Next image"
-                className={`absolute right-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 ${
+                aria-label={tui('nextImage')}
+                className={`absolute end-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 ${
                     !hasNext ? 'invisible' : ''
                 }`}
             >

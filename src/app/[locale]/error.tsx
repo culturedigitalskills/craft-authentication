@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useEffect } from 'react'
 import { AlertTriangle } from 'lucide-react'
@@ -10,6 +11,8 @@ export default function ErrorPage({
     error: Error & { digest?: string }
     reset: () => void
 }) {
+    const tui = useInterfaceTranslations('interface')
+
     useEffect(() => {
         console.error('Unhandled error:', error)
     }, [error])
@@ -17,15 +20,15 @@ export default function ErrorPage({
     return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
             <AlertTriangle className="mb-4 h-12 w-12 text-destructive" />
-            <h2 className="mb-2 text-2xl font-bold">Something went wrong</h2>
+            <h2 className="mb-2 text-2xl font-bold">{tui('somethingWentWrong')}</h2>
             <p className="mb-6 max-w-md text-muted-foreground">
-                An unexpected error occurred. Please try again.
+                {tui('anUnexpectedErrorOccurredPleaseTryAgain')}
             </p>
             <button
                 onClick={reset}
                 className="rounded-md bg-warm px-6 py-2.5 text-sm font-medium text-warm-foreground transition-colors hover:bg-warm/90"
             >
-                Try again
+                {tui('tryAgain')}
             </button>
         </div>
     )

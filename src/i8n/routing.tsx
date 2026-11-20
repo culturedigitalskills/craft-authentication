@@ -1,14 +1,13 @@
-//https://next-intl.dev/docs/routing/setup
-import {defineRouting} from 'next-intl/routing';
-import { createNavigation } from 'next-intl/navigation';
+import { defineRouting } from 'next-intl/routing'
+import { locales } from './locales'
 
 export const routing = defineRouting({
-  // A list of all locales that are supported
-  locales:   ['en', 'hi','es', 'ar','de','tr','el'],
- 
-  // Used when no locale matches
-  defaultLocale: 'en',
-  localePrefix: 'never',
-}
-);
-
+    locales,
+    defaultLocale: 'en',
+    localePrefix: 'as-needed',
+    // A URL always identifies one language, regardless of cookies or headers.
+    localeDetection: false,
+    localeCookie: false,
+    // Only genuinely translated editorial pages publish alternates, in metadata.
+    alternateLinks: false,
+})

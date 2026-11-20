@@ -1,14 +1,33 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from 'react'
+import { Link } from '@/i8n/navigation'
+import { useRouter } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, ArrowLeft, ArrowRight, Check, Loader2, Mic, Pencil, Save, Sparkles, Video } from 'lucide-react'
+import {
+    AlertCircle,
+    ArrowLeft,
+    ArrowRight,
+    Check,
+    Loader2,
+    Mic,
+    Pencil,
+    Save,
+    Sparkles,
+    Video,
+} from 'lucide-react'
 import { StepDots } from '@/components/shared/StepDots'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
@@ -61,7 +80,9 @@ export function CraftStoryWizard({
     const [step, setStep] = useState(initialStory?.lastStepReached ?? 0)
     const [story, setStory] = useState<Partial<CraftStoryDraft>>(initialStory ?? {})
     const [storyId, setStoryId] = useState<string | null>(initialStory?.id ?? null)
-    const [knownUpdatedAt, setKnownUpdatedAt] = useState<string | null>(initialStory?.updatedAt ?? null)
+    const [knownUpdatedAt, setKnownUpdatedAt] = useState<string | null>(
+        initialStory?.updatedAt ?? null,
+    )
     const [saving, setSaving] = useState(false)
     const [publishing, setPublishing] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -78,7 +99,8 @@ export function CraftStoryWizard({
     const [workshopMedia, setWorkshopMedia] = useState<WorkshopMedia[]>(initialWorkshopMedia)
     // mediaId -> mimeType for answer media, seeded from the server and extended
     // as new recordings upload, so a revisited video answer still renders as video.
-    const [answerMimeTypes, setAnswerMimeTypes] = useState<Record<string, string>>(answerMediaMimeTypes)
+    const [answerMimeTypes, setAnswerMimeTypes] =
+        useState<Record<string, string>>(answerMediaMimeTypes)
 
     // Timed caption segments per media id, used by the film storyboard to snap
     // its preview cuts to the same speech beats the renderer will use.
@@ -87,7 +109,7 @@ export function CraftStoryWizard({
     // Spoken answers drive the film's chapters and its length. Text-only answers
     // contribute nothing to the timeline, so they are left out.
     const storyboardAnswers: StoryboardAnswer[] = useMemo(() => {
-        return ANSWER_KEYS.flatMap(key => {
+        return ANSWER_KEYS.flatMap((key) => {
             const mediaId = story[`answer${key}MediaId` as const] as string | null | undefined
             if (!mediaId) return []
             const kind = mediaKind(answerMimeTypes[mediaId])
@@ -127,7 +149,7 @@ export function CraftStoryWizard({
 
     // Poll while any caption job is still running so chips flip to ready/failed.
     const hasActiveCaptionJobs = Object.values(captionStatuses).some(
-        s => s === 'PENDING' || s === 'PROCESSING'
+        (s) => s === 'PENDING' || s === 'PROCESSING',
     )
     useEffect(() => {
         if (!hasActiveCaptionJobs) return
@@ -136,12 +158,12 @@ export function CraftStoryWizard({
     }, [hasActiveCaptionJobs, refreshCaptionStatuses])
 
     function setAnswerText(key: AnswerKey, value: string) {
-        setStory(s => ({ ...s, [`answer${key}Text`]: value }))
+        setStory((s) => ({ ...s, [`answer${key}Text`]: value }))
     }
     function setAnswerMedia(key: AnswerKey, mediaId: string | null, mimeType?: string | null) {
-        setStory(s => ({ ...s, [`answer${key}MediaId`]: mediaId }))
+        setStory((s) => ({ ...s, [`answer${key}MediaId`]: mediaId }))
         if (mediaId && mimeType) {
-            setAnswerMimeTypes(m => ({ ...m, [mediaId]: mimeType }))
+            setAnswerMimeTypes((m) => ({ ...m, [mediaId]: mimeType }))
         }
     }
 
@@ -192,7 +214,7 @@ export function CraftStoryWizard({
                 setKnownUpdatedAt(data.story.updatedAt)
                 knownUpdatedAtRef.current = data.story.updatedAt
             }
-            setStory(s => ({ ...s, ...data.story }))
+            setStory((s) => ({ ...s, ...data.story }))
             // Saving enqueues caption jobs for new videos — pick up their status.
             void refreshCaptionStatuses()
             return true
@@ -222,7 +244,7 @@ export function CraftStoryWizard({
     }
 
     function handleBack() {
-        setStep(s => Math.max(0, s - 1))
+        setStep((s) => Math.max(0, s - 1))
     }
 
     // Save the current step's edits and return straight to the review screen.
@@ -255,7 +277,11 @@ export function CraftStoryWizard({
             })
             if (!res.ok) {
                 let body: { error?: string; message?: string } | null = null
-                try { body = await res.json() } catch { /* ignore */ }
+                try {
+                    body = await res.json()
+                } catch {
+                    /* ignore */
+                }
                 if (body?.error === 'EMPTY_STORY') {
                     setError(t('errors.emptyStory'))
                 } else if (body?.error === 'FILM_REQUIRED') {
@@ -297,10 +323,10 @@ export function CraftStoryWizard({
                             <ArrowLeft className="h-5 w-5" />
                         </Link>
                         <div>
-                            <h1 className="text-left text-2xl font-bold tracking-tight text-primary-foreground">
+                            <h1 className="text-start text-2xl font-bold tracking-tight text-primary-foreground">
                                 {t('wizardTitle')}
                             </h1>
-                            <p className="text-left text-sm text-primary-foreground/70">
+                            <p className="text-start text-sm text-primary-foreground/70">
                                 {t('wizardHelper')}
                             </p>
                         </div>
@@ -313,7 +339,10 @@ export function CraftStoryWizard({
                         {t('stepLabel', { current: step + 1, total: TOTAL_STEPS })}
                     </p>
 
-                    <div key={step} className="animate-in fade-in-50 slide-in-from-right-4 duration-300">
+                    <div
+                        key={step}
+                        className="animate-in fade-in-50 slide-in-from-right-4 duration-300"
+                    >
                         {step === 0 && (
                             <IntroStep
                                 // The film needs a story to belong to, and at
@@ -334,12 +363,21 @@ export function CraftStoryWizard({
                             <QuestionStep
                                 index={step}
                                 answerKey={currentKey}
-                                text={(story[`answer${currentKey}Text` as const] as string | null | undefined) ?? ''}
+                                text={
+                                    (story[`answer${currentKey}Text` as const] as
+                                        string | null | undefined) ?? ''
+                                }
                                 mediaId={currentMediaId}
-                                onTextChange={v => setAnswerText(currentKey, v)}
+                                onTextChange={(v) => setAnswerText(currentKey, v)}
                                 onMediaChange={(id, mime) => setAnswerMedia(currentKey, id, mime)}
-                                captionStatus={currentMediaId ? captionStatuses[currentMediaId] : undefined}
-                                initialMimeType={currentMediaId ? (answerMimeTypes[currentMediaId] ?? null) : null}
+                                captionStatus={
+                                    currentMediaId ? captionStatuses[currentMediaId] : undefined
+                                }
+                                initialMimeType={
+                                    currentMediaId
+                                        ? (answerMimeTypes[currentMediaId] ?? null)
+                                        : null
+                                }
                             />
                         )}
 
@@ -360,15 +398,21 @@ export function CraftStoryWizard({
                                 story={story}
                                 workshopCount={workshopMedia.length}
                                 captionStatuses={captionStatuses}
-                                onEditStep={target => { setError(null); setReturnToReview(true); setStep(target) }}
+                                onEditStep={(target) => {
+                                    setError(null)
+                                    setReturnToReview(true)
+                                    setStep(target)
+                                }}
                                 summaryText={(story.summaryText as string | null | undefined) ?? ''}
-                                onSummaryChange={value => {
+                                onSummaryChange={(value) => {
                                     // Update the save ref synchronously so an immediate
                                     // persist (e.g. after applying an AI draft) sees it.
                                     storyRef.current = { ...storyRef.current, summaryText: value }
-                                    setStory(s => ({ ...s, summaryText: value }))
+                                    setStory((s) => ({ ...s, summaryText: value }))
                                 }}
-                                onPersistSummary={() => { void save(step) }}
+                                onPersistSummary={() => {
+                                    void save(step)
+                                }}
                                 onRetryCaptions={retryCaptions}
                                 consented={consented}
                                 onConsentChange={setConsented}
@@ -391,7 +435,7 @@ export function CraftStoryWizard({
                             disabled={step === 0 || publishing}
                             className="w-full sm:w-auto"
                         >
-                            <ArrowLeft className="mr-1.5 h-4 w-4" />
+                            <ArrowLeft className="me-1.5 h-4 w-4" />
                             {t('back')}
                         </Button>
 
@@ -404,36 +448,51 @@ export function CraftStoryWizard({
                                     disabled={publishing}
                                     className="w-full sm:w-auto"
                                 >
-                                    <Save className="mr-1.5 h-4 w-4" />
+                                    <Save className="me-1.5 h-4 w-4" />
                                     {t('saveExit')}
                                 </Button>
                             )}
                             {saving && !publishing && (
-                                <span className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground sm:mr-2">
+                                <span className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground sm:me-2">
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                                     {t('saving')}
                                 </span>
                             )}
                             {returnToReview && step > 0 && step < TOTAL_STEPS - 1 ? (
-                                <Button type="button" onClick={handleReturnToReview} disabled={publishing} className="w-full sm:w-auto">
-                                    <Check className="mr-1.5 h-4 w-4" />
+                                <Button
+                                    type="button"
+                                    onClick={handleReturnToReview}
+                                    disabled={publishing}
+                                    className="w-full sm:w-auto"
+                                >
+                                    <Check className="me-1.5 h-4 w-4" />
                                     {t('backToReview')}
                                 </Button>
                             ) : step < TOTAL_STEPS - 1 ? (
-                                <Button type="button" onClick={handleNext} disabled={publishing} className="w-full sm:w-auto">
+                                <Button
+                                    type="button"
+                                    onClick={handleNext}
+                                    disabled={publishing}
+                                    className="w-full sm:w-auto"
+                                >
                                     {step === 0 ? t('begin') : t('next')}
-                                    <ArrowRight className="ml-1.5 h-4 w-4" />
+                                    <ArrowRight className="ms-1.5 h-4 w-4" />
                                 </Button>
                             ) : (
-                                <Button type="button" onClick={handlePublish} disabled={saving || publishing || !consented} className="w-full sm:w-auto">
+                                <Button
+                                    type="button"
+                                    onClick={handlePublish}
+                                    disabled={saving || publishing || !consented}
+                                    className="w-full sm:w-auto"
+                                >
                                     {publishing ? (
                                         <>
-                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                            <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                                             {t('publishing')}
                                         </>
                                     ) : (
                                         <>
-                                            <Check className="mr-1.5 h-4 w-4" />
+                                            <Check className="me-1.5 h-4 w-4" />
                                             {t('publish')}
                                         </>
                                     )}
@@ -462,7 +521,7 @@ function IntroStep({
             <p className="mb-4 text-base text-muted-foreground">{t('lead')}</p>
             <div className="mb-4 rounded-lg bg-muted/50 p-4">
                 <p className="mb-2 text-sm font-medium">{t('formatsTitle')}</p>
-                <ul className="ml-5 list-disc space-y-1 text-sm text-muted-foreground">
+                <ul className="ms-5 list-disc space-y-1 text-sm text-muted-foreground">
                     <li>{t('formatText')}</li>
                     <li>{t('formatAudio')}</li>
                     <li>{t('formatVideo')}</li>
@@ -521,7 +580,9 @@ function QuestionStep({
                     <div className="mb-1 flex items-center gap-2">
                         <Mic className="h-4 w-4 text-warm" />
                         <Video className="h-4 w-4 text-warm" />
-                        <span className="text-sm font-semibold text-warm">{t('answerRecordTitle')}</span>
+                        <span className="text-sm font-semibold text-warm">
+                            {t('answerRecordTitle')}
+                        </span>
                     </div>
                     <p className="mb-3 text-xs text-muted-foreground">{t('answerRecordHint')}</p>
                     <AnswerMediaUpload
@@ -548,14 +609,17 @@ function QuestionStep({
 
                 {/* Secondary: a written answer, not used in the film. */}
                 <div>
-                    <Label htmlFor={`answer-${answerKey}`} className="mb-1 block text-sm font-medium">
+                    <Label
+                        htmlFor={`answer-${answerKey}`}
+                        className="mb-1 block text-sm font-medium"
+                    >
                         {t('writeYourAnswer')}
                     </Label>
                     <p className="mb-1.5 text-xs text-muted-foreground">{t('answerWriteHint')}</p>
                     <Textarea
                         id={`answer-${answerKey}`}
                         value={text}
-                        onChange={e => onTextChange(e.target.value)}
+                        onChange={(e) => onTextChange(e.target.value)}
                         placeholder={t('answerPlaceholder')}
                         rows={5}
                     />
@@ -665,15 +729,19 @@ function ReviewStep({
 }) {
     const t = useTranslations('craftStory')
     const statusValues = Object.values(captionStatuses)
-    const captionsProcessing = statusValues.some(s => s === 'PENDING' || s === 'PROCESSING')
-    const captionsFailed = statusValues.some(s => s === 'FAILED')
+    const captionsProcessing = statusValues.some((s) => s === 'PENDING' || s === 'PROCESSING')
+    const captionsFailed = statusValues.some((s) => s === 'FAILED')
     const rows = ANSWER_KEYS.map((key, i) => {
         const text = story[`answer${key}Text` as const] as string | null | undefined
         const media = story[`answer${key}MediaId` as const] as string | null | undefined
         const summary = [
-            text?.trim() ? `${(text as string).slice(0, 80)}${(text as string).length > 80 ? '…' : ''}` : null,
+            text?.trim()
+                ? `${(text as string).slice(0, 80)}${(text as string).length > 80 ? '…' : ''}`
+                : null,
             media ? t('review.hasRecording') : null,
-        ].filter(Boolean).join(' · ')
+        ]
+            .filter(Boolean)
+            .join(' · ')
         return {
             // Questions occupy steps 1-6, in the same order as ANSWER_KEYS.
             step: i + 1,
@@ -685,19 +753,29 @@ function ReviewStep({
     // Workshop media is its own step (7); add it as a final editable row.
     const allRows = [
         ...rows,
-        { step: 7, label: t('step7.title'), value: t('review.workshopCount', { count: workshopCount }) },
+        {
+            step: 7,
+            label: t('step7.title'),
+            value: t('review.workshopCount', { count: workshopCount }),
+        },
     ]
 
     return (
         <div>
-            <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('review.title')}</h1>
+            <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                {t('review.title')}
+            </h1>
             <p className="mb-6 text-base text-muted-foreground">{t('review.lead')}</p>
 
             {/* The film is the headline of the story — offer it first. */}
             <StoryFilmPanel storyPublished={story.status === 'PUBLISHED'} />
 
             <div className="mt-6">
-                <SummaryEditor value={summaryText} onChange={onSummaryChange} onPersist={onPersistSummary} />
+                <SummaryEditor
+                    value={summaryText}
+                    onChange={onSummaryChange}
+                    onPersist={onPersistSummary}
+                />
             </div>
 
             <div className="mt-8 divide-y divide-border overflow-hidden rounded-lg border border-border">
@@ -707,13 +785,15 @@ function ReviewStep({
                         type="button"
                         onClick={() => onEditStep(step)}
                         aria-label={t('review.editStep', { section: label })}
-                        className="group flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none sm:flex-row sm:items-start sm:justify-between"
+                        className="group flex w-full flex-col gap-1 px-4 py-3 text-start transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none sm:flex-row sm:items-start sm:justify-between"
                     >
                         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-1/3">
                             {label}
                         </span>
                         <span className="flex items-start gap-2 sm:w-2/3">
-                            <span className={`text-sm ${value ? 'font-medium' : 'italic text-muted-foreground'}`}>
+                            <span
+                                className={`text-sm ${value ? 'font-medium' : 'italic text-muted-foreground'}`}
+                            >
                                 {value ?? t('review.notAnswered')}
                             </span>
                             <Pencil className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
@@ -749,7 +829,7 @@ function ReviewStep({
                     <input
                         type="checkbox"
                         checked={consented}
-                        onChange={e => onConsentChange(e.target.checked)}
+                        onChange={(e) => onConsentChange(e.target.checked)}
                         className="mt-1 h-4 w-4 shrink-0 accent-[color:var(--sc-accent)]"
                     />
                     <span className="leading-snug text-muted-foreground">{t('consent.body')}</span>
@@ -800,15 +880,21 @@ function SummaryEditor({
                 <Label htmlFor="story-summary" className="text-sm font-medium">
                     {t('label')}
                 </Label>
-                <Button type="button" size="sm" variant="outline" onClick={() => void suggest()} disabled={drafting}>
+                <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void suggest()}
+                    disabled={drafting}
+                >
                     {drafting ? (
                         <>
-                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                            <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                             {t('suggesting')}
                         </>
                     ) : (
                         <>
-                            <Sparkles className="mr-1.5 h-4 w-4" />
+                            <Sparkles className="me-1.5 h-4 w-4" />
                             {t('suggest')}
                         </>
                     )}
@@ -817,7 +903,7 @@ function SummaryEditor({
             <Textarea
                 id="story-summary"
                 value={value}
-                onChange={e => onChange(e.target.value)}
+                onChange={(e) => onChange(e.target.value)}
                 onBlur={onPersist}
                 placeholder={t('hint')}
                 rows={4}

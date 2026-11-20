@@ -4,6 +4,8 @@ import createNextIntlPlugin from 'next-intl/plugin'
 const withNextIntl = createNextIntlPlugin('./src/i8n/requests.tsx')
 const nextConfig: NextConfig = {
     output: 'standalone',
+    // Browser tests run beside the normal dev server with their own build cache.
+    distDir: process.env.LANGUAGE_E2E === '1' ? '.next-e2e' : '.next',
     allowedDevOrigins: ['192.168.0.43'],
     experimental: {
         serverActions: {

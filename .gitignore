@@ -50,3 +50,7 @@ garage.toml
 
 # transient files
 build-info.json
+
+# Isolated browser-test output
+/.next-e2e/
+/.local-dev/

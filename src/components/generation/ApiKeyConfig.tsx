@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useState, useEffect } from 'react'
 import { Key, Loader2, Edit2, Info, AlertCircle, CheckCircle } from 'lucide-react'
@@ -17,6 +18,8 @@ interface ApiKeyConfigProps {
 }
 
 export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('imageWorkspace')
     const [keyPopoverOpen, setKeyPopoverOpen] = useState(false)
     const [apiKeyInput, setApiKeyInput] = useState('')
@@ -35,7 +38,7 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
     // Handle storing the API key
     const handleStoreKey = async () => {
         if (!apiKeyInput.trim()) {
-            setKeyError('API Key cannot be empty')
+            setKeyError(tui('apiKeyCannotBeEmpty'))
             return
         }
         setIsStoringKey(true)
@@ -46,7 +49,7 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
             setApiKeyInput('')
             setKeyPopoverOpen(false)
         } catch (err: any) {
-            setKeyError(err.message || 'Failed to save key')
+            setKeyError(tui('failedToSaveKey'))
         } finally {
             setIsStoringKey(false)
         }
@@ -82,10 +85,10 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
             <div className="flex flex-col gap-1 border-b border-border/60 pb-4">
                 <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
                     <Key className="h-5 w-5 text-primary" />
-                    API Credentials
+                    {tui('apiCredentials')}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                    Set up your OpenRouter.ai credentials
+                    {tui('setUpYourOpenrouterAiCredentials')}
                 </p>
             </div>
             <div className="space-y-4">
@@ -102,17 +105,20 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
                                 disabled
                                 className="bg-muted/50 border-muted"
                             />
-                            <span className="absolute right-3 top-2.5 text-xs text-green-600 font-semibold flex items-center gap-1">
-                                <CheckCircle className="w-3.5 h-3.5" /> Active
+                            <span className="absolute end-3 top-2.5 text-xs text-green-600 font-semibold flex items-center gap-1">
+                                <CheckCircle className="w-3.5 h-3.5" /> {tui('active')}
                             </span>
                         </div>
-                        <Popover open={keyPopoverOpen} onOpenChange={(open) => {
-                            setKeyPopoverOpen(open)
-                            if (!open) {
-                                setApiKeyInput('')
-                                setKeyError(null)
-                            }
-                        }}>
+                        <Popover
+                            open={keyPopoverOpen}
+                            onOpenChange={(open) => {
+                                setKeyPopoverOpen(open)
+                                if (!open) {
+                                    setApiKeyInput('')
+                                    setKeyError(null)
+                                }
+                            }}
+                        >
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
@@ -123,10 +129,15 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
                                     <Edit2 className="w-4 h-4 text-primary" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-72 p-4 space-y-4 shadow-xl border-border bg-background" align="end" side="bottom" sideOffset={8}>
+                            <PopoverContent
+                                className="w-72 p-4 space-y-4 shadow-xl border-border bg-background"
+                                align="end"
+                                side="bottom"
+                                sideOffset={8}
+                            >
                                 <div className="space-y-2">
                                     <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                                        <Info className="w-4 h-4 text-primary" /> Setup Key
+                                        <Info className="w-4 h-4 text-primary" /> {tui('setupKey')}
                                     </h4>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
                                         {t('apiKeyInfo')}
@@ -172,8 +183,8 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
                                         >
                                             {isStoringKey ? (
                                                 <>
-                                                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                                                    Saving...
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin me-1.5" />
+                                                    {tui('saving')}
                                                 </>
                                             ) : (
                                                 t('store')
@@ -188,28 +199,32 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
                     <div className="flex flex-col gap-4">
                         <div className="p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm flex items-start gap-2.5">
                             <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-                            <div className="leading-snug">
-                                {t('noKeyWarning')}
-                            </div>
+                            <div className="leading-snug">{t('noKeyWarning')}</div>
                         </div>
-                        <Popover open={keyPopoverOpen} onOpenChange={(open) => {
-                            setKeyPopoverOpen(open)
-                            if (!open) {
-                                setApiKeyInput('')
-                                setKeyError(null)
-                            }
-                        }}>
+                        <Popover
+                            open={keyPopoverOpen}
+                            onOpenChange={(open) => {
+                                setKeyPopoverOpen(open)
+                                if (!open) {
+                                    setApiKeyInput('')
+                                    setKeyError(null)
+                                }
+                            }}
+                        >
                             <PopoverTrigger asChild>
-                                <Button
-                                    className="w-full flex items-center gap-2 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/95 hover:to-violet-600/95"
-                                >
+                                <Button className="w-full flex items-center gap-2 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/95 hover:to-violet-600/95">
                                     <Key className="w-4 h-4" /> {t('addKey')}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-72 p-4 space-y-4 shadow-xl border-border bg-background" align="center" side="bottom" sideOffset={8}>
+                            <PopoverContent
+                                className="w-72 p-4 space-y-4 shadow-xl border-border bg-background"
+                                align="center"
+                                side="bottom"
+                                sideOffset={8}
+                            >
                                 <div className="space-y-2">
                                     <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                                        <Info className="w-4 h-4 text-primary" /> Setup Key
+                                        <Info className="w-4 h-4 text-primary" /> {tui('setupKey')}
                                     </h4>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
                                         {t('apiKeyInfo')}
@@ -255,8 +270,8 @@ export function ApiKeyConfig({ userId, hasKey, setHasKey }: ApiKeyConfigProps) {
                                         >
                                             {isStoringKey ? (
                                                 <>
-                                                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                                                    Saving...
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin me-1.5" />
+                                                    {tui('saving')}
                                                 </>
                                             ) : (
                                                 t('store')

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { getTranslations } from 'next-intl/server'
 import { ArrowLeft } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
@@ -52,9 +52,7 @@ export default async function AdminArtisanMediaPage({ params }: PageProps) {
 
             <PageHeader
                 title={t('mediaFor', { name })}
-                description={
-                    artisan.deletedAt ? t('mediaRemovedHint') : t('mediaHint')
-                }
+                description={artisan.deletedAt ? t('mediaRemovedHint') : t('mediaHint')}
             />
 
             <MediaGalleryManager

@@ -4,7 +4,17 @@ import { useState, useRef } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
 import { Button } from '@/components/ui/button'
-import { BadgeCheck, ShieldAlert, ShieldOff, Upload, ClipboardPaste, Loader2, Calendar, User, Hash } from 'lucide-react'
+import {
+    BadgeCheck,
+    ShieldAlert,
+    ShieldOff,
+    Upload,
+    ClipboardPaste,
+    Loader2,
+    Calendar,
+    User,
+    Hash,
+} from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface VerifyResult {
@@ -94,9 +104,7 @@ export default function VerifyPage() {
             <div className="mx-auto max-w-2xl space-y-8 py-8">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-                    <p className="mt-2 text-muted-foreground">
-                        {t('description')}
-                    </p>
+                    <p className="mt-2 text-muted-foreground">{t('description')}</p>
                 </div>
 
                 <Card>
@@ -104,7 +112,7 @@ export default function VerifyPage() {
                         <CardTitle className="text-base">{t('jsonTitle')}</CardTitle>
                         <CardDescription>
                             {t.rich('jsonDescription', {
-                                code: chunks => <code className="text-xs">{chunks}</code>,
+                                code: (chunks) => <code className="text-xs">{chunks}</code>,
                             })}
                         </CardDescription>
                     </CardHeader>
@@ -112,7 +120,9 @@ export default function VerifyPage() {
                         <textarea
                             className="w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-xs leading-relaxed placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                             rows={10}
-                            placeholder={'{\n  "@context": [...],\n  "type": ["VerifiableCredential", "CraftCredential"],\n  ...\n}'}
+                            placeholder={
+                                '{\n  "@context": [...],\n  "type": ["VerifiableCredential", "CraftCredential"],\n  ...\n}'
+                            }
                             value={input}
                             onChange={(e) => {
                                 setInput(e.target.value)
@@ -121,16 +131,23 @@ export default function VerifyPage() {
                             }}
                         />
 
-                        {parseError && (
-                            <p className="text-xs text-red-600">{parseError}</p>
-                        )}
+                        {parseError && <p className="text-xs text-red-600">{parseError}</p>}
 
                         <div className="flex flex-wrap gap-2">
-                            <Button onClick={handleVerify} disabled={!input.trim() || loading} className="flex-1 sm:flex-none">
+                            <Button
+                                onClick={handleVerify}
+                                disabled={!input.trim() || loading}
+                                className="flex-1 sm:flex-none"
+                            >
                                 {loading ? (
-                                    <><Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> {t('verifying')}</>
+                                    <>
+                                        <Loader2 className="me-1.5 h-4 w-4 animate-spin" />{' '}
+                                        {t('verifying')}
+                                    </>
                                 ) : (
-                                    <><ClipboardPaste className="mr-1.5 h-4 w-4" /> {t('verify')}</>
+                                    <>
+                                        <ClipboardPaste className="me-1.5 h-4 w-4" /> {t('verify')}
+                                    </>
                                 )}
                             </Button>
 
@@ -139,7 +156,7 @@ export default function VerifyPage() {
                                 onClick={() => fileInputRef.current?.click()}
                                 className="flex-1 sm:flex-none"
                             >
-                                <Upload className="mr-1.5 h-4 w-4" />
+                                <Upload className="me-1.5 h-4 w-4" />
                                 {t('uploadFile')}
                             </Button>
                             <input
@@ -181,21 +198,33 @@ export default function VerifyPage() {
                                 <dl className="space-y-3 text-sm">
                                     {!!result.credential.credentialSubject?.title && (
                                         <div>
-                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t('product')}</dt>
-                                            <dd className="mt-0.5 font-medium">{String(result.credential.credentialSubject.title)}</dd>
+                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                                {t('product')}
+                                            </dt>
+                                            <dd className="mt-0.5 font-medium">
+                                                {String(result.credential.credentialSubject.title)}
+                                            </dd>
                                         </div>
                                     )}
                                     {!!result.credential.credentialSubject?.description && (
                                         <div>
-                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t('descriptionLabel')}</dt>
-                                            <dd className="mt-0.5 text-foreground/80">{String(result.credential.credentialSubject.description)}</dd>
+                                            <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                                {t('descriptionLabel')}
+                                            </dt>
+                                            <dd className="mt-0.5 text-foreground/80">
+                                                {String(
+                                                    result.credential.credentialSubject.description,
+                                                )}
+                                            </dd>
                                         </div>
                                     )}
                                     <div className="flex flex-wrap gap-x-8 gap-y-3 border-t border-border pt-3">
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             <Calendar className="h-3.5 w-3.5" />
                                             {t('issued', {
-                                                date: new Date(result.credential.validFrom).toLocaleDateString(locale, {
+                                                date: new Date(
+                                                    result.credential.validFrom,
+                                                ).toLocaleDateString(locale, {
                                                     day: 'numeric',
                                                     month: 'long',
                                                     year: 'numeric',
@@ -204,12 +233,15 @@ export default function VerifyPage() {
                                         </div>
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             <User className="h-3.5 w-3.5" />
-                                            {result.credential.issuer.name ?? result.credential.issuer.id}
+                                            {result.credential.issuer.name ??
+                                                result.credential.issuer.id}
                                         </div>
                                         {result.credential.id && (
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 <Hash className="h-3.5 w-3.5" />
-                                                <span className="font-mono">{formatShortId(result.credential.id)}</span>
+                                                <span className="font-mono">
+                                                    {formatShortId(result.credential.id)}
+                                                </span>
                                             </div>
                                         )}
                                     </div>

@@ -1,4 +1,5 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import { useState, useEffect, useCallback } from 'react'
 import { ShieldCheck, RefreshCw, AlertTriangle } from 'lucide-react'
@@ -16,6 +17,8 @@ interface ContentCredentialsClientProps {
 }
 
 export function ContentCredentialsClient({ userId }: ContentCredentialsClientProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const [status, setStatus] = useState<C2PAStatus | null>(null)
     const [loading, setLoading] = useState(true)
     const [setupModalOpen, setSetupModalOpen] = useState(false)
@@ -35,7 +38,7 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
                 setCommonName(data.defaultCN)
             }
         } catch (err: any) {
-            setError(err.message || 'Failed to load C2PA configuration status.')
+            setError(tui('failedToLoadC2paConfigurationStatus'))
         } finally {
             setLoading(false)
         }
@@ -58,7 +61,7 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
             if (!res.ok) throw new Error('Failed to update preference')
             setStatus((prev) => (prev ? { ...prev, c2paAutoRenew: enabled } : null))
         } catch (err: any) {
-            setError(err.message || 'Failed to update auto-renewal setting.')
+            setError(tui('failedToUpdateAutoRenewalSetting'))
         } finally {
             setAutoRenewLoading(false)
         }
@@ -66,7 +69,7 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
 
     const handleConfigureC2PA = async () => {
         if (!commonName.trim()) {
-            setError('Please enter a valid Common Name.')
+            setError(tui('pleaseEnterAValidCommonName'))
             return
         }
         setActionLoading(true)
@@ -78,10 +81,10 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
                 body: JSON.stringify({ commonName: commonName.trim() }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to configure C2PA credentials')
+            if (!res.ok) throw new Error(data.error || tui('failedToConfigureC2paCredentials'))
             await fetchStatus()
         } catch (err: any) {
-            setError(err.message || 'C2PA configuration failed.')
+            setError(tui('c2paConfigurationFailed'))
         } finally {
             setActionLoading(false)
         }
@@ -92,7 +95,7 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
             <div className="flex flex-col items-center justify-center min-h-[400px]">
                 <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
                 <p className="text-muted-foreground animate-pulse">
-                    Loading Content Credentials status...
+                    {tui('loadingContentCredentialsStatus')}
                 </p>
             </div>
         )
@@ -103,15 +106,13 @@ export function ContentCredentialsClient({ userId }: ContentCredentialsClientPro
             <div className="max-w-3xl space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
                     <ShieldCheck className="h-3.5 w-3.5" />
-                    C2PA Industry Standard
+                    {tui('c2paIndustryStandard')}
                 </div>
                 <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-foreground">
-                    Content Credentials
+                    {tui('contentCredentials')}
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                    Protect your work and prove you made it. Every image you upload gets a
-                    tamper-proof stamp of authorship, so anyone can see who created it, when, and
-                    what changes were made along the way.
+                    {tui('protectYourWorkAndProveYouMadeItEvery')}
                 </p>
             </div>
 

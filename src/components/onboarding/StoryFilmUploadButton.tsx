@@ -72,7 +72,10 @@ export function StoryFilmUploadButton({
             }
 
             // Display only; the server bounds it and computes nothing from it.
-            const durationSec = await measureMediaDuration('video', `/api/media/${outcome.media.id}`)
+            const durationSec = await measureMediaDuration(
+                'video',
+                `/api/media/${outcome.media.id}`,
+            )
 
             const res = await fetch('/api/artisans/me/story/film', {
                 method: 'PUT',
@@ -118,9 +121,9 @@ export function StoryFilmUploadButton({
                 disabled={disabled || uploading}
             >
                 {uploading ? (
-                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                    <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                 ) : (
-                    <Upload className="mr-1.5 h-4 w-4" />
+                    <Upload className="me-1.5 h-4 w-4" />
                 )}
                 {uploading ? t('uploadProgress', { percent: progress }) : label}
             </Button>

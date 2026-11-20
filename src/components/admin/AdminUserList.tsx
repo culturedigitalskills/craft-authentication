@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useRouter } from '@/i8n/navigation'
+import { Link } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Loader2, ShieldCheck, ShieldMinus, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -128,11 +128,11 @@ export function AdminUserList({
                                         }
                                     >
                                         {busy === user.id ? (
-                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                            <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                                         ) : isAdmin ? (
-                                            <ShieldMinus className="mr-1.5 h-4 w-4" />
+                                            <ShieldMinus className="me-1.5 h-4 w-4" />
                                         ) : (
-                                            <ShieldCheck className="mr-1.5 h-4 w-4" />
+                                            <ShieldCheck className="me-1.5 h-4 w-4" />
                                         )}
                                         {isAdmin ? t('withdrawAdmin') : t('makeAdmin')}
                                     </Button>

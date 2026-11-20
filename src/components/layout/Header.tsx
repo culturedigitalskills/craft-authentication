@@ -1,9 +1,9 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { usePathname } from '@/i8n/navigation'
+import { useState, useEffect, useRef, useCallback, useId } from 'react'
 import { Menu, X } from 'lucide-react'
 import { NavbarAuth } from './NavbarAuth'
 import { LanguageSelect } from '@/components/shared/LanguageSelect'
@@ -12,6 +12,21 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
     const t = useTranslations()
     const pathname = usePathname()
     const [menuOpen, setMenuOpen] = useState(false)
+    const previousPathname = useRef(pathname)
+    const drawerRef = useRef<HTMLDivElement>(null)
+    const menuButtonRef = useRef<HTMLButtonElement>(null)
+    const drawerId = useId()
+
+    useEffect(() => {
+        if (!menuOpen) return
+        const frame = requestAnimationFrame(() =>
+            drawerRef.current?.querySelector<HTMLAnchorElement>('a[href]')?.focus(),
+        )
+        return () => {
+            cancelAnimationFrame(frame)
+            if (drawerRef.current?.contains(document.activeElement)) menuButtonRef.current?.focus()
+        }
+    }, [menuOpen])
 
     // Prevent body scroll when menu is open
     useEffect(() => {
@@ -20,12 +35,17 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
         } else {
             document.body.style.overflow = ''
         }
-        return () => { document.body.style.overflow = '' }
+        return () => {
+            document.body.style.overflow = ''
+        }
     }, [menuOpen])
 
     // Close mobile menu on route change
     useEffect(() => {
-        setMenuOpen(false)
+        if (previousPathname.current !== pathname) {
+            previousPathname.current = pathname
+            setMenuOpen(false)
+        }
     }, [pathname])
 
     const navLinks = [
@@ -42,7 +62,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
     function isActive(href: string) {
         if (href === '/') return pathname === '/' || pathname === ''
-        if (standaloneSubroutes.some(route => pathname.startsWith(route))) return false
+        if (standaloneSubroutes.some((route) => pathname.startsWith(route))) return false
         return pathname.startsWith(href)
     }
 
@@ -59,7 +79,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
     const [ready, setReady] = useState(false)
 
     const measure = useCallback(() => {
-        const active = navLinks.find(link => isActive(link.href))
+        const active = navLinks.find((link) => isActive(link.href))
         const el = active ? linkRefs.current[active.href] : null
         const nav = navRef.current
         if (!el || !nav) {
@@ -97,7 +117,10 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
             <header className="sc-nav">
                 <div className="sc-container flex items-center justify-between py-3">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+                    <Link
+                        href="/"
+                        className="flex items-center gap-3 transition-opacity hover:opacity-80"
+                    >
                         <div
                             className="flex h-9 w-9 items-center justify-center rounded-[10px]"
                             style={{ background: 'var(--sc-accent)' }}
@@ -112,23 +135,32 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                         <div>
                             <span
                                 className="block text-base font-semibold leading-tight"
-                                style={{ fontFamily: 'var(--sc-font-display)', color: 'var(--sc-ink)' }}
+                                style={{
+                                    fontFamily: 'var(--sc-font-display)',
+                                    color: 'var(--sc-ink)',
+                                }}
                             >
                                 {t('title')}
                             </span>
-                            <span className="block text-[11px] leading-tight" style={{ color: 'var(--sc-text-muted)' }}>
+                            <span
+                                className="block text-[11px] leading-tight"
+                                style={{ color: 'var(--sc-text-muted)' }}
+                            >
                                 {t('subtitle')}
                             </span>
                         </div>
                     </Link>
 
                     {/* Desktop nav */}
-                    <nav ref={navRef} className="relative hidden items-center gap-4 lg:flex xl:gap-6">
-                        {navLinks.map(link => (
+                    <nav
+                        ref={navRef}
+                        className="relative hidden items-center gap-4 xl:flex xl:gap-6"
+                    >
+                        {navLinks.map((link) => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                ref={el => {
+                                ref={(el) => {
                                     linkRefs.current[link.href] = el
                                 }}
                                 className={`sc-nav__link${isActive(link.href) ? ' sc-nav__link--active' : ''}`}
@@ -149,11 +181,14 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                         />
 
                         {/* Separator */}
-                        <div className="mx-1 h-5 w-px" style={{ background: 'var(--sc-border-strong)' }} />
+                        <div
+                            className="mx-1 h-5 w-px"
+                            style={{ background: 'var(--sc-border-strong)' }}
+                        />
 
                         <div className="flex items-center gap-3">
                             <NavbarAuth variant="desktop" needsOnboarding={needsOnboarding} />
-                            <LanguageSelect isMobile={false} jsonlan={t('locale')} />
+                            <LanguageSelect isMobile={false} />
                         </div>
                     </nav>
 
@@ -161,9 +196,12 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                     <button
                         type="button"
                         onClick={() => setMenuOpen(true)}
-                        className="inline-flex items-center justify-center rounded-[10px] p-2 transition-colors lg:hidden"
+                        ref={menuButtonRef}
+                        aria-expanded={menuOpen}
+                        aria-controls={drawerId}
+                        className="inline-flex items-center justify-center rounded-[10px] p-2 transition-colors xl:hidden"
                         style={{ color: 'var(--sc-ink)' }}
-                        aria-label="Open menu"
+                        aria-label={t('interface.openMenu')}
                     >
                         <Menu className="h-6 w-6" />
                     </button>
@@ -173,7 +211,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
             {/* Mobile slide-over menu */}
             {/* Backdrop */}
             <div
-                className={`fixed inset-0 z-50 transition-opacity duration-300 lg:hidden ${
+                className={`fixed inset-0 z-50 transition-opacity duration-300 xl:hidden ${
                     menuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
                 }`}
                 style={{ backgroundColor: 'rgba(26, 39, 48, 0.45)' }}
@@ -182,13 +220,44 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
             {/* Drawer */}
             <div
-                className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-full max-w-xs flex-col overflow-y-auto shadow-xl transition-transform duration-300 ease-in-out lg:hidden ${
-                    menuOpen ? 'translate-x-0' : '-translate-x-full'
+                ref={drawerRef}
+                id={drawerId}
+                role="dialog"
+                aria-label={t('interface.navigation')}
+                aria-modal={menuOpen ? true : undefined}
+                aria-hidden={!menuOpen}
+                inert={!menuOpen}
+                onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                        event.preventDefault()
+                        setMenuOpen(false)
+                    }
+                    if (event.key !== 'Tab') return
+                    const items = [
+                        ...event.currentTarget.querySelectorAll<HTMLElement>(
+                            'a[href], button:not([disabled]), summary, input:not([disabled])',
+                        ),
+                    ].filter((item) => item.getClientRects().length > 0)
+                    const first = items[0]
+                    const last = items[items.length - 1]
+                    if (event.shiftKey && document.activeElement === first) {
+                        event.preventDefault()
+                        last?.focus()
+                    } else if (!event.shiftKey && document.activeElement === last) {
+                        event.preventDefault()
+                        first?.focus()
+                    }
+                }}
+                className={`fixed start-0 top-0 z-50 flex h-[100dvh] w-full max-w-xs flex-col overflow-y-auto shadow-xl transition-transform duration-300 ease-in-out xl:hidden ${
+                    menuOpen ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full'
                 }`}
                 style={{ background: 'var(--sc-surface)' }}
             >
                 {/* Drawer header */}
-                <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: 'var(--sc-border)' }}>
+                <div
+                    className="flex items-center justify-between border-b px-4 py-3"
+                    style={{ borderColor: 'var(--sc-border)' }}
+                >
                     <Link
                         href="/"
                         onClick={() => setMenuOpen(false)}
@@ -198,11 +267,17 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                             className="flex h-9 w-9 items-center justify-center rounded-[10px]"
                             style={{ background: 'var(--sc-accent)' }}
                         >
-                            <span className="text-sm font-semibold" style={{ fontFamily: 'var(--sc-font-display)', color: '#fff8ee' }}>
+                            <span
+                                className="text-sm font-semibold"
+                                style={{ fontFamily: 'var(--sc-font-display)', color: '#fff8ee' }}
+                            >
                                 {t('initials')}
                             </span>
                         </div>
-                        <span className="text-base font-semibold" style={{ fontFamily: 'var(--sc-font-display)', color: 'var(--sc-ink)' }}>
+                        <span
+                            className="text-base font-semibold"
+                            style={{ fontFamily: 'var(--sc-font-display)', color: 'var(--sc-ink)' }}
+                        >
                             {t('title')}
                         </span>
                     </Link>
@@ -211,7 +286,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                         onClick={() => setMenuOpen(false)}
                         className="rounded-[10px] p-2 transition-colors"
                         style={{ color: 'var(--sc-ink)' }}
-                        aria-label="Close menu"
+                        aria-label={t('interface.closeMenu')}
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -219,7 +294,7 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
 
                 {/* Drawer nav links */}
                 <nav className="flex flex-col px-2 py-2">
-                    {navLinks.map(link => (
+                    {navLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
@@ -227,7 +302,11 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                             className="rounded-[10px] px-3 py-3 text-base font-medium transition-colors"
                             style={
                                 isActive(link.href)
-                                    ? { color: 'var(--sc-accent)', background: 'color-mix(in srgb, var(--sc-accent) 8%, transparent)' }
+                                    ? {
+                                          color: 'var(--sc-accent)',
+                                          background:
+                                              'color-mix(in srgb, var(--sc-accent) 8%, transparent)',
+                                      }
                                     : { color: 'var(--sc-text)' }
                             }
                         >
@@ -237,10 +316,17 @@ export function Header({ needsOnboarding = false }: { needsOnboarding?: boolean 
                 </nav>
 
                 {/* Drawer auth & language */}
-                <div className="mt-auto border-t px-4 py-4" style={{ borderColor: 'var(--sc-border)' }}>
-                    <NavbarAuth variant="mobile" needsOnboarding={needsOnboarding} onAction={() => setMenuOpen(false)} />
+                <div
+                    className="mt-auto border-t px-4 py-4"
+                    style={{ borderColor: 'var(--sc-border)' }}
+                >
+                    <NavbarAuth
+                        variant="mobile"
+                        needsOnboarding={needsOnboarding}
+                        onAction={() => setMenuOpen(false)}
+                    />
                     <div className="mt-4 flex items-center gap-3">
-                        <LanguageSelect isMobile={true} jsonlan={t('locale')} />
+                        <LanguageSelect isMobile={true} />
                     </div>
                 </div>
             </div>

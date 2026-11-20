@@ -1,17 +1,24 @@
 'use client'
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
 
 import * as React from 'react'
 import { useState, useCallback, useEffect } from 'react'
 import {
-    Shield, Key, CheckCircle2, Copy, Check,
-    AlertTriangle, Loader2, ArrowLeft, ArrowRight, Lock,
+    Shield,
+    Key,
+    CheckCircle2,
+    Copy,
+    Check,
+    AlertTriangle,
+    Loader2,
+    ArrowLeft,
+    ArrowRight,
+    Lock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-    Dialog, DialogContent, DialogTitle, DialogDescription,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import {
     generateVaultSetup,
@@ -22,7 +29,14 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Step = 'checking' | 'intro' | 'recovery-key' | 'verify' | 'creating' | 'success' | 'already-initialized'
+type Step =
+    | 'checking'
+    | 'intro'
+    | 'recovery-key'
+    | 'verify'
+    | 'creating'
+    | 'success'
+    | 'already-initialized'
 
 interface VaultSetup {
     rawMasterKey: Uint8Array
@@ -76,6 +90,8 @@ function CheckingStep() {
 // ─── Already initialized ─────────────────────────────────────────────────────
 
 function AlreadyInitializedStep({ onClose }: { onClose: () => void }) {
+    const tui = useInterfaceTranslations('interface')
+
     return (
         <div className="flex flex-col items-center text-center gap-6">
             <div className="w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center ring-1 ring-green-200 dark:ring-green-800/50">
@@ -83,23 +99,25 @@ function AlreadyInitializedStep({ onClose }: { onClose: () => void }) {
             </div>
 
             <div className="space-y-2">
-                <h2 className="text-xl font-semibold tracking-tight">Vault already active</h2>
+                <h2 className="text-xl font-semibold tracking-tight">
+                    {tui('vaultAlreadyActive')}
+                </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-[260px] mx-auto">
-                    Your vault is set up and protecting your credentials.
+                    {tui('yourVaultIsSetUpAndProtectingYourCredentials')}
                 </p>
             </div>
 
-            <div className="w-full rounded-xl bg-muted/60 px-4 py-3 flex items-center gap-3 text-left">
+            <div className="w-full rounded-xl bg-muted/60 px-4 py-3 flex items-center gap-3 text-start">
                 <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
                     <Lock className="w-4 h-4 text-primary" />
                 </div>
                 <p className="text-sm text-muted-foreground leading-snug">
-                    Your credentials are encrypted and stored securely. No action needed.
+                    {tui('yourCredentialsAreEncryptedAndStoredSecurelyNoAction')}
                 </p>
             </div>
 
             <Button onClick={onClose} size="lg" variant="outline" className="w-full">
-                Close
+                {tui('close')}
             </Button>
         </div>
     )
@@ -108,21 +126,23 @@ function AlreadyInitializedStep({ onClose }: { onClose: () => void }) {
 // ─── Step 1 – Intro ──────────────────────────────────────────────────────────
 
 function IntroStep({ onNext, loading }: { onNext: () => void; loading: boolean }) {
+    const tui = useInterfaceTranslations('interface')
+
     const features = [
         {
             icon: Lock,
-            title: 'Your keys stay encrypted',
-            body: 'Nothing is stored in plain text — not even by us.',
+            title: tui('yourKeysStayEncrypted'),
+            body: tui('nothingIsStoredInPlainTextNotEvenBy'),
         },
         {
             icon: Key,
-            title: 'A recovery key keeps you safe',
-            body: 'If something goes wrong, you can always restore access.',
+            title: tui('aRecoveryKeyKeepsYouSafe'),
+            body: tui('ifSomethingGoesWrongYouCanAlwaysRestoreAccess'),
         },
         {
             icon: CheckCircle2,
-            title: 'Works silently in the background',
-            body: "Once set up, you won't need to think about it again.",
+            title: tui('worksSilentlyInTheBackground'),
+            body: tui('onceSetUpYouWontNeedToThinkAbout'),
         },
     ]
 
@@ -133,15 +153,20 @@ function IntroStep({ onNext, loading }: { onNext: () => void; loading: boolean }
             </div>
 
             <div className="space-y-2">
-                <h2 className="text-xl font-semibold tracking-tight">Protect your API keys</h2>
+                <h2 className="text-xl font-semibold tracking-tight">
+                    {tui('protectYourApiKeys')}
+                </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-                    Your vault stores your sensitive credentials — like API keys and signing certificates — in a secure, encrypted format to protect them on our registry.
+                    {tui('yourVaultStoresYourSensitiveCredentialsLikeApiKeys')}
                 </p>
             </div>
 
-            <div className="w-full space-y-2.5 text-left">
+            <div className="w-full space-y-2.5 text-start">
                 {features.map(({ icon: Icon, title, body }) => (
-                    <div key={title} className="flex gap-3 items-start rounded-xl bg-muted/60 px-4 py-3">
+                    <div
+                        key={title}
+                        className="flex gap-3 items-start rounded-xl bg-muted/60 px-4 py-3"
+                    >
                         <div className="mt-0.5 w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
                             <Icon className="w-4 h-4 text-primary" />
                         </div>
@@ -154,10 +179,15 @@ function IntroStep({ onNext, loading }: { onNext: () => void; loading: boolean }
             </div>
 
             <Button onClick={onNext} disabled={loading} size="lg" className="w-full">
-                {loading
-                    ? <><Loader2 className="mr-2 w-4 h-4 animate-spin" /> Preparing…</>
-                    : <>Get started <ArrowRight className="ml-2 w-4 h-4" /></>
-                }
+                {loading ? (
+                    <>
+                        <Loader2 className="me-2 w-4 h-4 animate-spin" /> {tui('preparing')}
+                    </>
+                ) : (
+                    <>
+                        {tui('getStarted')} <ArrowRight className="ms-2 w-4 h-4" />
+                    </>
+                )}
             </Button>
         </div>
     )
@@ -174,6 +204,8 @@ function RecoveryKeyStep({
     onBack: () => void
     onNext: () => void
 }) {
+    const tui = useInterfaceTranslations('interface')
+
     const [copied, setCopied] = useState(false)
     const [confirmed, setConfirmed] = useState(false)
 
@@ -193,16 +225,21 @@ function RecoveryKeyStep({
                     <Key className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                    <h2 className="text-base font-semibold">Your recovery key</h2>
-                    <p className="text-xs text-muted-foreground">Write it down or save it in a password manager</p>
+                    <h2 className="text-base font-semibold">{tui('yourRecoveryKey')}</h2>
+                    <p className="text-xs text-muted-foreground">
+                        {tui('writeItDownOrSaveItInAPassword')}
+                    </p>
                 </div>
             </div>
 
-            <div className="relative rounded-xl border border-border bg-muted/40 px-4 pt-3 pb-4">
+            <div
+                dir="ltr"
+                className="relative rounded-xl border border-border bg-muted/40 px-4 pt-3 pb-4"
+            >
                 <p className="text-[11px] text-muted-foreground font-mono mb-2 select-none">
                     {prefix}-
                 </p>
-                <div className="flex flex-wrap gap-1.5 pr-12">
+                <div className="flex flex-wrap gap-1.5 pe-12">
                     {segments.map((seg, i) => (
                         <span
                             key={i}
@@ -214,23 +251,24 @@ function RecoveryKeyStep({
                 </div>
                 <button
                     onClick={handleCopy}
-                    aria-label={copied ? 'Copied' : 'Copy recovery key'}
+                    aria-label={copied ? tui('copied') : tui('copyRecoveryKey')}
                     className={cn(
-                        'absolute top-3 right-3 flex items-center gap-1.5 text-xs rounded-lg px-2.5 py-1.5 border transition-all duration-200',
+                        'absolute top-3 end-3 flex items-center gap-1.5 text-xs rounded-lg px-2.5 py-1.5 border transition-all duration-200',
                         copied
                             ? 'bg-green-50 border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400'
-                            : 'bg-background border-border text-muted-foreground hover:text-foreground hover:border-foreground/30'
+                            : 'bg-background border-border text-muted-foreground hover:text-foreground hover:border-foreground/30',
                     )}
                 >
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Copied' : 'Copy'}
+                    {copied ? tui('copied') : tui('copy')}
                 </button>
             </div>
 
             <div className="flex gap-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 px-3.5 py-3">
                 <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-                    <span className="font-semibold">Don't take a screenshot.</span> Screenshots back up to cloud services and can expose your key. Use a password manager instead.
+                    <span className="font-semibold">{tui('dontTakeAScreenshot')}</span>{' '}
+                    {tui('screenshotsBackUpToCloudServicesAndCanExpose')}
                 </p>
             </div>
 
@@ -240,26 +278,32 @@ function RecoveryKeyStep({
                         type="checkbox"
                         className="sr-only"
                         checked={confirmed}
-                        onChange={e => setConfirmed(e.target.checked)}
+                        onChange={(e) => setConfirmed(e.target.checked)}
                     />
-                    <div className={cn(
-                        'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
-                        confirmed
-                            ? 'bg-primary border-primary'
-                            : 'border-input bg-background group-hover:border-primary/60'
-                    )}>
-                        {confirmed && <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3} />}
+                    <div
+                        className={cn(
+                            'w-5 h-5 rounded border-2 flex items-center justify-center transition-all',
+                            confirmed
+                                ? 'bg-primary border-primary'
+                                : 'border-input bg-background group-hover:border-primary/60',
+                        )}
+                    >
+                        {confirmed && (
+                            <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3} />
+                        )}
                     </div>
                 </div>
-                <span className="text-sm leading-snug">I've saved my recovery key in a safe place</span>
+                <span className="text-sm leading-snug">
+                    {tui('iveSavedMyRecoveryKeyInASafePlace')}
+                </span>
             </label>
 
             <div className="flex gap-2.5 pt-1">
                 <Button variant="outline" onClick={onBack} className="flex-1">
-                    <ArrowLeft className="mr-1.5 w-4 h-4" /> Back
+                    <ArrowLeft className="me-1.5 w-4 h-4" /> {tui('back')}
                 </Button>
                 <Button onClick={onNext} disabled={!confirmed} className="flex-1">
-                    Continue <ArrowRight className="ml-1.5 w-4 h-4" />
+                    {tui('continue')} <ArrowRight className="ms-1.5 w-4 h-4" />
                 </Button>
             </div>
         </div>
@@ -279,6 +323,8 @@ function VerifyStep({
     onNext: () => void
     apiError: string | null
 }) {
+    const tui = useInterfaceTranslations('interface')
+
     const [value, setValue] = useState('')
     const [matchError, setMatchError] = useState<string | null>(null)
 
@@ -288,7 +334,7 @@ function VerifyStep({
         const input = parseRecoveryToken(value.trim())
         const expected = parseRecoveryToken(recoveryToken)
         if (input !== expected) {
-            setMatchError("That doesn't match your recovery key. Double-check what you saved.")
+            setMatchError(tui('thatDoesntMatchYourRecoveryKeyDoubleCheckWhat'))
             return
         }
         setMatchError(null)
@@ -302,27 +348,31 @@ function VerifyStep({
                     <CheckCircle2 className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                    <h2 className="text-base font-semibold">Confirm your recovery key</h2>
-                    <p className="text-xs text-muted-foreground">Paste it back to make sure you saved it correctly</p>
+                    <h2 className="text-base font-semibold">{tui('confirmYourRecoveryKey')}</h2>
+                    <p className="text-xs text-muted-foreground">
+                        {tui('pasteItBackToMakeSureYouSavedIt')}
+                    </p>
                 </div>
             </div>
 
             <div className="space-y-1.5">
-                <Label htmlFor="vault-verify-input" className="text-sm">Recovery key</Label>
+                <Label htmlFor="vault-verify-input" className="text-sm">
+                    {tui('recoveryKey')}
+                </Label>
                 <Input
                     id="vault-verify-input"
                     value={value}
-                    onChange={e => {
+                    onChange={(e) => {
                         setValue(e.target.value)
                         setMatchError(null)
                     }}
-                    onKeyDown={e => e.key === 'Enter' && handleNext()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleNext()}
                     placeholder="CRAFTS-V001-…"
                     autoComplete="off"
                     spellCheck={false}
                     className={cn(
                         'font-mono text-sm h-11',
-                        error && 'border-destructive focus-visible:ring-destructive/40'
+                        error && 'border-destructive focus-visible:ring-destructive/40',
                     )}
                 />
                 {error && (
@@ -335,10 +385,10 @@ function VerifyStep({
 
             <div className="flex gap-2.5">
                 <Button variant="outline" onClick={onBack} className="flex-1">
-                    <ArrowLeft className="mr-1.5 w-4 h-4" /> Back
+                    <ArrowLeft className="me-1.5 w-4 h-4" /> {tui('back')}
                 </Button>
                 <Button onClick={handleNext} disabled={!value.trim()} className="flex-1">
-                    Create vault <ArrowRight className="ml-1.5 w-4 h-4" />
+                    {tui('createVault')} <ArrowRight className="ms-1.5 w-4 h-4" />
                 </Button>
             </div>
         </div>
@@ -348,6 +398,8 @@ function VerifyStep({
 // ─── Creating (intermediate) ─────────────────────────────────────────────────
 
 function CreatingStep() {
+    const tui = useInterfaceTranslations('interface')
+
     return (
         <div className="flex flex-col items-center justify-center gap-5 py-10">
             <div className="relative w-16 h-16">
@@ -358,8 +410,10 @@ function CreatingStep() {
                 </div>
             </div>
             <div className="text-center space-y-1">
-                <p className="text-sm font-medium">Setting up your vault…</p>
-                <p className="text-xs text-muted-foreground">Encrypting and storing your keys</p>
+                <p className="text-sm font-medium">{tui('settingUpYourVault')}</p>
+                <p className="text-xs text-muted-foreground">
+                    {tui('encryptingAndStoringYourKeys')}
+                </p>
             </div>
         </div>
     )
@@ -368,6 +422,8 @@ function CreatingStep() {
 // ─── Step 4 – Success ────────────────────────────────────────────────────────
 
 function SuccessStep({ onDone }: { onDone: () => void }) {
+    const tui = useInterfaceTranslations('interface')
+
     return (
         <div className="flex flex-col items-center text-center gap-6">
             <div className="w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center ring-1 ring-green-200 dark:ring-green-800/50">
@@ -375,24 +431,26 @@ function SuccessStep({ onDone }: { onDone: () => void }) {
             </div>
 
             <div className="space-y-2">
-                <h2 className="text-xl font-semibold tracking-tight">Vault ready</h2>
+                <h2 className="text-xl font-semibold tracking-tight">{tui('vaultReady')}</h2>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-[260px] mx-auto">
-                    Your credentials are encrypted and protected. You can now add API keys and certificates from your settings.
+                    {tui('yourCredentialsAreEncryptedAndProtectedYouCanNow')}
                 </p>
             </div>
 
-            <div className="w-full rounded-xl bg-muted/60 px-4 py-3 flex items-center gap-3 text-left">
+            <div className="w-full rounded-xl bg-muted/60 px-4 py-3 flex items-center gap-3 text-start">
                 <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
                     <Shield className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                    <p className="text-xs font-medium">Recovery key saved</p>
-                    <p className="text-xs text-muted-foreground">Keep it safe — it's the only way to recover access</p>
+                    <p className="text-xs font-medium">{tui('recoveryKeySaved')}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {tui('keepItSafeItsTheOnlyWayToRecover')}
+                    </p>
                 </div>
             </div>
 
             <Button onClick={onDone} size="lg" className="w-full">
-                Done
+                {tui('done')}
             </Button>
         </div>
     )
@@ -401,6 +459,8 @@ function SuccessStep({ onDone }: { onDone: () => void }) {
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export function VaultSetupModal({ open, onOpenChange, userId, onSuccess }: VaultSetupModalProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const [step, setStep] = useState<Step>('checking')
     const [setup, setSetup] = useState<VaultSetup | null>(null)
     const [introLoading, setIntroLoading] = useState(false)
@@ -442,14 +502,19 @@ export function VaultSetupModal({ open, onOpenChange, userId, onSuccess }: Vault
         }
 
         checkVault()
-        return () => { cancelled = true }
+        return () => {
+            cancelled = true
+        }
     }, [open])
 
-    const handleOpenChange = useCallback((next: boolean) => {
-        if (!next && step === 'creating') return
-        if (!next) reset()
-        onOpenChange(next)
-    }, [step, reset, onOpenChange])
+    const handleOpenChange = useCallback(
+        (next: boolean) => {
+            if (!next && step === 'creating') return
+            if (!next) reset()
+            onOpenChange(next)
+        },
+        [step, reset, onOpenChange],
+    )
 
     const handleIntroNext = useCallback(async () => {
         setIntroLoading(true)
@@ -488,14 +553,14 @@ export function VaultSetupModal({ open, onOpenChange, userId, onSuccess }: Vault
 
             if (!initRes.ok) {
                 const body = await initRes.json().catch(() => ({}))
-                throw new Error(body.error || 'Vault initialization failed')
+                throw new Error(body.error || tui('vaultInitializationFailed'))
             }
 
             // Zero the master key from memory (best-effort — JS GC does not guarantee this)
             setup.rawMasterKey.fill(0)
             setStep('success')
         } catch (err: any) {
-            setApiError(err.message ?? 'Something went wrong. Please try again.')
+            setApiError(tui('somethingWentWrongPleaseTryAgain'))
             setStep('verify')
         }
     }, [setup, userId])
@@ -509,12 +574,16 @@ export function VaultSetupModal({ open, onOpenChange, userId, onSuccess }: Vault
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent
                 className="sm:max-w-md rounded-2xl"
-                onInteractOutside={e => { if (step === 'creating') e.preventDefault() }}
-                onEscapeKeyDown={e => { if (step === 'creating') e.preventDefault() }}
+                onInteractOutside={(e) => {
+                    if (step === 'creating') e.preventDefault()
+                }}
+                onEscapeKeyDown={(e) => {
+                    if (step === 'creating') e.preventDefault()
+                }}
             >
-                <DialogTitle className="sr-only">Set up your secure vault</DialogTitle>
+                <DialogTitle className="sr-only">{tui('setUpYourSecureVault')}</DialogTitle>
                 <DialogDescription className="sr-only">
-                    A guided setup to create your encrypted credentials vault.
+                    {tui('aGuidedSetupToCreateYourEncryptedCredentialsVault')}
                 </DialogDescription>
 
                 <StepDots current={step} />
@@ -525,9 +594,7 @@ export function VaultSetupModal({ open, onOpenChange, userId, onSuccess }: Vault
                     <AlreadyInitializedStep onClose={() => handleOpenChange(false)} />
                 )}
 
-                {step === 'intro' && (
-                    <IntroStep onNext={handleIntroNext} loading={introLoading} />
-                )}
+                {step === 'intro' && <IntroStep onNext={handleIntroNext} loading={introLoading} />}
 
                 {step === 'recovery-key' && setup && (
                     <RecoveryKeyStep

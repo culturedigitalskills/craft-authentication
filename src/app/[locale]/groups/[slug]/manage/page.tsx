@@ -1,7 +1,9 @@
+import { getLocale } from 'next-intl/server'
 import { prisma } from '@/lib/prisma'
 import { ACTIVE_MEMBERSHIP_WHERE } from '@/lib/group'
 import { auth } from '@/lib/auth'
-import { redirect, notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { redirect } from '@/i8n/navigation'
 import { GroupManageForm } from '@/components/groups/GroupManageForm'
 
 interface PageProps {
@@ -10,7 +12,7 @@ interface PageProps {
 
 export default async function GroupManagePage({ params }: PageProps) {
     const session = await auth()
-    if (!session?.user) redirect('/login')
+    if (!session?.user) return redirect({ href: '/login', locale: await getLocale() })
 
     const { slug } = await params
     const group = await prisma.group.findFirst({
@@ -28,10 +30,7 @@ export default async function GroupManagePage({ params }: PageProps) {
                         },
                     },
                 },
-                orderBy: [
-                    { role: 'asc' },
-                    { joinedDate: 'asc' },
-                ],
+                orderBy: [{ role: 'asc' }, { joinedDate: 'asc' }],
             },
         },
     })
@@ -39,7 +38,8 @@ export default async function GroupManagePage({ params }: PageProps) {
     if (!group) notFound()
 
     // Requested via a retired slug — send to the current canonical URL.
-    if (group.slug !== slug) redirect(`/groups/${group.slug}/manage`)
+    if (group.slug !== slug)
+        return redirect({ href: `/groups/${group.slug}/manage`, locale: await getLocale() })
 
     // Check authorization: site admin or group admin
     const isAdmin = session.user.role === 'ADMIN'
@@ -52,15 +52,16 @@ export default async function GroupManagePage({ params }: PageProps) {
         })
         if (artisan) {
             const membership = group.memberships.find(
-                m => m.artisanId === artisan.id && m.role === 'ADMIN'
+                (m) => m.artisanId === artisan.id && m.role === 'ADMIN',
             )
             isGroupAdmin = !!membership
         }
     }
 
-    if (!isAdmin && !isGroupAdmin) redirect(`/groups/${slug}`)
+    if (!isAdmin && !isGroupAdmin)
+        return redirect({ href: `/groups/${slug}`, locale: await getLocale() })
 
-    const members = group.memberships.map(m => ({
+    const members = group.memberships.map((m) => ({
         id: m.id,
         role: m.role,
         artisan: m.artisan,
@@ -69,11 +70,21 @@ export default async function GroupManagePage({ params }: PageProps) {
     // Fetch group photos
     const [logoAttachment, coverAttachment] = await Promise.all([
         prisma.mediaAttachment.findFirst({
-            where: { entityType: 'Group', entityId: group.id, attachmentType: 'HERO', isPrimary: true },
+            where: {
+                entityType: 'Group',
+                entityId: group.id,
+                attachmentType: 'HERO',
+                isPrimary: true,
+            },
             select: { mediaId: true },
         }),
         prisma.mediaAttachment.findFirst({
-            where: { entityType: 'Group', entityId: group.id, attachmentType: 'COVER', isPrimary: true },
+            where: {
+                entityType: 'Group',
+                entityId: group.id,
+                attachmentType: 'COVER',
+                isPrimary: true,
+            },
             select: { mediaId: true },
         }),
     ])

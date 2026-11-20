@@ -1,19 +1,20 @@
+import { getLocale } from 'next-intl/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
+import { redirect } from '@/i8n/navigation'
 import { CraftStoryWizard, type CraftStoryDraft } from '@/components/onboarding/CraftStoryWizard'
 import type { WorkshopMedia } from '@/components/onboarding/StoryWorkshopUpload'
 import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 
 export default async function OnboardingStoryPage() {
     const session = await auth()
-    if (!session?.user) redirect('/login')
+    if (!session?.user) return redirect({ href: '/login', locale: await getLocale() })
 
     const artisan = await prisma.artisan.findUnique({
         where: { userId: session.user.id },
         select: { id: true },
     })
-    if (!artisan) redirect('/onboarding/artisan')
+    if (!artisan) return redirect({ href: '/onboarding/artisan', locale: await getLocale() })
 
     const story = await prisma.craftStory.findUnique({
         where: { artisanId: artisan.id },
@@ -31,7 +32,7 @@ export default async function OnboardingStoryPage() {
           })
         : []
 
-    const workshopMedia: WorkshopMedia[] = workshopAttachments.map(a => ({
+    const workshopMedia: WorkshopMedia[] = workshopAttachments.map((a) => ({
         attachmentId: a.id,
         mediaId: a.mediaId,
         url: `/api/media/${a.mediaId}`,
@@ -64,7 +65,7 @@ export default async function OnboardingStoryPage() {
     // Mime types of saved answer media, so reloaded previews render video
     // players (with captions) instead of falling back to audio.
     const answerMediaIds = story
-        ? ANSWER_MEDIA_FIELDS.map(k => story[k]).filter((v): v is string => typeof v === 'string')
+        ? ANSWER_MEDIA_FIELDS.map((k) => story[k]).filter((v): v is string => typeof v === 'string')
         : []
     let answerMediaMimeTypes: Record<string, string> = {}
     if (answerMediaIds.length > 0) {
@@ -72,7 +73,7 @@ export default async function OnboardingStoryPage() {
             where: { id: { in: answerMediaIds } },
             select: { id: true, mimeType: true },
         })
-        answerMediaMimeTypes = Object.fromEntries(files.map(f => [f.id, f.mimeType]))
+        answerMediaMimeTypes = Object.fromEntries(files.map((f) => [f.id, f.mimeType]))
     }
 
     return (

@@ -1,9 +1,18 @@
 'use client'
 
+import { LocalizedDate } from '@/components/shared/LocalizedDate'
+
+import { useTranslations as useInterfaceTranslations } from 'next-intl'
+
 import { Sparkles, Loader2, Trash2, Check, ImagePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
-    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
 } from '@/components/ui/dialog'
 import { useTranslations } from 'next-intl'
 
@@ -24,12 +33,14 @@ export function EventDetailsDialog({
     isDeleting,
     onDeleteMedia,
     isAddingToGallery,
-    onAddToGallery
+    onAddToGallery,
 }: EventDetailsDialogProps) {
+    const tui = useInterfaceTranslations('interface')
+
     const t = useTranslations('imageWorkspace')
 
     const isAlreadyInGallery = selectedTask?.mediaFile?.mediaAttachments?.some(
-        (att: any) => att.attachmentType === 'GALLERY'
+        (att: any) => att.attachmentType === 'GALLERY',
     )
 
     return (
@@ -39,10 +50,10 @@ export function EventDetailsDialog({
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-primary" />
-                            Task Completion Details
+                            {tui('taskCompletionDetails')}
                         </DialogTitle>
                         <DialogDescription className="text-sm">
-                            Generated image and settings parameters
+                            {tui('generatedImageAndSettingsParameters')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -53,38 +64,56 @@ export function EventDetailsDialog({
                             <div className="relative rounded-xl overflow-hidden border border-border bg-black/5 aspect-square max-h-[360px] flex items-center justify-center mx-auto shadow-inner group">
                                 <img
                                     src={`/api/media/${selectedTask.mediaFileId}`}
-                                    alt={selectedTask.settings?.prompt || 'Generated'}
+                                    alt={selectedTask.settings?.prompt || tui('generated')}
                                     className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-102"
                                 />
                             </div>
                         ) : (
                             <div className="h-[240px] rounded-xl border border-dashed border-border flex items-center justify-center bg-muted/20">
-                                <p className="text-sm text-muted-foreground">No media available</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {tui('noMediaAvailable')}
+                                </p>
                             </div>
                         )}
 
                         {/* Settings Info List */}
                         <div className="rounded-xl border border-border/80 bg-muted/30 p-4 space-y-2.5 text-sm">
                             <div className="flex justify-between border-b border-border/40 pb-2">
-                                <span className="font-semibold text-muted-foreground">Prompt:</span>
-                                <span className="text-foreground text-right max-w-[400px] truncate" title={selectedTask.settings?.prompt}>
+                                <span className="font-semibold text-muted-foreground">
+                                    {tui('prompt')}
+                                </span>
+                                <span
+                                    className="text-foreground text-end max-w-[400px] truncate"
+                                    title={selectedTask.settings?.prompt}
+                                >
                                     {selectedTask.settings?.prompt}
                                 </span>
                             </div>
                             <div className="flex justify-between border-b border-border/40 pb-2">
-                                <span className="font-semibold text-muted-foreground">Model:</span>
-                                <span className="text-foreground font-mono text-xs">{selectedTask.settings?.model}</span>
+                                <span className="font-semibold text-muted-foreground">
+                                    {tui('model')}
+                                </span>
+                                <span className="text-foreground font-mono text-xs">
+                                    {selectedTask.settings?.model}
+                                </span>
                             </div>
                             <div className="flex justify-between border-b border-border/40 pb-2">
-                                <span className="font-semibold text-muted-foreground">Resolution:</span>
+                                <span className="font-semibold text-muted-foreground">
+                                    {tui('resolution')}
+                                </span>
                                 <span className="text-foreground">
                                     {selectedTask.settings?.width}x{selectedTask.settings?.height}
                                 </span>
                             </div>
                             <div className="flex justify-between pt-1">
-                                <span className="font-semibold text-muted-foreground">Created:</span>
+                                <span className="font-semibold text-muted-foreground">
+                                    {tui('created')}
+                                </span>
                                 <span className="text-foreground">
-                                    {new Date(selectedTask.createdAt).toLocaleString()}
+                                    <LocalizedDate
+                                        value={selectedTask.createdAt}
+                                        format="dateTime"
+                                    />
                                 </span>
                             </div>
                         </div>
@@ -102,7 +131,7 @@ export function EventDetailsDialog({
                                 {isDeleting ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        Deleting...
+                                        {tui('deleting')}
                                     </>
                                 ) : (
                                     <>
@@ -121,17 +150,17 @@ export function EventDetailsDialog({
                                     {isAddingToGallery ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            Adding...
+                                            {tui('adding')}
                                         </>
                                     ) : isAlreadyInGallery ? (
                                         <>
                                             <Check className="w-4 h-4 text-green-500" />
-                                            Added to Gallery
+                                            {tui('addedToGallery')}
                                         </>
                                     ) : (
                                         <>
                                             <ImagePlus className="w-4 h-4" />
-                                            Add to Gallery
+                                            {tui('addToGallery')}
                                         </>
                                     )}
                                 </Button>
@@ -142,7 +171,7 @@ export function EventDetailsDialog({
                             onClick={() => onOpenChange(false)}
                             className="border-border/60 hover:bg-muted"
                         >
-                            Close
+                            {tui('close')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

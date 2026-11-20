@@ -1,10 +1,11 @@
+import { getLocale } from 'next-intl/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
+import { redirect } from '@/i8n/navigation'
 
 export default async function AuthRedirectPage() {
     const session = await auth()
-    if (!session?.user) redirect('/login')
+    if (!session?.user) return redirect({ href: '/login', locale: await getLocale() })
 
     const artisan = await prisma.artisan.findUnique({
         where: { userId: session.user.id },
@@ -12,8 +13,8 @@ export default async function AuthRedirectPage() {
     })
 
     if (artisan) {
-        redirect('/crafts')
+        return redirect({ href: '/crafts', locale: await getLocale() })
     } else {
-        redirect('/onboarding')
+        return redirect({ href: '/onboarding', locale: await getLocale() })
     }
 }

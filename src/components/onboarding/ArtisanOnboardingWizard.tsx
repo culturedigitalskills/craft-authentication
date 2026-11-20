@@ -1,7 +1,9 @@
 'use client'
 
+import { normalizeHashtag, isValidHashtag } from '@/lib/validations/hashtag'
+
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
 import { StepDots } from '@/components/shared/StepDots'
@@ -14,7 +16,7 @@ import { CoverPhotoUpload } from '@/components/profile/CoverPhotoUpload'
 import { LocationSelect } from '@/components/profile/LocationSelect'
 import { ArrowLeft, ArrowRight, Globe, Hash, X, Loader2, Check } from 'lucide-react'
 import { FaInstagram, FaFacebook, FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6'
-import { parseApiError } from '@/lib/api-error'
+import { parseApiError, httpErrorMessage, fieldIssueMessage } from '@/lib/api-error'
 import { normalizeWebsite } from '@/lib/validations/artisan'
 
 type WizardData = {
@@ -85,6 +87,7 @@ const SOCIAL_KEYS = [
 ] as const
 
 export function ArtisanOnboardingWizard() {
+    const tui = useTranslations('interface')
     const t = useTranslations('onboardingWizard')
     const tp = useTranslations('profile')
     const router = useRouter()
@@ -124,10 +127,10 @@ export function ArtisanOnboardingWizard() {
     }
 
     function addHashtag() {
-        const tag = hashtagInput.replace(/^#/, '').trim()
+        const tag = normalizeHashtag(hashtagInput)
         if (
             tag &&
-            /^[A-Za-z0-9_]{1,50}$/.test(tag) &&
+            isValidHashtag(tag) &&
             !data.hashtags.includes(tag) &&
             data.hashtags.length < 20
         ) {
@@ -199,7 +202,7 @@ export function ArtisanOnboardingWizard() {
                 const mapped: Record<string, string> = {}
                 for (const issue of issues) {
                     const field = issue.path.split('.')[0]
-                    if (!mapped[field]) mapped[field] = issue.message
+                    if (!mapped[field]) mapped[field] = fieldIssueMessage(issue, tui)
                 }
                 if (Object.keys(mapped).length > 0) {
                     showFieldErrors(mapped)
@@ -209,8 +212,7 @@ export function ArtisanOnboardingWizard() {
                 }
                 return
             } else {
-                const { error: serverError } = await parseApiError(res)
-                setError(serverError || t('createFailed'))
+                setError(httpErrorMessage(res.status, tui))
                 setSubmitting(false)
                 return
             }
@@ -562,7 +564,7 @@ export function ArtisanOnboardingWizard() {
                         onClick={back}
                         disabled={step === 1 || submitting}
                     >
-                        <ArrowLeft className="mr-1.5 h-4 w-4" />
+                        <ArrowLeft className="me-1.5 h-4 w-4" />
                         {t('back')}
                     </Button>
 
@@ -584,7 +586,7 @@ export function ArtisanOnboardingWizard() {
                                 disabled={(step === 1 && !nameValid) || submitting}
                             >
                                 {t('next')}
-                                <ArrowRight className="ml-1.5 h-4 w-4" />
+                                <ArrowRight className="ms-1.5 h-4 w-4" />
                             </Button>
                         ) : (
                             <Button
@@ -594,12 +596,12 @@ export function ArtisanOnboardingWizard() {
                             >
                                 {submitting ? (
                                     <>
-                                        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                        <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
                                         {t('creating')}
                                     </>
                                 ) : (
                                     <>
-                                        <Check className="mr-1.5 h-4 w-4" />
+                                        <Check className="me-1.5 h-4 w-4" />
                                         {t('finish')}
                                     </>
                                 )}

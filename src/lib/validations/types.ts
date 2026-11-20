@@ -12,6 +12,9 @@ export type ValidationErrorResponse = {
         path: string
         message: string
         code: string
+        origin?: string
+        minimum?: number
+        maximum?: number
     }[]
 }
 
@@ -38,6 +41,15 @@ export function handleValidationError(error: ZodError): NextResponse<ValidationE
                 path: (issue.path || []).join('.') || 'root',
                 message: issue.message,
                 code: issue.code,
+                ...('origin' in issue && typeof issue.origin === 'string'
+                    ? { origin: issue.origin }
+                    : {}),
+                ...('minimum' in issue && typeof issue.minimum === 'number'
+                    ? { minimum: issue.minimum }
+                    : {}),
+                ...('maximum' in issue && typeof issue.maximum === 'number'
+                    ? { maximum: issue.maximum }
+                    : {}),
             })),
         },
         { status: 400 },
