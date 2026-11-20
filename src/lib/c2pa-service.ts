@@ -13,10 +13,10 @@ import { UserSecretsService } from '@/lib/user-secrets-service'
 import {
     Reader,
     Builder,
+    Context,
     createTrustSettings,
     createVerifySettings,
     mergeSettings,
-    settingsToJson,
 } from '@contentauth/c2pa-node'
 import type { C2PAState } from '@/types/c2pa'
 
@@ -480,7 +480,7 @@ export class C2PAService {
             // getC2PATrustList() logs an error and returns null — we fall back to our CA only.
             const trustListPem = getC2PATrustList()
 
-            const settingsString = settingsToJson(
+            const context = new Context(
                 mergeSettings(
                     createTrustSettings({
                         verifyTrustList: true,
@@ -493,7 +493,7 @@ export class C2PAService {
 
             let reader: Reader | null = null
             try {
-                reader = await Reader.fromAsset({ buffer: mediaBuffer, mimeType }, settingsString)
+                reader = await Reader.fromAsset({ buffer: mediaBuffer, mimeType }, context)
             } catch (err: any) {
                 if (
                     err.message?.includes('JumbfNotFound') ||
