@@ -790,6 +790,10 @@
     "visibilityFailed": "Não foi possível atualizar a visibilidade. Tente novamente."
   },
   "home": {
+    "demoBanner": {
+      "text": "Esta é uma demonstração de pesquisa que mostra como artesãos podem compartilhar a história por trás do seu trabalho. Não é um marketplace nem uma plataforma oficial.",
+      "link": "Saiba mais"
+    },
     "hero": {
       "headlineLead": "Cada produto artesanal traz a marca das mãos que o",
       "headlineEmphasis": "criaram",

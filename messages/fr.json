@@ -790,6 +790,10 @@
     "visibilityFailed": "Impossible de modifier la visibilité. Veuillez réessayer."
   },
   "home": {
+    "demoBanner": {
+      "text": "Ceci est une démo de recherche montrant comment les artisans peuvent partager l’histoire derrière leur travail. Ce n’est ni une place de marché ni une plateforme officielle.",
+      "link": "En savoir plus"
+    },
     "hero": {
       "headlineLead": "Chaque création porte l’empreinte des mains qui l’ont",
       "headlineEmphasis": "façonnée",

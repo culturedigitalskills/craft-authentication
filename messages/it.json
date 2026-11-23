@@ -790,6 +790,10 @@
     "visibilityFailed": "Impossibile aggiornare la visibilità. Riprova."
   },
   "home": {
+    "demoBanner": {
+      "text": "Questa è una demo di ricerca che mostra come gli artigiani possono condividere la storia dietro il loro lavoro. Non è un marketplace né una piattaforma ufficiale.",
+      "link": "Scopri di più"
+    },
     "hero": {
       "headlineLead": "Ogni prodotto artigianale porta il segno delle mani che lo hanno",
       "headlineEmphasis": "creato",

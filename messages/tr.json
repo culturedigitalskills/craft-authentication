@@ -790,6 +790,10 @@
     "visibilityFailed": "Görünürlük güncellenemedi. Lütfen tekrar dene."
   },
   "home": {
+    "demoBanner": {
+      "text": "Bu, zanaatkârların eserlerinin ardındaki hikâyeyi nasıl paylaşabileceğini gösteren bir araştırma demosudur. Bir pazar yeri ya da resmî bir platform değildir.",
+      "link": "Daha fazla bilgi"
+    },
     "hero": {
       "headlineLead": "Her el yapımı ürün, onu yapan",
       "headlineEmphasis": "elleri taşır",
