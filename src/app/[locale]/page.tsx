@@ -160,6 +160,30 @@ export default async function Home() {
 
     return (
         <>
+            {/* ── 0. Demo notice ── Makes clear this is a research demo, not the
+                only (or an official) platform for these makers. Not dismissible. */}
+            <div
+                role="note"
+                className="border-b text-center"
+                style={{
+                    background: 'var(--sc-surface)',
+                    borderColor: 'var(--sc-border)',
+                    color: 'var(--sc-text-soft)',
+                    fontSize: 'var(--sc-text-sm)',
+                }}
+            >
+                <p className="sc-container py-2.5">
+                    {t('demoBanner.text')}{' '}
+                    <Link
+                        href="/about"
+                        className="font-semibold underline underline-offset-2"
+                        style={{ color: 'var(--sc-ink)' }}
+                    >
+                        {t('demoBanner.link')}
+                    </Link>
+                </p>
+            </div>
+
             {/* ── 1. Hero ── */}
             <section className="sc-container grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
                 <div>

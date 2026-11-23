@@ -790,6 +790,10 @@
     "visibilityFailed": "Sichtbarkeit konnte nicht aktualisiert werden. Bitte versuche es erneut."
   },
   "home": {
+    "demoBanner": {
+      "text": "Dies ist eine Forschungsdemo, die zeigt, wie Kunsthandwerker die Geschichte hinter ihrer Arbeit teilen können. Es handelt sich nicht um einen Marktplatz oder eine offizielle Plattform.",
+      "link": "Mehr erfahren"
+    },
     "hero": {
       "headlineLead": "Jedes handgefertigte Produkt trägt die Hände, die es",
       "headlineEmphasis": "geschaffen haben",
