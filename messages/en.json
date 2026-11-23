@@ -790,6 +790,10 @@
     "visibilityFailed": "Could not update visibility. Please try again."
   },
   "home": {
+    "demoBanner": {
+      "text": "This is a research demo showing how artisans can share the story behind their work. It is not a marketplace or an official platform.",
+      "link": "Learn more"
+    },
     "hero": {
       "headlineLead": "Every handcrafted product carries the hands that",
       "headlineEmphasis": "made it",

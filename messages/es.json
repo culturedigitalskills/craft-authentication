@@ -790,6 +790,10 @@
     "visibilityFailed": "No se pudo actualizar la visibilidad. Inténtalo de nuevo."
   },
   "home": {
+    "demoBanner": {
+      "text": "Esta es una demostración de investigación que muestra cómo los artesanos pueden compartir la historia detrás de su trabajo. No es un mercado ni una plataforma oficial.",
+      "link": "Más información"
+    },
     "hero": {
       "headlineLead": "Cada producto artesanal lleva las manos que",
       "headlineEmphasis": "lo crearon",
