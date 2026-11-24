@@ -194,7 +194,10 @@
       "failed": "Für diese Aufnahme konnten keine Untertitel erstellt werden",
       "someProcessing": "Untertitel werden noch im Hintergrund erstellt – du kannst jetzt veröffentlichen, sie erscheinen automatisch in deiner Geschichte, sobald sie fertig sind.",
       "someFailed": "Für einige Aufnahmen konnten keine Untertitel erstellt werden.",
-      "retry": "Erneut versuchen"
+      "retry": "Erneut versuchen",
+      "disclosure": "Für englische Untertitel erhält Groq in den USA den Ton deiner Aufnahmen und deines hochgeladenen Films, soweit noch Untertitel fehlen. Du kannst ohne Untertitel veröffentlichen.",
+      "request": "Audio für Untertitel an Groq senden",
+      "requestError": "Die Anfrage ist fehlgeschlagen. Bitte erneut versuchen."
     },
     "stepLabel": "Schritt {current} von {total}",
     "back": "Zurück",
@@ -244,7 +247,7 @@
       "formatVideo": "Videoaufnahme",
       "encouragement": "Bitte antworte in deinen eigenen Worten, so als würdest du deine Geschichte jemandem erzählen, der dein Handwerk verstehen möchte.",
       "alreadyHaveFilmTitle": "Hast du schon einen eigenen Film?",
-      "alreadyHaveFilmBody": "Lade ihn hoch, dann wird er zu deinem Geschichtsfilm. Eine kurze Zusammenfassung kannst du danach noch ergänzen, und wir fügen englische Untertitel hinzu."
+      "alreadyHaveFilmBody": "Bei der Überprüfung kannst du englische Untertitel anfordern."
     },
     "step1": {
       "title": "Über dich",
@@ -330,7 +333,7 @@
       "uploadOwn": "Eigenen Film hochladen",
       "uploadReplace": "Durch eigenen Film ersetzen",
       "uploadProgress": "Hochladen {percent}%",
-      "uploadHint": "Du hast schon einen eigenen Film? Lade ihn hoch, wir ergänzen englische Untertitel.",
+      "uploadHint": "Bei der Überprüfung kannst du englische Untertitel anfordern.",
       "uploadedBadge": "Das ist dein eigener Film, von dir hochgeladen.",
       "generateInstead": "Stattdessen aus meinen Antworten erstellen",
       "uploadFailed": "Der Film konnte nicht gespeichert werden. Bitte versuche es erneut.",
@@ -348,7 +351,8 @@
       "hint": "Ein kurzer Absatz, der deine Geschichte vorstellt. Schreibe selbst oder lass dir einen Entwurf vorschlagen und bearbeite ihn.",
       "empty": "Füge zuerst einige Antworten hinzu, bevor du eine Zusammenfassung erstellst.",
       "failed": "Wir konnten keine Zusammenfassung erstellen. Bitte versuche es erneut.",
-      "rateLimited": "Du hast kürzlich einige Zusammenfassungen erstellt. Bitte warte kurz und versuche es erneut."
+      "rateLimited": "Du hast kürzlich einige Zusammenfassungen erstellt. Bitte warte kurz und versuche es erneut.",
+      "providerNotice": "Für einen Vorschlag werden deine schriftlichen Antworten und vorhandenen Transkripte an Groq in den USA gesendet. Du kannst selbst eine Zusammenfassung schreiben."
     },
     "publicFilm": {
       "readFullStory": "Ganze Geschichte lesen"
@@ -372,7 +376,7 @@
     "wizardHelper": "Erzähle die Geschichte deines Handwerks in deinen eigenen Worten.",
     "consent": {
       "title": "Einwilligung zur Veröffentlichung",
-      "body": "Ich bestätige, dass diese Geschichte mir gehört und ich sie teilen darf, und ich stimme ihrer Veröffentlichung auf dieser Website zu, einschließlich meiner Aufnahmen, meines Namens und jedes Ortes, den ich hinzugefügt habe. Ich kann die Veröffentlichung jederzeit zurücknehmen."
+      "body": "Ich darf diese Geschichte teilen und stimme der Veröffentlichung meines Namens, meiner Aufnahmen und des von mir freigegebenen Orts zu. Ich kann die Universität bitten, die Geschichte zurückzunehmen."
     },
     "storyboard": {
       "title": "Filmvorschau",
@@ -762,7 +766,8 @@
     "editKey": "API-Schlüssel bearbeiten",
     "delete": "Löschen",
     "deleteConfirm": "Generiertes Bild aus Galerie löschen?",
-    "taskQueue": "Generierungsverlauf"
+    "taskQueue": "Generierungsverlauf",
+    "providerNotice": "OpenRouter und der gewählte Modellanbieter erhalten deine Eingabe. Signierte Bilder können die Eingabe und das Modell enthalten."
   },
   "materials": {
     "selectOne": "Bitte auswählen:",

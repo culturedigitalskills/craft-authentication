@@ -194,7 +194,10 @@
       "failed": "No se pudieron generar los subtítulos para esta grabación",
       "someProcessing": "Los subtítulos aún se generan en segundo plano: puedes publicar ahora y aparecerán automáticamente en tu historia cuando estén listos.",
       "someFailed": "No se pudieron generar los subtítulos de algunas grabaciones.",
-      "retry": "Intentar de nuevo"
+      "retry": "Intentar de nuevo",
+      "disclosure": "Para crear subtítulos en inglés, Groq (EE. UU.) recibe el audio de las grabaciones de tu historia y del vídeo subido que aún necesiten subtítulos. Puedes publicar sin ellos.",
+      "request": "Enviar audio a Groq para crear subtítulos",
+      "requestError": "No se pudo solicitar los subtítulos. Inténtalo de nuevo."
     },
     "wizardTitle": "Mi historia",
     "wizardHelper": "Comparte la historia de tu artesanía con tus propias palabras.",
@@ -246,7 +249,7 @@
       "formatVideo": "Grabación de vídeo",
       "encouragement": "Responde con tus propias palabras, como si le contaras tu historia a alguien que quiere entender tu artesanía.",
       "alreadyHaveFilmTitle": "¿Ya tienes un film propio?",
-      "alreadyHaveFilmBody": "Súbelo y será el film de tu historia. Después podrás añadir un resumen breve, y nosotros añadiremos subtítulos en inglés."
+      "alreadyHaveFilmBody": "Puedes solicitar subtítulos en inglés al revisar la historia."
     },
     "step1": {
       "title": "Sobre ti",
@@ -332,7 +335,7 @@
       "uploadOwn": "Subir mi propio film",
       "uploadReplace": "Sustituir por mi propio film",
       "uploadProgress": "Subiendo {percent}%",
-      "uploadHint": "¿Ya tienes un film propio? Súbelo y le añadiremos subtítulos en inglés.",
+      "uploadHint": "Puedes solicitar subtítulos en inglés al revisar la historia.",
       "uploadedBadge": "Este es tu propio film, subido por ti.",
       "generateInstead": "Crear uno con mis respuestas",
       "uploadFailed": "No pudimos guardar ese film. Inténtalo de nuevo.",
@@ -350,7 +353,8 @@
       "hint": "Un párrafo breve que presenta tu historia. Escríbelo tú mismo, o sugiere un borrador y edítalo.",
       "empty": "Añade algunas respuestas antes de redactar un resumen.",
       "failed": "No pudimos redactar un resumen. Inténtalo de nuevo.",
-      "rateLimited": "Has redactado varios resúmenes recientemente. Espera un poco e inténtalo de nuevo."
+      "rateLimited": "Has redactado varios resúmenes recientemente. Espera un poco e inténtalo de nuevo.",
+      "providerNotice": "Para sugerir un resumen, se envían tus respuestas escritas y las transcripciones disponibles a Groq (EE. UU.). También puedes escribirlo tú."
     },
     "publicFilm": {
       "readFullStory": "Leer la historia completa"
@@ -372,7 +376,7 @@
     },
     "consent": {
       "title": "Consentimiento para publicar",
-      "body": "Confirmo que esta historia es mía y puedo compartirla, y acepto que se publique en este sitio, incluidas mis grabaciones, mi nombre y cualquier ubicación que haya añadido. Puedo dejar de publicarla en cualquier momento."
+      "body": "Confirmo que tengo permiso para compartir esta historia y acepto publicar mi nombre, mis grabaciones y la ubicación que elegí compartir. Puedo pedir a la Universidad que retire la historia."
     },
     "storyboard": {
       "title": "Vista previa del film",
@@ -768,7 +772,8 @@
     "editKey": "Editar clave API",
     "delete": "Eliminar",
     "deleteConfirm": "¿Eliminar la imagen generada de la galería?",
-    "taskQueue": "Historial de generación"
+    "taskQueue": "Historial de generación",
+    "providerNotice": "OpenRouter y el proveedor del modelo seleccionado reciben tus instrucciones. Las imágenes firmadas pueden incluir las instrucciones y el modelo."
   },
   "mediaGallery": {
     "title": "Galería multimedia",

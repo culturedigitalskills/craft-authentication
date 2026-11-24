@@ -242,7 +242,7 @@ model Craft {
     inspiration      String?
     careInstructions String?
     isPublic         Boolean   @default(false)
-    isSharedLocation Boolean   @default(true)
+    isSharedLocation Boolean   @default(false)
     latitude         Float?
     longitude        Float?
     place            String?
@@ -391,9 +391,10 @@ model MediaAttachment {
 model MediaTranscript {
     id             String           @id @default(uuid())
     mediaId        String           @unique // source video MediaFile
-    audioMediaId   String? // extracted audio MediaFile (reused later for montage)
+    audioMediaId   String? // legacy stored extraction, retained for cleanup
     status         TranscriptStatus @default(PENDING)
     sourceLanguage String? // NOTE: Groq's translations endpoint reports the OUTPUT language ("English"), not the detected source
+    requestedAt    DateTime? // Maker requested external captions for this recording.
     segments       Json? // [{ start, end, text }] translated to English
     error          String?
     createdAt      DateTime         @default(now())

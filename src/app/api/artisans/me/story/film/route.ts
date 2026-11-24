@@ -10,7 +10,6 @@ import {
     UploadStoryFilmSchema,
 } from '@/lib/validations/craftStory'
 import { deleteMediaFiles } from '@/lib/media-delete'
-import { enqueueTranscription } from '@/lib/transcription'
 import { mediaKind } from '@/lib/media-kind'
 import { PLAYABLE_FILM_MIME_TYPES } from '@/lib/validations/media'
 import { siteBaseUrl } from '@/lib/site-url'
@@ -258,15 +257,6 @@ export async function PUT(request: NextRequest) {
         // The film it replaced is now unreferenced, along with its captions.
         if (existing?.outputMediaId && existing.outputMediaId !== mediaId) {
             await deleteMediaFiles([existing.outputMediaId])
-        }
-
-        // Captions are generated the same way as for a rendered film, so
-        // /api/media/[id]/subtitles serves them once Groq finishes. Non-fatal:
-        // the film is already usable without them.
-        try {
-            await enqueueTranscription(mediaId)
-        } catch (transcriptionError) {
-            console.error('Caption enqueue failed for uploaded film', mediaId, transcriptionError)
         }
 
         // inputsHash is an internal render detail; GET strips it too.

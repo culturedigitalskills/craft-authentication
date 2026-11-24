@@ -194,7 +194,10 @@
       "failed": "Bu kayıt için altyazı oluşturulamadı",
       "someProcessing": "Altyazılar hâlâ arka planda oluşturuluyor. Şimdi yayımlayabilirsin, hazır olduklarında hikâyende otomatik olarak görünecekler.",
       "someFailed": "Bazı kayıtlar için altyazı oluşturulamadı.",
-      "retry": "Tekrar dene"
+      "retry": "Tekrar dene",
+      "disclosure": "İngilizce altyazı oluşturmak için hikâye kayıtlarınızın ve yüklediğiniz filmin henüz altyazısı olmayan kısımlarının sesi ABD’deki Groq’a gönderilir. Altyazısız da yayımlayabilirsiniz.",
+      "request": "Altyazı için sesi Groq’a gönder",
+      "requestError": "Altyazı isteği başarısız oldu. Tekrar deneyin."
     },
     "wizardTitle": "Benim Hikâyem",
     "wizardHelper": "Zanaatının hikâyesini kendi sözlerinle paylaş.",
@@ -246,7 +249,7 @@
       "formatVideo": "Video kaydı",
       "encouragement": "Lütfen kendi sözlerinle, zanaatını anlamak isteyen birine hikâyeni anlatır gibi cevap ver.",
       "alreadyHaveFilmTitle": "Zaten kendi filmin var mı?",
-      "alreadyHaveFilmBody": "Onu yükle, hikâye filmin o olsun. Sonrasında kısa bir özet ekleyebilirsin, İngilizce altyazıyı da biz ekleriz."
+      "alreadyHaveFilmBody": "İnceleme aşamasında İngilizce altyazı isteyebilirsiniz."
     },
     "step1": {
       "title": "Kendin Hakkında",
@@ -332,7 +335,7 @@
       "uploadOwn": "Kendi filmimi yükle",
       "uploadReplace": "Kendi filmimle değiştir",
       "uploadProgress": "Yükleniyor {percent}%",
-      "uploadHint": "Zaten kendi filmin var mı? Onu yükle, İngilizce altyazıyı biz ekleyelim.",
+      "uploadHint": "İnceleme aşamasında İngilizce altyazı isteyebilirsiniz.",
       "uploadedBadge": "Bu senin kendi filmin, senin yüklediğin.",
       "generateInstead": "Bunun yerine cevaplarımdan oluştur",
       "uploadFailed": "Bu filmi kaydedemedik. Lütfen tekrar dene.",
@@ -350,7 +353,8 @@
       "hint": "Hikâyeni tanıtan kısa bir paragraf. Kendin yaz ya da bir taslak öner ve düzenle.",
       "empty": "Özet oluşturmadan önce birkaç yanıt ekle.",
       "failed": "Özet oluşturamadık. Lütfen tekrar dene.",
-      "rateLimited": "Son zamanlarda birkaç özet oluşturdun. Lütfen biraz bekleyip tekrar dene."
+      "rateLimited": "Son zamanlarda birkaç özet oluşturdun. Lütfen biraz bekleyip tekrar dene.",
+      "providerNotice": "Özet önerisi için yazılı yanıtlarınız ve mevcut dökümler ABD’deki Groq’a gönderilir. Özeti kendiniz de yazabilirsiniz."
     },
     "publicFilm": {
       "readFullStory": "Hikâyenin tamamını oku"
@@ -372,7 +376,7 @@
     },
     "consent": {
       "title": "Yayımlama onayı",
-      "body": "Bu hikâyenin bana ait olduğunu ve paylaşma hakkım olduğunu onaylıyorum; kayıtlarım, adım ve eklediğim konum dahil olmak üzere bu sitede yayımlanmasını kabul ediyorum. Yayımdan istediğim zaman kaldırabilirim."
+      "body": "Bu hikâyeyi paylaşma iznim olduğunu onaylıyorum. Adımın, kayıtlarımın ve paylaşmayı seçtiğim konumun yayımlanmasını kabul ediyorum. Üniversiteden hikâyemi kaldırmasını isteyebilirim."
     },
     "storyboard": {
       "title": "Film önizlemesi",
@@ -768,7 +772,8 @@
     "editKey": "API Anahtarını Düzenle",
     "delete": "Sil",
     "deleteConfirm": "Oluşturulan resim galeriden silinsin mi?",
-    "taskQueue": "Oluşturma Geçmişi"
+    "taskQueue": "Oluşturma Geçmişi",
+    "providerNotice": "OpenRouter ve seçtiğiniz modelin sağlayıcısı isteminizi alır. İmzalı görseller istemi ve modeli içerebilir."
   },
   "mediaGallery": {
     "title": "Medya Galerisi",

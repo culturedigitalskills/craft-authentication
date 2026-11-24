@@ -194,7 +194,10 @@
       "failed": "Captions couldn't be generated for this recording",
       "someProcessing": "Captions are still generating in the background. You can publish now, and they'll appear on your story automatically when ready.",
       "someFailed": "Captions couldn't be generated for some recordings.",
-      "retry": "Try again"
+      "retry": "Try again",
+      "disclosure": "For English captions, Groq in the US receives audio from your current story recordings and uploaded film that still need captions. You can publish without captions.",
+      "request": "Send audio to Groq for captions",
+      "requestError": "The caption request failed. Please try again."
     },
     "wizardTitle": "My Story",
     "wizardHelper": "Share the story of your craft in your own words.",
@@ -246,7 +249,7 @@
       "formatVideo": "Video recording",
       "encouragement": "Please answer in your own words, like you are telling your story to someone who wants to understand your craft.",
       "alreadyHaveFilmTitle": "Already have a film of your own?",
-      "alreadyHaveFilmBody": "Upload it and it becomes your story film. You can still add a short summary afterwards, and we will add English captions."
+      "alreadyHaveFilmBody": "Upload your own film as your story film. You can request English captions during review."
     },
     "step1": {
       "title": "About Yourself",
@@ -332,7 +335,7 @@
       "uploadOwn": "Upload my own film",
       "uploadReplace": "Replace with my own film",
       "uploadProgress": "Uploading {percent}%",
-      "uploadHint": "Already have a film of your own? Upload it instead and we will add English captions to it.",
+      "uploadHint": "You can upload a film you made yourself. You can request English captions during review.",
       "uploadedBadge": "This is your own film, uploaded by you.",
       "generateInstead": "Create one from my answers instead",
       "uploadFailed": "We could not save that film. Please try again.",
@@ -350,7 +353,8 @@
       "hint": "A short paragraph introducing your story. Write your own, or suggest a draft and edit it.",
       "empty": "Add some answers before drafting a summary.",
       "failed": "We couldn't draft a summary. Please try again.",
-      "rateLimited": "You've drafted a few summaries recently. Please wait a little and try again."
+      "rateLimited": "You've drafted a few summaries recently. Please wait a little and try again.",
+      "providerNotice": "A suggested summary sends your written answers and available transcripts to Groq in the US. You can also write your own."
     },
     "publicFilm": {
       "readFullStory": "Read the full story"
@@ -372,7 +376,7 @@
     },
     "consent": {
       "title": "Consent to publish",
-      "body": "I confirm this story is mine to share, and I agree to it being published on this site, including my recordings, my name and any location I chose to add. I can unpublish it at any time."
+      "body": "I have permission to share this story and agree to publish it on this site, including my name, recordings and any location I chose to share. I can ask the University to take it down."
     },
     "storyboard": {
       "title": "Film preview",
@@ -768,7 +772,8 @@
     "editKey": "Edit API Key",
     "delete": "Delete",
     "deleteConfirm": "Delete generated image from gallery?",
-    "taskQueue": "Generation History"
+    "taskQueue": "Generation History",
+    "providerNotice": "OpenRouter and the selected model provider receive your prompt. Signed images may include the prompt and model."
   },
   "mediaGallery": {
     "title": "Media Gallery",
@@ -847,7 +852,7 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: 28 August 2026",
+    "lastUpdated": "Last updated: 24 November 2026",
     "intro": "This policy explains what personal information Sustainable Crafting collects, why we collect it, and what rights you have over it. It applies to this website and to the accounts, artisan profiles, handcrafted product records and story films created through it.",
     "sections": [
       {
@@ -860,19 +865,19 @@
       },
       {
         "heading": "The information we collect",
-        "body": "Account information. When you create an account we store your name, your email address and a hash of your password. If you sign in with Google we store the account identifier, name, email address and profile image that Google provides. We never receive or store your Google password.\n\nArtisan profile. If you create an artisan profile we store the first and last name, country and region you enter, together with anything else you choose to add: a biography, years of experience, how you learned your craft, a website, social media handles and hashtags. You may also record the approximate latitude and longitude of where you work.\n\nHandcrafted product records. Titles, descriptions, materials, techniques, measurements, photographs and videos of the pieces you document, and optionally the place where a piece was made.\n\nMy Story. Your written answers to the story questions, the audio and video you record or upload, photographs and videos of your workshop, tools, materials and process, and the short summary that introduces your story. From this material we generate English captions, a transcript and an assembled story film.\n\nCommunities. Your membership of any community on the site, and the role you hold in it.\n\nTechnical information. A session cookie that keeps you signed in, ordinary server logs recording requests made to the site."
+        "body": "Account information. When you create an account we store your name, your email address and a hash of your password. If you sign in with Google we store the account identifier, name, email address and profile image that Google provides. We never receive or store your Google password.\n\nArtisan profile. If you create an artisan profile we store the first and last name, country and region you enter, together with anything else you choose to add: a biography, years of experience, how you learned your craft, a website, social media handles and hashtags.\n\nHandcrafted product records. Titles, descriptions, materials, techniques, measurements, photographs and videos of the pieces you document, and optionally the place where a piece was made. If you turn on location sharing, your browser rounds the coordinates to the nearest tenth of a degree before the site looks up a place name or stores the new location.\n\nMy Story. Your written answers to the story questions, the audio and video you record or upload, photographs and videos of your workshop, tools, materials and process, and the short summary that introduces your story. You can create a story film and separately request English captions and a transcript.\n\nCommunities. Your membership of any community on the site, and the role you hold in it.\n\nTechnical information. A session cookie that keeps you signed in, ordinary server logs recording requests made to the site."
       },
       {
         "heading": "Recordings and sensitive information",
-        "body": "Story recordings carry your face and your voice, and they often describe your family, your community, your traditions and your beliefs. Depending on what you choose to say, a recording may reveal information that data protection law treats as a special category, such as ethnic origin or religious belief.\n\nWe process this material only because you have chosen to provide it and have consented to it being published. You can withdraw that consent at any time by unpublishing your story or by asking us to delete it."
+        "body": "Story recordings carry your face and your voice, and they often describe your family, your community, your traditions and your beliefs. Depending on what you choose to say, a recording may reveal information that data protection law treats as a special category, such as ethnic origin or religious belief.\n\nYou can answer in writing. Include information about other people only if you have permission. Saving a draft, requesting captions and publishing your story are separate choices. You can delete your story or contact {privacyContact} to withdraw permission for publication."
       },
       {
         "heading": "Why we process your information",
-        "body": "To provide your account and the service you asked for, we process your account and profile information because it is necessary to perform our agreement with you.\n\nTo publish your handcrafted product records, your story and your film, we rely on your consent, which you give when you choose to publish. Published material is visible to anyone who visits the site.\n\nTo generate captions, transcripts and draft summaries from your recordings, we rely on your consent, which you give when you choose to record or upload.\n\nTo keep the site secure and working, including rate limiting and error logging, we rely on our legitimate interest in operating a safe service.\n\nAs a research project we may report anonymous or aggregated statistics about how the site is used. That material does not identify you."
+        "body": "To provide your account and the service you asked for, we process your account and profile information because it is necessary to perform our agreement with you.\n\nTo publish your handcrafted product records, your story and your film, we rely on your consent, which you give when you choose to publish. Published material is visible to anyone who visits the site.\n\nTo generate captions, transcripts and draft summaries from your recordings, we rely on your consent, which you give when you select the corresponding caption or summary action. The site can save your draft without sending it for either purpose.\n\nTo keep the site secure and working, including rate limiting and error logging, we rely on our legitimate interest in operating a safe service.\n\nAs a research project we may report anonymous or aggregated statistics about how the site is used. That material does not identify you."
       },
       {
         "heading": "Who we share it with",
-        "body": "We do not sell your personal information and we do not use it for advertising.\n\nAutomated transcription. Audio and video from your story recordings is sent to Groq, a service provider in the United States, which produces the English captions and transcripts and drafts summary text. Only the media needed for that task is sent.\n\nSign in with Google. If you choose this option, Google processes the sign in under its own privacy policy.\n\nMaps and embedded video. Handcrafted product pages can show a map from OpenStreetMap and video embedded from YouTube. Neither loads until you choose to open it. When you do, that provider receives your IP address and may set its own cookies. Some pages also display images hosted by Wikimedia.\n\nHosting. The site, its database and its media storage are operated for the project rather than on a public cloud bucket."
+        "body": "We do not sell your personal information and we do not use it for advertising.\n\nAutomated transcription. If you request captions, we send the audio of the recordings covered by your request to Groq in the United States. If you request a suggested summary, we send the written answers and available transcript text to Groq.\n\nAI image generation. If you generate an image, OpenRouter and the selected model provider receive your prompt. Signed outputs can retain the prompt and model name.\n\nSign in with Google. If you choose this option, Google processes the sign in under its own privacy policy.\n\nPlace lookup. When you enable craft location sharing, the site sends rounded coordinates to OpenStreetMap’s Nominatim service to find a locality.\n\nMaps and embedded video. Handcrafted product pages can show a map from OpenStreetMap and video embedded from YouTube. Neither loads until you choose to open it. When you do, that provider receives your IP address and may set its own cookies. Some pages also display images hosted by Wikimedia.\n\nHosting. The site, its database and its media storage are operated for the project rather than on a public cloud bucket."
       },
       {
         "heading": "Information leaving the UK",
@@ -880,11 +885,11 @@
       },
       {
         "heading": "How long we keep it",
-        "body": "Account and profile information is kept for as long as your account is open. Deleting your artisan profile deletes the handcrafted products and the story attached to it. Deleting a media file removes both the database record and the stored file.\n\nUnpublished drafts stay in your account until you delete them. Server logs are kept only for as long as they are needed to operate and secure the site."
+        "body": "Removing your maker profile hides it and its crafts and story from public view. The project keeps the records so the profile can be restored. To request erasure of your account, profile or related material, use {privacyContact}. You can also delete individual crafts or your story. Files used elsewhere may remain there. Downloads already held by others can persist.\n\nAccount details are kept while your account is open. Unpublished drafts remain until you delete them or the project handles an erasure request. Server logs are kept as needed to operate and secure the site."
       },
       {
         "heading": "Access to what you upload",
-        "body": "Published material is public by design and can be seen by anyone visiting the site.\n\nMaterial you have not published is not listed anywhere public and is not linked from any page. Media files are served from an address containing a long random identifier, and anyone holding that address can open the file. Please treat an unpublished upload as unlisted rather than as private, and do not upload anything you would not want seen if its address were shared."
+        "body": "Public profiles, published crafts and published stories can be viewed by anyone, including people who follow a QR code. A file attached to a public item can be viewed or downloaded. Gallery uploads are public by default. Review the gallery setting before adding personal photographs or recordings. A file used only in private material is restricted to its owner and site administrators. A file used in several places can still be public through another attachment. Signed images and certificates can carry your name or account identifier in downloaded copies."
       },
       {
         "heading": "Security",
@@ -910,7 +915,7 @@
   },
   "terms": {
     "title": "Terms of Service",
-    "lastUpdated": "Last updated: 28 August 2026",
+    "lastUpdated": "Last updated: 24 November 2026",
     "intro": "These terms govern your use of Sustainable Crafting. By creating an account or using the site, you agree to them.",
     "sections": [
       {
@@ -927,7 +932,7 @@
       },
       {
         "heading": "Publishing and consent",
-        "body": "Material stays unpublished until you choose to publish it. When you publish a story, that story and its film become visible to anyone who visits the site, including your name, your recordings and any location you chose to share. You can unpublish at any time."
+        "body": "When you publish your story, visitors can see your story, name, recordings, any location you chose to share, and a ready story film. You can hide the film, delete your story, or contact {privacyContact} to withdraw permission for publication. The public visibility of gallery uploads is controlled separately."
       },
       {
         "heading": "Acceptable use",
@@ -947,7 +952,7 @@
       },
       {
         "heading": "Ending your use of the site",
-        "body": "You can stop using the site and delete your account at any time. Deleting your artisan profile deletes the handcrafted products and the story attached to it. We may suspend or end access where these terms are breached."
+        "body": "You can remove your maker profile from public view. Removal keeps the profile, crafts and story available for restoration. To request erasure of your account or associated material, use {privacyContact}. We may suspend or end access where these terms are breached."
       },
       {
         "heading": "Changes to these terms",

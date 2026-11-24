@@ -8,7 +8,7 @@ import {
     UpdateCraftStorySchema,
 } from '@/lib/validations/craftStory'
 import { deleteMediaFiles } from '@/lib/media-delete'
-import { collectTranscriptAudioIds, enqueueTranscription } from '@/lib/transcription'
+import { collectTranscriptAudioIds } from '@/lib/transcription'
 
 export async function GET() {
     const { session, unauthorized } = await requireAuth()
@@ -109,12 +109,6 @@ export async function PUT(request: NextRequest) {
             const audioIds = await collectTranscriptAudioIds(replacedMediaIds)
             // Fire-and-forget; failure here shouldn't fail the save.
             void deleteMediaFiles([...replacedMediaIds, ...audioIds])
-        }
-
-        // Queue English captions for any answer videos referenced in this save.
-        // enqueueTranscription no-ops for non-video media and work already done.
-        if (submittedMediaIds.length > 0) {
-            await Promise.all(submittedMediaIds.map(enqueueTranscription))
         }
 
         return NextResponse.json({ story })

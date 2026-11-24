@@ -71,9 +71,13 @@ Story videos (My Story answers and workshop clips) are automatically transcribed
 captions via Groq Whisper. Requires `GROQ_API_KEY` and ffmpeg (bundled via `ffmpeg-static` for local dev,
 installed in the production image).
 
+Craft location sharing defaults to off. The browser, place lookup, storage and public views use coordinates rounded to 0.1 degrees. Disabling sharing clears the location on save.
+
+Story uploads are saved without external transcription. GET /api/artisans/me/story/transcripts lists caption status for the maker's current recordings. POST to the same endpoint with `{ "sendAudioToGroq": true, "mediaIds": ["<uuid>"] }` to request English captions for the selected recordings. Audio extraction uses temporary storage.
+
 ### Verifiable Credentials
 
-- `GET /api/vc/:craftId` - Download signed credential JSON for a craft
+- `GET /api/vc/:craftId` - Download a signed credential for a published craft. For a private craft or removed maker, only the owner or a site administrator can download it.
 - `POST /api/vc/verify` - Verify a credential JSON
 - `GET /api/vc/signing-test` - Signing self-test endpoint (dev by default; production requires `VC_TEST_TOKEN` + `x-vc-test-token` header)
 

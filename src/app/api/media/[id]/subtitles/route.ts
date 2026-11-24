@@ -52,7 +52,7 @@ export async function GET(
         return new NextResponse(vtt, {
             headers: {
                 'Content-Type': 'text/vtt; charset=utf-8',
-                'Cache-Control': access.isPublic ? 'public, max-age=3600' : 'private, no-store',
+                'Cache-Control': access.isPublic ? 'public, no-cache' : 'private, no-store',
             },
         })
     } catch (error) {

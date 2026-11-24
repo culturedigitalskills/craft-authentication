@@ -30,7 +30,7 @@ export const CreateCraftSchema = z.object({
     inspiration: z.string().max(2000).optional(),
     careInstructions: z.string().max(2000).optional(),
     isPublic: z.boolean().default(false),
-    isSharedLocation: z.boolean().default(true),
+    isSharedLocation: z.boolean().default(false),
     latitude: z.number().min(-90).max(90).nullish(),
     longitude: z.number().min(-180).max(180).nullish(),
     place: z.string().max(255).nullish(),

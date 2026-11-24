@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, requireActiveArtisan } from '@/lib/auth-guard'
@@ -15,7 +16,10 @@ async function storyMediaIds(userId: string): Promise<string[] | null> {
     })
     if (!artisan) return null
 
-    const story = await prisma.craftStory.findUnique({ where: { artisanId: artisan.id } })
+    const story = await prisma.craftStory.findUnique({
+        where: { artisanId: artisan.id },
+        include: { film: { select: { outputMediaId: true, source: true } } },
+    })
     if (!story) return null
 
     const answerMediaIds = ANSWER_MEDIA_FIELDS.map(k => story[k]).filter(
@@ -25,7 +29,17 @@ async function storyMediaIds(userId: string): Promise<string[] | null> {
         where: { entityType: 'CraftStory', entityId: story.id },
         select: { mediaId: true },
     })
-    return [...new Set([...answerMediaIds, ...workshopAttachments.map(a => a.mediaId)])]
+    const ids = [...answerMediaIds, ...workshopAttachments.map(a => a.mediaId)]
+    if (story.film?.source === 'UPLOADED' && story.film.outputMediaId) ids.push(story.film.outputMediaId)
+    const recordings = await prisma.mediaFile.findMany({
+        where: {
+            id: { in: ids },
+            uploaderId: userId,
+            OR: [{ mimeType: { startsWith: 'audio/' } }, { mimeType: { startsWith: 'video/' } }],
+        },
+        select: { id: true },
+    })
+    return recordings.map(recording => recording.id)
 }
 
 /**
@@ -40,13 +54,13 @@ async function transcriptsFor(mediaIds: string[]): Promise<{
     if (mediaIds.length === 0) return { statuses: {}, segments: {} }
     const transcripts = await prisma.mediaTranscript.findMany({
         where: { mediaId: { in: mediaIds } },
-        select: { mediaId: true, status: true, segments: true },
+        select: { mediaId: true, status: true, segments: true, requestedAt: true },
     })
 
-    const statuses: Record<string, string> = {}
+    const statuses: Record<string, string> = Object.fromEntries(mediaIds.map(id => [id, 'AVAILABLE']))
     const segments: Record<string, TranscriptSegment[]> = {}
     for (const t of transcripts) {
-        statuses[t.mediaId] = t.status
+        statuses[t.mediaId] = t.requestedAt || t.status === 'READY' ? t.status : 'AVAILABLE'
         if (t.status === 'READY' && t.segments) {
             segments[t.mediaId] = t.segments as unknown as TranscriptSegment[]
         }
@@ -73,29 +87,30 @@ export async function GET() {
     }
 }
 
-/**
- * Retry captions that failed (e.g. a transient upstream error). Re-enqueues only
- * the FAILED transcripts for this story's media; enqueueTranscription re-claims
- * FAILED rows and no-ops for anything already done or in flight. Returns the
- * refreshed statuses.
- */
-export async function POST() {
+const captionRequest = z.object({
+    sendAudioToGroq: z.literal(true),
+    mediaIds: z.array(z.uuid()).min(1),
+})
+
+export async function POST(request: Request) {
     const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
 
     try {
+        const input = captionRequest.safeParse(await request.json().catch(() => null))
+        if (!input.success) return errorResponse('Choose recordings for external captions', 400)
         const mediaIds = await storyMediaIds(session!.user.id)
-        if (!mediaIds) return NextResponse.json({ statuses: {}, segments: {} })
-
-        const failed = await prisma.mediaTranscript.findMany({
-            where: { mediaId: { in: mediaIds }, status: 'FAILED' },
-            select: { mediaId: true },
-        })
-        await Promise.all(failed.map(f => enqueueTranscription(f.mediaId)))
+        if (!mediaIds) return errorResponse('Recording no longer available', 409)
+        const allowed = new Set(mediaIds)
+        const selected = [...new Set(input.data.mediaIds)]
+        if (selected.some(id => !allowed.has(id))) {
+            return errorResponse('Recording no longer available', 409)
+        }
+        await Promise.all(selected.map(id => enqueueTranscription(id)))
 
         return NextResponse.json(await transcriptsFor(mediaIds))
     } catch (error) {
-        console.error('Error retrying captions:', error)
-        return errorResponse('Failed to retry captions', 500)
+        console.error('Error requesting captions:', error)
+        return errorResponse('Failed to request captions', 500)
     }
 }

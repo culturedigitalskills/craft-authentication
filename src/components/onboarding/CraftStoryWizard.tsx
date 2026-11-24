@@ -130,18 +130,28 @@ export function CraftStoryWizard({
         }
     }, [])
 
-    // Re-run any failed captions (e.g. a transient upstream error). The failed
-    // rows flip back to processing, and the poll below picks them up.
-    const retryCaptions = useCallback(async () => {
+    const [captionRequestError, setCaptionRequestError] = useState(false)
+    const [requestingCaptions, setRequestingCaptions] = useState(false)
+    const requestCaptions = async () => {
+        const mediaIds = Object.keys(captionStatuses).filter(id => ['FAILED', 'AVAILABLE'].includes(captionStatuses[id]))
+        if (requestingCaptions || !mediaIds.length) return
+        setRequestingCaptions(true)
+        setCaptionRequestError(false)
         try {
-            const res = await fetch('/api/artisans/me/story/transcripts', { method: 'POST' })
-            if (!res.ok) return
+            const res = await fetch('/api/artisans/me/story/transcripts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sendAudioToGroq: true, mediaIds }),
+            })
+            if (!res.ok) throw new Error('Caption request failed')
             const data = await res.json()
             setCaptionStatuses(data.statuses ?? {})
         } catch {
-            // Informational retry — never surface fetch failures.
+            setCaptionRequestError(true)
+        } finally {
+            setRequestingCaptions(false)
         }
-    }, [])
+    }
 
     useEffect(() => {
         void refreshCaptionStatuses()
@@ -413,7 +423,10 @@ export function CraftStoryWizard({
                                 onPersistSummary={() => {
                                     void save(step)
                                 }}
-                                onRetryCaptions={retryCaptions}
+                                onFilmUploaded={refreshCaptionStatuses}
+                                onRequestCaptions={requestCaptions}
+                                requestingCaptions={requestingCaptions}
+                                captionRequestError={captionRequestError}
                                 consented={consented}
                                 onConsentChange={setConsented}
                             />
@@ -633,7 +646,7 @@ function QuestionStep({
 // invisible to the artisan (there is no editing step to surface it).
 function CaptionStatusChip({ status }: { status?: string }) {
     const t = useTranslations('craftStory.captions')
-    if (!status) return null
+    if (!status || status === 'AVAILABLE') return null
     if (status === 'READY') {
         return (
             <p className="flex items-center gap-1.5 text-xs font-medium text-warm">
@@ -712,7 +725,10 @@ function ReviewStep({
     summaryText,
     onSummaryChange,
     onPersistSummary,
-    onRetryCaptions,
+    onFilmUploaded,
+    onRequestCaptions,
+    requestingCaptions,
+    captionRequestError,
     consented,
     onConsentChange,
 }: {
@@ -723,7 +739,10 @@ function ReviewStep({
     summaryText: string
     onSummaryChange: (value: string) => void
     onPersistSummary: () => void
-    onRetryCaptions: () => void
+    onFilmUploaded: () => Promise<void>
+    onRequestCaptions: () => void
+    requestingCaptions: boolean
+    captionRequestError: boolean
     consented: boolean
     onConsentChange: (value: boolean) => void
 }) {
@@ -768,7 +787,7 @@ function ReviewStep({
             <p className="mb-6 text-base text-muted-foreground">{t('review.lead')}</p>
 
             {/* The film is the headline of the story — offer it first. */}
-            <StoryFilmPanel storyPublished={story.status === 'PUBLISHED'} />
+            <StoryFilmPanel storyPublished={story.status === 'PUBLISHED'} onUploaded={onFilmUploaded} />
 
             <div className="mt-6">
                 <SummaryEditor
@@ -802,6 +821,15 @@ function ReviewStep({
                 ))}
             </div>
             <p className="mt-3 text-center text-xs text-muted-foreground">{t('review.editHint')}</p>
+            {(statusValues.includes('AVAILABLE') || captionsFailed) && (
+                <div className="mt-4 space-y-2">
+                    <p className="text-sm">{t('captions.disclosure')}</p>
+                    <Button type="button" variant="outline" onClick={onRequestCaptions} disabled={requestingCaptions}>
+                        {t('captions.request')}
+                    </Button>
+                </div>
+            )}
+            {captionRequestError && <p role="alert">{t('captions.requestError')}</p>}
             {captionsProcessing && (
                 <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -814,9 +842,6 @@ function ReviewStep({
                         <AlertCircle className="h-3.5 w-3.5" />
                         {t('captions.someFailed')}
                     </p>
-                    <Button type="button" variant="ghost" size="sm" onClick={onRetryCaptions}>
-                        {t('captions.retry')}
-                    </Button>
                 </div>
             )}
 
@@ -900,6 +925,7 @@ function SummaryEditor({
                     )}
                 </Button>
             </div>
+            <p className="mb-2 text-sm text-muted-foreground">{t('providerNotice')}</p>
             <Textarea
                 id="story-summary"
                 value={value}

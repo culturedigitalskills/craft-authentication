@@ -194,7 +194,10 @@
       "failed": "Impossible de générer les sous-titres de cet enregistrement",
       "someProcessing": "Les sous-titres sont en cours de génération en arrière-plan. Vous pouvez publier maintenant : ils apparaîtront automatiquement dans votre histoire dès qu’ils seront prêts.",
       "someFailed": "Impossible de générer les sous-titres de certains enregistrements.",
-      "retry": "Réessayer"
+      "retry": "Réessayer",
+      "disclosure": "Pour les sous-titres anglais, Groq, aux États-Unis, reçoit le son des enregistrements du récit et du film importé qui en ont encore besoin. Vous pouvez publier sans sous-titres.",
+      "request": "Envoyer le son à Groq pour le sous-titrage",
+      "requestError": "La demande a échoué. Veuillez réessayer."
     },
     "wizardTitle": "Mon histoire",
     "wizardHelper": "Racontez l’histoire de votre métier avec vos propres mots.",
@@ -246,7 +249,7 @@
       "formatVideo": "Enregistrement vidéo",
       "encouragement": "Répondez avec vos propres mots, comme si vous racontiez votre histoire à une personne qui souhaite comprendre votre métier.",
       "alreadyHaveFilmTitle": "Vous avez déjà votre propre film ?",
-      "alreadyHaveFilmBody": "Importez-le pour en faire le film de votre histoire. Vous pourrez ensuite ajouter un bref résumé, et nous y ajouterons des sous-titres anglais."
+      "alreadyHaveFilmBody": "Vous pouvez demander des sous-titres anglais lors de la relecture."
     },
     "step1": {
       "title": "À propos de vous",
@@ -332,7 +335,7 @@
       "uploadOwn": "Importer mon propre film",
       "uploadReplace": "Remplacer par mon propre film",
       "uploadProgress": "Importation : {percent} %",
-      "uploadHint": "Vous avez déjà votre propre film ? Importez-le et nous y ajouterons des sous-titres anglais.",
+      "uploadHint": "Vous pouvez demander des sous-titres anglais lors de la relecture.",
       "uploadedBadge": "Il s’agit de votre propre film, que vous avez importé.",
       "generateInstead": "Créer plutôt un film à partir de mes réponses",
       "uploadFailed": "Impossible d’enregistrer ce film. Veuillez réessayer.",
@@ -350,7 +353,8 @@
       "hint": "Un court paragraphe pour présenter votre histoire. Rédigez-le vous-même ou demandez une proposition à modifier.",
       "empty": "Ajoutez des réponses avant de demander un résumé.",
       "failed": "Impossible de rédiger un résumé. Veuillez réessayer.",
-      "rateLimited": "Vous avez demandé plusieurs résumés récemment. Patientez un peu avant de réessayer."
+      "rateLimited": "Vous avez demandé plusieurs résumés récemment. Patientez un peu avant de réessayer.",
+      "providerNotice": "Pour proposer un résumé, vos réponses écrites et les transcriptions disponibles sont envoyées à Groq aux États-Unis. Vous pouvez aussi le rédiger vous-même."
     },
     "publicFilm": {
       "readFullStory": "Lire toute l’histoire"
@@ -372,7 +376,7 @@
     },
     "consent": {
       "title": "Consentement à la publication",
-      "body": "Je confirme avoir le droit de partager cette histoire et j’accepte sa publication sur ce site, avec mes enregistrements, mon nom et tout lieu que j’ai choisi d’ajouter. Je peux en retirer la publication à tout moment."
+      "body": "Je confirme avoir le droit de partager ce récit et accepte la publication de mon nom, de mes enregistrements et du lieu que j’ai choisi de partager. Je peux demander à l’université de retirer mon récit."
     },
     "storyboard": {
       "title": "Aperçu du film",
@@ -768,7 +772,8 @@
     "editKey": "Modifier la clé API",
     "delete": "Supprimer",
     "deleteConfirm": "Supprimer l’image générée de la galerie ?",
-    "taskQueue": "Historique de génération"
+    "taskQueue": "Historique de génération",
+    "providerNotice": "OpenRouter et le fournisseur du modèle sélectionné reçoivent votre consigne. Les images signées peuvent contenir la consigne et le modèle."
   },
   "mediaGallery": {
     "title": "Galerie multimédia",

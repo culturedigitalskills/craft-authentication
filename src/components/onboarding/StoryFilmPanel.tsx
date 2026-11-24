@@ -32,7 +32,7 @@ interface FilmView {
  * public when the story is published, so a film rendered after that point sits
  * finished but hidden until the artisan is told to show it.
  */
-export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: boolean }) {
+export function StoryFilmPanel({ storyPublished = false, onUploaded }: { storyPublished?: boolean; onUploaded?: () => Promise<void> }) {
     const t = useTranslations('craftStory.film')
     const tStory = useTranslations('craftStory')
 
@@ -121,7 +121,7 @@ export function StoryFilmPanel({ storyPublished = false }: { storyPublished?: bo
         <StoryFilmUploadButton
             label={isReady ? t('uploadReplace') : t('uploadOwn')}
             disabled={busy}
-            onUploaded={refresh}
+            onUploaded={async () => { await refresh(); await onUploaded?.() }}
         />
     )
 

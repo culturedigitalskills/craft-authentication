@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { approximateCoordinate } from '@/lib/craft-location'
+import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Link } from '@/i8n/navigation'
@@ -139,7 +140,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
     const [inspiration, setInspiration] = useState(craft?.inspiration ?? '')
     const [careInstructions, setCareInstructions] = useState(craft?.careInstructions ?? '')
     const [isPublic, setIsPublic] = useState(craft?.isPublic ?? false)
-    const [isSharedLocation, setIsSharedLocation] = useState(craft?.isSharedLocation ?? true)
+    const [isSharedLocation, setIsSharedLocation] = useState(craft?.isSharedLocation ?? false)
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
     const [resolvedPlace, setResolvedPlace] = useState<string | null>(null)
 
@@ -159,33 +160,27 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
     const [galleryLoading, setGalleryLoading] = useState(false)
     const [galleryError, setGalleryError] = useState(false)
 
-    // The browser permission prompt only makes sense once the artisan is on the
-    // location step and has opted in, and it should not repeat on every visit.
-    const locationRequested = useRef(false)
-    useEffect(() => {
-        if (step !== STEP_VISIBILITY || !isSharedLocation) return
-        if (locationRequested.current || !navigator.geolocation) return
-        locationRequested.current = true
+    const locationRequest = useRef(0)
+    function changeLocationSharing(enabled: boolean) {
+        const request = ++locationRequest.current
+        setIsSharedLocation(enabled)
+        setLocation(null)
+        setResolvedPlace(null)
+        if (!enabled || !navigator.geolocation) return
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude
-                const lng = position.coords.longitude
-                setLocation({ lat, lng })
-                // Resolve the place name now so saving doesn't wait on a
-                // geocode round-trip. Non-fatal on failure.
-                fetch(`/api/geocode?lat=${lat}&lng=${lng}`)
-                    .then((res) => res.json())
-                    .then((geo) => {
-                        if (geo?.city) setResolvedPlace(geo.city)
-                    })
-                    .catch(() => {})
-            },
-            (geoError) => {
-                console.error('Geolocation error:', geoError.message)
-            },
-        )
-    }, [step, isSharedLocation])
+        navigator.geolocation.getCurrentPosition((position) => {
+            if (request !== locationRequest.current) return
+            const lat = approximateCoordinate(position.coords.latitude)
+            const lng = approximateCoordinate(position.coords.longitude)
+            setLocation({ lat, lng })
+            fetch(`/api/geocode?lat=${lat}&lng=${lng}`)
+                .then((res) => res.json())
+                .then((geo) => {
+                    if (request === locationRequest.current && geo?.city) setResolvedPlace(geo.city)
+                })
+                .catch(() => {})
+        })
+    }
 
     function clearFieldError(key: string) {
         setFieldErrors((prev) => {
@@ -977,7 +972,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                                         type="checkbox"
                                         id="isSharedLocation"
                                         checked={isSharedLocation}
-                                        onChange={(e) => setIsSharedLocation(e.target.checked)}
+                                        onChange={(e) => changeLocationSharing(e.target.checked)}
                                         className="rounded border-input"
                                     />
                                     {t('createCraftMakeLocationPublic')}
@@ -987,7 +982,7 @@ export function CraftWizard({ craft }: { craft: CraftWizardCraft | null }) {
                             {isSharedLocation && (
                                 <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                                     <MapPin className="h-3.5 w-3.5 shrink-0" />
-                                    {resolvedPlace ??
+                                    {resolvedPlace ?? craft?.place ??
                                         (location ? tw('locationFound') : tw('locationPending'))}
                                 </p>
                             )}

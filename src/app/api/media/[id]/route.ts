@@ -86,13 +86,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             'Content-Disposition',
             `inline; filename="${headerSafeFilename(fileData.originalName)}"`,
         )
-        // Media files are immutable per id, so a public one can be cached hard.
-        // A private one must not be: a shared cache would hand it to the next
-        // person asking, and a year of browser cache would outlive the removal
-        // or unpublishing that made it private in the first place.
+        // A public attachment can later become private or be removed.
         headers.set(
             'Cache-Control',
-            access.isPublic ? 'public, max-age=31536000' : 'private, no-store',
+            access.isPublic ? 'public, no-cache' : 'private, no-store',
         )
         headers.set('Accept-Ranges', 'bytes')
 
