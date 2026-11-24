@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client'
+import { validCues } from '@/lib/vtt'
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -6,6 +8,7 @@ import { errorResponse, handleValidationError } from '@/lib/validations/types'
 import {
     ANSWER_KEYS,
     CreateStoryFilmSchema,
+    readSceneSettings,
     UpdateStoryFilmSchema,
     UploadStoryFilmSchema,
 } from '@/lib/validations/craftStory'
@@ -55,6 +58,10 @@ async function collectMeta(story: StoryWithArtisan) {
         orderBy: { displayOrder: 'asc' },
     })
 
+    const settings = readSceneSettings(story.sceneSettings)
+    const transcripts = await prisma.mediaTranscript.findMany({ where: { mediaId: { in: answerMediaIds }, status: 'READY' },
+        select: { mediaId: true, segments: true } })
+    const cues = new Map(transcripts.map(t => [t.mediaId, validCues(t.segments)]))
     let spokenCount = 0
     let videoAnswerCount = 0
     const chapters = ANSWER_KEYS.map(key => {
@@ -69,7 +76,9 @@ async function collectMeta(story: StoryWithArtisan) {
             voiceMediaId: isSpoken ? (mediaId as string) : null,
             voiceKind: (isSpoken ? kind : null) as 'audio' | 'video' | null,
             voiceDurationSec: 0,
-            segments: null,
+            visualId: settings[key]?.visualId,
+            captionText: settings[key]?.caption?.mediaId === mediaId ? settings[key]?.caption?.text : undefined,
+            segments: mediaId ? (cues.get(mediaId) ?? null) : null,
         }
     })
 
@@ -158,7 +167,14 @@ export async function GET() {
         }
 
         const { inputsHash: _inputsHash, ...filmView } = film
-        return NextResponse.json({ film: filmView, stale })
+        const transcript = film.outputMediaId ? await prisma.mediaTranscript.findUnique({
+            where: { mediaId: film.outputMediaId }, select: { status: true, segments: true },
+        }) : null
+        const hasCaptions = transcript?.status === 'READY' && validCues(transcript.segments).length > 0
+        const edition = await prisma.storyPublication.findUnique({
+            where: { storyId: story.id }, select: { filmMediaId: true },
+        })
+        return NextResponse.json({ film: { ...filmView, hasCaptions }, featuredMediaId: edition?.filmMediaId ?? null, stale })
     } catch (error) {
         console.error('Error fetching story film:', error)
         return errorResponse('Failed to fetch film', 500)
@@ -250,6 +266,8 @@ export async function PUT(request: NextRequest) {
                 // An uploaded film was never planned, so there is nothing to
                 // compare against and it can never be stale.
                 inputsHash: null,
+                chapters: Prisma.DbNull,
+                isPublic: false,
                 error: null,
             },
         })
@@ -279,17 +297,21 @@ export async function PATCH(request: NextRequest) {
         if (!story) return errorResponse('No story to film', 404)
 
         const body = await request.json()
-        const { isPublic } = UpdateStoryFilmSchema.parse(body)
-
+        const { isPublic, outputMediaId } = UpdateStoryFilmSchema.parse(body)
+        const edition = await prisma.storyPublication.findUnique({ where: { storyId: story.id } })
+        if (!edition) return errorResponse('Publish the story page first', 409)
         const film = await prisma.storyFilm.findUnique({ where: { storyId: story.id } })
-        if (!film || film.status !== 'READY') {
-            return errorResponse('Film is not ready to publish', 409)
-        }
-
-        const updated = await prisma.storyFilm.update({
-            where: { storyId: story.id },
-            data: { isPublic },
-        })
+        if (!film || (isPublic && (film.status !== 'READY' || !film.outputMediaId || outputMediaId !== film.outputMediaId)))
+            return errorResponse('Review the current film before featuring it', 409)
+        const [updated] = await prisma.$transaction([
+            prisma.storyFilm.update({ where: { storyId: story.id, ...(isPublic ? { outputMediaId: film.outputMediaId!, status: 'READY' } : {}) }, data: { isPublic } }),
+            prisma.storyPublication.update({ where: { storyId: story.id }, data: {
+                filmMediaId: isPublic ? film.outputMediaId : null,
+                filmChapters: isPublic && film.chapters ? film.chapters : Prisma.DbNull,
+            } }),
+        ])
+        if (edition.filmMediaId && edition.filmMediaId !== film.outputMediaId)
+            await deleteMediaFiles([edition.filmMediaId])
         return NextResponse.json({ film: updated })
     } catch (error) {
         if (error instanceof ZodError) return handleValidationError(error)

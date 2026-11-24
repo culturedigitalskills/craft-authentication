@@ -274,6 +274,7 @@ model CraftStory {
     answerChallengesText    String?
     answerChallengesMediaId String?
     summaryText             String?
+    sceneSettings           Json?
     publishedAt             DateTime?
     // When the artisan consented to this story being published. Null for
     // stories published before consent was recorded, which stay published.
@@ -282,6 +283,23 @@ model CraftStory {
     updatedAt               DateTime         @updatedAt
     artisan                 Artisan          @relation(fields: [artisanId], references: [id], onDelete: Cascade)
     film                    StoryFilm?
+    publication             StoryPublication?
+}
+
+// The public edition is replaced only on explicit publication. Media IDs are
+// retained even when a maker removes the attachment from the working draft.
+model StoryPublication {
+    storyId       String     @id
+    answers       Json
+    summaryText   String?
+    workshopIds   String[]   @default([])
+    mediaIds      String[]   @default([])
+    filmMediaId   String?
+    filmChapters  Json?
+    story         CraftStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+    @@index([mediaIds], type: Gin)
+    @@index([filmMediaId])
 }
 
 // One auto-assembled voiceover documentary per story. The rendered mp4 lives in
@@ -298,6 +316,7 @@ model StoryFilm {
     outputMediaId   String?    @unique
     templateVersion Int        @default(1)
     inputsHash      String?
+    chapters        Json?
     durationSec     Float?
     error           String?
     createdAt       DateTime   @default(now())

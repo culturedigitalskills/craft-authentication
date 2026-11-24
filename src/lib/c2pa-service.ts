@@ -632,13 +632,15 @@ export class C2PAService {
                 const signerIssuer = manifest.signature_info?.issuer || 'Unknown'
                 const signerTime = manifest.signature_info?.time || null
 
-                const actionsAssertion = manifest.assertions?.find(
-                    (a: any) => a.label === 'c2pa.actions' || a.label === 'c2pa.actions.v2',
-                ) as any
-                if (actionsAssertion?.data?.actions) {
-                    for (const act of actionsAssertion.data.actions) {
+                // An edit can have multiple action assertions with the same label and
+                // different instance numbers. Preserve each signed action in manifest order.
+                for (const assertion of manifest.assertions ?? []) {
+                    if (assertion.label !== 'c2pa.actions' && assertion.label !== 'c2pa.actions.v2') continue
+                    const data = assertion.data
+                    if (!data || typeof data !== 'object' || !('actions' in data) || !Array.isArray(data.actions)) continue
+                    for (const act of data.actions) {
                         // c2pa.opened is an internal ingredient reference — not user-facing
-                        if (act.action === 'c2pa.opened') continue
+                        if (!act || typeof act.action !== 'string' || act.action === 'c2pa.opened') continue
                         assertions.push({
                             action: act.action,
                             description: act.description || act.parameters?.description || null,

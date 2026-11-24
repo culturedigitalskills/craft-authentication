@@ -8,6 +8,12 @@ export interface TranscriptSegment {
     text: string
 }
 
+export function validCues(value: unknown): TranscriptSegment[] {
+    if (!Array.isArray(value)) return []
+    return value.filter((s): s is TranscriptSegment => s && typeof s.text === 'string' && s.text.trim()
+        && Number.isFinite(s.start) && Number.isFinite(s.end) && s.start >= 0 && s.end > s.start)
+}
+
 // HH:MM:SS.mmm — the WebVTT cue timestamp format.
 export function vttTimestamp(seconds: number): string {
     const totalMs = Math.max(0, Math.round(seconds * 1000))

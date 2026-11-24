@@ -146,6 +146,12 @@ export async function DELETE(
             return errorResponse('Forbidden', 403)
         }
 
+        // Removing a file from a draft must not break the edition a visitor can still see.
+        const edition = await prisma.storyPublication.findFirst({
+            where: { OR: [{ mediaIds: { has: id } }, { filmMediaId: id }] }, select: { storyId: true },
+        })
+        if (edition) return errorResponse('Remove this file from the published story before deleting it.', 409)
+
         // If this media has captions, its extracted-audio asset has no
         // attachment and won't be cleaned up by the cascade — capture it now
         // so we can GC it after the source (and its cascading transcript) go.

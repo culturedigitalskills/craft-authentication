@@ -187,6 +187,34 @@
     "reviewPhotos": "Photos"
   },
   "craftStory": {
+    "studio": {
+      "supplied": "Film captions supplied",
+      "chooseFilm": "Review the film and select it for your page before publishing a film-only story.",
+      "featureWithPage": "Include this film when I publish",
+      "previousFilm": "Your previously featured film is still on your page.",
+      "draft": "Private draft",
+      "saved": "Saved",
+      "firstScene": "Make my first scene",
+      "firstHint": "Your name is enough to start. Add a photo and a sentence or a recording; the other profile details can wait.",
+      "profileReady": "Your profile is ready",
+      "firstPhoto": "A photo from your workshop",
+      "scenePreview": "Private scene preview",
+      "review": "Review my story",
+      "preview": "Preview draft",
+      "publishChanges": "Publish changes",
+      "live": "Your story page is live. You can review your film here.",
+      "chapters": "Read or listen by chapter",
+      "noCaptions": "Captions are not available for this film.",
+      "sceneVisual": "Visual for this scene",
+      "automatic": "Mix my workshop images",
+      "shot": "Workshop visual {n}",
+      "captions": "Edit film captions",
+      "captionHint": "Enter the exact words in English, one short line per caption. Line timings are estimated; review them in the film.",
+      "filmHint": "Your voice and workshop images become a short film. You can publish the page while the film is being made.",
+      "featureAfter": "Review the film, then choose whether to show it on your published page.",
+      "featureFailed": "The film could not be updated. Refresh and review the current film.",
+      "reload": "Discard my local edits and reload"
+    },
     "captionsLabel": "English",
     "captions": {
       "processing": "Generating English captions…",
@@ -889,7 +917,7 @@
       },
       {
         "heading": "Access to what you upload",
-        "body": "Public profiles, published crafts and published stories can be viewed by anyone, including people who follow a QR code. A file attached to a public item can be viewed or downloaded. Gallery uploads are public by default. Review the gallery setting before adding personal photographs or recordings. A file used only in private material is restricted to its owner and site administrators. A file used in several places can still be public through another attachment. Signed images and certificates can carry your name or account identifier in downloaded copies."
+        "body": "Public profiles, published crafts and published stories can be viewed by anyone, including people who follow a QR code. A file attached to a public item can be viewed or downloaded. Gallery uploads are public by default. Review the gallery setting before adding personal photographs or recordings. A file used only in private material is restricted to its owner and site administrators. A file used in several places can still be public through another attachment. Signed images and certificates can carry your name or account identifier in downloaded copies.\n\nPublishing a story creates a public edition. Later draft edits stay private until you publish again. A film appears on the public story only when you choose to feature it. Replacing a file in a draft can leave its earlier copy visible in the published edition."
       },
       {
         "heading": "Security",
@@ -901,7 +929,7 @@
       },
       {
         "heading": "Cookies",
-        "body": "This site uses a session cookie to keep you signed in. It identifies your session and is cleared when you sign out. Your selected interface language is part of the page address, rather than a language-preference cookie. There are no analytics or advertising cookies set by this website. You can clear cookies in your browser at any time, but the site cannot keep you signed in without the session cookie."
+        "body": "This site uses a session cookie to keep you signed in. It identifies your session and is cleared when you sign out. Your selected interface language is part of the page address, rather than a language-preference cookie. There are no analytics or advertising cookies set by this website. You can clear cookies in your browser at any time, but the site cannot keep you signed in without the session cookie.\n\nWhile you complete your maker profile, this browser saves a draft for your account on this device. The site clears it when you finish. The story editor also keeps unsaved changes in this tab for recovery. Clearing this site’s browser storage removes those local copies. On a shared device, clear site data after use."
       },
       {
         "heading": "Children",
@@ -932,7 +960,7 @@
       },
       {
         "heading": "Publishing and consent",
-        "body": "When you publish your story, visitors can see your story, name, recordings, any location you chose to share, and a ready story film. You can hide the film, delete your story, or contact {privacyContact} to withdraw permission for publication. The public visibility of gallery uploads is controlled separately."
+        "body": "When you publish your story, visitors can see your story, name, recordings, any location you chose to share, and any film you choose to feature. Editing your draft does not change the public edition until you publish again. You can hide the film, delete your story, or contact {privacyContact} to withdraw permission for publication. The public visibility of gallery uploads is controlled separately."
       },
       {
         "heading": "Acceptable use",

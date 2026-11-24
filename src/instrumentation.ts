@@ -9,6 +9,8 @@ export async function register() {
     if (process.env.NEXT_PHASE === 'phase-production-build') return
 
     const { recoverStaleTranscriptions } = await import('@/lib/transcription')
+    const { checkFilmEncoder } = await import('@/lib/ffmpeg')
+    void checkFilmEncoder().catch(err => console.error('Story film startup check:', err.message))
     const { recoverStaleFilms } = await import('@/lib/film/jobs')
     const { C2PAService } = await import('@/lib/c2pa-service')
     const sweep = async () => {

@@ -136,6 +136,32 @@ test('privacy choices govern location, credentials and external captions', async
                     !!(await db.mediaTranscript.findUnique({ where: { mediaId } }))?.requestedAt,
             )
             .toBe(true)
+        const summary = page.locator('#story-summary')
+        const published = 'First published summary ' + id
+        const revised = 'Private revision ' + id
+        await summary.fill(published)
+        await page.getByRole('checkbox', { name: /I have permission to share this story/ }).check()
+        await page.getByRole('button', { name: 'Publish my story', exact: true }).click()
+        const publicPage = await visitor.newPage()
+        await expect.poll(async () => {
+            await publicPage.goto('/artisans/' + artisan.slug)
+            return publicPage.getByText(published, { exact: true }).count()
+        }).toBe(1)
+        await summary.fill(revised)
+        await summary.blur()
+        await expect.poll(async () => (await db.craftStory.findUnique({
+            where: { artisanId: artisan.id },
+        }))?.summaryText).toBe(revised)
+        await page.reload()
+        await expect(page.locator('#story-summary')).toHaveValue(revised)
+        await publicPage.reload()
+        await expect(publicPage.getByText(published, { exact: true })).toBeVisible()
+        await expect(publicPage.getByText(revised, { exact: true })).toHaveCount(0)
+        await page.getByRole('button', { name: 'Publish changes', exact: true }).click()
+        await expect.poll(async () => {
+            await publicPage.reload()
+            return publicPage.getByText(revised, { exact: true }).count()
+        }).toBe(1)
         await db.artisan.update({ where: { id: artisan.id }, data: { deletedAt: new Date() } })
         expect((await visitor.request.get('/api/vc/' + craftId)).status()).toBe(404)
     } finally {

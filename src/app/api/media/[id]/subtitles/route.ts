@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { errorResponse } from '@/lib/validations/types'
-import { segmentsToVtt, type TranscriptSegment } from '@/lib/vtt'
+import { segmentsToVtt, validCues } from '@/lib/vtt'
 import { resolveMediaAccess } from '@/lib/media-visibility'
 import { auth } from '@/lib/auth'
 
@@ -46,7 +46,8 @@ export async function GET(
             return errorResponse('Captions not available', 404)
         }
 
-        const segments = transcript.segments as unknown as TranscriptSegment[]
+        const segments = validCues(transcript.segments)
+        if (!segments.length) return errorResponse('Captions not available', 404)
         const vtt = segmentsToVtt(segments)
 
         return new NextResponse(vtt, {

@@ -19,11 +19,11 @@ export const FILM_FPS = 30
 // read the same number or a fresh film reports itself out of date.
 //   1: original silent-card assembly.
 //   2: music bed under the whole film.
-export const FILM_TEMPLATE_VERSION = 2
+//   3: voice-first scenes, maker-selected visuals and caption text, navigable chapters.
+export const FILM_TEMPLATE_VERSION = 3
 
-const INTRO_CARD_SEC = 3.0
-const TITLE_CARD_SEC = 2.6
-const OUTRO_CARD_SEC = 4.0
+// Voice and workshop footage start on the first frame. Keep only a short end credit.
+const OUTRO_CARD_SEC = 2.5
 // A shot never holds shorter than this, so the picture doesn't flash by.
 const MIN_SHOT_SEC = 2.5
 // Fallback cut interval when a chapter has no transcript to snap to.
@@ -44,6 +44,8 @@ export interface FilmChapterInput {
     voiceMediaId: string | null
     voiceKind: 'audio' | 'video' | null
     voiceDurationSec: number
+    visualId?: string
+    captionText?: string
     // English transcript for this answer if READY, else null (no cut-snapping).
     segments: TranscriptSegment[] | null
 }
@@ -70,7 +72,7 @@ export interface FilmShot {
 
 export interface PlannedChapter {
     key: AnswerKey
-    titleCard: { text: string; durationSec: number }
+    startSec: number
     voiceMediaId: string
     voiceKind: 'audio' | 'video'
     voiceDurationSec: number
@@ -81,7 +83,6 @@ export interface FilmPlan {
     width: number
     height: number
     fps: number
-    intro: { text: string; durationSec: number }
     chapters: PlannedChapter[]
     outro: { name: string; profileUrl: string; durationSec: number }
     captionSegments: TranscriptSegment[]
@@ -107,6 +108,20 @@ export function validateIngredients(inputs: FilmInputs): IngredientCheck {
     const hasTalkingHead = spoken.some(c => c.voiceKind === 'video')
     if (inputs.visuals.length === 0 && !hasTalkingHead) return { ok: false, reason: 'NO_VISUAL' }
     return { ok: true }
+}
+
+// For an English transcript supplied by the maker, one line is one cue.
+// Distribute lines by their word counts; a real timed transcript keeps its original timing.
+function timeCaptionLines(text: string, duration: number): TranscriptSegment[] {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
+    const lengths = lines.map(l => l.split(/\s+/).length)
+    const total = lengths.reduce((a,b) => a+b, 0)
+    let words = 0
+    return lines.map((text, i) => {
+        const start = duration * words / total
+        words += lengths[i]
+        return { start, end: duration * words / total, text }
+    })
 }
 
 // Cut a chapter's voice duration into shot lengths. With a transcript, cuts
@@ -170,17 +185,21 @@ export function buildFilmPlan(inputs: FilmInputs): FilmPlan {
     const captionSegments: TranscriptSegment[] = []
     const chapters: PlannedChapter[] = []
 
-    let clock = INTRO_CARD_SEC
+    let clock = 0
     let poolIndex = 0
     let shotCounter = 0
 
     for (const chapter of spoken) {
-        clock += TITLE_CARD_SEC
         const voiceStart = clock
-        const durations = cutDurations(chapter.voiceDurationSec, chapter.segments)
+        const segments = chapter.captionText?.trim()
+            ? timeCaptionLines(chapter.captionText, chapter.voiceDurationSec) : chapter.segments
+        const durations = cutDurations(chapter.voiceDurationSec, segments)
+        const chosen = pool.find(item => item.mediaId === chapter.visualId)
+        const talkingHead = inputs.visuals.length === 0 && chapter.voiceKind === 'video'
+            ? pool.find(item => item.mediaId === chapter.voiceMediaId) : undefined
 
         const shots: FilmShot[] = durations.map(durationSec => {
-            const base = pool[poolIndex % pool.length]
+            const base = chosen ?? talkingHead ?? pool[poolIndex % pool.length]
             poolIndex++
             let source: FilmShotSource = base
             if (base.type === 'image') {
@@ -196,15 +215,15 @@ export function buildFilmPlan(inputs: FilmInputs): FilmPlan {
 
         chapters.push({
             key: chapter.key,
-            titleCard: { text: chapter.titleCardText, durationSec: TITLE_CARD_SEC },
+            startSec: voiceStart,
             voiceMediaId: chapter.voiceMediaId as string,
             voiceKind: chapter.voiceKind as 'audio' | 'video',
             voiceDurationSec: chapter.voiceDurationSec,
             shots,
         })
 
-        if (chapter.segments) {
-            for (const seg of chapter.segments) {
+        if (segments) {
+            for (const seg of segments) {
                 captionSegments.push({
                     start: seg.start + voiceStart,
                     end: seg.end + voiceStart,
@@ -222,7 +241,6 @@ export function buildFilmPlan(inputs: FilmInputs): FilmPlan {
         width: FILM_WIDTH,
         height: FILM_HEIGHT,
         fps: FILM_FPS,
-        intro: { text: inputs.artisanName, durationSec: INTRO_CARD_SEC },
         chapters,
         outro: { name: inputs.artisanName, profileUrl: inputs.profileUrl, durationSec: OUTRO_CARD_SEC },
         captionSegments,
