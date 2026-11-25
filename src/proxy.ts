@@ -45,6 +45,28 @@ function generateCsp(nonce: string) {
 export default async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname
     if (pathname === '/health') return NextResponse.next()
+    if (pathname === '/_next/image') {
+        // User uploads can be withdrawn or erased. Serve them through the media
+        // access check on every request, including previously issued optimiser URLs.
+        const src = request.nextUrl.searchParams.get('url')
+        if (src) {
+            let target: URL
+            try { target = new URL(src, request.nextUrl.origin) }
+            catch { return NextResponse.next() }
+            if (target.pathname.startsWith('/api/media/') &&
+                (target.origin === request.nextUrl.origin || target.origin === process.env.AUTH_URL ||
+                 target.origin === 'http://localhost:20100')) {
+                const destination = request.nextUrl.clone()
+                destination.pathname = target.pathname
+                destination.search = target.search
+                const response = NextResponse.redirect(destination, 307)
+                response.headers.set('Cache-Control', 'private, no-store')
+                return response
+            }
+        }
+        return NextResponse.next()
+    }
+
 
     // Apply rate limiting only to API routes
     if (pathname.startsWith('/api/')) {
@@ -68,6 +90,7 @@ export const config = {
     matcher: [
         // Match all API routes for rate limiting
         '/api/:path*',
+        '/_next/image',
         // Match all pathnames for intl except API, _next, _vercel, and files with dots
         '/((?!api|_next|_vercel|.*\\..*).*)',
         // Match all pathnames within /users, optionally with locale prefix

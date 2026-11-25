@@ -84,23 +84,28 @@ export async function issueCraftVC(params: {
     )
 
     const credentialId = craftCredentialId(params.id)
-    await prisma.verifiableCredential.upsert({
-        where: { credentialId },
-        create: {
-            credentialId,
-            issuerDid: vc.issuer.id,
-            holderDid: params.artisanSlug,
-            credentialType: 'CraftCredential',
-            credentialSubject: vc.credentialSubject as object,
-            proof: vc.proof as object,
-            issuanceDate: new Date(vc.validFrom),
-        },
-        update: {
-            holderDid: params.artisanSlug,
-            credentialSubject: vc.credentialSubject as object,
-            proof: vc.proof as object,
-            issuanceDate: new Date(vc.validFrom),
-        },
+    await prisma.$transaction(async tx => {
+        // Signing and hashing may have finished after the maker deleted the craft.
+        const matches = await tx.$queryRaw<{id: string}[]>`SELECT id FROM "Craft" WHERE id = ${params.id} FOR KEY SHARE`
+        if (!matches.length) return
+        await tx.verifiableCredential.upsert({
+            where: { credentialId },
+            create: {
+                credentialId,
+                issuerDid: vc.issuer.id,
+                holderDid: params.artisanSlug,
+                credentialType: 'CraftCredential',
+                credentialSubject: vc.credentialSubject as object,
+                proof: vc.proof as object,
+                issuanceDate: new Date(vc.validFrom),
+            },
+            update: {
+                holderDid: params.artisanSlug,
+                credentialSubject: vc.credentialSubject as object,
+                proof: vc.proof as object,
+                issuanceDate: new Date(vc.validFrom),
+            },
+        })
     })
 }
 
