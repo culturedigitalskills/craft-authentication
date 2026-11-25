@@ -1,8 +1,8 @@
+import { approximateCoordinate, sharedCraftLocation } from '@/lib/craft-location'
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
-import { requireActiveArtisan } from '@/lib/auth-guard'
+import { canReadCraft, requireActiveArtisan } from '@/lib/auth-guard'
 import { UpdateCraftSchema } from '@/lib/validations/craft'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { deleteMediaFiles } from '@/lib/media-delete'
@@ -33,21 +33,10 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 },
             },
         })
-        if (!craft) return errorResponse('Craft not found', 404)
-
-        // A private craft, or one whose maker has been removed, is visible only
-        // to its owner or a site admin. A removed artisan's work leaves public
-        // view with them, but the owner keeps their own copy reachable and an
-        // admin can still see what they are acting on.
-        if (!craft.isPublic || craft.artisan.deletedAt) {
-            const session = await auth()
-            const isOwner = session?.user?.id === craft.artisan.userId
-            const isAdmin = session?.user?.role === 'ADMIN'
-            if (!isOwner && !isAdmin) return errorResponse('Craft not found', 404)
-        }
+        if (!craft || !(await canReadCraft(craft))) return errorResponse('Craft not found', 404)
 
         const mediaIds = await getCraftMediaIds(id)
-        return NextResponse.json({ ...craft, mediaIds })
+        return NextResponse.json({ ...craft, ...sharedCraftLocation(craft), mediaIds })
     } catch (error) {
         console.error('Error fetching craft:', error)
         return errorResponse('Failed to fetch craft', 500)
@@ -81,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         // Edit and media reconcile commit together, so a failure can't leave
         // the craft's text updated but its photos stale (or vice versa).
         const { updated, removed } = await prisma.$transaction(async (tx) => {
-            const record = await tx.craft.update({
+            let record = await tx.craft.update({
                 where: { id },
                 data: {
                     title: input.title,
@@ -99,13 +88,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                     careInstructions: input.careInstructions,
                     isPublic: input.isPublic,
                     isSharedLocation: input.isSharedLocation,
-                    latitude: input.latitude,
-                    longitude: input.longitude,
+                    latitude: input.latitude == null ? input.latitude : approximateCoordinate(input.latitude),
+                    longitude: input.longitude == null ? input.longitude : approximateCoordinate(input.longitude),
                     place: input.place,
                     videos: input.videos,
                 },
             })
 
+            // The first update holds the row lock while we apply its sharing choice.
+            if (!record.isSharedLocation && (record.latitude != null || record.longitude != null || record.place != null)) {
+                record = await tx.craft.update({
+                    where: { id },
+                    data: { latitude: null, longitude: null, place: null },
+                })
+            }
             // Only reconcile media when the client sent a list.
             const dropped = input.mediaIds
                 ? await setCraftMedia(id, input.mediaIds, tx)
@@ -132,7 +128,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             console.error('VC re-issuance failed for craft', id, vcError)
         }
 
-        return NextResponse.json(updated)
+        return NextResponse.json({ ...updated, ...sharedCraftLocation(updated) })
     } catch (error) {
         if (error instanceof ZodError) return handleValidationError(error)
         console.error('Error updating craft:', error)

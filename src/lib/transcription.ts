@@ -5,8 +5,7 @@ import path from 'path'
 import { prisma } from '@/lib/prisma'
 import { initGarage } from '@/lib/object-store'
 import { runFfmpeg } from '@/lib/ffmpeg'
-import { downloadObjectToFile, createMediaFileFromBuffer } from '@/lib/media-io'
-import { deleteMediaFiles } from '@/lib/media-delete'
+import { downloadObjectToFile } from '@/lib/media-io'
 import type { TranscriptSegment } from '@/lib/vtt'
 
 export type { TranscriptSegment } from '@/lib/vtt'
@@ -40,7 +39,7 @@ function scheduleJob(mediaId: string) {
 
 /**
  * Atomically claim a transcript row for processing. Claimable states are
- * PENDING, FAILED (manual retry via re-save), and stale PROCESSING (a job
+ * PENDING, FAILED (maker-requested retry), and stale PROCESSING (a job
  * orphaned by a crash or redeploy). Exactly one concurrent caller wins.
  */
 async function claimTranscription(mediaId: string): Promise<boolean> {
@@ -48,6 +47,7 @@ async function claimTranscription(mediaId: string): Promise<boolean> {
     const claimed = await prisma.mediaTranscript.updateMany({
         where: {
             mediaId,
+            requestedAt: { not: null },
             OR: [
                 { status: { in: ['PENDING', 'FAILED'] } },
                 { status: 'PROCESSING', updatedAt: { lt: staleCutoff } },
@@ -60,7 +60,7 @@ async function claimTranscription(mediaId: string): Promise<boolean> {
 
 /**
  * Ensure a spoken answer (video or audio) has a caption transcript. Idempotent
- * and safe to call on every save: it no-ops for non-audio/video media and for
+ * after an explicit maker request: it no-ops for non-audio/video media and for
  * transcripts already done or actively in flight, otherwise it claims the row
  * and queues processing.
  */
@@ -77,10 +77,15 @@ export async function enqueueTranscription(mediaId: string): Promise<void> {
     // claim below is the only place that transitions state.
     await prisma.mediaTranscript.upsert({
         where: { mediaId },
-        create: { mediaId, status: 'PENDING' },
+        create: { mediaId, status: 'PENDING', requestedAt: new Date() },
         update: {},
     })
 
+    // Legacy automatic jobs require an explicit request before they can run again.
+    await prisma.mediaTranscript.updateMany({
+        where: { mediaId, requestedAt: null, status: { not: 'READY' } },
+        data: { requestedAt: new Date(), status: 'PENDING' },
+    })
     if (await claimTranscription(mediaId)) scheduleJob(mediaId)
 }
 
@@ -88,19 +93,25 @@ export async function enqueueTranscription(mediaId: string): Promise<void> {
  * Re-queue jobs orphaned by a crash or redeploy (rows stuck in PENDING or
  * PROCESSING past the staleness window). Called from instrumentation on
  * server boot and on a slow heartbeat. FAILED rows are deliberately not
- * swept — they retry when the artisan saves again.
+ * swept — only the maker can request another attempt.
  */
 export async function recoverStaleTranscriptions(): Promise<void> {
     const staleCutoff = new Date(Date.now() - STALE_JOB_MS)
     const stale = await prisma.mediaTranscript.findMany({
         where: {
+            requestedAt: { not: null },
             status: { in: ['PENDING', 'PROCESSING'] },
             updatedAt: { lt: staleCutoff },
         },
         select: { mediaId: true },
     })
     for (const { mediaId } of stale) {
-        if (await claimTranscription(mediaId)) scheduleJob(mediaId)
+        // Legacy automatic jobs require an explicit request before they can run again.
+    await prisma.mediaTranscript.updateMany({
+        where: { mediaId, requestedAt: null, status: { not: 'READY' } },
+        data: { requestedAt: new Date(), status: 'PENDING' },
+    })
+    if (await claimTranscription(mediaId)) scheduleJob(mediaId)
     }
 }
 
@@ -119,8 +130,8 @@ async function setStatus(
  * Worker body — assumes the claim is already held (status PROCESSING).
  * Extracts audio from the source video, sends it to Groq Whisper to be
  * transcribed-and-translated to English with timestamps, and persists the
- * result. The extracted audio is kept as its own MediaFile for later reuse
- * (e.g. a montage). Errors are recorded on the transcript row, never thrown.
+ * result. Temporary audio is removed after the request. Errors are recorded on
+ * the transcript row.
  */
 async function processTranscription(mediaId: string): Promise<void> {
     const media = await prisma.mediaFile.findUnique({ where: { id: mediaId } })
@@ -146,7 +157,7 @@ async function processTranscription(mediaId: string): Promise<void> {
         await downloadObjectToFile(media.objectKey, inputPath)
 
         // 2. Extract a compact mono 16 kHz mp3 — small enough for Whisper and
-        //    a reusable audio asset for a future montage.
+        //    small enough to send as a temporary audio track.
         await runFfmpeg([
             '-i', inputPath,
             '-vn',
@@ -165,27 +176,12 @@ async function processTranscription(mediaId: string): Promise<void> {
             return
         }
 
-        // 3. Store the extracted audio as its own MediaFile (kept for reuse).
-        const audio = await createMediaFileFromBuffer({
-            buffer: audioBuffer,
-            mimeType: 'audio/mpeg',
-            extension: 'mp3',
-            originalName: `audio-${mediaId}.mp3`,
-            uploaderId: media.uploaderId,
+        // The extracted audio stays temporary and is removed in the finally block.
+        const request = await prisma.mediaTranscript.findFirst({
+            where: { mediaId, requestedAt: { not: null } },
+            select: { mediaId: true },
         })
-        try {
-            await prisma.mediaTranscript.update({
-                where: { mediaId },
-                data: { audioMediaId: audio.id },
-            })
-        } catch {
-            // The transcript row vanished mid-job (source video replaced or
-            // deleted). Don't strand the audio we just created.
-            await deleteMediaFiles([audio.id])
-            return
-        }
-
-        // 4. Transcribe + translate to English (with timestamps) via Groq Whisper.
+        if (!request) return
         const form = new FormData()
         form.append('file', new Blob([new Uint8Array(audioBuffer)], { type: 'audio/mpeg' }), 'audio.mp3')
         form.append('model', whisperModel())
@@ -198,8 +194,7 @@ async function processTranscription(mediaId: string): Promise<void> {
             signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
         })
         if (!res.ok) {
-            const body = await res.text().catch(() => '')
-            throw new Error(`Groq transcription failed (${res.status}): ${body.slice(0, 300)}`)
+            throw new Error(`Groq transcription failed (${res.status})`)
         }
 
         const data = (await res.json()) as {

@@ -5,13 +5,13 @@ import path from 'path'
 import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { initGarage } from '@/lib/object-store'
-import { runFfmpeg, probeDuration } from '@/lib/ffmpeg'
+import { runFfmpeg, probeDuration, checkFilmEncoder } from '@/lib/ffmpeg'
 import { downloadObjectToFile, createMediaFileFromBuffer } from '@/lib/media-io'
 import { deleteMediaFiles } from '@/lib/media-delete'
 import { mediaKind } from '@/lib/media-kind'
 import { siteBaseUrl } from '@/lib/site-url'
-import { ANSWER_KEYS } from '@/lib/validations/craftStory'
-import type { TranscriptSegment } from '@/lib/vtt'
+import { ANSWER_KEYS, readSceneSettings } from '@/lib/validations/craftStory'
+import { validCues, type TranscriptSegment } from '@/lib/vtt'
 import enMessages from '../../../messages/en.json'
 import { computeInputsHash } from './hash'
 import { mixMusicBed } from './music'
@@ -328,7 +328,7 @@ async function gatherInputs(
         select: { mediaId: true, segments: true },
     })
     const segmentsById = new Map(
-        transcripts.map(t => [t.mediaId, (t.segments as unknown as TranscriptSegment[]) ?? null]),
+        transcripts.map(t => [t.mediaId, validCues(t.segments)]),
     )
 
     const localPath = new Map<string, string>()
@@ -342,6 +342,7 @@ async function gatherInputs(
     }
 
     // Chapters, in ANSWER_KEYS order.
+    const settings = readSceneSettings(story.sceneSettings)
     const chapters: FilmChapterInput[] = []
     for (let i = 0; i < ANSWER_KEYS.length; i++) {
         const key = ANSWER_KEYS[i]
@@ -364,6 +365,8 @@ async function gatherInputs(
         chapters.push({
             key,
             titleCardText: englishTitle(i),
+            visualId: settings[key]?.visualId,
+            captionText: settings[key]?.caption?.mediaId === mediaId ? settings[key]?.caption?.text : undefined,
             voiceMediaId,
             voiceKind,
             voiceDurationSec,
@@ -422,28 +425,9 @@ async function renderTimeline(
         return start
     }
 
-    // Intro name card.
-    const introPath = path.join(tmpDir, 'unit-intro.mp4')
-    await renderCard({
-        durationSec: plan.intro.durationSec,
-        lines: [{ text: plan.intro.text, fontSize: 64, yExpr: '(h-text_h)/2' }],
-        outPath: introPath,
-        tmpDir,
-    })
-    units.push(introPath)
-
-    // Per chapter: title card, then the voiced body.
+    // Open immediately with the maker; chapter titles live in the navigable player.
     for (let ci = 0; ci < plan.chapters.length; ci++) {
         const chapter: PlannedChapter = plan.chapters[ci]
-
-        const titlePath = path.join(tmpDir, `unit-title-${ci}.mp4`)
-        await renderCard({
-            durationSec: chapter.titleCard.durationSec,
-            lines: [{ text: chapter.titleCard.text, fontSize: 52, yExpr: '(h-text_h)/2' }],
-            outPath: titlePath,
-            tmpDir,
-        })
-        units.push(titlePath)
 
         // Render each shot to a uniform silent clip. A shot that can't be built
         // (missing or unreadable source) becomes a neutral filler of the same
@@ -531,6 +515,7 @@ export async function renderStoryFilm(storyId: string): Promise<void> {
     const priorOutputId = existing?.outputMediaId ?? null
 
     try {
+        await checkFilmEncoder()
         await initGarage()
 
         const gathered = await gatherInputs(storyId, tmpDir)
@@ -562,14 +547,14 @@ export async function renderStoryFilm(storyId: string): Promise<void> {
         // Soft captions ride a synthetic READY transcript on the output file, so
         // the existing /api/media/[id]/subtitles route serves them unchanged.
         await prisma.$transaction([
-            prisma.mediaTranscript.create({
+            ...(plan.captionSegments.length ? [prisma.mediaTranscript.create({
                 data: {
                     mediaId: output.id,
                     status: 'READY',
                     sourceLanguage: 'English',
                     segments: plan.captionSegments as unknown as object[],
                 },
-            }),
+            })] : []),
             prisma.storyFilm.update({
                 where: { storyId },
                 data: {
@@ -577,6 +562,9 @@ export async function renderStoryFilm(storyId: string): Promise<void> {
                     // Rendering over a film the artisan uploaded returns
                     // ownership of the row to the generator.
                     source: 'RENDERED',
+                    isPublic: false,
+                    templateVersion: FILM_TEMPLATE_VERSION,
+                    chapters: plan.chapters.map(({ key, startSec }) => ({ key, startSec })),
                     outputMediaId: output.id,
                     durationSec,
                     inputsHash: computeInputsHash(gathered.inputs),

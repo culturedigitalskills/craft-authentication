@@ -11,7 +11,24 @@ export const ANSWER_MEDIA_FIELDS = ANSWER_KEYS.map(k => `answer${k}MediaId` as c
 const textAnswer = z.string().max(5000).optional().nullable()
 const mediaId = z.uuid().optional().nullable()
 
+export const SceneSettingsSchema = z.partialRecord(z.enum(ANSWER_KEYS), z.object({
+    visualId: z.uuid().optional(),
+    // Bind captions to a particular recording, never to its replacement.
+    caption: z.object({ mediaId: z.uuid(), text: z.string().max(5000) }).optional(),
+}))
+export type SceneSettings = z.infer<typeof SceneSettingsSchema>
+export function readSceneSettings(value: unknown): SceneSettings {
+    return SceneSettingsSchema.safeParse(value).data ?? {}
+}
+export const PublishStorySchema = z.object({
+    featureFilmId: z.uuid().optional(),
+    consent: z.boolean().optional(),
+    expectedUpdatedAt: z.string().datetime().optional(),
+})
+
 export const UpdateCraftStorySchema = z.object({
+    sceneSettings: SceneSettingsSchema.optional(),
+    expectNew: z.boolean().optional(),
     lastStepReached: z.number().int().min(0).max(8).optional(),
     expectedUpdatedAt: z.string().datetime().optional(),
     answerSelfText: textAnswer,
@@ -40,6 +57,7 @@ export type CreateStoryFilm = z.infer<typeof CreateStoryFilmSchema>
 // PATCH /api/artisans/me/story/film — publish/unpublish the rendered film.
 export const UpdateStoryFilmSchema = z.object({
     isPublic: z.boolean(),
+    outputMediaId: z.uuid().optional(),
 })
 export type UpdateStoryFilm = z.infer<typeof UpdateStoryFilmSchema>
 

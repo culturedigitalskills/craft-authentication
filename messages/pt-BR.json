@@ -187,6 +187,34 @@
     "reviewPhotos": "Fotos"
   },
   "craftStory": {
+    "studio": {
+      "supplied": "Legendas do filme adicionadas",
+      "chooseFilm": "Para publicar uma história só com o filme, assista a ele e selecione-o para a página.",
+      "featureWithPage": "Incluir este filme ao publicar",
+      "previousFilm": "O filme anterior continua na sua página.",
+      "draft": "Rascunho privado",
+      "saved": "Salvo",
+      "firstScene": "Criar minha primeira cena",
+      "firstHint": "Seu nome basta para começar. Adicione uma foto e uma frase ou gravação. Você pode completar o perfil depois.",
+      "profileReady": "Seu perfil está pronto",
+      "firstPhoto": "Uma foto do seu ateliê",
+      "scenePreview": "Prévia privada da cena",
+      "review": "Revisar minha história",
+      "preview": "Ver o rascunho",
+      "publishChanges": "Publicar alterações",
+      "live": "Sua história está no ar. Você pode revisar o filme aqui.",
+      "chapters": "Ler ou ouvir por capítulo",
+      "noCaptions": "Não há legendas disponíveis para este filme.",
+      "sceneVisual": "Imagem desta cena",
+      "automatic": "Alternar imagens do ateliê",
+      "shot": "Imagem do ateliê {n}",
+      "captions": "Editar legendas",
+      "captionHint": "Digite as palavras exatas em inglês, uma linha curta por legenda. Confira os tempos estimados no filme.",
+      "filmHint": "Sua voz e suas imagens viram um curta. Você pode publicar a página enquanto o filme é preparado.",
+      "featureAfter": "Assista ao filme e escolha se quer exibi-lo na sua página publicada.",
+      "featureFailed": "Não foi possível atualizar o filme. Recarregue e confira a versão atual.",
+      "reload": "Descartar minhas alterações locais e recarregar"
+    },
     "captionsLabel": "Inglês",
     "captions": {
       "processing": "Gerando legendas em inglês…",
@@ -194,7 +222,10 @@
       "failed": "Não foi possível gerar legendas para esta gravação",
       "someProcessing": "As legendas estão sendo geradas em segundo plano. Você pode publicar agora, e elas aparecerão automaticamente na sua história quando estiverem prontas.",
       "someFailed": "Não foi possível gerar legendas para algumas gravações.",
-      "retry": "Tentar novamente"
+      "retry": "Tentar novamente",
+      "disclosure": "Para gerar legendas em inglês, a Groq, nos EUA, recebe o áudio das gravações da história e do filme enviado que ainda precisam de legendas. Você pode publicar sem elas.",
+      "request": "Enviar áudio à Groq para legendar",
+      "requestError": "Não foi possível solicitar as legendas. Tente novamente."
     },
     "wizardTitle": "Minha história",
     "wizardHelper": "Conte a história do seu ofício com suas próprias palavras.",
@@ -246,7 +277,7 @@
       "formatVideo": "Gravação de vídeo",
       "encouragement": "Responda com suas próprias palavras, como se contasse sua história a alguém que quer entender seu ofício.",
       "alreadyHaveFilmTitle": "Já tem um vídeo próprio?",
-      "alreadyHaveFilmBody": "Envie-o para usá-lo como vídeo da sua história. Você poderá adicionar um breve resumo depois, e nós adicionaremos legendas em inglês."
+      "alreadyHaveFilmBody": "Você pode solicitar legendas em inglês durante a revisão."
     },
     "step1": {
       "title": "Sobre você",
@@ -332,7 +363,7 @@
       "uploadOwn": "Enviar meu próprio vídeo",
       "uploadReplace": "Substituir pelo meu próprio vídeo",
       "uploadProgress": "Enviando: {percent}%",
-      "uploadHint": "Já tem um vídeo próprio? Envie-o, e nós adicionaremos legendas em inglês.",
+      "uploadHint": "Você pode solicitar legendas em inglês durante a revisão.",
       "uploadedBadge": "Este é o seu próprio vídeo, enviado por você.",
       "generateInstead": "Criar um vídeo a partir das minhas respostas",
       "uploadFailed": "Não foi possível salvar este vídeo. Tente novamente.",
@@ -350,7 +381,8 @@
       "hint": "Um parágrafo curto para apresentar sua história. Escreva o seu ou peça um rascunho e edite-o.",
       "empty": "Adicione algumas respostas antes de gerar um resumo.",
       "failed": "Não foi possível criar um resumo. Tente novamente.",
-      "rateLimited": "Você gerou vários resumos recentemente. Aguarde um pouco e tente novamente."
+      "rateLimited": "Você gerou vários resumos recentemente. Aguarde um pouco e tente novamente.",
+      "providerNotice": "Para sugerir um resumo, suas respostas escritas e transcrições disponíveis são enviadas à Groq nos EUA. Você também pode escrever o seu."
     },
     "publicFilm": {
       "readFullStory": "Ler a história completa"
@@ -372,7 +404,7 @@
     },
     "consent": {
       "title": "Consentimento para publicação",
-      "body": "Confirmo que tenho o direito de compartilhar esta história e concordo com sua publicação neste site, incluindo minhas gravações, meu nome e qualquer localização que eu tenha escolhido adicionar. Posso retirá-la do ar a qualquer momento."
+      "body": "Confirmo que tenho permissão para compartilhar a história e concordo com a publicação do meu nome, das gravações e do local que escolhi compartilhar. Posso pedir à universidade que retire a história."
     },
     "storyboard": {
       "title": "Prévia do vídeo",
@@ -768,7 +800,8 @@
     "editKey": "Editar chave de API",
     "delete": "Excluir",
     "deleteConfirm": "Excluir a imagem gerada da galeria?",
-    "taskQueue": "Histórico de geração"
+    "taskQueue": "Histórico de geração",
+    "providerNotice": "A OpenRouter e o provedor do modelo escolhido recebem suas instruções. Imagens assinadas podem incluir as instruções e o modelo."
   },
   "mediaGallery": {
     "title": "Galeria de mídia",

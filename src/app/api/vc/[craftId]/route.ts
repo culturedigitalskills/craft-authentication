@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { DOMAIN } from '@/lib/did/config'
+import { craftCredentialId } from '@/lib/craft'
+import { canReadCraft } from '@/lib/auth-guard'
 import { errorResponse } from '@/lib/validations/types'
 import type { CraftCredential } from '@/lib/did/vc'
 
@@ -10,7 +11,14 @@ export async function GET(
 ) {
     try {
         const { craftId } = await params
-        const credentialId = `${DOMAIN}/credentials/crafts/${craftId}`
+        const craft = await prisma.craft.findFirst({
+            where: { id: craftId, deletedAt: null },
+            select: { isPublic: true, artisan: { select: { deletedAt: true, userId: true } } },
+        })
+        if (!craft || !(await canReadCraft(craft))) {
+            return errorResponse('Credential not found', 404)
+        }
+        const credentialId = craftCredentialId(craftId)
 
         const vcRecord = await prisma.verifiableCredential.findUnique({
             where: { credentialId },

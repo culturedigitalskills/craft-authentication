@@ -143,3 +143,13 @@ export async function requireGroupAdmin(groupId: string) {
         ),
     }
 }
+
+/** A private craft and a removed maker's craft are still accessible to their owner and site administrators. */
+export async function canReadCraft(craft: {
+    isPublic: boolean
+    artisan: { deletedAt: Date | null; userId: string }
+}) {
+    if (craft.isPublic && !craft.artisan.deletedAt) return true
+    const session = await auth()
+    return session?.user?.id === craft.artisan.userId || session?.user?.role === 'ADMIN'
+}

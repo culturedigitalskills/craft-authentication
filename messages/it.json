@@ -187,6 +187,34 @@
     "reviewPhotos": "Foto"
   },
   "craftStory": {
+    "studio": {
+      "supplied": "Sottotitoli del film inseriti",
+      "chooseFilm": "Per pubblicare una storia composta solo dal film, guardalo e selezionalo per la pagina.",
+      "featureWithPage": "Includi questo film quando pubblico",
+      "previousFilm": "Il film precedente è ancora sulla tua pagina.",
+      "draft": "Bozza privata",
+      "saved": "Salvato",
+      "firstScene": "Crea la mia prima scena",
+      "firstHint": "Per iniziare basta il tuo nome. Aggiungi una foto e una frase o una registrazione. Puoi completare il profilo in seguito.",
+      "profileReady": "Il tuo profilo è pronto",
+      "firstPhoto": "Una foto del tuo laboratorio",
+      "scenePreview": "Anteprima privata della scena",
+      "review": "Rivedi la mia storia",
+      "preview": "Anteprima della bozza",
+      "publishChanges": "Pubblica le modifiche",
+      "live": "La tua storia è online. Qui puoi rivedere il film.",
+      "chapters": "Leggi o ascolta i capitoli",
+      "noCaptions": "I sottotitoli non sono disponibili per questo film.",
+      "sceneVisual": "Immagine per la scena",
+      "automatic": "Alterna le immagini del laboratorio",
+      "shot": "Immagine del laboratorio {n}",
+      "captions": "Modifica i sottotitoli",
+      "captionHint": "Inserisci le parole esatte in inglese, una breve riga per sottotitolo. Verifica i tempi stimati nel film.",
+      "filmHint": "La tua voce e le immagini diventano un breve film. Puoi pubblicare la pagina durante la creazione del film.",
+      "featureAfter": "Guarda il film, poi scegli se mostrarlo sulla pagina pubblicata.",
+      "featureFailed": "Impossibile aggiornare il film. Ricarica e controlla la versione attuale.",
+      "reload": "Scarta le mie modifiche locali e ricarica"
+    },
     "captionsLabel": "Inglese",
     "captions": {
       "processing": "Generazione dei sottotitoli in inglese…",
@@ -194,7 +222,10 @@
       "failed": "Impossibile generare i sottotitoli per questa registrazione",
       "someProcessing": "I sottotitoli vengono generati in background. Puoi pubblicare subito: appariranno automaticamente nella storia quando saranno pronti.",
       "someFailed": "Impossibile generare i sottotitoli per alcune registrazioni.",
-      "retry": "Riprova"
+      "retry": "Riprova",
+      "disclosure": "Per i sottotitoli in inglese, Groq negli Stati Uniti riceve l’audio delle registrazioni della storia e del filmato caricato ancora da sottotitolare. Puoi pubblicare senza sottotitoli.",
+      "request": "Invia l’audio a Groq per i sottotitoli",
+      "requestError": "La richiesta non è riuscita. Riprova."
     },
     "wizardTitle": "La mia storia",
     "wizardHelper": "Racconta la storia del tuo mestiere con parole tue.",
@@ -246,7 +277,7 @@
       "formatVideo": "Registrazione video",
       "encouragement": "Rispondi con parole tue, come se raccontassi la tua storia a una persona che vuole conoscere il tuo mestiere.",
       "alreadyHaveFilmTitle": "Hai già un tuo video?",
-      "alreadyHaveFilmBody": "Caricalo per usarlo come video della tua storia. Potrai aggiungere un breve riepilogo in seguito e noi aggiungeremo i sottotitoli in inglese."
+      "alreadyHaveFilmBody": "Puoi richiedere i sottotitoli in inglese durante la revisione."
     },
     "step1": {
       "title": "Parlaci di te",
@@ -332,7 +363,7 @@
       "uploadOwn": "Carica il mio video",
       "uploadReplace": "Sostituisci con il mio video",
       "uploadProgress": "Caricamento: {percent}%",
-      "uploadHint": "Hai già un tuo video? Caricalo e aggiungeremo i sottotitoli in inglese.",
+      "uploadHint": "Puoi richiedere i sottotitoli in inglese durante la revisione.",
       "uploadedBadge": "Questo è il tuo video, caricato da te.",
       "generateInstead": "Crea invece un video dalle mie risposte",
       "uploadFailed": "Impossibile salvare il video. Riprova.",
@@ -350,7 +381,8 @@
       "hint": "Un breve paragrafo per presentare la tua storia. Scrivilo tu oppure richiedi una bozza da modificare.",
       "empty": "Aggiungi delle risposte prima di creare un riepilogo.",
       "failed": "Impossibile creare un riepilogo. Riprova.",
-      "rateLimited": "Hai richiesto diversi riepiloghi di recente. Attendi un po’ e riprova."
+      "rateLimited": "Hai richiesto diversi riepiloghi di recente. Attendi un po’ e riprova.",
+      "providerNotice": "Per suggerire un riepilogo, le risposte scritte e le trascrizioni disponibili vengono inviate a Groq negli Stati Uniti. Puoi anche scriverlo tu."
     },
     "publicFilm": {
       "readFullStory": "Leggi tutta la storia"
@@ -372,7 +404,7 @@
     },
     "consent": {
       "title": "Consenso alla pubblicazione",
-      "body": "Confermo di avere il diritto di condividere questa storia e acconsento alla sua pubblicazione sul sito, comprese le registrazioni, il mio nome e le località che ho scelto di aggiungere. Posso ritirarla dalla pubblicazione in qualsiasi momento."
+      "body": "Confermo di poter condividere questa storia e acconsento alla pubblicazione del mio nome, delle mie registrazioni e del luogo che ho scelto di condividere. Posso chiedere all’università di rimuovere la storia."
     },
     "storyboard": {
       "title": "Anteprima del video",
@@ -768,7 +800,8 @@
     "editKey": "Modifica chiave API",
     "delete": "Elimina",
     "deleteConfirm": "Eliminare l’immagine generata dalla galleria?",
-    "taskQueue": "Cronologia delle generazioni"
+    "taskQueue": "Cronologia delle generazioni",
+    "providerNotice": "OpenRouter e il fornitore del modello scelto ricevono le tue istruzioni. Le immagini firmate possono includere le istruzioni e il modello."
   },
   "mediaGallery": {
     "title": "Galleria multimediale",

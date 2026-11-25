@@ -1,3 +1,4 @@
+import { approximateCoordinate } from '@/lib/craft-location'
 import { NextRequest, NextResponse } from 'next/server'
 import { z, ZodError } from 'zod'
 import { requireAuth } from '@/lib/auth-guard'
@@ -18,8 +19,8 @@ export async function GET(request: NextRequest) {
         )
 
         const url = new URL('https://nominatim.openstreetmap.org/reverse')
-        url.searchParams.set('lat', String(lat))
-        url.searchParams.set('lon', String(lng))
+        url.searchParams.set('lat', String(approximateCoordinate(lat)))
+        url.searchParams.set('lon', String(approximateCoordinate(lng)))
         url.searchParams.set('format', 'json')
 
         const res = await fetch(url, {

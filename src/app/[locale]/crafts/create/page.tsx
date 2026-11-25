@@ -1,3 +1,4 @@
+import { sharedCraftLocation } from '@/lib/craft-location'
 import { getLocale } from 'next-intl/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
@@ -59,9 +60,7 @@ export default async function CraftCreatePage({
             careInstructions: record.careInstructions,
             isPublic: record.isPublic,
             isSharedLocation: record.isSharedLocation,
-            latitude: record.latitude,
-            longitude: record.longitude,
-            place: record.place,
+            ...sharedCraftLocation(record),
             videos: record.videos,
             media,
         }

@@ -2,7 +2,7 @@
 
 import { normalizeHashtag, isValidHashtag } from '@/lib/validations/hashtag'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
 import { Container } from '@/components/layout/Container'
@@ -86,7 +86,10 @@ const SOCIAL_KEYS = [
     'socialYoutube',
 ] as const
 
-export function ArtisanOnboardingWizard() {
+export function ArtisanOnboardingWizard({ ownerId }: { ownerId: string }) {
+    const studio = useTranslations('craftStory.studio')
+    const stories = useTranslations('craftStory.banner')
+    const makers = useTranslations('artisans')
     const tui = useTranslations('interface')
     const t = useTranslations('onboardingWizard')
     const tp = useTranslations('profile')
@@ -99,8 +102,31 @@ export function ArtisanOnboardingWizard() {
     const [error, setError] = useState<string | null>(null)
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
+    const storageKey = 'sc:profile-draft:' + ownerId
+    const current = useRef({ data: INITIAL_DATA, step: 1, hashtagInput: '' })
+    const [createdSlug, setCreatedSlug] = useState<string | null>(null)
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem(storageKey)
+            if (raw) {
+                const saved = JSON.parse(raw)
+                current.current = { data: { ...INITIAL_DATA, ...saved.data }, step: saved.step, hashtagInput: saved.hashtagInput ?? '' }
+                setData(current.current.data)
+                setStep(Math.max(1, Math.min(TOTAL_STEPS, Number(saved.step) || 1)))
+                setHashtagInput(saved.hashtagInput ?? '')
+            }
+        } catch { /* Profile creation also works with storage disabled. */ }
+    }, [storageKey])
+    function remember(next: Partial<typeof current.current>) {
+        current.current = { ...current.current, ...next }
+        try { localStorage.setItem(storageKey, JSON.stringify(current.current)) } catch { /* optional storage */ }
+    }
+    function move(to: number) { remember({ step: to }); setStep(to) }
+
     const update = <K extends keyof WizardData>(key: K, value: WizardData[K]) => {
-        setData((d) => ({ ...d, [key]: value }))
+        const next = { ...current.current.data, [key]: value }
+        remember({ data: next })
+        setData(next)
         setFieldErrors((fe) => {
             if (!(key in fe)) return fe
             const next = { ...fe }
@@ -119,11 +145,11 @@ export function ArtisanOnboardingWizard() {
     const nameValid = /\D/.test(data.firstName.trim()) && /\D/.test(data.lastName.trim())
 
     function next() {
-        if (step < TOTAL_STEPS) setStep((s) => s + 1)
+        if (step < TOTAL_STEPS) move(step + 1)
     }
 
     function back() {
-        if (step > 1) setStep((s) => s - 1)
+        if (step > 1) move(step - 1)
     }
 
     function addHashtag() {
@@ -136,10 +162,11 @@ export function ArtisanOnboardingWizard() {
         ) {
             update('hashtags', [...data.hashtags, tag])
         }
+        remember({ hashtagInput: '' })
         setHashtagInput('')
     }
 
-    async function handleSubmit() {
+    async function handleSubmit(startScene = false) {
         setSubmitting(true)
         setError(null)
         setFieldErrors({})
@@ -252,17 +279,25 @@ export function ArtisanOnboardingWizard() {
             // can be re-uploaded from the profile page.
             if (attachments.length > 0) await Promise.allSettled(attachments)
 
-            router.push(`/artisans/${artisan.slug}`)
+            setCreatedSlug(artisan.slug)
+            try { localStorage.removeItem(storageKey) } catch { /* optional */ }
+            if (startScene) router.push('/onboarding/story')
         } catch {
             setError(t('createFailed'))
             setSubmitting(false)
         }
     }
 
+    if (createdSlug) return <Container><div className="mx-auto my-12 max-w-xl space-y-5 rounded-2xl border p-8">
+        <h1 className="text-2xl font-semibold">{studio('profileReady')}</h1><p>{stories('startBody')}</p>
+        <div className="flex flex-wrap gap-3"><Button onClick={() => router.push('/onboarding/story')}>{studio('firstScene')}</Button>
+            <Button variant="outline" onClick={() => router.push('/artisans/' + createdSlug)}>{makers('viewProfile')}</Button></div>
+    </div></Container>
     return (
         <Container>
             <div className="mx-auto max-w-2xl py-10 sm:py-14">
                 {/* Steps are 1-based here; StepDots takes a zero-based index. */}
+                {step === 1 && <p className="mb-4 text-sm text-muted-foreground">{studio('firstHint')}</p>}
                 <StepDots current={step - 1} total={TOTAL_STEPS} />
                 <p className="mb-8 text-center text-xs text-muted-foreground">
                     {t('stepLabel', { current: step, total: TOTAL_STEPS })}
@@ -499,7 +534,7 @@ export function ArtisanOnboardingWizard() {
                                     <div className="flex gap-2">
                                         <Input
                                             value={hashtagInput}
-                                            onChange={(e) => setHashtagInput(e.target.value)}
+                                            onChange={(e) => { remember({ hashtagInput: e.target.value }); setHashtagInput(e.target.value) }}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
                                                     e.preventDefault()
@@ -568,7 +603,9 @@ export function ArtisanOnboardingWizard() {
                         {t('back')}
                     </Button>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                        {step === 1 && <Button type="button" variant="outline" onClick={() => void handleSubmit(true)}
+                            disabled={!nameValid || submitting}>{studio('firstScene')}</Button>}
                         {step > 1 && step < TOTAL_STEPS && (
                             <Button
                                 type="button"
@@ -591,7 +628,7 @@ export function ArtisanOnboardingWizard() {
                         ) : (
                             <Button
                                 type="button"
-                                onClick={handleSubmit}
+                                onClick={() => void handleSubmit()}
                                 disabled={submitting || !nameValid}
                             >
                                 {submitting ? (

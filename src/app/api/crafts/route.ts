@@ -1,3 +1,4 @@
+import { sharedCraftLocation } from '@/lib/craft-location'
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -112,9 +113,7 @@ export async function POST(request: NextRequest) {
                     careInstructions: input.careInstructions,
                     isPublic: input.isPublic,
                     isSharedLocation: input.isSharedLocation,
-                    latitude: input.latitude ?? null,
-                    longitude: input.longitude ?? null,
-                    place: input.place ?? null,
+                    ...sharedCraftLocation(input),
                     videos: input.videos ?? [],
                 },
             })

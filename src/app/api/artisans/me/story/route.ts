@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -8,7 +9,7 @@ import {
     UpdateCraftStorySchema,
 } from '@/lib/validations/craftStory'
 import { deleteMediaFiles } from '@/lib/media-delete'
-import { collectTranscriptAudioIds, enqueueTranscription } from '@/lib/transcription'
+import { collectTranscriptAudioIds } from '@/lib/transcription'
 
 export async function GET() {
     const { session, unauthorized } = await requireAuth()
@@ -44,7 +45,7 @@ export async function PUT(request: NextRequest) {
         if (!artisan) return errorResponse('Artisan profile required', 409)
 
         const body = await request.json()
-        const { expectedUpdatedAt, ...patch } = UpdateCraftStorySchema.parse(body)
+        const { expectedUpdatedAt, expectNew, ...patch } = UpdateCraftStorySchema.parse(body)
 
         // Validate that every answer*MediaId being saved was uploaded by this user.
         const submittedMediaIds = ANSWER_MEDIA_FIELDS
@@ -69,6 +70,8 @@ export async function PUT(request: NextRequest) {
         const existing = await prisma.craftStory.findUnique({
             where: { artisanId: artisan.id },
         })
+
+        if (expectNew && existing) return errorResponse('A draft already exists. Reload to continue.', 409)
 
         // Two-tab overwrite guard: if the client tells us when it last loaded the story,
         // refuse the write when the server-side updatedAt has moved past that point.
@@ -96,30 +99,24 @@ export async function PUT(request: NextRequest) {
             }
         }
 
-        const story = await prisma.craftStory.upsert({
-            where: { artisanId: artisan.id },
-            create: { artisanId: artisan.id, ...patch },
-            update: patch,
-        })
+        const story = existing && expectedUpdatedAt
+            ? (await prisma.craftStory.updateManyAndReturn({
+                where: { id: existing.id, updatedAt: new Date(expectedUpdatedAt) }, data: patch,
+            }))[0]
+            : expectNew
+            ? await prisma.craftStory.create({ data: { artisanId: artisan.id, ...patch } })
+            : await prisma.craftStory.upsert({ where: { artisanId: artisan.id },
+                create: { artisanId: artisan.id, ...patch }, update: patch })
+        if (!story) return errorResponse('Story was updated elsewhere. Reload to continue.', 409)
 
-        if (replacedMediaIds.length > 0) {
-            // Collect the extracted-audio assets before the source videos are
-            // GC'd (transcript rows cascade with the source; audio does not),
-            // then remove the source media and their audio together.
-            const audioIds = await collectTranscriptAudioIds(replacedMediaIds)
-            // Fire-and-forget; failure here shouldn't fail the save.
-            void deleteMediaFiles([...replacedMediaIds, ...audioIds])
-        }
-
-        // Queue English captions for any answer videos referenced in this save.
-        // enqueueTranscription no-ops for non-video media and work already done.
-        if (submittedMediaIds.length > 0) {
-            await Promise.all(submittedMediaIds.map(enqueueTranscription))
-        }
+        // The cleanup helper keeps a replaced source while a public edition references it.
+        if (replacedMediaIds.length) await deleteMediaFiles(replacedMediaIds)
 
         return NextResponse.json({ story })
     } catch (error) {
         if (error instanceof ZodError) return handleValidationError(error)
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')
+            return errorResponse('A draft already exists. Reload to continue.', 409)
         console.error('Error saving craft story:', error)
         return errorResponse('Failed to save craft story', 500)
     }
@@ -158,7 +155,8 @@ export async function DELETE() {
             where: { storyId: story.id },
             select: { outputMediaId: true },
         })
-        const filmOutputIds = film?.outputMediaId ? [film.outputMediaId] : []
+        const edition = await prisma.storyPublication.findUnique({ where: { storyId: story.id } })
+        const filmOutputIds = [film?.outputMediaId, edition?.filmMediaId].filter((id): id is string => Boolean(id))
 
         await prisma.mediaAttachment.deleteMany({
             where: { entityType: 'CraftStory', entityId: story.id },
@@ -168,7 +166,7 @@ export async function DELETE() {
         // Extracted-audio assets are keyed off the source videos and have no
         // attachment, so gather them before the source media (and their
         // cascading transcripts) are removed.
-        const sourceMediaIds = [...answerMediaIds, ...workshopMediaIds]
+        const sourceMediaIds = [...answerMediaIds, ...workshopMediaIds, ...(edition?.mediaIds ?? [])]
         const transcriptAudioIds = await collectTranscriptAudioIds(sourceMediaIds)
 
         // Best-effort cleanup of underlying MediaFile rows + Garage objects.

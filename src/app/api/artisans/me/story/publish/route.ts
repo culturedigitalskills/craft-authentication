@@ -1,125 +1,118 @@
 import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
+import { ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireActiveArtisan } from '@/lib/auth-guard'
-import { errorResponse } from '@/lib/validations/types'
-import { ANSWER_MEDIA_FIELDS, ANSWER_TEXT_FIELDS } from '@/lib/validations/craftStory'
+import { errorResponse, handleValidationError } from '@/lib/validations/types'
+import { ANSWER_TEXT_FIELDS, PublishStorySchema } from '@/lib/validations/craftStory'
+import { editionAnswers, editionMediaIds } from '@/lib/story-publication'
 import { canMakeFilm, getFilmIngredients } from '@/lib/film/eligibility'
+import { enqueueFilm } from '@/lib/film/jobs'
+import { deleteMediaFiles } from '@/lib/media-delete'
 
 export async function POST(request: Request) {
     const { session, unauthorized } = await requireActiveArtisan()
     if (unauthorized) return unauthorized
-
     try {
-        // The wizard sends { consent: true } from its consent checkbox. Older
-        // clients send no body at all, which parses to an empty object.
-        const body = await request.json().catch(() => ({}))
-        const consentGiven = (body as { consent?: unknown }).consent === true
-
-        const artisan = await prisma.artisan.findUnique({
-            where: { userId: session!.user.id },
-            select: { id: true },
-        })
-        if (!artisan) return errorResponse('Artisan profile required', 409)
-
-        const story = await prisma.craftStory.findUnique({
-            where: { artisanId: artisan.id },
-        })
-        if (!story) return errorResponse('No story to publish', 404)
-
-        const hasTextAnswer = ANSWER_TEXT_FIELDS.some(
-            k => (story[k] ?? '').toString().trim().length > 0
+        const { consent, expectedUpdatedAt, featureFilmId } = PublishStorySchema.parse(
+            await request.json().catch(() => ({})),
         )
-        const hasAnswerMedia = ANSWER_MEDIA_FIELDS.some(k => Boolean(story[k]))
-        const workshopCount = await prisma.mediaAttachment.count({
-            where: { entityType: 'CraftStory', entityId: story.id },
-        })
-        // An uploaded film is a story in itself: an artisan who arrives with a
-        // finished film has something to publish even with no answers recorded.
-        const uploadedFilm = await prisma.storyFilm.findFirst({
-            where: { storyId: story.id, source: 'UPLOADED', status: 'READY' },
-            select: { id: true },
-        })
-        const hasContent =
-            hasTextAnswer || hasAnswerMedia || workshopCount > 0 || Boolean(uploadedFilm)
-
-        if (!hasContent) {
-            return NextResponse.json(
-                {
-                    error: 'EMPTY_STORY',
-                    message: 'Add at least one written answer, recording, or workshop photo before publishing.',
-                },
-                { status: 400 }
-            )
-        }
-
-        // Publishing puts the artisan's face, voice and chosen location in
-        // public, so it needs their explicit consent. Stories consented to
-        // earlier keep that consent and are not asked again.
-        if (!story.consentedAt && !consentGiven) {
-            return NextResponse.json(
-                {
-                    error: 'CONSENT_REQUIRED',
-                    message: 'Confirm the publication consent before publishing your story.',
-                },
-                { status: 400 }
-            )
-        }
-
-        // If this story has the raw material for a film, require a finished one
-        // before publishing (the film is the story's headline). A story that
-        // can't make a film publishes as the written page, and a FAILED render
-        // is allowed through so a broken render never traps the artisan.
-        // A story told out loud needs something to look at. Without a visual no
-        // film can be built, and the public page falls back to listing every
-        // recording as its own bare player, which reads as a broken page rather
-        // than as a story. Ask for one picture instead of publishing that.
-        const ingredients = await getFilmIngredients(story)
-        const hasVisual = ingredients.workshopCount >= 1 || ingredients.videoAnswerCount >= 1
-        if (ingredients.spokenCount >= 1 && !hasVisual) {
-            return NextResponse.json(
-                {
-                    error: 'VISUAL_REQUIRED',
-                    message:
-                        'Add at least one photo or video of your work before publishing, so your story can be shown as a film rather than as a list of recordings.',
-                },
-                { status: 400 }
-            )
-        }
-
-        if (canMakeFilm(ingredients)) {
-            const film = await prisma.storyFilm.findUnique({
-                where: { storyId: story.id },
-                select: { status: true },
+        const result = await prisma.$transaction(async (tx) => {
+            const story = await tx.craftStory.findFirst({
+                where: { artisan: { userId: session!.user.id } },
+                include: { publication: true, film: true },
             })
-            if (!film || film.status === 'PENDING' || film.status === 'PROCESSING') {
-                return NextResponse.json(
-                    {
-                        error: 'FILM_REQUIRED',
-                        message: 'Create your film before publishing your story.',
-                    },
-                    { status: 400 }
-                )
+            if (!story) return { response: errorResponse('No story to publish', 404) }
+            if (!story.consentedAt && !consent) {
+                return {
+                    response: NextResponse.json({ error: 'CONSENT_REQUIRED' }, { status: 400 }),
+                }
+            }
+            const workshop = await tx.mediaAttachment.findMany({
+                where: { entityType: 'CraftStory', entityId: story.id, attachmentType: 'PROCESS' },
+                orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
+                select: { mediaId: true },
+            })
+            const answers = editionAnswers(story)
+            const workshopIds = workshop.map((a) => a.mediaId)
+            const mediaIds = editionMediaIds(answers, workshopIds)
+            if (
+                featureFilmId &&
+                (story.film?.status !== 'READY' || story.film.outputMediaId !== featureFilmId)
+            )
+                return {
+                    response: errorResponse('Review the current film before featuring it', 409),
+                }
+            if (
+                !mediaIds.length &&
+                !ANSWER_TEXT_FIELDS.some((k) => answers[k]?.trim()) &&
+                !featureFilmId &&
+                !story.publication?.filmMediaId
+            ) {
+                if (story.film?.status === 'READY')
+                    return {
+                        response: NextResponse.json({ error: 'SELECT_FILM' }, { status: 400 }),
+                    }
+                return { response: NextResponse.json({ error: 'EMPTY_STORY' }, { status: 400 }) }
+            }
+            const data = {
+                answers,
+                workshopIds,
+                mediaIds,
+                summaryText: story.summaryText,
+                ...(featureFilmId
+                    ? {
+                          filmMediaId: featureFilmId,
+                          filmChapters: story.film?.chapters ?? Prisma.DbNull,
+                      }
+                    : {}),
+            }
+            const now = new Date()
+            const saved = await tx.craftStory.updateMany({
+                where: {
+                    id: story.id,
+                    updatedAt: expectedUpdatedAt ? new Date(expectedUpdatedAt) : story.updatedAt,
+                },
+                data: {
+                    status: 'PUBLISHED',
+                    publishedAt: now,
+                    consentedAt: story.consentedAt ?? now,
+                },
+            })
+            if (!saved.count)
+                return { response: errorResponse('Story changed. Reload before publishing.', 409) }
+            // Featuring a specific reviewed film is a separate, explicit action.
+            await tx.storyPublication.upsert({
+                where: { storyId: story.id },
+                create: { storyId: story.id, ...data },
+                update: data,
+            })
+            if (featureFilmId)
+                await tx.storyFilm.update({
+                    where: { storyId: story.id, outputMediaId: featureFilmId, status: 'READY' },
+                    data: { isPublic: true },
+                })
+            const updated = await tx.craftStory.findUniqueOrThrow({ where: { id: story.id } })
+            return {
+                story: updated,
+                initialFilm: !story.film,
+                retired: (story.publication?.mediaIds ?? []).filter((id) => !mediaIds.includes(id)),
+            }
+        })
+        if (result.response) return result.response
+        // The page is already published. A worker or caption failure cannot undo it.
+        if (result.initialFilm) {
+            try {
+                if (canMakeFilm(await getFilmIngredients(result.story)))
+                    await enqueueFilm(result.story.id)
+            } catch (err) {
+                console.error('Could not queue optional story film:', err)
             }
         }
-
-        const updated = await prisma.craftStory.update({
-            where: { artisanId: artisan.id },
-            data: {
-                status: 'PUBLISHED',
-                publishedAt: new Date(),
-                ...(story.consentedAt ? {} : { consentedAt: new Date() }),
-            },
-        })
-
-        // A rendered, READY film becomes the story's public hero. The artisan has
-        // already previewed it in the wizard, so publishing the story approves it.
-        await prisma.storyFilm.updateMany({
-            where: { storyId: story.id, status: 'READY' },
-            data: { isPublic: true },
-        })
-
-        return NextResponse.json({ story: updated })
+        if (result.retired.length) await deleteMediaFiles(result.retired)
+        return NextResponse.json({ story: result.story })
     } catch (error) {
+        if (error instanceof ZodError) return handleValidationError(error)
         console.error('Error publishing craft story:', error)
         return errorResponse('Failed to publish craft story', 500)
     }
