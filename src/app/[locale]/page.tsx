@@ -187,7 +187,6 @@ export default async function Home() {
             {/* ── 1. Hero ── */}
             <section className="sc-container grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
                 <div>
-                    <p className="sc-eyebrow mb-4">{t('hero.chipKicker')}</p>
                     <h1 className="sc-h1">
                         {t('hero.headlineLead')}{' '}
                         <em style={{ fontStyle: 'italic', color: 'var(--sc-accent)' }}>
