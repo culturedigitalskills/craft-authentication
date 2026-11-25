@@ -88,6 +88,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     artisan       Artisan?
+    pendingMediaWrites ErasureObject[]
     mediaFiles    MediaFile[]
     secrets       UserSecrets[]
     wrappedKeys   UserWrappedVaultKeys[]
@@ -503,3 +504,28 @@ model TaskEvent {
     @@index([createdAt])
 }
 
+
+// Random status receipt with no user ID, email or profile content.
+model ErasureReceipt {
+    id          String          @id @default(uuid())
+    createdAt   DateTime        @default(now())
+    completedAt DateTime?
+    objects     ErasureObject[]
+
+    @@index([completedAt])
+}
+
+model ErasureObject {
+    id        String          @id @default(uuid())
+    receiptId String?
+    pendingUploaderId String?
+    pendingUploader User? @relation(fields: [pendingUploaderId], references: [id], onDelete: SetNull)
+    receipt   ErasureReceipt? @relation(fields: [receiptId], references: [id], onDelete: Restrict)
+    bucket    String
+    objectKey String
+    retryAt   DateTime        @default(now())
+
+    @@index([pendingUploaderId])
+    @@index([retryAt])
+    @@index([receiptId])
+}

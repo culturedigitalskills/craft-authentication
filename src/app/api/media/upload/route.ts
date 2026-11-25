@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import s3Client, { BUCKET_NAME, initGarage } from '@/lib/object-store'
-import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { BUCKET_NAME, initGarage } from '@/lib/object-store'
+import { storeNewMedia } from '@/lib/store-new-media'
 import { randomUUID } from 'crypto'
 import { fileUploadSchema, resolveMimeType } from '@/lib/validations/media'
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
@@ -81,46 +81,10 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Storage first, then the row. These cannot be made atomic: S3 does not
-        // join a database transaction, so wrapping them only ever guaranteed
-        // "no row without an object" while still leaking objects when the
-        // commit failed. Worse, it held an interactive transaction open for the
-        // whole upload, which blows Prisma's 5s default on large videos and
-        // fails the request outright. This order keeps that guarantee without
-        // the timeout, and cleans up the object if the row cannot be written.
-        const putCommand = new PutObjectCommand({
-            Bucket: BUCKET_NAME,
-            Key: objectKey,
-            Body: uploadBuffer,
-            ContentType: mimeType,
-            Metadata: {
-                'original-name': file.name,
-            },
-        })
-        await s3Client.send(putCommand)
-
-        let mediaFile
-        try {
-            mediaFile = await prisma.mediaFile.create({
-                data: {
-                    id: fileId,
-                    filename: objectKey,
-                    originalName: file.name,
-                    mimeType,
-                    size: fileSize,
-                    bucket: BUCKET_NAME,
-                    objectKey,
-                    uploaderId: session!.user.id,
-                },
-            })
-        } catch (dbError) {
-            await s3Client
-                .send(new DeleteObjectCommand({ Bucket: BUCKET_NAME, Key: objectKey }))
-                .catch((cleanupError) =>
-                    console.error('Failed to clean up orphaned object', objectKey, cleanupError),
-                )
-            throw dbError
-        }
+        const mediaFile = await storeNewMedia({
+            id: fileId, filename: objectKey, originalName: file.name, mimeType,
+            size: fileSize, bucket: BUCKET_NAME, objectKey, uploaderId: session!.user.id,
+        }, uploadBuffer, { 'original-name': file.name })
 
         return NextResponse.json(mediaFile, { status: 201 })
     } catch (error) {

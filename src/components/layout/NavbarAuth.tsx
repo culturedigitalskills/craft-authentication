@@ -45,6 +45,7 @@ export function NavbarAuth({
 }: NavbarAuthProps) {
     const { data: session, status } = useSession()
     const t = useTranslations('navbar')
+    const account = useTranslations('accountDeletion')
     const locale = useLocale()
     const signOutHref = getPathname({ href: '/', locale })
     const pathname = usePathname()
@@ -215,6 +216,11 @@ export function NavbarAuth({
 
                     <div className="my-1 border-t" style={{ borderColor: 'var(--sc-border)' }} />
 
+                    <Link href="/account"
+                        onClick={() => { setDropdownOpen(false); onAction?.() }}
+                        className={rowBase + ' ' + rowIdle}>
+                        <User className="h-4 w-4" />{account('settings')}
+                    </Link>
                     {/* Logout */}
                     <button
                         type="button"
@@ -469,6 +475,11 @@ export function NavbarAuth({
                         </Link>
                     </div>
 
+                    <Link href="/account"
+                        onClick={() => { setDropdownOpen(false); onAction?.() }}
+                        className={rowBase + ' ' + rowIdle}>
+                        <User className="h-4 w-4" />{account('settings')}
+                    </Link>
                     {/* Logout */}
                     <div className="border-t py-1" style={{ borderColor: 'var(--sc-border)' }}>
                         <button

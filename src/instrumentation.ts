@@ -13,6 +13,17 @@ export async function register() {
     void checkFilmEncoder().catch(err => console.error('Story film startup check:', err.message))
     const { recoverStaleFilms } = await import('@/lib/film/jobs')
     const { C2PAService } = await import('@/lib/c2pa-service')
+    const { drainErasureObjects } = await import('@/lib/erasure-storage')
+    let draining = false
+    async function cleanup() {
+        if (draining) return
+        draining = true
+        try { await drainErasureObjects() }
+        catch { console.error('Account file cleanup will retry') }
+        finally { draining = false }
+    }
+    void cleanup()
+    setInterval(() => void cleanup(), 60_000).unref()
     const sweep = async () => {
         await recoverStaleTranscriptions().catch(err => {
             console.error('Transcription recovery sweep failed:', err)

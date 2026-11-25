@@ -880,7 +880,7 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: 24 November 2026",
+    "lastUpdated": "Last updated: 25 November 2026",
     "intro": "This policy explains what personal information Sustainable Crafting collects, why we collect it, and what rights you have over it. It applies to this website and to the accounts, artisan profiles, handcrafted product records and story films created through it.",
     "sections": [
       {
@@ -913,7 +913,7 @@
       },
       {
         "heading": "How long we keep it",
-        "body": "Removing your maker profile hides it and its crafts and story from public view. The project keeps the records so the profile can be restored. To request erasure of your account, profile or related material, use {privacyContact}. You can also delete individual crafts or your story. Files used elsewhere may remain there. Downloads already held by others can persist.\n\nAccount details are kept while your account is open. Unpublished drafts remain until you delete them or the project handles an erasure request. Server logs are kept as needed to operate and secure the site."
+        "body": "You can hide your maker profile in Account settings. Your crafts and story leave public view, and the project retains the records so a site administrator can restore the profile. You can also choose permanent account deletion. This ends all sessions and removes your profile, crafts, drafts, published story, films, hosted certificates and signing keys. We remove your uploads from our active storage, including their use in groups. Cleanup is retried until storage confirms removal. You can check the result in the same browser. A temporary status record contains no account identifier and is removed after seven days following completion.\n\nWe remove your account identifiers from moderation events. Other members keep their own accounts and content. Copies downloaded by others can remain, including identifying information embedded in signed images. Backup expiry, external provider copies and information about you in another person’s material need separate handling. For details or help exercising your rights, use {privacyContact}."
       },
       {
         "heading": "Access to what you upload",
@@ -929,7 +929,7 @@
       },
       {
         "heading": "Cookies",
-        "body": "This site uses a session cookie to keep you signed in. It identifies your session and is cleared when you sign out. Your selected interface language is part of the page address, rather than a language-preference cookie. There are no analytics or advertising cookies set by this website. You can clear cookies in your browser at any time, but the site cannot keep you signed in without the session cookie.\n\nWhile you complete your maker profile, this browser saves a draft for your account on this device. The site clears it when you finish. The story editor also keeps unsaved changes in this tab for recovery. Clearing this site’s browser storage removes those local copies. On a shared device, clear site data after use."
+        "body": "This site uses a session cookie to keep you signed in. It identifies your session and is cleared when you sign out. Your selected interface language is part of the page address, rather than a language-preference cookie. There are no analytics or advertising cookies set by this website. You can clear cookies in your browser at any time, but the site cannot keep you signed in without the session cookie.\n\nWhile you complete your maker profile, this browser saves a draft for your account on this device. The site clears it when you finish. The story editor also keeps unsaved changes in this tab for recovery. Clearing this site’s browser storage removes those local copies. On a shared device, clear site data after use. After permanent deletion, a temporary browser cookie lets you check file cleanup for up to seven days."
       },
       {
         "heading": "Children",
@@ -943,7 +943,7 @@
   },
   "terms": {
     "title": "Terms of Service",
-    "lastUpdated": "Last updated: 24 November 2026",
+    "lastUpdated": "Last updated: 25 November 2026",
     "intro": "These terms govern your use of Sustainable Crafting. By creating an account or using the site, you agree to them.",
     "sections": [
       {
@@ -980,7 +980,7 @@
       },
       {
         "heading": "Ending your use of the site",
-        "body": "You can remove your maker profile from public view. Removal keeps the profile, crafts and story available for restoration. To request erasure of your account or associated material, use {privacyContact}. We may suspend or end access where these terms are breached."
+        "body": "In Account settings you can hide your maker profile or permanently delete your account and content. Hiding allows an administrator to restore the profile. Permanent deletion closes the account and removes its hosted materials. Copies already downloaded by others may remain. For assistance or erasure requests, use {privacyContact}. We may suspend or end access where these terms are breached."
       },
       {
         "heading": "Changes to these terms",
@@ -1275,5 +1275,34 @@
     "actionPublished": "Published",
     "actionUploaded": "Uploaded",
     "actionRecorded": "Recorded action"
+  },
+  "accountDeletion": {
+    "settings": "Account settings",
+    "title": "Permanently delete account and content",
+    "scope": "This removes your sign-in, profile, crafts, stories, films, uploads, hosted certificates and signing keys. Your uploads also disappear from groups where they were used. Other members keep their accounts and work.",
+    "inventory": "Crafts: {crafts} · Stories: {stories} · Uploaded files: {media}",
+    "limits": "Downloads held by others may persist. Backup expiry and external provider copies are handled separately. Clear saved drafts on other devices you used.",
+    "contact": "Contact University Data Compliance",
+    "review": "Review permanent deletion",
+    "confirm": "Permanently delete the account for {email}? This cannot be undone.",
+    "password": "Current password",
+    "google": "Sign in again with Google",
+    "cancel": "Cancel",
+    "delete": "Permanently delete my account",
+    "lastAdmin": "You are the last site administrator. Give another account the administrator role before deleting yours, or contact the University.",
+    "wrongPassword": "Check your current password and try again.",
+    "expired": "Your session has expired. Sign in again.",
+    "rateLimit": "Too many attempts. Try again in a minute.",
+    "failed": "We could not confirm the result. Check the status before trying again.",
+    "receipt": "Deletion status",
+    "loading": "Checking your deletion status…",
+    "pending": "Your account and public pages have been removed. Stored-file cleanup is in progress. You can return here in this browser to check the result.",
+    "complete": "Your account, hosted content and associated files have been removed from the active service. This confirmation is available in this browser for a limited time.",
+    "unavailable": "This browser has no current deletion receipt. Contact the University if you need confirmation.",
+    "retry": "Status is temporarily unavailable. We’ll check again shortly.",
+    "home": "Return to the home page",
+    "hide": "Hide my maker profile",
+    "hideHint": "Take your profile, crafts and stories out of public view. Your data stays in your account. A site administrator can restore the profile.",
+    "hidden": "Your profile is hidden. A site administrator can restore it."
   }
 }

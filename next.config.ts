@@ -29,8 +29,8 @@ const nextConfig: NextConfig = {
         'ffmpeg-static',
     ],
     images: {
-        // Media files are immutable per id, so optimized variants can be
-        // cached aggressively (31 days) instead of the 60s default.
+        // Stable editorial assets can be optimised and
+        // cached for 31 days. User uploads bypass this cache in the proxy.
         minimumCacheTTL: 2678400,
         remotePatterns: [
             {

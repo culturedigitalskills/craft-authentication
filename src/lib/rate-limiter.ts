@@ -46,7 +46,7 @@ export async function applyRateLimit(
     // NextAuth session/csrf/providers/callback routes use the general limiter
     const isAuthAttempt =
         pathname === '/api/auth/callback/credentials' ||
-        pathname === '/api/auth/register'
+        pathname === '/api/auth/register' || (pathname === '/api/account' && request.method === 'DELETE')
     const limiter = isAuthAttempt ? authLimiter : apiLimiter
     const clientId = getClientId(request, session)
 
