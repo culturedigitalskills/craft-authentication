@@ -65,3 +65,16 @@ export async function probeDuration(filePath: string): Promise<number> {
 
     throw new Error(`Could not determine duration for ${filePath}`)
 }
+
+// Execute a real frame with the same text filter and encoder used by the credits.
+// A help command can exit successfully even when a named filter is absent.
+let encoderProbe: Promise<void> | undefined
+export function checkFilmEncoder(): Promise<void> {
+    encoderProbe ??= runFfmpeg(['-v', 'error', '-f', 'lavfi', '-i', 'color=s=64x64:d=0.1',
+        '-vf', 'drawtext=font=Noto Sans:text=OK', '-frames:v', '1', '-c:v', 'libx264', '-f', 'null', '-'])
+        .catch(cause => {
+            encoderProbe = undefined
+            throw new Error('Film encoder unavailable (FFmpeg drawtext/libx264). Check FFMPEG_PATH and retry.', { cause })
+        })
+    return encoderProbe
+}

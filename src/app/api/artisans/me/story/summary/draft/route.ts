@@ -107,8 +107,7 @@ export async function POST() {
             signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
         })
         if (!res.ok) {
-            const body = await res.text().catch(() => '')
-            console.error(`Groq summary failed (${res.status}): ${body.slice(0, 300)}`)
+            console.error(`Groq summary failed (${res.status})`)
             return errorResponse('Could not draft a summary right now. Please try again.', 502)
         }
 

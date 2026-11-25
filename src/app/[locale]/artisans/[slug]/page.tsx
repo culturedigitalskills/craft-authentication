@@ -15,9 +15,11 @@ import { GalleryGrid } from '@/components/shared/GalleryGrid'
 import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { CraftStoryDisplay, type WorkshopMediaItem } from '@/components/artisan/CraftStoryDisplay'
+import { editionAnswers } from '@/lib/story-publication'
+import { validCues } from '@/lib/vtt'
+import { readChapterMarks } from '@/lib/film/markers'
 import { StoryFilmHero } from '@/components/artisan/StoryFilmHero'
 import { AdminArtisanActions } from '@/components/artisan/AdminArtisanActions'
-import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 import { getCraftPrimaryImageMap } from '@/lib/craft'
 import { ScMedia } from '@/components/sc/ScMedia'
 import { PortraitFallback, IndigoDotsCover } from '@/components/sc/fallbacks'
@@ -70,6 +72,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ArtisanPublicProfilePage({ params }: PageProps) {
+    const tStory = await getInterfaceTranslations('craftStory')
     const tui = await getInterfaceTranslations('interface')
 
     const { slug } = await params
@@ -196,62 +199,26 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
     // the page an admin restores from renders with every image broken.
     const mediaNeedsCredentials = Boolean(artisan.deletedAt)
 
-    const publishedStory = await prisma.craftStory.findUnique({
-        where: { artisanId: artisan.id },
+    const edition = await prisma.storyPublication.findFirst({
+        where: { story: { artisanId: artisan.id, status: 'PUBLISHED' } },
     })
-    const story = publishedStory && publishedStory.status === 'PUBLISHED' ? publishedStory : null
-
+    const story = edition ? editionAnswers(edition.answers as Parameters<typeof editionAnswers>[0]) : null
+    const publicFilmId = edition?.filmMediaId ?? null
     let workshopMedia: WorkshopMediaItem[] = []
     let answerMediaMimeTypes: Record<string, string> = {}
     let captionedMediaIds: string[] = []
-    let publicFilm: { outputMediaId: string } | null = null
-    if (story) {
-        // A published film that the artisan chose to show becomes the story hero.
-        const film = await prisma.storyFilm.findUnique({
-            where: { storyId: story.id },
-            select: { status: true, isPublic: true, outputMediaId: true },
-        })
-        if (film && film.status === 'READY' && film.isPublic && film.outputMediaId) {
-            publicFilm = { outputMediaId: film.outputMediaId }
-        }
-
-        const workshopAttachments = await prisma.mediaAttachment.findMany({
-            where: {
-                entityType: 'CraftStory',
-                entityId: story.id,
-                attachmentType: 'PROCESS',
-            },
-            include: { media: { select: { mimeType: true } } },
-            orderBy: { displayOrder: 'asc' },
-        })
-        workshopMedia = workshopAttachments.map((a) => ({
-            mediaId: a.mediaId,
-            isVideo: (a.media.mimeType ?? '').startsWith('video/'),
+    if (edition) {
+        const ids = [...edition.mediaIds, ...(publicFilmId ? [publicFilmId] : [])]
+        const [files, transcripts] = await Promise.all([
+            prisma.mediaFile.findMany({ where: { id: { in: ids } }, select: { id: true, mimeType: true } }),
+            prisma.mediaTranscript.findMany({ where: { mediaId: { in: ids }, status: 'READY' },
+                select: { mediaId: true, segments: true } }),
+        ])
+        answerMediaMimeTypes = Object.fromEntries(files.map(f => [f.id, f.mimeType]))
+        workshopMedia = edition.workshopIds.filter(id => answerMediaMimeTypes[id]).map(mediaId => ({
+            mediaId, isVideo: answerMediaMimeTypes[mediaId].startsWith('video/'),
         }))
-
-        const answerMediaIds = ANSWER_MEDIA_FIELDS.map((k) => story[k]).filter((v): v is string =>
-            Boolean(v),
-        )
-        if (answerMediaIds.length > 0) {
-            const files = await prisma.mediaFile.findMany({
-                where: { id: { in: answerMediaIds } },
-                select: { id: true, mimeType: true },
-            })
-            answerMediaMimeTypes = Object.fromEntries(files.map((f) => [f.id, f.mimeType]))
-        }
-
-        // Which story videos have ready English captions to serve as a <track>.
-        const videoMediaIds = [
-            ...answerMediaIds.filter((id) => (answerMediaMimeTypes[id] ?? '').startsWith('video/')),
-            ...workshopMedia.filter((m) => m.isVideo).map((m) => m.mediaId),
-        ]
-        if (videoMediaIds.length > 0) {
-            const transcripts = await prisma.mediaTranscript.findMany({
-                where: { mediaId: { in: videoMediaIds }, status: 'READY' },
-                select: { mediaId: true },
-            })
-            captionedMediaIds = transcripts.map((t) => t.mediaId)
-        }
+        captionedMediaIds = transcripts.filter(t => validCues(t.segments).length).map(t => t.mediaId)
     }
 
     const locationText = formatLocation(artisan.country, artisan.region, await getLocale()) || null
@@ -401,21 +368,19 @@ export default async function ArtisanPublicProfilePage({ params }: PageProps) {
                             </p>
                         )}
 
-                        {story && publicFilm && (
-                            <StoryFilmHero
-                                outputMediaId={publicFilm.outputMediaId}
-                                summaryText={story.summaryText}
-                                story={story}
-                            />
-                        )}
-
-                        {story && !publicFilm && (
-                            <CraftStoryDisplay
-                                story={story}
-                                workshop={workshopMedia}
-                                answerMediaMimeTypes={answerMediaMimeTypes}
-                                captionedMediaIds={captionedMediaIds}
-                            />
+                        {story && edition && (
+                            <section id="craft-story" className="scroll-mt-24 space-y-7">
+                                <div>
+                                    <p className="sc-eyebrow mb-2">{tStory('publicHeading')}</p>
+                                    <h2 className="sc-h2">{tStory('publicTitle')}</h2>
+                                </div>
+                                {edition.summaryText?.trim() && <p dir="auto" className="sc-lead whitespace-pre-line">{edition.summaryText}</p>}
+                                {publicFilmId && <StoryFilmHero outputMediaId={publicFilmId}
+                                    hasCaptions={captionedMediaIds.includes(publicFilmId)}
+                                    chapters={readChapterMarks(edition.filmChapters)} />}
+                                <CraftStoryDisplay story={story} workshop={workshopMedia}
+                                    answerMediaMimeTypes={answerMediaMimeTypes} captionedMediaIds={captionedMediaIds} />
+                            </section>
                         )}
 
                         {/* Crafts */}

@@ -44,7 +44,7 @@ export function PromptForm({
                     {tui('imageParameters')}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                    {tui('inputDetailsForGeneratingYourMedia')}
+                    {t('providerNotice')}
                 </p>
             </div>
             <form onSubmit={onSubmit} className="space-y-6">

@@ -41,14 +41,14 @@ describe('attachmentIsPublic', () => {
     })
 
     describe('story media (recordings, workshop photos)', () => {
-        it('is public once the story is published', () => {
+        it('does not expose a new working attachment just because an edition exists', () => {
             expect(
                 attachmentIsPublic('CraftStory', true, {
                     kind: 'story',
                     published: true,
                     artisanRemoved: false,
                 }),
-            ).toBe(true)
+            ).toBe(false)
         })
 
         it('is private while the story is still a draft', () => {

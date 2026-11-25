@@ -17,7 +17,8 @@ export interface WorkshopMedia {
 }
 
 interface StoryWorkshopUploadProps {
-    storyId: string
+    storyId: string | null
+    ensureStory?: () => Promise<string | null>
     // Controlled by the wizard so uploads survive stepping away and back — the
     // step subtree remounts on navigation, which would otherwise reset local state.
     items: WorkshopMedia[]
@@ -29,7 +30,7 @@ interface StoryWorkshopUploadProps {
 }
 
 export function StoryWorkshopUpload({
-    storyId,
+    storyId, ensureStory,
     items,
     onItemsChange,
     captionStatuses = {},
@@ -74,6 +75,8 @@ export function StoryWorkshopUpload({
         setProgress(0)
         const perFilePct = new Array(readyFiles.length).fill(0)
         try {
+            const target = storyId ?? await ensureStory?.()
+            if (!target) throw new Error(tui('uploadFailed'))
             // Upload and attach in parallel; failures don't block the rest.
             const results = await Promise.allSettled(
                 readyFiles.map(async (file, i) => {
@@ -91,7 +94,7 @@ export function StoryWorkshopUpload({
                         body: JSON.stringify({
                             mediaId: outcome.media.id,
                             entityType: 'CraftStory',
-                            entityId: storyId,
+                            entityId: target,
                             attachmentType: 'PROCESS',
                             displayOrder: items.length + i,
                         }),
@@ -128,6 +131,8 @@ export function StoryWorkshopUpload({
                     reason instanceof Error && reason.message ? reason.message : t('uploadFailed'),
                 )
             }
+        } catch (reason) {
+            setError(reason instanceof Error ? reason.message : t('uploadFailed'))
         } finally {
             setIsUploading(false)
             if (fileInputRef.current) fileInputRef.current.value = ''

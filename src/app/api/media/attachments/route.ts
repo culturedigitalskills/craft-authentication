@@ -4,7 +4,6 @@ import { CreateMediaAttachmentSchema, ReorderMediaAttachmentsSchema } from '@/li
 import { handleValidationError, errorResponse } from '@/lib/validations/types'
 import { ZodError } from 'zod'
 import { requireActiveArtisan } from '@/lib/auth-guard'
-import { enqueueTranscription } from '@/lib/transcription'
 import { deleteMediaFiles } from '@/lib/media-delete'
 
 export async function POST(request: NextRequest) {
@@ -105,18 +104,6 @@ export async function POST(request: NextRequest) {
         // this very request) is kept. Must run after the create above so a
         // re-attachment of the same media still counts as a reference.
         if (displacedMediaIds.length > 0) void deleteMediaFiles(displacedMediaIds)
-
-        // Queue English captions for workshop videos attached to a story.
-        // enqueueTranscription no-ops for non-video media. Non-fatal — the
-        // attachment already exists, and a failed enqueue retries on the
-        // artisan's next save.
-        if (validatedData.entityType === 'CraftStory') {
-            try {
-                await enqueueTranscription(validatedData.mediaId)
-            } catch (transcriptionError) {
-                console.error('Transcription enqueue failed for media', validatedData.mediaId, transcriptionError)
-            }
-        }
 
         return NextResponse.json(attachment, { status: 201 })
     } catch (error) {

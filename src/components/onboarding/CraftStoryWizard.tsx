@@ -1,14 +1,6 @@
 'use client'
 
-import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type Dispatch,
-    type SetStateAction,
-} from 'react'
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react'
 import { Link } from '@/i8n/navigation'
 import { useRouter } from '@/i8n/navigation'
 import { useTranslations } from 'next-intl'
@@ -24,17 +16,16 @@ import {
     Loader2,
     Mic,
     Pencil,
-    Save,
     Sparkles,
     Video,
 } from 'lucide-react'
-import { StepDots } from '@/components/shared/StepDots'
+import { useStoryAutosave } from './useStoryAutosave'
 import { AnswerMediaUpload } from './AnswerMediaUpload'
 import { StoryWorkshopUpload, type WorkshopMedia } from './StoryWorkshopUpload'
 import { StoryFilmPanel } from './StoryFilmPanel'
 import { StoryFilmUploadButton } from './StoryFilmUploadButton'
 import { FilmStoryboard, type StoryboardAnswer } from './FilmStoryboard'
-import { ANSWER_KEYS, type AnswerKey } from '@/lib/validations/craftStory'
+import { ANSWER_KEYS, type AnswerKey, type SceneSettings } from '@/lib/validations/craftStory'
 import { mediaKind } from '@/lib/media-kind'
 import type { TranscriptSegment } from '@/lib/vtt'
 
@@ -42,6 +33,7 @@ export type CraftStoryDraft = {
     id: string
     status: 'DRAFT' | 'PUBLISHED'
     lastStepReached: number
+    sceneSettings?: SceneSettings
     updatedAt: string
     answerSelfText: string | null
     answerSelfMediaId: string | null
@@ -60,446 +52,448 @@ export type CraftStoryDraft = {
 }
 
 interface CraftStoryWizardProps {
+    ownerId: string
+    slug: string
     initialStory: CraftStoryDraft | null
     initialWorkshopMedia: WorkshopMedia[]
     // mediaId -> mimeType for saved answer media, so reloaded previews render correctly.
     answerMediaMimeTypes?: Record<string, string>
 }
 
-// 0=intro, 1-6=questions, 7=workshop media, 8=review
-const TOTAL_STEPS = 9
-
 export function CraftStoryWizard({
+    ownerId,
+    slug,
     initialStory,
     initialWorkshopMedia,
     answerMediaMimeTypes = {},
 }: CraftStoryWizardProps) {
     const t = useTranslations('craftStory')
     const router = useRouter()
-
-    const [step, setStep] = useState(initialStory?.lastStepReached ?? 0)
-    const [story, setStory] = useState<Partial<CraftStoryDraft>>(initialStory ?? {})
-    const [storyId, setStoryId] = useState<string | null>(initialStory?.id ?? null)
-    const [knownUpdatedAt, setKnownUpdatedAt] = useState<string | null>(
-        initialStory?.updatedAt ?? null,
-    )
-    const [saving, setSaving] = useState(false)
-    const [publishing, setPublishing] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    // Publication consent. A story consented to on an earlier publish keeps it,
-    // so re-publishing an edit does not ask again.
-    const [consented, setConsented] = useState(Boolean(initialStory?.consentedAt))
-    // True while editing a single step reached by clicking a section on the
-    // review screen — lets us offer a direct "back to review" action.
-    const [returnToReview, setReturnToReview] = useState(false)
-    // mediaId -> transcript status for this story's videos (caption chips).
-    const [captionStatuses, setCaptionStatuses] = useState<Record<string, string>>({})
-    // Workshop media lives here (not inside the step component) so it survives
-    // stepping away and back — the step subtree remounts on navigation.
-    const [workshopMedia, setWorkshopMedia] = useState<WorkshopMedia[]>(initialWorkshopMedia)
-    // mediaId -> mimeType for answer media, seeded from the server and extended
-    // as new recordings upload, so a revisited video answer still renders as video.
-    const [answerMimeTypes, setAnswerMimeTypes] =
-        useState<Record<string, string>>(answerMediaMimeTypes)
-
-    // Timed caption segments per media id, used by the film storyboard to snap
-    // its preview cuts to the same speech beats the renderer will use.
-    const [captionSegments, setCaptionSegments] = useState<Record<string, TranscriptSegment[]>>({})
-
-    // Spoken answers drive the film's chapters and its length. Text-only answers
-    // contribute nothing to the timeline, so they are left out.
-    const storyboardAnswers: StoryboardAnswer[] = useMemo(() => {
-        return ANSWER_KEYS.flatMap((key) => {
-            const mediaId = story[`answer${key}MediaId` as const] as string | null | undefined
-            if (!mediaId) return []
-            const kind = mediaKind(answerMimeTypes[mediaId])
-            if (kind !== 'audio' && kind !== 'video') return []
-            return [{ key, mediaId, kind }]
-        })
-    }, [story, answerMimeTypes])
-
-    const refreshCaptionStatuses = useCallback(async () => {
-        try {
-            const res = await fetch('/api/artisans/me/story/transcripts')
-            if (!res.ok) return
-            const data = await res.json()
-            setCaptionStatuses(data.statuses ?? {})
-            setCaptionSegments(data.segments ?? {})
-        } catch {
-            // Chips are informational only — never surface fetch failures.
-        }
-    }, [])
-
-    // Re-run any failed captions (e.g. a transient upstream error). The failed
-    // rows flip back to processing, and the poll below picks them up.
-    const retryCaptions = useCallback(async () => {
-        try {
-            const res = await fetch('/api/artisans/me/story/transcripts', { method: 'POST' })
-            if (!res.ok) return
-            const data = await res.json()
-            setCaptionStatuses(data.statuses ?? {})
-        } catch {
-            // Informational retry — never surface fetch failures.
-        }
-    }, [])
-
-    useEffect(() => {
-        void refreshCaptionStatuses()
-    }, [refreshCaptionStatuses])
-
-    // Poll while any caption job is still running so chips flip to ready/failed.
-    const hasActiveCaptionJobs = Object.values(captionStatuses).some(
-        (s) => s === 'PENDING' || s === 'PROCESSING',
+    const draft = useStoryAutosave(ownerId, initialStory, (conflict) =>
+        setError(t(conflict ? 'errors.conflict' : 'errors.saveFailed')),
     )
+    const { step, story } = draft
     useEffect(() => {
-        if (!hasActiveCaptionJobs) return
-        const id = setInterval(() => void refreshCaptionStatuses(), 8000)
-        return () => clearInterval(id)
-    }, [hasActiveCaptionJobs, refreshCaptionStatuses])
-
-    function setAnswerText(key: AnswerKey, value: string) {
-        setStory((s) => ({ ...s, [`answer${key}Text`]: value }))
-    }
-    function setAnswerMedia(key: AnswerKey, mediaId: string | null, mimeType?: string | null) {
-        setStory((s) => ({ ...s, [`answer${key}MediaId`]: mediaId }))
-        if (mediaId && mimeType) {
-            setAnswerMimeTypes((m) => ({ ...m, [mediaId]: mimeType }))
-        }
-    }
-
-    // Mirrors of state used inside queued background saves — a chained save
-    // must read the values current at execution time, not the ones captured
-    // when the save was queued.
-    const storyRef = useRef(story)
-    storyRef.current = story
-    const knownUpdatedAtRef = useRef(knownUpdatedAt)
-    knownUpdatedAtRef.current = knownUpdatedAt
-    // Serializes saves so expectedUpdatedAt conflict detection stays coherent.
-    const pendingSaveRef = useRef<Promise<boolean>>(Promise.resolve(true))
-
-    async function save(nextStep: number): Promise<boolean> {
-        setSaving(true)
-        setError(null)
-        const draft = storyRef.current
-        try {
-            const res = await fetch('/api/artisans/me/story', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    lastStepReached: Math.max(nextStep, draft.lastStepReached ?? 0),
-                    expectedUpdatedAt: knownUpdatedAtRef.current ?? undefined,
-                    answerSelfText: draft.answerSelfText ?? null,
-                    answerSelfMediaId: draft.answerSelfMediaId ?? null,
-                    answerCraftText: draft.answerCraftText ?? null,
-                    answerCraftMediaId: draft.answerCraftMediaId ?? null,
-                    answerMeaningText: draft.answerMeaningText ?? null,
-                    answerMeaningMediaId: draft.answerMeaningMediaId ?? null,
-                    answerBenefitsText: draft.answerBenefitsText ?? null,
-                    answerBenefitsMediaId: draft.answerBenefitsMediaId ?? null,
-                    answerFutureText: draft.answerFutureText ?? null,
-                    answerFutureMediaId: draft.answerFutureMediaId ?? null,
-                    answerChallengesText: draft.answerChallengesText ?? null,
-                    answerChallengesMediaId: draft.answerChallengesMediaId ?? null,
-                    summaryText: draft.summaryText ?? null,
-                }),
+        let active = true
+        void fetch('/api/artisans/me/story', { cache: 'no-store' })
+            .then(async (res) => {
+                if (!res.ok) return
+                const { story: fresh } = await res.json()
+                if (
+                    active &&
+                    fresh?.updatedAt !== initialStory?.updatedAt &&
+                    draft.server.current.updatedAt === initialStory?.updatedAt
+                )
+                    router.refresh()
             })
-            if (res.status === 409) {
-                setError(t('errors.conflict'))
-                return false
-            }
-            if (!res.ok) throw new Error('Save failed')
+            .catch(() => {})
+        return () => {
+            active = false
+        }
+        // Only validate the initial page revision; the save queue owns subsequent writes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ownerId])
+    const [publishing, setPublishing] = useState(false)
+    const [featureChoice, setFeatureChoice] = useState<string | null>(null)
+    const [publishCount, setPublishCount] = useState(0)
+    const [consented, setConsented] = useState(Boolean(initialStory?.consentedAt))
+    const [returnToReview, setReturnToReview] = useState(false)
+    const [previewOpen, setPreviewOpen] = useState(false)
+    const [workshop, setWorkshop] = useState(initialWorkshopMedia)
+    const [mimes, setMimes] = useState(answerMediaMimeTypes)
+    const [statuses, setStatuses] = useState<Record<string, string>>({})
+    const [segments, setSegments] = useState<Record<string, TranscriptSegment[]>>({})
+    const refresh = useCallback(async () => {
+        try {
+            const res = await fetch(
+                '/api/artisans/me/story/transcripts',
+                { cache: 'no-store' },
+            )
+            if (!res.ok) return
             const data = await res.json()
-            if (data.story?.id) setStoryId(data.story.id)
-            if (data.story?.updatedAt) {
-                setKnownUpdatedAt(data.story.updatedAt)
-                knownUpdatedAtRef.current = data.story.updatedAt
-            }
-            setStory((s) => ({ ...s, ...data.story }))
-            // Saving enqueues caption jobs for new videos — pick up their status.
-            void refreshCaptionStatuses()
-            return true
+            setStatuses(data.statuses ?? {})
+            setSegments(data.segments ?? {})
         } catch {
-            setError(t('errors.saveFailed'))
-            return false
-        } finally {
-            setSaving(false)
+            /* Captions don't block a story edit. */
+        }
+    }, [])
+    useEffect(() => {
+        void refresh()
+    }, [refresh])
+    const active = Object.values(statuses).some((s) => s === 'PENDING' || s === 'PROCESSING')
+    useEffect(() => {
+        if (!active) return
+        const timer = setInterval(() => void refresh(), 8000)
+        return () => clearInterval(timer)
+    }, [refresh, active])
+    const answers: StoryboardAnswer[] = ANSWER_KEYS.flatMap((key) => {
+        const mediaId = story[`answer${key}MediaId`]
+        if (!mediaId) return []
+        const kind = mediaKind(mimes[mediaId])
+        return kind === 'audio' || kind === 'video' ? [{ key, mediaId, kind }] : []
+    })
+    const settings = story.sceneSettings ?? {}
+    const filmCaptionStatus = { ...statuses }
+    for (const { key, mediaId } of answers) {
+        if (settings[key]?.caption?.mediaId === mediaId && settings[key]?.caption?.text.trim()) {
+            filmCaptionStatus[mediaId] = 'SUPPLIED'
         }
     }
-
-    // Queue a save behind any in-flight one. save() never rejects, so the
-    // chain cannot break; callers that care await the returned promise.
-    function queueSave(nextStep: number): Promise<boolean> {
-        const queued = pendingSaveRef.current.then(() => save(nextStep))
-        pendingSaveRef.current = queued
-        return queued
+    const [requestingCaptions, setRequestingCaptions] = useState(false)
+    const [captionRequestError, setCaptionRequestError] = useState(false)
+    async function requestCaptions() {
+        const mediaIds = Object.keys(filmCaptionStatus).filter(id =>
+            ['AVAILABLE', 'FAILED'].includes(filmCaptionStatus[id]),
+        )
+        if (!mediaIds.length || requestingCaptions) return
+        setRequestingCaptions(true)
+        setCaptionRequestError(false)
+        try {
+            if (!await draft.flush()) return
+            const result = await fetch('/api/artisans/me/story/transcripts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sendAudioToGroq: true, mediaIds }),
+            })
+            if (!result.ok) throw new Error('Caption request failed')
+            await refresh()
+        } catch {
+            setCaptionRequestError(true)
+        } finally {
+            setRequestingCaptions(false)
+        }
     }
-
-    function handleNext() {
-        // Advance immediately — the save runs in the background so stepping
-        // through the wizard never waits on the network. Failures surface in
-        // the error banner, and publish/exit await the full save chain.
-        const target = step + 1
-        setStep(target)
-        void queueSave(target)
+    const setScene = (key: AnswerKey, value: NonNullable<SceneSettings[AnswerKey]>) =>
+        draft.edit({ sceneSettings: { ...settings, [key]: value } })
+    const editStep = (n: number) => {
+        setReturnToReview(true)
+        void draft.go(n)
     }
-
-    function handleBack() {
-        setStep((s) => Math.max(0, s - 1))
-    }
-
-    // Save the current step's edits and return straight to the review screen.
-    function handleReturnToReview() {
+    const review = () => {
         setReturnToReview(false)
-        setStep(TOTAL_STEPS - 1)
-        void queueSave(step)
+        void draft.go(8).then(() => refresh())
     }
-
-    async function handleSaveExit() {
-        await queueSave(step)
-        router.push('/profile')
+    async function exitEditor() {
+        if (await draft.flush()) router.push('/profile')
     }
-
-    async function handlePublish() {
+    async function publish() {
         setPublishing(true)
         setError(null)
         try {
-            // Persist final state (behind any still-running background saves),
-            // then publish.
-            const saved = await queueSave(step)
-            if (!saved) {
-                setPublishing(false)
-                return
-            }
+            if (!(await draft.flush())) return
             const res = await fetch('/api/artisans/me/story/publish', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ consent: consented }),
+                body: JSON.stringify({
+                    consent: consented,
+                    featureFilmId: featureChoice ?? undefined,
+                    expectedUpdatedAt: draft.server.current.updatedAt,
+                }),
             })
+            const body = await res.json()
             if (!res.ok) {
-                let body: { error?: string; message?: string } | null = null
-                try {
-                    body = await res.json()
-                } catch {
-                    /* ignore */
-                }
-                if (body?.error === 'EMPTY_STORY') {
-                    setError(t('errors.emptyStory'))
-                } else if (body?.error === 'FILM_REQUIRED') {
-                    setError(t('errors.filmRequired'))
-                } else if (body?.error === 'VISUAL_REQUIRED') {
-                    setError(t('errors.visualRequired'))
-                } else if (body?.error === 'CONSENT_REQUIRED') {
-                    setError(t('errors.consentRequired'))
-                } else {
-                    setError(t('errors.publishFailed'))
-                }
-                setPublishing(false)
+                setError(
+                    t(
+                        res.status === 409
+                            ? 'errors.conflict'
+                            : body.error === 'EMPTY_STORY'
+                              ? 'errors.emptyStory'
+                              : body.error === 'SELECT_FILM'
+                                ? 'studio.chooseFilm'
+                                : body.error === 'CONSENT_REQUIRED'
+                                  ? 'errors.consentRequired'
+                                  : 'errors.publishFailed',
+                    ),
+                )
                 return
             }
-            // Keep the button disabled on success — router.push doesn't unmount
-            // the wizard immediately, and re-enabling allowed a second publish.
-            router.push('/profile')
+            setFeatureChoice(null)
+            draft.acceptServer(body.story)
+            setPublishCount((n) => n + 1)
         } catch {
             setError(t('errors.publishFailed'))
+        } finally {
             setPublishing(false)
         }
     }
-
-    const isQuestion = step >= 1 && step <= 6
-    const currentKey = isQuestion ? ANSWER_KEYS[step - 1] : null
-    const currentMediaId = currentKey
-        ? ((story[`answer${currentKey}MediaId` as const] as string | null | undefined) ?? null)
-        : null
-
-    return (
-        <div className="container mx-auto px-4 py-10">
-            <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl shadow-lg">
-                <div className="px-6 py-6" style={{ background: 'var(--sc-ink-deep)' }}>
-                    <div className="flex items-center gap-3">
-                        <Link
-                            href="/profile"
-                            className="rounded-md p-2 text-primary-foreground/70 transition-colors hover:bg-white/10 hover:text-primary-foreground"
-                        >
-                            <ArrowLeft className="h-5 w-5" />
-                        </Link>
-                        <div>
-                            <h1 className="text-start text-2xl font-bold tracking-tight text-primary-foreground">
-                                {t('wizardTitle')}
-                            </h1>
-                            <p className="text-start text-sm text-primary-foreground/70">
-                                {t('wizardHelper')}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <CardContent className="p-6">
-                    <StepDots current={step} total={TOTAL_STEPS} />
-                    <p className="mb-8 text-center text-xs text-muted-foreground">
-                        {t('stepLabel', { current: step + 1, total: TOTAL_STEPS })}
+    const key = step > 0 && step < 7 ? ANSWER_KEYS[step - 1] : null
+    const media = key ? (story[`answer${key}MediaId`] ?? null) : null
+    const text = key ? (story[`answer${key}Text`] ?? '') : ''
+    const card = (k: AnswerKey, i: number) => {
+        const words = story[`answer${k}Text`]
+        const id = story[`answer${k}MediaId`]
+        const image =
+            workshop.find((m) => m.mediaId === settings[k]?.visualId) ??
+            workshop[i % Math.max(workshop.length, 1)]
+        if (!words && !id && !(i === 0 && image)) return null
+        return (
+            <figure key={k} className="space-y-3 rounded-xl border bg-muted/20 p-4">
+                <figcaption className="text-sm font-semibold text-warm">
+                    {t('studio.scenePreview')} · {t(`step${i + 1}.title`)}
+                </figcaption>
+                {image &&
+                    (image.isVideo ? (
+                        <video
+                            controls
+                            playsInline
+                            src={image.url}
+                            className="max-h-64 w-full rounded-md"
+                        />
+                    ) : (
+                        <img
+                            src={image.url}
+                            alt={t('studio.firstPhoto')}
+                            className="max-h-64 w-full rounded-md object-contain"
+                        />
+                    ))}
+                {words && (
+                    <p dir="auto" className="whitespace-pre-line">
+                        {words}
                     </p>
-
-                    <div
-                        key={step}
-                        className="animate-in fade-in-50 slide-in-from-right-4 duration-300"
+                )}
+                {id &&
+                    (mimes[id]?.startsWith('video/') ? (
+                        <video controls playsInline src={'/api/media/' + id} className="w-full" />
+                    ) : (
+                        <audio
+                            controls
+                            preload="metadata"
+                            aria-label={t(`step${i + 1}.title`)}
+                            src={'/api/media/' + id}
+                            className="w-full"
+                        />
+                    ))}
+            </figure>
+        )
+    }
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <Card className="mx-auto max-w-2xl overflow-hidden rounded-2xl">
+                <header
+                    className="space-y-2 px-6 py-5 text-primary-foreground"
+                    style={{ background: 'var(--sc-ink-deep)' }}
+                >
+                    <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-sm underline"
+                        onClick={exitEditor}
                     >
-                        {step === 0 && (
-                            <IntroStep
-                                // The film needs a story to belong to, and at
-                                // this point there may not be one saved yet.
-                                onEnsureStory={() => queueSave(0)}
-                                // Their film is done, so the work that remains
-                                // is the summary and publishing: skip to review.
-                                // Persist that jump, or a reload would drop them
-                                // back at the intro with no sign of their film.
-                                onFilmUploaded={() => {
-                                    setStep(TOTAL_STEPS - 1)
-                                    void queueSave(TOTAL_STEPS - 1)
-                                }}
-                            />
+                        <ArrowLeft className="h-4 w-4" />
+                        {t('saveExit')}
+                    </button>
+                    <h1 className="text-2xl font-semibold">{t('wizardTitle')}</h1>
+                </header>
+                <CardContent className="space-y-5 p-5 sm:p-7">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3 text-sm">
+                        <strong>{t('studio.draft')}</strong>
+                        <span role="status">
+                            {draft.state === 'saving'
+                                ? t('saving')
+                                : draft.state === 'saved'
+                                  ? t('studio.saved')
+                                  : draft.state === 'error'
+                                    ? t('errors.saveFailed')
+                                    : ''}
+                        </span>
+                        {story.status === 'PUBLISHED' && (
+                            <Link className="underline" href={'/artisans/' + slug + '#craft-story'}>
+                                {t('banner.view')}
+                            </Link>
                         )}
-
-                        {isQuestion && currentKey && (
+                    </div>
+                    {publishCount > 0 && step === 8 && (
+                        <p role="status" className="rounded-lg bg-warm/10 p-3">
+                            {t('studio.live')}
+                        </p>
+                    )}
+                    {step === 0 && (
+                        <IntroStep onEnsureStory={draft.flush} onFilmUploaded={review} />
+                    )}
+                    {step === 1 && !story.status && (
+                        <details className="text-sm">
+                            <summary className="cursor-pointer">
+                                {t('intro.alreadyHaveFilmTitle')}
+                            </summary>
+                            <StoryFilmUploadButton
+                                label={t('film.uploadOwn')}
+                                onBeforeUpload={draft.flush}
+                                onUploaded={review}
+                            />
+                        </details>
+                    )}
+                    {key && (
+                        <div className="space-y-5">
                             <QuestionStep
                                 index={step}
-                                answerKey={currentKey}
-                                text={
-                                    (story[`answer${currentKey}Text` as const] as
-                                        string | null | undefined) ?? ''
-                                }
-                                mediaId={currentMediaId}
-                                onTextChange={(v) => setAnswerText(currentKey, v)}
-                                onMediaChange={(id, mime) => setAnswerMedia(currentKey, id, mime)}
-                                captionStatus={
-                                    currentMediaId ? captionStatuses[currentMediaId] : undefined
-                                }
-                                initialMimeType={
-                                    currentMediaId
-                                        ? (answerMimeTypes[currentMediaId] ?? null)
-                                        : null
-                                }
+                                answerKey={key}
+                                text={text}
+                                mediaId={media}
+                                onTextChange={(v) => draft.edit({ [`answer${key}Text`]: v })}
+                                onMediaChange={(id, mime) => {
+                                    if (id && mime) setMimes((m) => ({ ...m, [id]: mime }))
+                                    draft.edit({ [`answer${key}MediaId`]: id })
+                                    void draft.flush().then(() => refresh())
+                                }}
+                                captionStatus={media ? statuses[media] : undefined}
+                                filmCaptionSupplied={Boolean(
+                                    media && filmCaptionStatus[media] === 'SUPPLIED',
+                                )}
+                                initialMimeType={media ? mimes[media] : null}
                             />
-                        )}
-
-                        {step === 7 && (
-                            <WorkshopStep
-                                storyId={storyId}
-                                items={workshopMedia}
-                                onItemsChange={setWorkshopMedia}
-                                captionStatuses={captionStatuses}
-                                onUploaded={refreshCaptionStatuses}
-                                storyboardAnswers={storyboardAnswers}
-                                captionSegments={captionSegments}
-                            />
-                        )}
-
-                        {step === 8 && (
+                            {media && (
+                                <details className="rounded-xl border p-4">
+                                    <summary className="cursor-pointer text-sm font-medium">
+                                        {t('studio.captions')}
+                                    </summary>
+                                    <label className="mt-3 block text-sm">
+                                        {t('studio.captionHint')}
+                                        <Textarea
+                                            rows={3}
+                                            maxLength={5000}
+                                            dir="auto"
+                                            value={
+                                                settings[key]?.caption?.mediaId === media
+                                                    ? (settings[key]?.caption?.text ?? '')
+                                                    : ''
+                                            }
+                                            onChange={(e) =>
+                                                setScene(key, {
+                                                    ...settings[key],
+                                                    caption: {
+                                                        mediaId: media,
+                                                        text: e.target.value,
+                                                    },
+                                                })
+                                            }
+                                        />
+                                    </label>
+                                    {segments[media]?.length > 0 && (
+                                        <p className="mt-2 text-sm">
+                                            {segments[media].map((s) => s.text).join(' ')}
+                                        </p>
+                                    )}
+                                </details>
+                            )}
+                            {step === 1 && (
+                                <div className="rounded-xl border p-4">
+                                    <h2 className="mb-2 font-semibold">{t('studio.firstPhoto')}</h2>
+                                    <StoryWorkshopUpload
+                                        storyId={story.id ?? null}
+                                        ensureStory={async () =>
+                                            (await draft.flush())
+                                                ? (draft.server.current.id ?? null)
+                                                : null
+                                        }
+                                        items={workshop}
+                                        onItemsChange={setWorkshop}
+                                    />
+                                </div>
+                            )}
+                            {card(key, step - 1)}
+                        </div>
+                    )}
+                    {step === 7 && (
+                        <WorkshopStep
+                            storyId={story.id ?? null}
+                            items={workshop}
+                            onItemsChange={setWorkshop}
+                            captionStatuses={statuses}
+                            onUploaded={() => void refresh()}
+                            storyboardAnswers={answers}
+                            settings={settings}
+                            onScene={setScene}
+                            captionSegments={segments}
+                        />
+                    )}
+                    {step === 8 && (
+                        <>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                aria-expanded={previewOpen}
+                                onClick={() => setPreviewOpen(!previewOpen)}
+                            >
+                                {t('studio.preview')}
+                            </Button>
+                            {previewOpen && (
+                                <div className="space-y-4">
+                                    {story.summaryText && <p dir="auto">{story.summaryText}</p>}
+                                    {ANSWER_KEYS.map(card)}
+                                </div>
+                            )}
                             <ReviewStep
+                                featureChoice={featureChoice}
+                                onFeatureChoice={setFeatureChoice}
                                 story={story}
-                                workshopCount={workshopMedia.length}
-                                captionStatuses={captionStatuses}
-                                onEditStep={(target) => {
-                                    setError(null)
-                                    setReturnToReview(true)
-                                    setStep(target)
-                                }}
-                                summaryText={(story.summaryText as string | null | undefined) ?? ''}
-                                onSummaryChange={(value) => {
-                                    // Update the save ref synchronously so an immediate
-                                    // persist (e.g. after applying an AI draft) sees it.
-                                    storyRef.current = { ...storyRef.current, summaryText: value }
-                                    setStory((s) => ({ ...s, summaryText: value }))
-                                }}
-                                onPersistSummary={() => {
-                                    void save(step)
-                                }}
-                                onRetryCaptions={retryCaptions}
+                                refreshFilm={publishCount}
+                                beforeRender={draft.flush}
+                                workshopCount={workshop.length}
+                                captionStatuses={filmCaptionStatus}
+                                onEditStep={editStep}
+                                summaryText={story.summaryText ?? ''}
+                                onSummaryChange={(v) => draft.edit({ summaryText: v })}
+                                onPersistSummary={() => void draft.flush()}
+                                onFilmUploaded={refresh}
+                                onRequestCaptions={requestCaptions}
+                                requestingCaptions={requestingCaptions}
+                                captionRequestError={captionRequestError}
                                 consented={consented}
                                 onConsentChange={setConsented}
                             />
-                        )}
-
-                        {error && (
-                            <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-                                {error}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleBack}
-                            disabled={step === 0 || publishing}
-                            className="w-full sm:w-auto"
-                        >
-                            <ArrowLeft className="me-1.5 h-4 w-4" />
-                            {t('back')}
-                        </Button>
-
-                        <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row sm:items-center">
-                            {step > 0 && step < TOTAL_STEPS - 1 && (
-                                <Button
+                        </>
+                    )}
+                    {error && (
+                        <div role="alert" className="rounded-lg border p-3 text-sm text-red-700">
+                            {error}
+                            {draft.conflict && (
+                                <button
                                     type="button"
-                                    variant="ghost"
-                                    onClick={handleSaveExit}
-                                    disabled={publishing}
-                                    className="w-full sm:w-auto"
+                                    className="ms-2 underline"
+                                    onClick={draft.discardLocal}
                                 >
-                                    <Save className="me-1.5 h-4 w-4" />
-                                    {t('saveExit')}
-                                </Button>
-                            )}
-                            {saving && !publishing && (
-                                <span className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground sm:me-2">
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                    {t('saving')}
-                                </span>
-                            )}
-                            {returnToReview && step > 0 && step < TOTAL_STEPS - 1 ? (
-                                <Button
-                                    type="button"
-                                    onClick={handleReturnToReview}
-                                    disabled={publishing}
-                                    className="w-full sm:w-auto"
-                                >
-                                    <Check className="me-1.5 h-4 w-4" />
-                                    {t('backToReview')}
-                                </Button>
-                            ) : step < TOTAL_STEPS - 1 ? (
-                                <Button
-                                    type="button"
-                                    onClick={handleNext}
-                                    disabled={publishing}
-                                    className="w-full sm:w-auto"
-                                >
-                                    {step === 0 ? t('begin') : t('next')}
-                                    <ArrowRight className="ms-1.5 h-4 w-4" />
-                                </Button>
-                            ) : (
-                                <Button
-                                    type="button"
-                                    onClick={handlePublish}
-                                    disabled={saving || publishing || !consented}
-                                    className="w-full sm:w-auto"
-                                >
-                                    {publishing ? (
-                                        <>
-                                            <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
-                                            {t('publishing')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Check className="me-1.5 h-4 w-4" />
-                                            {t('publish')}
-                                        </>
-                                    )}
-                                </Button>
+                                    {t('studio.reload')}
+                                </button>
                             )}
                         </div>
-                    </div>
+                    )}
+                    <footer className="flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+                        {step > 0 && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                disabled={publishing}
+                                onClick={() => void draft.go(step - 1)}
+                            >
+                                {t('back')}
+                            </Button>
+                        )}
+                        {step > 0 && step < 8 && (
+                            <Button type="button" variant="outline" onClick={review}>
+                                {t('studio.review')}
+                            </Button>
+                        )}
+                        {step === 8 ? (
+                            <Button
+                                type="button"
+                                disabled={!consented || publishing || draft.conflict}
+                                onClick={publish}
+                            >
+                                {publishing
+                                    ? t('publishing')
+                                    : story.status === 'PUBLISHED'
+                                      ? t('studio.publishChanges')
+                                      : t('publish')}
+                            </Button>
+                        ) : (
+                            !returnToReview && (
+                                <Button type="button" onClick={() => void draft.go(step + 1)}>
+                                    {step === 0 ? t('begin') : t('next')}{' '}
+                                    <ArrowRight className="h-4 w-4" />
+                                </Button>
+                            )
+                        )}
+                    </footer>
                 </CardContent>
             </Card>
         </div>
@@ -517,7 +511,7 @@ function IntroStep({
     const tFilm = useTranslations('craftStory.film')
     return (
         <div>
-            <h1 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
+            <h2 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h2>
             <p className="mb-4 text-base text-muted-foreground">{t('lead')}</p>
             <div className="mb-4 rounded-lg bg-muted/50 p-4">
                 <p className="mb-2 text-sm font-medium">{t('formatsTitle')}</p>
@@ -551,6 +545,7 @@ function QuestionStep({
     mediaId,
     onTextChange,
     onMediaChange,
+    filmCaptionSupplied,
     captionStatus,
     initialMimeType,
 }: {
@@ -561,6 +556,7 @@ function QuestionStep({
     onTextChange: (value: string) => void
     onMediaChange: (id: string | null, mimeType?: string | null) => void
     captionStatus?: string
+    filmCaptionSupplied: boolean
     initialMimeType?: string | null
 }) {
     const t = useTranslations('craftStory')
@@ -569,9 +565,9 @@ function QuestionStep({
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-warm">
                 {t('questionLabel', { index })}
             </p>
-            <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
+            <h2 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
                 {t(`step${index}.title`)}
-            </h1>
+            </h2>
             <p className="mb-6 text-base text-muted-foreground">{t(`step${index}.prompt`)}</p>
 
             <div className="space-y-4">
@@ -593,7 +589,13 @@ function QuestionStep({
                     />
                     {mediaId && (
                         <div className="mt-2">
-                            <CaptionStatusChip status={captionStatus} />
+                            {filmCaptionSupplied ? (
+                                <p className="text-xs font-medium text-warm">
+                                    {t('studio.supplied')}
+                                </p>
+                            ) : (
+                                <CaptionStatusChip status={captionStatus} />
+                            )}
                         </div>
                     )}
                 </div>
@@ -621,6 +623,7 @@ function QuestionStep({
                         value={text}
                         onChange={(e) => onTextChange(e.target.value)}
                         placeholder={t('answerPlaceholder')}
+                        maxLength={5000}
                         rows={5}
                     />
                 </div>
@@ -633,7 +636,7 @@ function QuestionStep({
 // invisible to the artisan (there is no editing step to surface it).
 function CaptionStatusChip({ status }: { status?: string }) {
     const t = useTranslations('craftStory.captions')
-    if (!status) return null
+    if (!status || status === 'AVAILABLE') return null
     if (status === 'READY') {
         return (
             <p className="flex items-center gap-1.5 text-xs font-medium text-warm">
@@ -665,6 +668,8 @@ function WorkshopStep({
     captionStatuses,
     onUploaded,
     storyboardAnswers,
+    settings,
+    onScene,
     captionSegments,
 }: {
     storyId: string | null
@@ -673,12 +678,14 @@ function WorkshopStep({
     captionStatuses: Record<string, string>
     onUploaded: () => void
     storyboardAnswers: StoryboardAnswer[]
+    settings: SceneSettings
+    onScene: (key: AnswerKey, value: NonNullable<SceneSettings[AnswerKey]>) => void
     captionSegments: Record<string, TranscriptSegment[]>
 }) {
     const t = useTranslations('craftStory.step7')
     return (
         <div>
-            <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
+            <h2 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h2>
             <p className="mb-6 text-base text-muted-foreground">{t('prompt')}</p>
             {storyId ? (
                 <>
@@ -693,6 +700,8 @@ function WorkshopStep({
                         on the film are visible in one glance. */}
                     <FilmStoryboard
                         answers={storyboardAnswers}
+                        settings={settings}
+                        onScene={onScene}
                         workshopMedia={items}
                         segments={captionSegments}
                     />
@@ -706,24 +715,38 @@ function WorkshopStep({
 
 function ReviewStep({
     story,
+    refreshFilm,
+    beforeRender,
+    featureChoice,
+    onFeatureChoice,
     workshopCount,
     captionStatuses,
     onEditStep,
     summaryText,
     onSummaryChange,
     onPersistSummary,
-    onRetryCaptions,
+    onFilmUploaded,
+    onRequestCaptions,
+    requestingCaptions,
+    captionRequestError,
     consented,
     onConsentChange,
 }: {
     story: Partial<CraftStoryDraft>
+    refreshFilm: number
+    featureChoice: string | null
+    onFeatureChoice: (id: string | null) => void
+    beforeRender: () => Promise<boolean>
     workshopCount: number
     captionStatuses: Record<string, string>
     onEditStep: (step: number) => void
     summaryText: string
     onSummaryChange: (value: string) => void
     onPersistSummary: () => void
-    onRetryCaptions: () => void
+    onFilmUploaded: () => Promise<void>
+    onRequestCaptions: () => void
+    requestingCaptions: boolean
+    captionRequestError: boolean
     consented: boolean
     onConsentChange: (value: boolean) => void
 }) {
@@ -762,13 +785,20 @@ function ReviewStep({
 
     return (
         <div>
-            <h1 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
+            <h2 className="mb-2 text-2xl font-bold tracking-tight sm:text-3xl">
                 {t('review.title')}
-            </h1>
+            </h2>
             <p className="mb-6 text-base text-muted-foreground">{t('review.lead')}</p>
 
             {/* The film is the headline of the story — offer it first. */}
-            <StoryFilmPanel storyPublished={story.status === 'PUBLISHED'} />
+            <StoryFilmPanel
+                featureChoice={featureChoice}
+                onFeatureChoice={onFeatureChoice}
+                key={refreshFilm}
+                onUploaded={onFilmUploaded}
+                beforeRender={beforeRender}
+                storyPublished={story.status === 'PUBLISHED'}
+            />
 
             <div className="mt-6">
                 <SummaryEditor
@@ -802,6 +832,15 @@ function ReviewStep({
                 ))}
             </div>
             <p className="mt-3 text-center text-xs text-muted-foreground">{t('review.editHint')}</p>
+            {(statusValues.includes('AVAILABLE') || captionsFailed) && (
+                <div className="mt-4 space-y-2">
+                    <p className="text-sm">{t('captions.disclosure')}</p>
+                    <Button type="button" variant="outline" onClick={onRequestCaptions} disabled={requestingCaptions}>
+                        {t('captions.request')}
+                    </Button>
+                </div>
+            )}
+            {captionRequestError && <p role="alert">{t('captions.requestError')}</p>}
             {captionsProcessing && (
                 <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -814,9 +853,6 @@ function ReviewStep({
                         <AlertCircle className="h-3.5 w-3.5" />
                         {t('captions.someFailed')}
                     </p>
-                    <Button type="button" variant="ghost" size="sm" onClick={onRetryCaptions}>
-                        {t('captions.retry')}
-                    </Button>
                 </div>
             )}
 
@@ -900,6 +936,7 @@ function SummaryEditor({
                     )}
                 </Button>
             </div>
+            <p className="mb-2 text-sm text-muted-foreground">{t('providerNotice')}</p>
             <Textarea
                 id="story-summary"
                 value={value}

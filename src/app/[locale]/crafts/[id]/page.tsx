@@ -1,3 +1,4 @@
+import { sharedCraftLocation } from '@/lib/craft-location'
 import { LocalizedDate } from '@/components/shared/LocalizedDate'
 import { publicMetadata } from '@/i8n/seo'
 import { PUBLIC_CRAFT_WHERE } from '@/lib/craft'
@@ -112,7 +113,7 @@ export default async function OneCraftPage({ params, searchParams }: PageProps) 
 
     return (
         <RenderOneCraftPage
-            craft={craft}
+            craft={{ ...craft, ...sharedCraftLocation(craft) }}
             imageIds={imageIds}
             videoFileIds={videoFileIds}
             currentPageUrl={currentPageUrl}
