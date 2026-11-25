@@ -14,5 +14,5 @@ export default async function OnboardingArtisanPage() {
     })
     if (existing) return redirect({ href: '/profile', locale: await getLocale() })
 
-    return <ArtisanOnboardingWizard />
+    return <ArtisanOnboardingWizard ownerId={session.user.id} />
 }

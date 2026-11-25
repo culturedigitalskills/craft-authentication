@@ -49,6 +49,10 @@ Generic starter CRUD over the `DataRecord` table (not used by the craft feature)
 ### Artisan Profile
 
 - `GET /api/artisans/me` - Get current user's artisan profile
+- `GET / PUT /api/artisans/me/story` - Load or patch a private story draft. Send `expectedUpdatedAt` for revision checks; conflicting writes return 409. Optional `sceneSettings` maps question names to a workshop `visualId` and/or a recording-bound English caption (`{mediaId, text}`).
+- `POST /api/artisans/me/story/publish` - Publish the saved edition (`{consent, expectedUpdatedAt, featureFilmId?}`). A recording or photo alone qualifies; the optional first film queues separately when eligible. The featured film stays unchanged unless the maker explicitly selects a reviewed output via `featureFilmId`.
+- `GET / POST /api/artisans/me/story/film` - Inspect or start a background render; POST retries a failed job from the saved sources. GET includes caption availability and staleness.
+- `PATCH /api/artisans/me/story/film` - Feature a reviewed output with `{isPublic:true, outputMediaId}`, or hide it with `{isPublic:false}`. The page must already be published.
 - `GET /api/artisans/me/story/transcripts` - Caption-generation status per story video (authenticated)
 - `POST /api/artisans` - Create artisan profile (authenticated)
 - `PUT /api/artisans/:id` - Update artisan profile (owner only)
@@ -71,9 +75,13 @@ Story videos (My Story answers and workshop clips) are automatically transcribed
 captions via Groq Whisper. Requires `GROQ_API_KEY` and ffmpeg (bundled via `ffmpeg-static` for local dev,
 installed in the production image).
 
+Craft location sharing defaults to off. The browser, place lookup, storage and public views use coordinates rounded to 0.1 degrees. Disabling sharing clears the location on save.
+
+Story uploads are saved without external transcription. GET /api/artisans/me/story/transcripts lists caption status for the maker's current recordings. POST to the same endpoint with `{ "sendAudioToGroq": true, "mediaIds": ["<uuid>"] }` to request English captions for the selected recordings. Audio extraction uses temporary storage.
+
 ### Verifiable Credentials
 
-- `GET /api/vc/:craftId` - Download signed credential JSON for a craft
+- `GET /api/vc/:craftId` - Download a signed credential for a published craft. For a private craft or removed maker, only the owner or a site administrator can download it.
 - `POST /api/vc/verify` - Verify a credential JSON
 - `GET /api/vc/signing-test` - Signing self-test endpoint (dev by default; production requires `VC_TEST_TOKEN` + `x-vc-test-token` header)
 

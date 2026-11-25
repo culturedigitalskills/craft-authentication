@@ -49,7 +49,12 @@ export function CoverPhotoUpload({
 
         try {
             const outcome = await uploadWithProgress(file, setProgress)
-            if (!outcome.ok) throw new Error(outcome.error || tui('uploadFailed'))
+            if (!outcome.ok) {
+                // Keep the server's actionable credential refusal. Other errors stay localized.
+                setError(outcome.status === 403 && outcome.error ? outcome.error : t('coverUploadFailed'))
+                setPreviewUrl(currentCoverUrl)
+                return
+            }
             const mediaFile = outcome.media
 
             if (artisanId) {

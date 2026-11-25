@@ -14,7 +14,17 @@ describe('Verifiable Credentials (VC) API Integration Tests', () => {
     let createdVc: any
     const testCraftId = `craft-${crypto.randomUUID()}`
 
+    const makerId = crypto.randomUUID()
     beforeAll(async () => {
+        await prisma.user.create({
+            data: {
+                id: makerId, name: 'VC test maker', email: makerId + '@example.invalid',
+                artisan: { create: {
+                    firstName: 'VC', lastName: 'Maker', slug: makerId,
+                    crafts: { create: { id: testCraftId, title: 'Handcrafted Mug', isPublic: true } },
+                } },
+            },
+        })
         // Generate a valid Verifiable Credential using our VC library
         createdVc = await generateCraftVC(
             testCraftId,
@@ -33,6 +43,7 @@ describe('Verifiable Credentials (VC) API Integration Tests', () => {
         await prisma.verifiableCredential.deleteMany({
             where: { credentialId }
         })
+        await prisma.user.deleteMany({ where: { id: makerId } })
     })
 
     it('should pass the self-signing test route', async () => {

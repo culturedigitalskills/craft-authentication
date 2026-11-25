@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
 import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 
@@ -21,6 +22,13 @@ export async function deleteMediaFile(id: string) {
     if (remainingRefs > 0) return
     const filmRefs = await prisma.storyFilm.count({ where: { outputMediaId: id } })
     if (filmRefs > 0) return
+    const [edition, draft] = await Promise.all([
+        prisma.storyPublication.findFirst({
+            where: { OR: [{ mediaIds: { has: id } }, { filmMediaId: id }] }, select: { storyId: true },
+        }),
+        prisma.craftStory.findFirst({ where: { OR: ANSWER_MEDIA_FIELDS.map(k => ({ [k]: id })) }, select: { id: true } }),
+    ])
+    if (edition || draft) return
 
     // Captioning stores the audio it extracted as its own MediaFile, linked from
     // the transcript rather than by an attachment. The transcript cascades away

@@ -1,5 +1,14 @@
 # Unreleased — language URLs, interface localization and verification
 
+## Craft location and external captions
+
+Deploy the Prisma migration with the app. Drain existing transcription workers before switching versions. Previously queued work requires a new maker request before the new worker will send audio. Existing transcripts remain readable. Existing coordinates are rounded on display and when resubmitted. The migration changes the default for new crafts and leaves historical values in storage. Review retention of historical coordinates and extracted audio with the University.
+
+## Artisan story editions and films
+
+Apply the Prisma migration `20261117000000_story_publication` and regenerate the client before starting the updated application. It snapshots existing published stories and featured films; private drafts and hidden films stay private. Existing films remain playable; regenerating applies the new voice-first timing and chapter markers. Film generation requires FFmpeg with libx264, drawtext and the project's Noto fonts. The server checks this on startup. No transcription key is required for rendering or for English captions entered by the maker.
+
+
 ## Additional interface languages
 
 Japanese (ja), French (fr), Italian (it) and Brazilian Portuguese (pt-BR) are now supported. Their URL prefixes are /ja, /fr, /it and /pt-BR. The owner selected Brazilian Portuguese; the selector explicitly labels it Português (Brasil). Editorial canonical/hreflang metadata and sitemap entries expand to these locales automatically.

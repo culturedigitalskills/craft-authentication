@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { redirect } from '@/i8n/navigation'
 import { CraftStoryWizard, type CraftStoryDraft } from '@/components/onboarding/CraftStoryWizard'
 import type { WorkshopMedia } from '@/components/onboarding/StoryWorkshopUpload'
-import { ANSWER_MEDIA_FIELDS } from '@/lib/validations/craftStory'
+import { ANSWER_MEDIA_FIELDS, readSceneSettings } from '@/lib/validations/craftStory'
 
 export default async function OnboardingStoryPage() {
     const session = await auth()
@@ -12,7 +12,7 @@ export default async function OnboardingStoryPage() {
 
     const artisan = await prisma.artisan.findUnique({
         where: { userId: session.user.id },
-        select: { id: true },
+        select: { id: true, slug: true },
     })
     if (!artisan) return redirect({ href: '/onboarding/artisan', locale: await getLocale() })
 
@@ -43,6 +43,7 @@ export default async function OnboardingStoryPage() {
         ? {
               id: story.id,
               status: story.status,
+              sceneSettings: readSceneSettings(story.sceneSettings),
               lastStepReached: story.lastStepReached,
               updatedAt: story.updatedAt.toISOString(),
               answerSelfText: story.answerSelfText,
@@ -78,6 +79,8 @@ export default async function OnboardingStoryPage() {
 
     return (
         <CraftStoryWizard
+            key={artisan.id + (initial?.updatedAt ?? ':new')}
+            ownerId={artisan.id} slug={artisan.slug}
             initialStory={initial}
             initialWorkshopMedia={workshopMedia}
             answerMediaMimeTypes={answerMediaMimeTypes}

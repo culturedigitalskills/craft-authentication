@@ -48,10 +48,8 @@ export function CraftStoryDisplay({
     if (!hasAny) return null
 
     return (
-        <section id="craft-story" className="scroll-mt-24">
-            <p className="sc-eyebrow mb-2">{t('publicHeading')}</p>
-            <h2 className="sc-h2 mb-8">{t('publicTitle')}</h2>
-
+        <section id="story-chapters" className="scroll-mt-24">
+            <h3 className="sc-h2 mb-6">{t('studio.chapters')}</h3>
             <div className="flex flex-col gap-10">
                 {ANSWER_KEYS.map((key, i) => {
                     const text = story[`answer${key}Text` as const]
@@ -100,7 +98,8 @@ export function CraftStoryDisplay({
                                     ) : (
                                         <audio
                                             src={`/api/media/${mediaId}`}
-                                            controls
+                                            aria-label={t(('step' + (i + 1) + '.title') as 'step1.title')}
+                                            preload="metadata" controls
                                             className="w-full"
                                         />
                                     )}
