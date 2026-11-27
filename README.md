@@ -79,6 +79,13 @@ Craft location sharing defaults to off. The browser, place lookup, storage and p
 
 Story uploads are saved without external transcription. GET /api/artisans/me/story/transcripts lists caption status for the maker's current recordings. POST to the same endpoint with `{ "sendAudioToGroq": true, "mediaIds": ["<uuid>"] }` to request English captions for the selected recordings. Audio extraction uses temporary storage.
 
+### Permanent account deletion
+
+Account settings offers reversible profile hiding and permanent deletion. Permanent deletion is self-service for active, hidden and profile-less accounts. Password users confirm their current password. Google-only users need a session established within the previous five minutes. The final site administrator must grant the role to another account first.
+
+- `DELETE /api/account` requires a same-origin authenticated request and a JSON body containing the current `accountId`, `confirmation: true` and the password for a password account. The account ID only confirms which signed-in account the user sees. Deletion removes hosted records in a transaction and queues immutable object keys for physical erasure. A response of 200 means complete and 202 means files remain queued.
+- `GET /api/account/erasure-status` returns `pending`, `complete` or `unavailable` using the temporary HttpOnly receipt cookie. The status contains no account or file identifiers.
+
 ### Verifiable Credentials
 
 - `GET /api/vc/:craftId` - Download a signed credential for a published craft. For a private craft or removed maker, only the owner or a site administrator can download it.

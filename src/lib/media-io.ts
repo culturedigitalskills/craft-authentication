@@ -2,8 +2,8 @@ import { randomUUID } from 'crypto'
 import fs from 'fs'
 import { pipeline } from 'stream/promises'
 import type { Readable } from 'stream'
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
-import { prisma } from '@/lib/prisma'
+import { GetObjectCommand } from '@aws-sdk/client-s3'
+import { storeNewMedia } from '@/lib/store-new-media'
 import s3Client, { BUCKET_NAME } from '@/lib/object-store'
 
 // Shared object-store <-> local-disk helpers used by the caption pipeline and
@@ -35,25 +35,9 @@ export async function createMediaFileFromBuffer(params: {
 }): Promise<{ id: string; objectKey: string }> {
     const id = randomUUID()
     const objectKey = `${id}.${params.extension}`
-    await s3Client.send(
-        new PutObjectCommand({
-            Bucket: BUCKET_NAME,
-            Key: objectKey,
-            Body: params.buffer,
-            ContentType: params.mimeType,
-        }),
-    )
-    await prisma.mediaFile.create({
-        data: {
-            id,
-            filename: objectKey,
-            originalName: params.originalName,
-            mimeType: params.mimeType,
-            size: params.buffer.byteLength,
-            bucket: BUCKET_NAME,
-            objectKey,
-            uploaderId: params.uploaderId ?? null,
-        },
-    })
+    await storeNewMedia({
+        id, filename: objectKey, originalName: params.originalName, mimeType: params.mimeType,
+        size: params.buffer.byteLength, bucket: BUCKET_NAME, objectKey, uploaderId: params.uploaderId ?? null,
+    }, params.buffer)
     return { id, objectKey }
 }

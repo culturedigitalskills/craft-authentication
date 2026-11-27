@@ -93,11 +93,11 @@ test('privacy choices govern location, credentials and external captions', async
         await page.locator('#isSharedLocation').uncheck()
         await page.goto('/privacy')
         await expect(
-            page.getByText(/project keeps the records so the profile can be restored/),
+            page.getByText(/retains the records so a site administrator can restore the profile/),
         ).toBeVisible()
         await page.goto('/terms')
         await expect(
-            page.getByText(/Removal keeps the profile, crafts and story available for restoration/),
+            page.getByText(/Hiding allows an administrator to restore the profile/),
         ).toBeVisible()
         await page.goto('/generation-workspace')
         await expect(

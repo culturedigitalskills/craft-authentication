@@ -6,7 +6,8 @@ import { auth } from '@/lib/auth'
 import { UserSecretsService } from '@/lib/user-secrets-service'
 import { C2PAService } from '@/lib/c2pa-service'
 import s3Client, { BUCKET_NAME, initGarage } from '@/lib/object-store'
-import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { storeNewMedia } from '@/lib/store-new-media'
+import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { randomUUID } from 'crypto'
 import fs from 'fs'
 import path from 'path'
@@ -372,30 +373,10 @@ async function runGenerationInBackground(eventId: string, userId: string) {
         }
 
         // 4. Save and Upload
-        const mediaFile = await prisma.$transaction(async (tx) => {
-            const createdFile = await tx.mediaFile.create({
-                data: {
-                    id: fileId,
-                    filename: objectKey,
-                    originalName: `openrouter-${Date.now()}${extension}`,
-                    mimeType,
-                    size: fileSize,
-                    bucket: BUCKET_NAME,
-                    objectKey,
-                    uploaderId: userId,
-                },
-            })
-
-            const putCommand = new PutObjectCommand({
-                Bucket: BUCKET_NAME,
-                Key: objectKey,
-                Body: uploadBuffer,
-                ContentType: mimeType,
-            })
-            await s3Client.send(putCommand)
-
-            return createdFile
-        })
+        const mediaFile = await storeNewMedia({
+            id: fileId, filename: objectKey, originalName: `openrouter-${Date.now()}${extension}`, mimeType,
+            size: fileSize, bucket: BUCKET_NAME, objectKey, uploaderId: userId,
+        }, uploadBuffer)
 
         // 5. Complete task
         await prisma.taskEvent.update({

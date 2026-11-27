@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client'
+import { lockAccounts } from '@/lib/account-erasure'
 import { prisma } from '@/lib/prisma'
 
 /**
@@ -20,20 +22,30 @@ export async function recordAdminAction(params: {
     entityType: 'Artisan' | 'User'
     entityId: string
     detail?: Record<string, unknown>
-}): Promise<void> {
-    try {
-        await prisma.adminAuditLog.create({
+}, transaction?: Prisma.TransactionClient): Promise<void> {
+    async function write(tx: Prisma.TransactionClient) {
+        if (!transaction) await lockAccounts(tx)
+        const actor = await tx.user.findUnique({ where: { id: params.actor.id }, select: { email: true } })
+        const subject = params.entityType === 'User'
+            ? await tx.user.count({ where: { id: params.entityId } })
+            : await tx.artisan.count({ where: { id: params.entityId } })
+        if (!actor || !subject) return
+        await tx.adminAuditLog.create({
             data: {
                 actorUserId: params.actor.id,
                 // Copied rather than joined, so the entry still names someone
                 // after that account is gone.
-                actorEmail: params.actor.email,
+                actorEmail: actor.email,
                 action: params.action,
                 entityType: params.entityType,
                 entityId: params.entityId,
                 detail: (params.detail ?? {}) as object,
             },
         })
+    }
+    if (transaction) return write(transaction)
+    try {
+        await prisma.$transaction(write)
     } catch (error) {
         console.error('Failed to record admin action', params.action, error)
     }

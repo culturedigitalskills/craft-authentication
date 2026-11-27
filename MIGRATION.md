@@ -1,3 +1,9 @@
+## Permanent account deletion
+
+Apply `20261125000000_account_erasure` and `20261125000100_track_inflight_erasure` and regenerate the Prisma client before starting the release. The app drains pending object removals on startup and each minute. A cleanup failure keeps the task queued. Monitor recurring cleanup errors and the oldest pending task. The worker uses the stored bucket and key. Keep historic buckets accessible to it. Uploads now bypass the Next image optimiser. If the deployment persists an older image-optimiser cache or uses a separate CDN, purge cached upload variants during rollout and configure the CDN to honour media revalidation.
+
+This clears the active service. Apply the University-approved backup expiry schedule, keep backup copies beyond ordinary use, and reconcile subsequent erasures before reopening a restored backup. The temporary receipt does not identify the account and cannot serve as a backup erasure ledger. Handle external-provider deletion and downloaded copies through the existing rights-request process.
+
 # Unreleased — language URLs, interface localization and verification
 
 ## Craft location and external captions
